@@ -1,0 +1,272 @@
+[
+  {
+    "name": "方片A",
+    "suit": 1,
+    "point": 1
+  },
+  {
+    "name": "梅花A",
+    "suit": 2,
+    "point": 1
+  },
+  {
+    "name": "红桃A",
+    "suit": 3,
+    "point": 1
+  },
+  {
+    "name": "黑桃A",
+    "suit": 4,
+    "point": 1
+  },
+  {
+    "name": "方片2",
+    "suit": 1,
+    "point": 2
+  },
+  {
+    "name": "梅花2",
+    "suit": 2,
+    "point": 2
+  },
+  {
+    "name": "红桃2",
+    "suit": 3,
+    "point": 2
+  },
+  {
+    "name": "黑桃2",
+    "suit": 4,
+    "point": 2
+  },
+  {
+    "name": "方片3",
+    "suit": 1,
+    "point": 3
+  },
+  {
+    "name": "梅花3",
+    "suit": 2,
+    "point": 3
+  },
+  {
+    "name": "红桃3",
+    "suit": 3,
+    "point": 3
+  },
+  {
+    "name": "黑桃3",
+    "suit": 4,
+    "point": 3
+  },
+  {
+    "name": "方片4",
+    "suit": 1,
+    "point": 4
+  },
+  {
+    "name": "梅花4",
+    "suit": 2,
+    "point": 4
+  },
+  {
+    "name": "红桃4",
+    "suit": 3,
+    "point": 4
+  },
+  {
+    "name": "黑桃4",
+    "suit": 4,
+    "point": 4
+  },
+  {
+    "name": "方片5",
+    "suit": 1,
+    "point": 5
+  },
+  {
+    "name": "梅花5",
+    "suit": 2,
+    "point": 5
+  },
+  {
+    "name": "红桃5",
+    "suit": 3,
+    "point": 5
+  },
+  {
+    "name": "黑桃5",
+    "suit": 4,
+    "point": 5
+  },
+  {
+    "name": "方片6",
+    "suit": 1,
+    "point": 6
+  },
+  {
+    "name": "梅花6",
+    "suit": 2,
+    "point": 6
+  },
+  {
+    "name": "红桃6",
+    "suit": 3,
+    "point": 6
+  },
+  {
+    "name": "黑桃6",
+    "suit": 4,
+    "point": 6
+  },
+  {
+    "name": "方片7",
+    "suit": 1,
+    "point": 7
+  },
+  {
+    "name": "梅花7",
+    "suit": 2,
+    "point": 7
+  },
+  {
+    "name": "红桃7",
+    "suit": 3,
+    "point": 7
+  },
+  {
+    "name": "黑桃7",
+    "suit": 4,
+    "point": 7
+  },
+  {
+    "name": "方片8",
+    "suit": 1,
+    "point": 8
+  },
+  {
+    "name": "梅花8",
+    "suit": 2,
+    "point": 8
+  },
+  {
+    "name": "红桃8",
+    "suit": 3,
+    "point": 8
+  },
+  {
+    "name": "黑桃8",
+    "suit": 4,
+    "point": 8
+  },
+  {
+    "name": "方片9",
+    "suit": 1,
+    "point": 9
+  },
+  {
+    "name": "梅花9",
+    "suit": 2,
+    "point": 9
+  },
+  {
+    "name": "梅花9",
+    "suit": 2,
+    "point": 9
+  },
+  {
+    "name": "红桃9",
+    "suit": 3,
+    "point": 9
+  },
+  {
+    "name": "方片10",
+    "suit": 1,
+    "point": 10
+  },
+  {
+    "name": "梅花10",
+    "suit": 2,
+    "point": 10
+  },
+  {
+    "name": "红桃10",
+    "suit": 3,
+    "point": 10
+  },
+  {
+    "name": "黑桃10",
+    "suit": 4,
+    "point": 10
+  },
+  {
+    "name": "方片J",
+    "suit": 1,
+    "point": 11
+  },
+  {
+    "name": "梅花J",
+    "suit": 2,
+    "point": 11
+  },
+  {
+    "name": "红桃J",
+    "suit": 3,
+    "point": 11
+  },
+  {
+    "name": "黑桃J",
+    "suit": 4,
+    "point": 11
+  },
+  {
+    "name": "方片Q",
+    "suit": 1,
+    "point": 12
+  },
+  {
+    "name": "梅花Q",
+    "suit": 2,
+    "point": 12
+  },
+  {
+    "name": "红桃Q",
+    "suit": 3,
+    "point": 12
+  },
+  {
+    "name": "黑桃Q",
+    "suit": 4,
+    "point": 12
+  },
+  {
+    "name": "方片K",
+    "suit": 1,
+    "point": 13
+  },
+  {
+    "name": "梅花K",
+    "suit": 2,
+    "point": 13
+  },
+  {
+    "name": "红桃K",
+    "suit": 3,
+    "point": 13
+  },
+  {
+    "name": "黑桃K",
+    "suit": 4,
+    "point": 13
+  },
+  {
+    "name": "小王",
+    "suit": 5,
+    "point": 20
+  },
+  {
+    "name": "大王",
+    "suit": 5,
+    "point": 21
+  }
+]
