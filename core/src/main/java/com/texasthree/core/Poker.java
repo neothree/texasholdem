@@ -321,9 +321,10 @@ public class Poker {
     private static Hand findFullHouse(Profile p) {
         List<List<Card>> three = p.pointCountMap.get(3);
         List<List<Card>> two = p.pointCountMap.get(2);
-        if (three == null || two == null) {
+        if (three == null || (three.size() == 1 && two == null)) {
             return null;
         }
+
 
         // 找出三张
         sortList(three, false);
@@ -333,12 +334,12 @@ public class Poker {
         // 找出两张
         if (three.size() == 2) {
             list.addAll(three.get(1).subList(0, 2));
-        } else if (three.size() == 1 && two != null) {
+        } else {
             sortList(two, false);
             list.addAll(two.get(0));
         }
 
-        return !list.isEmpty() ? new Hand(list, CardType.FullHouse) : null;
+        return new Hand(list, CardType.FullHouse);
     }
 
     /**
@@ -468,15 +469,26 @@ public class Poker {
         return 0;
     }
 
+
+    private static Integer findSamePoint(List<Card> a) {
+        for (int i = 0; i < a.size() - 1; i++) {
+            if (a.get(i).point.equals(a.get(i + 1).point)) {
+                return a.get(i).point;
+            }
+        }
+        return null;
+
+    }
+
     /**
      * 一对比较
      */
     private static int compreOnePair(List<Card> a, List<Card> b) {
-        Profile ap = new Profile(a);
-        Profile bp = new Profile(b);
-        if (ap.pointCountMap.get(2).get(0).get(0).point > bp.pointCountMap.get(2).get(0).get(0).point) {
+        Integer ap = findSamePoint(a);
+        Integer bp = findSamePoint(b);
+        if (ap > bp) {
             return 1;
-        } else if (ap.pointCountMap.get(2).get(0).get(0).point < bp.pointCountMap.get(2).get(0).get(0).point) {
+        } else if (ap < bp) {
             return -1;
         }
         return compareHighCard(a, b);
