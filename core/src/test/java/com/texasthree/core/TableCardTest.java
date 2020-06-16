@@ -2,7 +2,9 @@ package com.texasthree.core;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 import static org.junit.Assert.assertEquals;
@@ -23,6 +25,8 @@ public class TableCardTest {
     @Test
     public void testGetInstance() throws Exception {
         List<Card> pair = TableCard.getInstance().shuffle();
-        assertEquals(54, pair.size());
+        Set<Integer> set = new HashSet<>();
+        pair.forEach(v -> set.add(v.getId()));
+        assertEquals(54, set.size());
     }
 }

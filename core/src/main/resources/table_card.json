@@ -150,13 +150,13 @@
     "point": 9
   },
   {
-    "name": "梅花9",
-    "suit": 2,
+    "name": "红桃9",
+    "suit": 3,
     "point": 9
   },
   {
-    "name": "红桃9",
-    "suit": 3,
+    "name": "黑桃9",
+    "suit": 4,
     "point": 9
   },
   {

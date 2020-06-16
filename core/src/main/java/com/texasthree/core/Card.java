@@ -48,4 +48,8 @@ public class Card implements Comparable<Card> {
     public int compareTo(Card other) {
         return this.point.compareTo(other.point);
     }
+
+    public int getId() {
+        return point * 10 + suit;
+    }
 }

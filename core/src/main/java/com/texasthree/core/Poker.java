@@ -1,5 +1,7 @@
 package com.texasthree.core;
 
+import com.alibaba.fastjson.JSONObject;
+
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -18,11 +20,17 @@ class Profile {
 
     public int min = 2;
 
-    public Profile(List<Card> list) {
+    public Profile(List<Card> list, int min) {
         this.list = list;
         this.pointMap = this.toPointMap(list);
         this.pointCountMap = this.toPointCountMap(this.pointMap);
         this.suitMap = this.toSuitMap(list);
+        this.min = min;
+
+    }
+
+    public Profile(List<Card> list) {
+        this(list, 2);
     }
 
     private Map<Integer, List<Card>> toPointMap(List<Card> list) {
@@ -64,12 +72,13 @@ class Profile {
 
 public class Poker {
 
+    public static int MIN_POINT = 2;
 
     /**
      * 计算牌型
      */
     public static Hand typeOf(List<Card> list) {
-        return typeOf(list, 2);
+        return typeOf(list, MIN_POINT);
     }
 
     /**
@@ -78,7 +87,7 @@ public class Poker {
     public static Hand typeOf(List<Card> list, int min) {
         // 从小到大排列
         sort(list, true);
-        Profile profile = new Profile(list);
+        Profile profile = new Profile(list, min);
 
         // 金刚
         Hand hand = findFourOfKind(profile);
@@ -98,7 +107,7 @@ public class Poker {
             return hand;
         }
 
-        if (min == 2) {
+        if (min == MIN_POINT) {
             // 葫芦大于同花
             hand = findFullHouse(profile);
             if (hand != null) {
@@ -123,7 +132,7 @@ public class Poker {
         }
 
         // 顺子
-        hand = findStraight(profile);
+        hand = findStraight(profile.list, profile.min);
         if (hand != null) {
             return hand;
         }
@@ -146,18 +155,18 @@ public class Poker {
             return hand;
         }
 
-        return findHighCard(profile);
+        return findHighCard(profile.list);
     }
 
     /**
      * 比较手牌a, b的大小
      */
     public static int compare(Hand a, Hand b) {
-        return compare(a, b, 2);
+        return compare(a, b, MIN_POINT);
     }
 
     public static int compare(Hand a, Hand b, int min) {
-        if (min != 2) {
+        if (min != MIN_POINT) {
             if (CardType.Flush.equals(a.getType()) && CardType.FullHouse.equals(b.getType())) {
                 return 1;
             }
@@ -176,18 +185,18 @@ public class Poker {
         switch (b.getType()) {
             case HighCard:
             case Flush:
-                return compareHighCard(a.getList(), b.getList());
+                return compareHighCard(a.getBest(), b.getBest());
             case OnePair:
             case ThreeOfKind:
             case FourOfKind:
-                return compreOnePair(a.getList(), b.getList());
+                return compreOnePair(a.getBest(), b.getBest());
             case TwoPairs:
-                return compareTwoPairs(a.getList(), b.getList());
+                return compareTwoPairs(a.getBest(), b.getBest());
             case Straight:
             case StraightFlush:
-                return compareStraight(a.getList(), b.getList(), min);
+                return compareStraight(a.getBest(), b.getBest(), min);
             case FullHouse:
-                return compareFullHouse(a.getList(), b.getList());
+                return compareFullHouse(a.getBest(), b.getBest());
             default:
                 return 0;
         }
@@ -222,18 +231,18 @@ public class Poker {
     /**
      * 顺子
      */
-    private static Hand findStraight(Profile p) {
-        if (p.list.size() < 5) {
+    private static Hand findStraight(List<Card> list, int min) {
+        if (list.size() < 5) {
             return null;
         }
 
-        List<Card> list = p.list.stream().filter(distinctByKey(v -> v.point)).collect(Collectors.toList());
+        list = list.stream().filter(distinctByKey(v -> v.point)).collect(Collectors.toList());
         if (list.size() < 5) {
             return null;
         }
 
         sort(list, true);
-        for (int last = list.size(); last >= 5; last--) {
+        for (int last = list.size() - 1; last >= 4; last--) {
             boolean find = true;
             for (int i = last; i >= last - 3; i--) {
                 if (list.get(i).point - list.get(i - 1).point != 1) {
@@ -241,25 +250,24 @@ public class Poker {
                 }
             }
             if (find) {
-                return new Hand(list.subList(last - 4, last), CardType.Straight);
+                return new Hand(list.subList(last - 4, last + 1), CardType.Straight);
             }
         }
 
         // A 2 3 4 5 也是顺子
-        if (list.get(list.size()).point == 14
-                && list.get(0).point == p.min
-                && list.get(0).point == p.min + 1
-                && list.get(0).point == p.min + 2
-                && list.get(0).point == p.min + 3) {
-            List<Card> straight = list.subList(0, 4);
-            straight.add(list.get(list.size()));
-            return new Hand(straight, CardType.Straight);
+        if (list.get(list.size() - 1).point == 14
+                && list.get(0).point == min
+                && list.get(1).point == min + 1
+                && list.get(2).point == min + 2
+                && list.get(3).point == min + 3) {
+            List<Card> find = list.subList(0, 4);
+            find.add(list.get(list.size() - 1));
+            return new Hand(find, CardType.Straight);
         }
         return null;
     }
 
     private static Hand findFlush(Profile p, CardType type) {
-
         Hand ret = null;
         for (Integer suit : p.suitMap.keySet()) {
             List<Card> v = p.suitMap.get(suit);
@@ -269,16 +277,16 @@ public class Poker {
 
             // 同花
             if (CardType.Flush.equals(type)) {
-                Hand other = new Hand(v.size() == 5 ? v : findHighCard(p).getList(), type);
+                Hand other = new Hand(v.size() == 5 ? v : findHighCard(v).getBest(), type);
                 if (ret == null || other.compareTo(ret) == 1) {
                     ret = other;
                 }
             } else {
-                Hand straight = findStraight(p);
+                Hand straight = findStraight(v, p.min);
                 if (straight != null
-                        && (CardType.RoyalFlush.equals(type) && straight.getList().get(4).point == 14 && straight.getList().get(0).point == 10 || CardType.StraightFlush.equals(type))
+                        && ((CardType.RoyalFlush.equals(type) && straight.getBest().get(4).point == 14 && straight.getBest().get(0).point == 10) || CardType.StraightFlush.equals(type))
                         && (ret == null || compare(straight, ret) == 1)) {
-                    ret = new Hand(straight.getList(), type);
+                    ret = new Hand(straight.getBest(), type);
                 }
             }
         }
@@ -312,7 +320,8 @@ public class Poker {
      */
     private static Hand findFullHouse(Profile p) {
         List<List<Card>> three = p.pointCountMap.get(3);
-        if (three == null) {
+        List<List<Card>> two = p.pointCountMap.get(2);
+        if (three == null || two == null) {
             return null;
         }
 
@@ -322,13 +331,13 @@ public class Poker {
         list.addAll(three.get(0));
 
         // 找出两张
-        List<List<Card>> two = p.pointCountMap.get(2);
         if (three.size() == 2) {
             list.addAll(three.get(1).subList(0, 2));
         } else if (three.size() == 1 && two != null) {
             sortList(two, false);
             list.addAll(two.get(0));
         }
+
         return !list.isEmpty() ? new Hand(list, CardType.FullHouse) : null;
     }
 
@@ -425,10 +434,10 @@ public class Poker {
     /**
      * 寻找高牌
      */
-    private static Hand findHighCard(Profile p) {
-        List<Card> find = p.list.stream().filter(distinctByKey(v -> v.point)).collect(Collectors.toList());
-        sort(find, true);
-        return new Hand(find.size() >= 5 ? p.list.subList(0, 5) : find, CardType.HighCard);
+    private static Hand findHighCard(List<Card> list) {
+        List<Card> find = list.stream().filter(distinctByKey(v -> v.point)).collect(Collectors.toList());
+        sort(find, false);
+        return new Hand(find.size() >= 5 ? find.subList(0, 5) : find, CardType.HighCard);
     }
 
     private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {

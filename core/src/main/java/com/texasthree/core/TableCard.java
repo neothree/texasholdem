@@ -39,7 +39,7 @@ public class TableCard {
             JSONArray array = JSONArray.parseArray(sb.toString());
             for (int i = 0; i < array.size(); i++) {
                 JSONObject obj = array.getJSONObject(i);
-                all.add(new Card(obj.getString("name"), obj.getInteger("point"), obj.getInteger("point")));
+                all.add(new Card(obj.getString("name"), obj.getInteger("point"), obj.getInteger("suit")));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -56,5 +56,13 @@ public class TableCard {
         return pair;
     }
 
+    public Card getCardById(int id) {
+        for (Card v : all) {
+            if (v.getId() == id) {
+                return v;
+            }
+        }
+        return null;
+    }
 
 }
