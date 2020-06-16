@@ -1,7 +1,6 @@
 package com.texasthree.core;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -11,7 +10,7 @@ public class Hand implements Comparable<Hand> {
     /**
      * 手里的两张牌
      */
-    private List<Card> two;
+    private List<Card> list;
     /**
      * 牌型
      */
@@ -29,16 +28,22 @@ public class Hand implements Comparable<Hand> {
      */
     private List<Card> bottom;
 
-    public Hand(List<Card> two) {
-        this.two = two;
+    public Hand(List<Card> list) {
+        this.list = list;
+    }
+
+    public Hand(List<Card> list, CardType type) {
+        this.list = list;
+        this.type = type;
+
     }
 
     public void fresh(List<Card> bottom) {
         this.bottom = bottom;
         List<Card> list = new ArrayList<>();
-        list.addAll(two);
+        list.addAll(this.list);
         list.addAll(this.bottom);
-        Hand hand = Poker.Best(list);
+        Hand hand = Poker.typeOf(list);
         this.type = hand.type;
         this.best = hand.best;
         this.key = hand.key;
@@ -47,5 +52,25 @@ public class Hand implements Comparable<Hand> {
     @Override
     public int compareTo(Hand other) {
         return Poker.compare(this, other);
+    }
+
+    public List<Card> getList() {
+        return list;
+    }
+
+    public CardType getType() {
+        return type;
+    }
+
+    public List<Card> getBest() {
+        return best;
+    }
+
+    public List<Card> getKey() {
+        return key;
+    }
+
+    public List<Card> getBottom() {
+        return bottom;
     }
 }

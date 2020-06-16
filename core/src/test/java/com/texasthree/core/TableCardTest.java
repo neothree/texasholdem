@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static com.texasthree.core.TableCard.getInstance;
+
 import static org.junit.Assert.assertEquals;
 
 

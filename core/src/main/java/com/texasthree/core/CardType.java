@@ -48,9 +48,13 @@ public enum CardType {
      */
     Max(1110);
 
-    private int weight;
+    private Integer weight;
 
-    private CardType(int weight) {
+    private CardType(Integer weight) {
         this.weight = weight;
+    }
+
+    public Integer getWeight() {
+        return weight;
     }
 }

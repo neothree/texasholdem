@@ -1,25 +1,5 @@
 [
   {
-    "name": "方片A",
-    "suit": 1,
-    "point": 1
-  },
-  {
-    "name": "梅花A",
-    "suit": 2,
-    "point": 1
-  },
-  {
-    "name": "红桃A",
-    "suit": 3,
-    "point": 1
-  },
-  {
-    "name": "黑桃A",
-    "suit": 4,
-    "point": 1
-  },
-  {
     "name": "方片2",
     "suit": 1,
     "point": 2
@@ -258,6 +238,26 @@
     "name": "黑桃K",
     "suit": 4,
     "point": 13
+  },
+  {
+    "name": "方片A",
+    "suit": 1,
+    "point": 14
+  },
+  {
+    "name": "梅花A",
+    "suit": 2,
+    "point": 14
+  },
+  {
+    "name": "红桃A",
+    "suit": 3,
+    "point": 14
+  },
+  {
+    "name": "黑桃A",
+    "suit": 4,
+    "point": 14
   },
   {
     "name": "小王",

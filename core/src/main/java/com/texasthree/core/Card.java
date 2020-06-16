@@ -1,6 +1,8 @@
 package com.texasthree.core;
 
-public class Card {
+import java.util.Comparator;
+
+public class Card implements Comparable<Card> {
     /**
      * 黑桃
      */
@@ -40,5 +42,10 @@ public class Card {
     @Override
     public String toString() {
         return name;
+    }
+
+    @Override
+    public int compareTo(Card other) {
+        return this.point.compareTo(other.point);
     }
 }
