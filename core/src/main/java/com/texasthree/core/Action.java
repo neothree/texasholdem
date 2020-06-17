@@ -1,15 +1,27 @@
 package com.texasthree.core;
 
 public class Action {
-    private int chipsBet;
 
-    private Optype op;
+    public int id;
+
+    public Optype op;
+
+    public final int chipsBet;
+    public final int chipsAdd;
+    public final int chipsLeft;
+    public final int sumPot;
 
     public Action(Optype op) {
-        this.op = op;
+        this(-1, op, 0, 0, 0, 0);
     }
 
-    public int getChipsBet() {
-        return chipsBet;
+    public Action(int id, Optype op, int chipsBet, int chipsAdd, int chipsLeft, int sumPot) {
+        this.id = id;
+        this.op = op;
+        this.chipsBet = chipsBet;
+        this.chipsAdd = chipsAdd;
+        this.chipsLeft = chipsLeft;
+        this.sumPot = sumPot;
     }
+
 }

@@ -20,8 +20,6 @@ public class Texas {
 
     private List<Card> leftCard;
 
-    private Map<String, Integer> playing = new HashMap<>();
-
     private Map<Law, Integer> laws;
 
     private Ring<Player> ring;
@@ -50,7 +48,7 @@ public class Texas {
 
         if (this.smallBlind() > 0) {
             this.actionBlind();
-        } else if (this.ante() > 0 && this.playing.containsKey(Law.DoubleAnte.name())) {
+        } else if (this.ante() > 0 && this.laws.containsKey(Law.DoubleAnte)) {
             this.actionDealerAnte();
         }
 
@@ -69,7 +67,7 @@ public class Texas {
             return null;
         }
 
-        this.pot.action();
+        this.pot.action(this.opPlayer(), action);
 
         Move move = this.turn();
 
@@ -99,7 +97,7 @@ public class Texas {
             } else if (this.preflopOnceAction(standard, opNext)) {
                 Player player = this.nextOpPlayer(opNext.getId());
                 Action action = this.pot.getAction(player.getId());
-                this.pot.setStandardInfo(action.getChipsBet(), player.getId());
+                this.pot.setStandardInfo(action.chipsBet, player.getId());
             } else {
                 move = Move.CircleEnd;
             }
@@ -132,10 +130,10 @@ public class Texas {
 
         // 2. 第一圈, 没有小盲, 开始全跟注/或, 轮到庄家, 庄家还有一次说话机会
         if (this.smallBlind() == 0 && this.dealer() == opNext) {
-            if (this.playing.containsKey(Law.DoubleAnte.name()) && standard == this.ante()) {
+            if (this.laws.containsKey(Law.DoubleAnte) && standard == this.ante()) {
                 return true;
             }
-            if (!this.playing.containsKey(Law.DoubleAnte.name()) && standard == 0) {
+            if (!this.laws.containsKey(Law.DoubleAnte) && standard == 0) {
                 return true;
             }
         }
@@ -264,7 +262,7 @@ public class Texas {
 
     private boolean straddleEnable() {
         // 必须三个玩家以上触发
-        return this.playing.containsKey(Law.Straddle.name()) && this.playerNum > 3;
+        return this.laws.containsKey(Law.Straddle) && this.playerNum > 3;
     }
 
     private Player opPlayer() {

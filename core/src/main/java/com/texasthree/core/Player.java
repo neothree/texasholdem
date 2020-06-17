@@ -30,4 +30,8 @@ public class Player {
 
     public void leave() {
     }
+
+    public void changeChips(int change) {
+
+    }
 }

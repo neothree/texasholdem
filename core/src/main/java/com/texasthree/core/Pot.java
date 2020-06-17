@@ -1,5 +1,6 @@
 package com.texasthree.core;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -10,17 +11,30 @@ public class Pot {
 
     private final int smallBind;
 
-    private final int ante ;
+    private final int ante;
 
-    private final int payerNum ;
+    private final int payerNum;
 
     private int amplitude;
 
-    private Set<Integer> allin = new HashSet();
+    private Integer lastBetOrRaise;
 
-    private Set<Integer> fold = new HashSet();
+    private Integer legalRaiseId;
 
-    public Pot(int playerNum, int smallBind, int ante) {
+    private Set<Integer> allin = new HashSet<>();
+
+    private Set<Integer> fold = new HashSet<>();
+
+    private Set<Integer> flopRaise = new HashSet<>();
+
+    private List<CircleRecord> records = new ArrayList<>();
+
+    private CircleRecord going;
+
+    private Action standardAct;
+
+
+    Pot(int playerNum, int smallBind, int ante) {
         this.smallBind = smallBind;
         this.ante = ante;
         this.payerNum = playerNum;
@@ -30,7 +44,7 @@ public class Pot {
     /**
      * 一圈开始
      */
-    public void circleStart() {
+    void circleStart() {
         if (Circle.River.equals(circle)) {
             return;
         }
@@ -39,76 +53,106 @@ public class Pot {
         this.circle = nextCircle(circle);
 
         if (smallBind > 0) {
-            this.amplitude = this.smallBind*2;
+            this.amplitude = this.smallBind * 2;
         } else {
-            this.amplitude = this.ante*2;
+            this.amplitude = this.ante * 2;
         }
 
-
-
-//        -- 记录一圈刚开始时的数据
-//        local info = {
-//                circle = self.circle,
-//                sumPot = self:SumChips(),
-//                board = nil,
-//                num = self:NotFoldNum(),
-//                actList = {},
-//    }
-//        self.record[self.circle] = info
-
+        this.going = new CircleRecord(this.circle, this.sumPot(), this.notFoldNum());
     }
 
-    public void circleEnd(List<Card> board) {
-
+    /**
+     * 一圈结束
+     */
+    void circleEnd(List<Card> board) {
+        // TODO 分池
+        this.going.board = board;
+        this.records.add(this.going);
+        this.lastBetOrRaise = this.getStandardId();
+        this.standardAct = null;
     }
 
-    public void action() {
+    void action(Player player, Action action) {
+        Action act = this.parseAction(player, action);
+        if (act.chipsAdd > 0) {
+            player.changeChips(-act.chipsAdd);
+            if (player.getChips() <= 0) {
+                action.op = Optype.Allin;
+            }
+        }
+        this.going.actions.add(act);
 
+        int ampl = act.chipsBet - this.getStandard();
+        if (this.standardAct == null || ampl > 0) {
+            // 每轮刚开始 standardAct 为 nil, 有人押注后直接为 standardAct
+            this.standardAct = act;
+            // 翻牌前有加注
+            if (Circle.Preflop.equals(circle)) {
+                this.flopRaise.add(player.getId());
+            }
+            // 加注增幅
+            if (ampl >= this.amplitude) {
+                this.amplitude = ampl;
+                this.legalRaiseId = player.getId();
+            }
+        }
+
+        // 记录 弃牌 和 allin
+        if (Optype.Fold.equals(act.op)) {
+            this.fold.add(player.getId());
+        } else if (Optype.Allin.equals(act.op)) {
+            this.allin.add(player.getId());
+        }
     }
 
-    public Action getAction(int id) {
+    int sumPot() {
+        return -1;
+    }
+
+    Action getAction(int id) {
         return null;
     }
 
 
-    public int getStandard() {
-        return 0;
+    int getStandard() {
+        return this.standardAct != null ? standardAct.chipsBet : 0;
     }
 
-    public int getStandardId() {
-        return -1;
+    Integer getStandardId() {
+        return this.standardAct != null ? standardAct.id : 0;
     }
 
-    public void setStandardInfo(int chips, int id) {
-    }
-
-
-    public void showdown() {
-
+    void setStandardInfo(int chips, int id) {
+        this.standardAct = new Action(id, null, chips, 0, 0, 0);
     }
 
 
-    public int allinNum() {
+    void showdown() {
+
+    }
+
+
+    int allinNum() {
         return this.allin.size();
     }
 
-    public int foldNum() {
+    int foldNum() {
         return this.fold.size();
     }
 
-    public int notFoldNum() {
+    int notFoldNum() {
         return this.payerNum - foldNum();
     }
 
-    public boolean isFold(int i) {
+    boolean isFold(int i) {
         return fold.contains(i);
     }
 
-    public boolean isAllin(int i) {
+    boolean isAllin(int i) {
         return allin.contains(i);
     }
 
-    public Circle circle() {
+    Circle circle() {
         return circle;
     }
 
@@ -121,8 +165,42 @@ public class Pot {
             return Circle.River;
         } else {
             return Circle.Preflop;
-
         }
+    }
+
+    /**
+     * 将action中的数据补充完整
+     */
+    private Action parseAction(Player player, Action action) {
+        int chipsBetOld = this.chipsThisCircle(player.getId());
+        int chipsBet = chipsBetOld;
+        int chipsLeft = player.getChips();
+        if (Optype.Raise.equals(action.op) || Optype.DealerAnte.equals(action.op)) {
+            chipsBet = chipsBetOld + action.chipsAdd;
+        } else if (Optype.Allin.equals(action.op)) {
+            chipsBet = chipsBetOld + chipsLeft;
+        } else if (Optype.Call.equals(action.op)) {
+            chipsBet = this.getStandard();
+        }
+        int chipsAdd = chipsBet - chipsBetOld;
+        if (chipsAdd > player.getChips()) {
+            return null;
+        }
+        return new Action(player.getId(), action.op, chipsBet, chipsAdd, chipsLeft, this.sumPot());
+
+    }
+
+    /**
+     * 这一圈的押注数
+     */
+    private int chipsThisCircle(int id) {
+        for (int i = this.going.actions.size() - 1; i > 0; i--) {
+            Action act = this.going.actions.get(i);
+            if (act.id == id) {
+                return act.chipsBet;
+            }
+        }
+        return 0;
     }
 }
 
