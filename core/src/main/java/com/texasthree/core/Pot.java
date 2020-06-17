@@ -1,9 +1,6 @@
 package com.texasthree.core;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Pot {
 
@@ -33,6 +30,9 @@ public class Pot {
 
     private Action standardAct;
 
+    private Map<Integer, Integer> anteBet = new HashMap<>();
+
+    private List<Integer> devide;
 
     Pot(int playerNum, int smallBind, int ante) {
         this.smallBind = smallBind;
@@ -131,6 +131,53 @@ public class Pot {
 
     }
 
+    void actionBlind(Player sb, Player bb) {
+        // 小盲注
+        int chipsBet = sb.getChips() > this.smallBind ? this.smallBind : sb.getChips();
+        sb.changeChips(-chipsBet);
+        Action actSb = new Action(sb.getId(), Optype.SmallBlind, chipsBet, chipsBet, sb.getChips(), 0);
+        this.going.actions.add(actSb);
+        if (sb.getChips() == 0) {
+            this.allin.add(sb.getId());
+        }
+
+        // 大盲注
+        chipsBet = bb.getChips() > this.smallBind * 2 ? this.smallBind * 2 : bb.getChips();
+        bb.changeChips(-chipsBet);
+        Action actBb = new Action(bb.getId(), Optype.BigBlind, chipsBet, chipsBet, bb.getChips(), 0);
+        this.going.actions.add(actBb);
+        if (bb.getChips() == 0) {
+            this.allin.add(bb.getId());
+        }
+
+        if (actBb.chipsBet > actSb.chipsBet) {
+            this.standardAct = actBb;
+            this.legalRaiseId = actBb.id;
+        }  else {
+            this.standardAct = actSb;
+            this.legalRaiseId = actSb.id;
+        }
+    }
+
+    void actionAnte(Ring<Player> ring, int ante) {
+        for (int i = 0; i < ring.size();i ++) {
+            Player player = ring.value;
+            if (player.getChips() >= ante) {
+                this.anteBet.put(player.getId(), ante);
+            } else {
+                this.anteBet.put(player.getId(), player.getChips());
+                this.allin.add(player.getId());
+            }
+            player.changeChips(this.anteBet.get(player.getId()));
+        }
+
+        // 分池
+        this.devide = this.makeDevide();
+    }
+
+    private List<Integer> makeDevide() {
+        return null;
+    }
 
     int allinNum() {
         return this.allin.size();
@@ -193,7 +240,7 @@ public class Pot {
     /**
      * 这一圈的押注数
      */
-    private int chipsThisCircle(int id) {
+    int chipsThisCircle(int id) {
         for (int i = this.going.actions.size() - 1; i > 0; i--) {
             Action act = this.going.actions.get(i);
             if (act.id == id) {

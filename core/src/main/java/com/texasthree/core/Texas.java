@@ -35,7 +35,7 @@ public class Texas {
      * 开始
      */
     public Move start() {
-        this.pot = new Pot(this.smallBlind(), this.ante(), ring.size());
+        this.pot = new Pot(ring.size(), this.smallBlind(), this.ante());
 
         // 一圈开始
         this.circleStart();
@@ -161,7 +161,7 @@ public class Texas {
     }
 
     private int chipsThisCircle(int id) {
-        return 0;
+        return this.pot.chipsThisCircle(id);
     }
 
     private int leaveOrFoldNum() {
@@ -173,14 +173,14 @@ public class Texas {
      * 前注
      */
     private void actionAnte() {
-
+        this.pot.actionAnte(this.ring, this.ante());
     }
 
     /**
      * 盲注
      */
     private void actionBlind() {
-
+        this.pot.actionBlind(this.sbPlayer(), this.bbPlayer());
     }
 
     private Move actionStraddle() {
@@ -297,11 +297,11 @@ public class Texas {
         return null;
     }
 
-    private int smallBlind() {
+    public int smallBlind() {
         return this.laws.getOrDefault(Law.SmallBlind, 0);
     }
 
-    private int ante() {
+    public int ante() {
         return this.laws.getOrDefault(Law.Ante, 0);
     }
 
@@ -311,12 +311,12 @@ public class Texas {
     }
 
     public Player sbPlayer() {
-        Integer id = this.laws.get(Law.Dealer);
+        Integer id = this.laws.get(Law.SB);
         return this.getPlayer(v -> v.getId() == id);
     }
 
     public Player bbPlayer() {
-        Integer id = this.laws.get(Law.Dealer);
+        Integer id = this.laws.get(Law.BB);
         return this.getPlayer(v -> v.getId() == id);
     }
 

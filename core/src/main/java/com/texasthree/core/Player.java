@@ -29,9 +29,10 @@ public class Player {
     }
 
     public void leave() {
+        leave = true;
     }
 
     public void changeChips(int change) {
-
+        this.chips += change;
     }
 }
