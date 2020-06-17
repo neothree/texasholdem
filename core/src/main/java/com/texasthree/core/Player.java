@@ -6,13 +6,14 @@ public class Player {
 
     private int chips;
 
-    private Boolean leave;
+    private boolean leave;
 
     private Hand hand;
 
-    public Player(int id, int chips) {
+    public Player(int id, int chips, Hand hand) {
         this.id = id;
         this.chips = chips;
+        this.hand = hand;
     }
 
     public int getId() {
@@ -23,7 +24,7 @@ public class Player {
         return chips;
     }
 
-    public Boolean getLeave() {
+    public Boolean isLeave() {
         return leave;
     }
 

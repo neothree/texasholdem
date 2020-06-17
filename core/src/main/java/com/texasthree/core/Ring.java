@@ -1,22 +1,21 @@
 package com.texasthree.core;
 
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class Ring<T> {
     private Ring<T> next;
     private Ring<T> prev;
 
-    private T value;
+    public final T value;
 
-//    public Ring() {
-//        next = this;
-//        prev = this;
-//    }
+    public Ring(T v) {
+        this.value = v;
+        next = this;
+        prev = this;
+    }
 
     public void link(T v) {
-        Ring<T> node = new Ring<>();
-        node.value = v;
+        Ring<T> node = new Ring<>(v);
 
         node.next = this.next;
         node.prev = this;
@@ -24,6 +23,7 @@ public class Ring<T> {
         this.next.prev = node;
         this.next = node;
     }
+
 
     public Ring move(int n) {
         Ring m = this;
@@ -34,31 +34,15 @@ public class Ring<T> {
         return m;
     }
 
-    public Ring move(Predicate<T> filter) {
+    public Ring<T> move(Predicate<T> filter) {
         int limit = this.size();
         Ring<T> n = this;
-        while (limit > 0 && !filter.test(n.getValue())) {
+        while (limit > 0 && !filter.test(n.value)) {
             limit--;
             n = n.next;
         }
         return filter.test(n.value) ? n : null;
     }
-
-    public void setValue(T v) {
-        this.value = v;
-    }
-
-    public T getValue() {
-        return value;
-    }
-//    public void unlink(int n) {
-//        n = n % this.size();
-//        if (n == 0) {
-//            return;
-//        }
-//
-//
-//    }
 
     public int size() {
         int size = 1;
@@ -67,7 +51,7 @@ public class Ring<T> {
         }
 
         Ring n = next;
-        while (n != next) {
+        while (n != this) {
             size++;
             n = n.next;
         }

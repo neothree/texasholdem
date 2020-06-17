@@ -35,7 +35,6 @@ public class Hand implements Comparable<Hand> {
     public Hand(List<Card> best, CardType type) {
         this.best = best;
         this.type = type;
-
     }
 
     public void fresh(List<Card> bottom) {

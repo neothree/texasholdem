@@ -4,11 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 public class Texas {
-
-
-    private String id;
     /**
      * 是否结束
      */
@@ -18,11 +16,9 @@ public class Texas {
      */
     private Pot pot;
 
-    private final int playerNum = 1;
+    private final int playerNum;
 
     private List<Card> leftCard;
-
-    private Circle circle;
 
     private Map<String, Integer> playing = new HashMap<>();
 
@@ -30,17 +26,18 @@ public class Texas {
 
     private Ring<Player> ring;
 
-    public Texas(Map<Law, Integer> laws, Ring<Player> playerList, List<Card> leftCard) {
+    public Texas(Map<Law, Integer> laws, Ring<Player> ring, List<Card> leftCard) {
         this.laws = laws;
-        this.ring = playerList;
+        this.ring = ring;
         this.leftCard = leftCard;
+        this.playerNum = ring.size();
     }
 
     /**
      * 开始
      */
-    public void start() {
-        this.pot = new Pot();
+    public Move start() {
+        this.pot = new Pot(this.smallBlind(), this.ante(), ring.size());
 
         // 一圈开始
         this.circleStart();
@@ -51,19 +48,20 @@ public class Texas {
         // 移动到操作位
         this.nextOp();
 
-        if (this.getSmallBlind() > 0) {
+        if (this.smallBlind() > 0) {
             this.actionBlind();
-        } else if (this.getAnte() > 0 && this.playing.containsKey(Law.DoubleAnte.name())) {
+        } else if (this.ante() > 0 && this.playing.containsKey(Law.DoubleAnte.name())) {
             this.actionDealerAnte();
         }
 
         // 轮转
-        this.turn();
+        Move move = this.turn();
 
         // 强制盲注
         if (this.straddleEnable()) {
-            this.actionStraddle();
+            move = this.actionStraddle();
         }
+        return move;
     }
 
     private Move action(Action action) {
@@ -76,7 +74,7 @@ public class Texas {
         Move move = this.turn();
 
         // 如果下一位玩家离开则自动弃牌
-        if (Move.NextOp.equals(move) && this.getOpPlayer().getLeave()) {
+        if (Move.NextOp.equals(move) && this.opPlayer().isLeave()) {
             move = this.action(new Action(Optype.Fold));
         }
 
@@ -89,17 +87,15 @@ public class Texas {
     private Move turn() {
         Move move = Move.NextOp;
         int leftNum = this.playerNum - this.pot.allinNum() - this.pot.foldNum();
-        Player opNext = this.nextOpPlayer(this.getOpPlayer().getId());
+        Player opNext = this.nextOpPlayer(this.opPlayer().getId());
         int standard = this.pot.getStandard();
         if ((this.playerNum - this.leaveOrFoldNum() == 1)
                 || (leftNum == 1 && standard == this.chipsThisCircle(opNext.getId()))
                 || leftNum == 0) {
             move = Move.Showdown;
-        } else {
-            if (opNext != null && opNext.getId() == this.pot.getStandardId()) {
-                if (Circle.River.equals(this.circle) || leftNum <= 1) {
-                    move = Move.Showdown;
-                }
+        } else if (opNext != null && opNext.getId() == this.pot.getStandardId()) {
+            if (Circle.River.equals(this.pot.circle()) || leftNum <= 1) {
+                move = Move.Showdown;
             } else if (this.preflopOnceAction(standard, opNext)) {
                 Player player = this.nextOpPlayer(opNext.getId());
                 Action action = this.pot.getAction(player.getId());
@@ -108,6 +104,7 @@ public class Texas {
                 move = Move.CircleEnd;
             }
         }
+
         if (Move.NextOp.equals(move)) {
             this.nextOp();
         } else if (Move.CircleEnd.equals(move)) {
@@ -124,18 +121,18 @@ public class Texas {
      * Preflop多一次押注
      */
     private boolean preflopOnceAction(int standard, Player opNext) {
-        if (!Circle.Preflop.equals(this.getCircle())) {
+        if (!Circle.Preflop.equals(this.pot.circle())) {
             return false;
         }
 
         // 1. 第一圈, 有小盲, 开始全跟注, 轮到大盲, 大盲还有一次说话机会
-        if (this.getSmallBlind() > 0 && standard == this.getSmallBlind() * 2 && this.getBbPlayer() == opNext) {
+        if (this.smallBlind() > 0 && standard == this.smallBlind() * 2 && this.bbPlayer() == opNext) {
             return true;
         }
 
         // 2. 第一圈, 没有小盲, 开始全跟注/或, 轮到庄家, 庄家还有一次说话机会
-        if (this.getSmallBlind() == 0 && this.getDealer() == opNext) {
-            if (this.playing.containsKey(Law.DoubleAnte.name()) && standard == this.getAnte()) {
+        if (this.smallBlind() == 0 && this.dealer() == opNext) {
+            if (this.playing.containsKey(Law.DoubleAnte.name()) && standard == this.ante()) {
                 return true;
             }
             if (!this.playing.containsKey(Law.DoubleAnte.name()) && standard == 0) {
@@ -149,19 +146,20 @@ public class Texas {
      * 找到紧挨 id 的下一个没有allin 和 fold 的座位
      */
     private Player nextOpPlayer(int id) {
-        if (this.pot.notFoldNum() == this.pot.allinNum()) {
+        if (this.playerNum == this.pot.allinNum() + this.pot.foldNum()) {
             return null;
         }
-        Ring<Player> r = new Ring<>();
-        while (r.getPrev().getValue().getId() != id) {
+
+        Ring<Player> r = this.ring;
+        while (r.getPrev().value.getId() != id) {
             r = r.getNext();
         }
         int standardId = this.pot.getStandardId();
-        while ((this.pot.isFold(r.getValue().getId()) || this.pot.isAllin(r.getValue().getId()))
-                && r.getValue().getId() != standardId) {
+        while ((this.pot.isFold(r.value.getId()) || this.pot.isAllin(r.value.getId()))
+                && r.value.getId() != standardId) {
             r = r.getNext();
         }
-        return r.getValue();
+        return r.value;
     }
 
     private int chipsThisCircle(int id) {
@@ -169,7 +167,8 @@ public class Texas {
     }
 
     private int leaveOrFoldNum() {
-        return 1;
+        // TODO 加上leave数量
+        return this.pot.foldNum();
     }
 
     /**
@@ -186,8 +185,8 @@ public class Texas {
 
     }
 
-    private void actionStraddle() {
-
+    private Move actionStraddle() {
+        return null;
     }
 
     /**
@@ -202,7 +201,7 @@ public class Texas {
 
         this.freshHand();
 
-        if (this.getOpPlayer().getLeave()) {
+        if (this.opPlayer().isLeave()) {
             this.action(new Action(Optype.Fold));
         }
     }
@@ -220,13 +219,11 @@ public class Texas {
     }
 
     private void circleEnd() {
-        this.pot.circleEnd(this.getBoard());
+        this.pot.circleEnd(this.board());
 
-//        -- 从庄家下一位开始
-//        local opPlayer = self:NextOpPlayer(self:Dealer():Id())
-//        if opPlayer ~= nil then
-//           self.playerRing = self.playerRing:MoveTo(function(v) return v == opPlayer end)
-//        end
+        // 从庄家下一位开始
+        Player op = this.nextOpPlayer(this.dealer().getId());
+        this.ring.move(v -> v == op);
     }
 
     private void showdown() {
@@ -243,18 +240,18 @@ public class Texas {
      */
     public Move playerLeave(String id) {
         Player player = this.getPlayer(id);
-        if (player.getLeave()) {
+        if (player.isLeave()) {
             return null;
         }
 
-        player.getLeave();
+        player.isLeave();
 
         if (this.isOver) {
             return null;
         }
 
         // 如果是正在押注玩家直接弃牌
-        if (this.getOpPlayer() == player) {
+        if (this.opPlayer() == player) {
             return this.action(new Action(Optype.Fold));
         }
 
@@ -270,22 +267,19 @@ public class Texas {
         return this.playing.containsKey(Law.Straddle.name()) && this.playerNum > 3;
     }
 
-    private Player getOpPlayer() {
-        return null;
+    private Player opPlayer() {
+        return this.ring.value;
     }
 
-    private Circle getCircle() {
-        return null;
-    }
 
     /**
      * 牌面
      */
-    private List<Card> getBoard() {
+    private List<Card> board() {
         if (this.isOver && this.isCompareShowdown()) {
             return this.leftCard.subList(0, 5);
         }
-        switch (this.getCircle()) {
+        switch (this.pot.circle()) {
             case Flop:
                 return this.leftCard.subList(0, 3);
             case Turn:
@@ -305,23 +299,31 @@ public class Texas {
         return null;
     }
 
-    private int getSmallBlind() {
+    private int smallBlind() {
         return this.laws.getOrDefault(Law.SmallBlind, 0);
     }
 
-    private int getAnte() {
+    private int ante() {
         return this.laws.getOrDefault(Law.Ante, 0);
     }
 
-    public Player getDealer() {
-        return null;
+    public Player dealer() {
+        Integer id = this.laws.get(Law.Dealer);
+        return this.getPlayer(v -> v.getId() == id);
     }
 
-    public Player getSbPlayer() {
-        return null;
+    public Player sbPlayer() {
+        Integer id = this.laws.get(Law.Dealer);
+        return this.getPlayer(v -> v.getId() == id);
     }
 
-    public Player getBbPlayer() {
-        return null;
+    public Player bbPlayer() {
+        Integer id = this.laws.get(Law.Dealer);
+        return this.getPlayer(v -> v.getId() == id);
+    }
+
+    private Player getPlayer(Predicate<Player> filter) {
+        Ring<Player> r = this.ring.move(filter);
+        return r != null ? r.value : null;
     }
 }
