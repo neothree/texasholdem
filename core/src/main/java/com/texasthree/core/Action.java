@@ -15,6 +15,10 @@ public class Action {
         this(-1, op, 0, 0, 0, 0);
     }
 
+    public Action(Optype op, int chipsAdd) {
+        this(-1, op, 0, chipsAdd, 0, 0);
+    }
+
     public Action(int id, Optype op, int chipsBet, int chipsAdd, int chipsLeft, int sumPot) {
         this.id = id;
         this.op = op;

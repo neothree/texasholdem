@@ -15,16 +15,28 @@ class TexasConfig {
     int initChips = 100;
     Ring<Player> ring;
     List<Card> leftCard = TableCard.getInstance().shuffle();
+    Map<Law, Integer> laws;
+
+    public TexasConfig() {
+
+    }
+
+    public TexasConfig(int playerNum) {
+        this.playerNum = playerNum;
+    }
 
     Texas make() {
         if (ring == null) {
             ring = Ring.create(playerNum);
-            for (int i = 0; i < playerNum; i++) {
+            for (int i = 1; i <= playerNum; i++) {
                 ring.setValue(new Player(i, initChips, new Hand(leftCard.subList(i * 2, i * 2 + 2))));
                 ring = ring.getNext();
             }
         }
-        Map<Law, Integer> laws = new HashMap<>();
+        if (laws == null) {
+            laws = new HashMap<>();
+        }
+
         laws.put(Law.SmallBlind, smallBlind);
         laws.put(Law.Ante, ante);
         laws.put(Law.Dealer, 1);
@@ -141,6 +153,62 @@ public class TexasTest {
     }
 
     @Test
+    public void testCircle() throws Exception {
+        TexasConfig config = new TexasConfig(5);
+        Texas texas = config.make();
+        texas.start();
+
+        equalsOp(4, new Action(Optype.Call), Circle.Preflop, texas);
+        equalsOp(5, new Action(Optype.Call), Circle.Preflop, texas);
+        equalsOp(1, new Action(Optype.Call), Circle.Preflop, texas);
+        equalsOp(2, new Action(Optype.Fold), Circle.Preflop, texas);
+        equalsOp(3, new Action(Optype.Fold), Circle.Preflop, texas);
+
+        equalsOp(4, createRaise(2), Circle.Flop, texas);
+        equalsOp(5, new Action(Optype.Fold), Circle.Flop, texas);
+        equalsOp(1, new Action(Optype.Call), Circle.Flop, texas);
+
+        equalsOp(4, new Action(Optype.Check), Circle.Turn, texas);
+        equalsOp(1, new Action(Optype.Check), Circle.Turn, texas);
+
+        assertEquals(Circle.River, texas.circle());
+
+
+        ////////////////////////////////////////////////////////////////////////
+        config = new TexasConfig(5);
+        texas = config.make();
+        texas.start();
+
+        equalsOp(4, new Action(Optype.Call), Circle.Preflop, texas);
+        equalsOp(5, new Action(Optype.Call), Circle.Preflop, texas);
+        equalsOp(1, new Action(Optype.Call), Circle.Preflop, texas);
+        equalsOp(2, new Action(Optype.Call), Circle.Preflop, texas);
+        equalsOp(3, new Action(Optype.Check), Circle.Preflop, texas);
+
+
+        equalsOp(2, new Action(Optype.Fold), Circle.Flop, texas);
+        equalsOp(3, new Action(Optype.Raise, 2), Circle.Flop, texas);
+        equalsOp(4, new Action(Optype.Fold), Circle.Flop, texas);
+        equalsOp(5, new Action(Optype.Fold), Circle.Flop, texas);
+        equalsOp(1, new Action(Optype.Call), Circle.Flop, texas);
+
+        assertEquals(Circle.Turn, texas.circle());
+
+        ////////////////////////////////////////////////////////////////////////
+        config = new TexasConfig(5);
+        texas = config.make();
+        texas.start();
+
+        equalsOp(4, new Action(Optype.Raise, 4), Circle.Preflop, texas);
+        equalsOp(5, new Action(Optype.Allin), Circle.Preflop, texas);
+        equalsOp(1, new Action(Optype.Allin), Circle.Preflop, texas);
+        equalsOp(2, new Action(Optype.Fold), Circle.Preflop, texas);
+        equalsOp(3, new Action(Optype.Allin), Circle.Preflop, texas);
+        equalsOp(4, new Action(Optype.Allin), Circle.Preflop, texas);
+        assertTrue(texas.isOver());
+    }
+
+    @Test
     public void testAction() throws Exception {
         Texas texas = create(2, 200);
         texas.start();
@@ -161,18 +229,6 @@ public class TexasTest {
         assertEquals(Move.NextOp, texas.action(new Action(Optype.Check)));
         assertEquals(Move.CircleEnd, texas.action(new Action(Optype.Check)));
 
-
-        // TODO 两倍前注
-//        Map<Law, Integer> law = new HashMap<>();
-//        law.put(Law.SmallBlind, 0);
-//        law.put(Law.Ante, 1);
-//        law.put(Law.DoubleAnte, 1);
-//        texas = create(2, 100, law);
-//        assertEquals(Move.NextOp, texas.start());
-//        assertEquals(texas.opPlayer().getId(), 1);
-//        equalsMoveAndOp(new Action(Optype.Call), Move.NextOp, 1, texas);
-//        equalsMoveAndOp(new Action(Optype.Check), Move.CircleEnd, 0, texas);
-
         // 复现
         Ring<Player> ring = Ring.create(3);
         ring.setValue(new Player(1, 100, new Hand(new ArrayList<>())));
@@ -182,18 +238,118 @@ public class TexasTest {
         config.ring = ring;
         texas = config.make();
         assertEquals(Move.NextOp, texas.start());
-        equalsMoveAndOp(1, new Action(Optype.Allin), Move.NextOp, texas);
-        equalsMoveAndOp(2, new Action(Optype.Call), Move.NextOp, texas);
-        equalsMoveAndOp(3, new Action(Optype.Call), Move.CircleEnd, texas);
-        equalsMoveAndOp(2, new Action(Optype.Fold), Move.Showdown, texas);
+        equalsOp(1, new Action(Optype.Allin), Move.NextOp, texas);
+        equalsOp(2, new Action(Optype.Call), Move.NextOp, texas);
+        equalsOp(3, new Action(Optype.Call), Move.CircleEnd, texas);
+        equalsOp(2, new Action(Optype.Fold), Move.Showdown, texas);
+    }
+
+    @Test
+    public void testOpPlayer() throws Exception {
+        TexasConfig config = new TexasConfig(5);
+        Texas texas = config.make();
+        texas.start();
+
+        // Preflop
+        equalsOp(4, new Action(Optype.Call), Move.NextOp, texas);
+        equalsOp(5, new Action(Optype.Call), Move.NextOp, texas);
+        equalsOp(1, new Action(Optype.Call), Move.NextOp, texas);
+        equalsOp(2, new Action(Optype.Call), Move.NextOp, texas);
+        // 第一圈，大盲这种情况下多一次押注
+        equalsOp(3, new Action(Optype.Check), Move.CircleEnd, texas);
+
+        // Flop
+        equalsOp(2, new Action(Optype.Fold), Move.NextOp, texas);
+        equalsOp(3, new Action(Optype.Fold), Move.NextOp, texas);
+        equalsOp(4, new Action(Optype.Raise, 2), Move.NextOp, texas);
+        equalsOp(5, new Action(Optype.Call), Move.NextOp, texas);
+        equalsOp(1, new Action(Optype.Fold), Move.CircleEnd, texas);
+
+        // Turn
+        equalsOp(4, new Action(Optype.Raise, 2), Move.NextOp, texas);
+        equalsOp(5, new Action(Optype.Call), Move.CircleEnd, texas);
+
+        // River
+        equalsOp(4, new Action(Optype.Raise, 2), Move.NextOp, texas);
+        equalsOp(5, new Action(Optype.Call), Move.Showdown, texas);
+
+        //////////////////////////////////////////////////////////////////
+        Ring<Player> ring = Ring.create(5);
+        for (int i = 1; i <= 4; i++) {
+            ring.setValue(new Player(i, 100, new Hand(new ArrayList<>())));
+            ring = ring.getNext();
+        }
+        ring.setValue(new Player(5, 50, new Hand(new ArrayList<>())));
+        config = new TexasConfig();
+        config.ring = ring;
+        texas = config.make();
+        texas.start();
+
+        equalsOp(4, new Action(Optype.Raise, 4), Move.NextOp, texas);
+        equalsOp(5, new Action(Optype.Allin), Move.NextOp, texas);
+        equalsOp(1, new Action(Optype.Call), Move.NextOp, texas);
+        equalsOp(2, new Action(Optype.Fold), Move.NextOp, texas);
+        equalsOp(3, new Action(Optype.Call), Move.NextOp, texas);
+        equalsOp(4, new Action(Optype.Call), Move.CircleEnd, texas);
+
+        equalsOp(3, new Action(Optype.Check), Move.NextOp, texas);
+        equalsOp(4, new Action(Optype.Check), Move.NextOp, texas);
+        equalsOp(1, new Action(Optype.Raise, 4), Move.NextOp, texas);
+        equalsOp(3, new Action(Optype.Fold), Move.NextOp, texas);
+        equalsOp(4, new Action(Optype.Call), Move.CircleEnd, texas);
+
+        equalsOp(4, new Action(Optype.Raise, 5), Move.NextOp, texas);
+        equalsOp(1, new Action(Optype.Call), Move.CircleEnd, texas);
+
+
+        ////////////////////////////////////////////////////////////////////////
+        config = new TexasConfig();
+        texas = config.make();
+        texas.start();
+
+        equalsOp(1, new Action(Optype.Call), Move.NextOp, texas);
+        equalsOp(2, new Action(Optype.Check), Move.CircleEnd, texas);
+
+        assertEquals(Circle.Flop, texas.circle());
+        assertTrue(texas.opPlayer().getId() == 2);
+
+        ////////////////////////////////////////////////////////////////////////
+        //  短牌：在“两倍前注”下, 开局后，所有玩家都call，最后应该到庄家还有一次option
+        config = new TexasConfig();
+        config.smallBlind = 0;
+        config.ante = 1;
+        config.laws = new HashMap<>();
+        config.laws.put(Law.DoubleAnte, 1);
+        texas = config.make();
+        texas.start();
+        equalsOp(2, new Action(Optype.Call), Move.NextOp, texas);
+        equalsOp(1, new Action(Optype.Check), Move.CircleEnd, texas);
+
+        ////////////////////////////////////////////////////////////////////////
+        //  短牌：在“smallBlind == 0”下, 开局后，所有玩家都check，最后应该到庄家还有一次option
+        config = new TexasConfig();
+        config.smallBlind = 0;
+        config.ante = 1;
+        texas = config.make();
+        texas.start();
+        equalsOp(2, new Action(Optype.Check), Move.NextOp, texas);
+        equalsOp(1, new Action(Optype.Check), Move.CircleEnd, texas);
+
+
     }
 
     private Action createRaise(int chipsAdd) {
         return new Action(-1, Optype.Raise, 0, chipsAdd, 0, 0);
     }
 
-    private void equalsMoveAndOp(Integer opId, Action act, Move move, Texas texas) throws Exception {
+    private void equalsOp(Integer opId, Action act, Move move, Texas texas) throws Exception {
         assertTrue(opId == texas.opPlayer().getId());
         assertEquals(move, texas.action(act));
+    }
+
+    private void equalsOp(Integer opId, Action act, Circle circle, Texas texas) throws Exception {
+        assertEquals(opId.toString(), texas.opPlayer().getId() + "");
+        assertEquals(circle, texas.circle());
+        texas.action(act);
     }
 }

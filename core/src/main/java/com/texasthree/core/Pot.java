@@ -182,7 +182,8 @@ public class Pot {
                 this.anteBet.put(player.getId(), player.getChips());
                 this.allin.add(player.getId());
             }
-            player.changeChips(this.anteBet.get(player.getId()));
+            player.changeChips(-this.anteBet.get(player.getId()));
+            ring = ring.getNext();
         }
 
         // 分池
@@ -232,7 +233,7 @@ public class Pot {
     /**
      * 将action中的数据补充完整
      */
-    Action parseAction(Player player, Action action) {
+    Action parseAction(Player player, Action action) throws Exception {
         int chipsBetOld = this.chipsThisCircle(player.getId());
         int chipsBet = chipsBetOld;
         int chipsLeft = player.getChips();
@@ -245,7 +246,8 @@ public class Pot {
         }
         int chipsAdd = chipsBet - chipsBetOld;
         if (chipsAdd > player.getChips()) {
-            return null;
+            System.out.println(chipsAdd +": "+player.getChips());
+            throw new TexasException();
         }
         return new Action(player.getId(), action.op, chipsBet, chipsAdd, chipsLeft, this.sumPot());
 
@@ -255,7 +257,7 @@ public class Pot {
      * 这一圈的押注数
      */
     int chipsThisCircle(int id) {
-        for (int i = this.going.actions.size() - 1; i > 0; i--) {
+        for (int i = this.going.actions.size() - 1; i >= 0; i--) {
             Action act = this.going.actions.get(i);
             if (act.id == id) {
                 return act.chipsBet;

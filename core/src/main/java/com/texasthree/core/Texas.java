@@ -77,7 +77,7 @@ public class Texas {
                 (Optype.Raise.equals(act.op) && act.chipsAdd < opMap.get(act.op))) {
             System.out.println(JSONObject.toJSONString(opMap));
             System.out.println(JSONObject.toJSONString(act));
-                throw new Exception("押注错误");
+            throw new Exception("押注错误");
         }
 
 
@@ -168,7 +168,7 @@ public class Texas {
         }
         Integer standardId = this.pot.getStandardId();
         while ((this.pot.isFold(r.value.getId()) || this.pot.isAllin(r.value.getId()))
-                && r.value.getId() != standardId) {
+                && (standardId == null || r.value.getId() != standardId)) {
             r = r.getNext();
         }
         return r.value;
@@ -345,5 +345,13 @@ public class Texas {
     private Player getPlayer(Predicate<Player> filter) {
         Ring<Player> r = this.ring.move(filter);
         return r != null ? r.value : null;
+    }
+
+    public Circle circle() {
+        return this.pot.circle();
+    }
+
+    public boolean isOver() {
+        return this.isOver;
     }
 }
