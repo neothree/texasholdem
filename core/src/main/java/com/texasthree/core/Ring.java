@@ -6,16 +6,31 @@ public class Ring<T> {
     private Ring<T> next;
     private Ring<T> prev;
 
-    public final T value;
+    public T value;
 
-    public Ring(T v) {
-        this.value = v;
+    public static <T> Ring<T> create(int num) {
+        if (num < 0) {
+            return null;
+        }
+        Ring<T> r = new Ring<>();
+        for (int i = 1; i < num; i++) {
+            r.link(null);
+        }
+        return r;
+    }
+
+    public Ring() {
         next = this;
         prev = this;
     }
 
+    public void setValue(T v) {
+        this.value = v;
+    }
+
     public void link(T v) {
-        Ring<T> node = new Ring<>(v);
+        Ring<T> node = new Ring<>();
+        node.value = v;
 
         node.next = this.next;
         node.prev = this;
@@ -36,7 +51,7 @@ public class Ring<T> {
 
     public Ring<T> move(Predicate<T> filter) {
         int limit = this.size();
-        Ring<T> n = this;
+        Ring<T> n = this.next;
         while (limit > 0 && !filter.test(n.value)) {
             limit--;
             n = n.next;

@@ -1,5 +1,7 @@
 package com.texasthree.core;
 
+import com.alibaba.fastjson.JSONObject;
+
 import java.util.*;
 
 public class Pot {
@@ -72,12 +74,12 @@ public class Pot {
         this.standardAct = null;
     }
 
-    void action(Player player, Action action) {
-        Action act = this.parseAction(player, action);
+    void action(Player player, Action act) throws Exception {
+        act = this.parseAction(player, act);
         if (act.chipsAdd > 0) {
             player.changeChips(-act.chipsAdd);
             if (player.getChips() <= 0) {
-                action.op = Optype.Allin;
+                act.op = Optype.Allin;
             }
         }
         this.going.actions.add(act);
@@ -86,6 +88,9 @@ public class Pot {
         if (this.standardAct == null || ampl > 0) {
             // 每轮刚开始 standardAct 为 nil, 有人押注后直接为 standardAct
             this.standardAct = act;
+            if (act.op == null) {
+                throw new Exception("错误");
+            }
             // 翻牌前有加注
             if (Circle.Preflop.equals(circle)) {
                 this.flopRaise.add(player.getId());
@@ -110,6 +115,15 @@ public class Pot {
     }
 
     Action getAction(int id) {
+        if (this.going == null) {
+            return null;
+        }
+        for (int i = this.going.actions.size() - 1; i >= 0; i--) {
+            Action action = this.going.actions.get(i);
+            if (action.id == id) {
+                return action;
+            }
+        }
         return null;
     }
 
@@ -119,7 +133,7 @@ public class Pot {
     }
 
     Integer getStandardId() {
-        return this.standardAct != null ? standardAct.id : 0;
+        return this.standardAct != null ? standardAct.id : null;
     }
 
     void setStandardInfo(int chips, int id) {
@@ -153,14 +167,14 @@ public class Pot {
         if (actBb.chipsBet > actSb.chipsBet) {
             this.standardAct = actBb;
             this.legalRaiseId = actBb.id;
-        }  else {
+        } else {
             this.standardAct = actSb;
             this.legalRaiseId = actSb.id;
         }
     }
 
     void actionAnte(Ring<Player> ring, int ante) {
-        for (int i = 0; i < ring.size();i ++) {
+        for (int i = 0; i < ring.size(); i++) {
             Player player = ring.value;
             if (player.getChips() >= ante) {
                 this.anteBet.put(player.getId(), ante);
@@ -218,7 +232,7 @@ public class Pot {
     /**
      * 将action中的数据补充完整
      */
-    private Action parseAction(Player player, Action action) {
+    Action parseAction(Player player, Action action) {
         int chipsBetOld = this.chipsThisCircle(player.getId());
         int chipsBet = chipsBetOld;
         int chipsLeft = player.getChips();
@@ -248,6 +262,42 @@ public class Pot {
             }
         }
         return 0;
+    }
+
+
+    void actionDealerAnte(Player dealer, int ante) throws Exception {
+        if (dealer.getChips() <= 0) {
+            return;
+        }
+        int chipsBet = dealer.getChips() >= ante ? ante : dealer.getChips();
+        Action action = new Action(dealer.getId(), Optype.DealerAnte, chipsBet, chipsBet, 0, 0);
+        this.action(dealer, action);
+        this.legalRaiseId = dealer.getId();
+    }
+
+    Map<Optype, Integer> opMap(Player op) {
+        int chipsLeft = op.getChips();
+        int opBetChips = this.chipsThisCircle(op.getId());
+        int maxBetChips = chipsLeft + opBetChips;
+        Map<Optype, Integer> ret = new HashMap<>();
+        ret.put(Optype.Fold, 0);
+        ret.put(Optype.Allin, chipsLeft);
+
+        if (opBetChips == this.getStandard()) {
+            ret.put(Optype.Check, 0);
+        } else if (maxBetChips > this.getStandard()) {
+            ret.put(Optype.Call, this.getStandard() - opBetChips);
+        }
+
+        if (chipsLeft + opBetChips > this.raiseLine()) {
+            ret.put(Optype.Raise, this.raiseLine());
+        }
+        return ret;
+
+    }
+
+    private int raiseLine() {
+        return this.getStandard() + this.amplitude;
     }
 }
 

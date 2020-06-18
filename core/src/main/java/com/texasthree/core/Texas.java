@@ -1,5 +1,7 @@
 package com.texasthree.core;
 
+import com.alibaba.fastjson.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,8 +36,8 @@ public class Texas {
     /**
      * 开始
      */
-    public Move start() {
-        this.pot = new Pot(ring.size(), this.smallBlind(), this.ante());
+    public Move start() throws Exception {
+        this.pot = new Pot(playerNum, this.smallBlind(), this.ante());
 
         // 一圈开始
         this.circleStart();
@@ -43,12 +45,14 @@ public class Texas {
         // 前注
         this.actionAnte();
 
-        // 移动到操作位
-        this.nextOp();
+        this.ring = this.ring.move(v -> v == this.dealer());
+        this.pot.setStandardInfo(0, this.dealer().getId());
 
         if (this.smallBlind() > 0) {
+            // 盲注
             this.actionBlind();
         } else if (this.ante() > 0 && this.laws.containsKey(Law.DoubleAnte)) {
+            // 庄家前注
             this.actionDealerAnte();
         }
 
@@ -62,12 +66,22 @@ public class Texas {
         return move;
     }
 
-    private Move action(Action action) {
+    public Move action(Action action) throws Exception {
         if (this.isOver) {
             return null;
         }
 
-        this.pot.action(this.opPlayer(), action);
+        Action act = this.pot.parseAction(this.opPlayer(), action);
+        Map<Optype, Integer> opMap = this.pot.opMap(this.opPlayer());
+        if (!opMap.containsKey(act.op) ||
+                (Optype.Raise.equals(act.op) && act.chipsAdd < opMap.get(act.op))) {
+            System.out.println(JSONObject.toJSONString(opMap));
+            System.out.println(JSONObject.toJSONString(act));
+                throw new Exception("押注错误");
+        }
+
+
+        this.pot.action(this.opPlayer(), act);
 
         Move move = this.turn();
 
@@ -82,7 +96,7 @@ public class Texas {
     /**
      * 操作位轮转
      */
-    private Move turn() {
+    private Move turn() throws Exception {
         Move move = Move.NextOp;
         int leftNum = this.playerNum - this.pot.allinNum() - this.pot.foldNum();
         Player opNext = this.nextOpPlayer(this.opPlayer().getId());
@@ -152,7 +166,7 @@ public class Texas {
         while (r.getPrev().value.getId() != id) {
             r = r.getNext();
         }
-        int standardId = this.pot.getStandardId();
+        Integer standardId = this.pot.getStandardId();
         while ((this.pot.isFold(r.value.getId()) || this.pot.isAllin(r.value.getId()))
                 && r.value.getId() != standardId) {
             r = r.getNext();
@@ -181,6 +195,8 @@ public class Texas {
      */
     private void actionBlind() {
         this.pot.actionBlind(this.sbPlayer(), this.bbPlayer());
+        // 模拟操作位是大盲
+        this.ring = this.ring.move(v -> v == this.bbPlayer());
     }
 
     private Move actionStraddle() {
@@ -190,11 +206,11 @@ public class Texas {
     /**
      * 庄家前注
      */
-    private void actionDealerAnte() {
-
+    private void actionDealerAnte() throws Exception {
+        this.pot.actionDealerAnte(this.dealer(), this.ante());
     }
 
-    private void circleStart() {
+    private void circleStart() throws Exception {
         this.pot.circleStart();
 
         this.freshHand();
@@ -204,24 +220,30 @@ public class Texas {
         }
     }
 
-    private void freshHand() {
-//        local board = self:Board()
-//        for _, player in self:PlayerRing():Iterator() do
-//            player:Handhold():Fresh(board)
-//        end
-    }
-
-
-    private void nextOp() {
-
-    }
 
     private void circleEnd() {
         this.pot.circleEnd(this.board());
 
         // 从庄家下一位开始
         Player op = this.nextOpPlayer(this.dealer().getId());
-        this.ring.move(v -> v == op);
+        if (op == null) {
+            System.out.println("222222222222222");
+        }
+        ring = this.ring.move(v -> v == op);
+    }
+
+    private void freshHand() {
+        Ring<Player> r = this.ring;
+        List<Card> board = this.board();
+        for (int i = 0; i < playerNum; i++) {
+            r.value.getHand().fresh(board);
+            r = r.getNext();
+        }
+    }
+
+
+    private void nextOp() {
+        this.ring = this.ring.move(v -> !this.pot.isAllin(v.getId()) && !this.pot.isFold(v.getId()));
     }
 
     private void showdown() {
@@ -236,7 +258,7 @@ public class Texas {
     /**
      * 玩家离开
      */
-    public Move playerLeave(String id) {
+    public Move playerLeave(String id) throws Exception {
         Player player = this.getPlayer(id);
         if (player.isLeave()) {
             return null;
@@ -265,7 +287,7 @@ public class Texas {
         return this.laws.containsKey(Law.Straddle) && this.playerNum > 3;
     }
 
-    private Player opPlayer() {
+    public Player opPlayer() {
         return this.ring.value;
     }
 
@@ -290,7 +312,7 @@ public class Texas {
     }
 
     private boolean isCompareShowdown() {
-        return true;
+        return this.isOver && this.playerNum - this.leaveOrFoldNum() > 1;
     }
 
     private Player getPlayer(String id) {

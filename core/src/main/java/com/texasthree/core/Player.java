@@ -35,4 +35,8 @@ public class Player {
     public void changeChips(int change) {
         this.chips += change;
     }
+
+    public Hand getHand() {
+        return hand;
+    }
 }
