@@ -1,4 +1,4 @@
-package com.texasthree.core;
+package com.texasthree.core.texas;
 
 import java.util.List;
 import java.util.Map;

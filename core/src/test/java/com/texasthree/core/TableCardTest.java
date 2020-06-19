@@ -1,5 +1,7 @@
 package com.texasthree.core;
 
+import com.texasthree.core.texas.Card;
+import com.texasthree.core.texas.TableCard;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;

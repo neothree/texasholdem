@@ -1,5 +1,9 @@
 package com.texasthree.core;
 
+import com.texasthree.core.texas.Card;
+import com.texasthree.core.texas.CardType;
+import com.texasthree.core.texas.Hand;
+import com.texasthree.core.texas.Poker;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 

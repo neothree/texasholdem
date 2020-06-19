@@ -1,6 +1,7 @@
 package com.texasthree.core;
 
 
+import com.texasthree.core.texas.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -114,17 +115,15 @@ public class TexasTest {
      */
     @Test
     public void testOther() throws Exception {
-        Map<Law, Integer> law = new HashMap<>();
-        law.put(Law.SmallBlind, 1);
-        law.put(Law.Ante, 1);
-        law.put(Law.Dealer, 0);
-        law.put(Law.SB, 1);
-        law.put(Law.BB, 2);
+        TexasConfig config = new TexasConfig(3);
+        config.smallBlind = 1;
+        config.ante = 1;
+        Texas texas = config.make();
+        texas.start();
 
-        Texas texas = create(3);
-        assertEquals(0, texas.dealer().getId());
-        assertEquals(1, texas.sbPlayer().getId());
-        assertEquals(2, texas.bbPlayer().getId());
+        assertEquals(1, texas.dealer().getId());
+        assertEquals(2, texas.sbPlayer().getId());
+        assertEquals(3, texas.bbPlayer().getId());
         assertEquals(1, texas.smallBlind());
         assertEquals(1, texas.ante());
     }
@@ -134,20 +133,17 @@ public class TexasTest {
      */
     @Test
     public void testStart() throws Exception {
-        Map<Law, Integer> law = new HashMap<>();
-        law.put(Law.SmallBlind, 50);
-        law.put(Law.Dealer, 0);
-        law.put(Law.SB, 0);
-        law.put(Law.BB, 1);
-
-        List<Card> leftCard = TableCard.getInstance().shuffle();
-
-
-        Texas texas = create(2, 100, 50);
+        TexasConfig config = new TexasConfig();
+        Ring<Player> ring = Ring.create(2);
+        ring.setValue(new Player(1, 500, new Hand(new ArrayList<>())));
+        ring.getNext().setValue(new Player(2, 50, new Hand(new ArrayList<>())));
+        config.ring = ring;
+        config.smallBlind = 50;
+        Texas texas = config.make();
         Move move = texas.start();
-        assertEquals(0, texas.dealer().getId());
-        assertEquals(0, texas.sbPlayer().getId());
-        assertEquals(1, texas.bbPlayer().getId());
+        assertEquals(1, texas.dealer().getId());
+        assertEquals(1, texas.sbPlayer().getId());
+        assertEquals(2, texas.bbPlayer().getId());
         assertEquals(50, texas.smallBlind());
         assertEquals(Move.Showdown, move);
     }
@@ -334,8 +330,40 @@ public class TexasTest {
         texas.start();
         equalsOp(2, new Action(Optype.Check), Move.NextOp, texas);
         equalsOp(1, new Action(Optype.Check), Move.CircleEnd, texas);
+    }
 
+    @Test
+    public void testAuth() throws Exception {
+        TexasConfig config = new TexasConfig(5);
+        Texas texas = config.make();
+        texas.start();
 
+        // chips: 2
+        Player player = texas.opPlayer();
+        player.changeChips(2 - player.getChips());
+        equals(texas.auth(), Optype.Fold, Optype.Allin);
+
+        // chips: 3
+        player.changeChips(3 - player.getChips());
+        equals(texas.auth(), Optype.Fold, Optype.Allin, Optype.Call);
+
+        // chips: 10
+        player.changeChips(10 - player.getChips());
+//        equals(texas.auth(), Optype.Fold, Optype.Allin, Optype.Call);
+        equalsOp(4, new Action(Optype.Call), Move.NextOp, texas);
+
+        // chips: 1
+        player = texas.opPlayer();
+        player.changeChips(1 - player.getChips());
+        equals(texas.auth(), Optype.Fold, Optype.Allin);
+        equalsOp(5, new Action(Optype.Allin), Move.NextOp, texas);
+    }
+
+    private void equals(Map<Optype, Integer> auth, Optype... ops) {
+        assertTrue(auth.size() == ops.length);
+        for (Optype optype : ops) {
+            assertTrue(auth.containsKey(optype));
+        }
     }
 
     private Action createRaise(int chipsAdd) {

@@ -1,9 +1,9 @@
-package com.texasthree.core;
+package com.texasthree.core.texas;
 
 import com.alibaba.fastjson.JSONObject;
+import com.texasthree.core.Round;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -72,10 +72,10 @@ public class Texas {
         }
 
         Action act = this.pot.parseAction(this.opPlayer(), action);
-        Map<Optype, Integer> opMap = this.pot.opMap(this.opPlayer());
-        if (!opMap.containsKey(act.op) ||
-                (Optype.Raise.equals(act.op) && act.chipsAdd < opMap.get(act.op))) {
-            System.out.println(JSONObject.toJSONString(opMap));
+        Map<Optype, Integer> auth = this.pot.auth(this.opPlayer());
+        if (!auth.containsKey(act.op) ||
+                (Optype.Raise.equals(act.op) && act.chipsAdd < auth.get(act.op))) {
+            System.out.println(JSONObject.toJSONString(auth));
             System.out.println(JSONObject.toJSONString(act));
             throw new Exception("押注错误");
         }
@@ -353,5 +353,9 @@ public class Texas {
 
     public boolean isOver() {
         return this.isOver;
+    }
+
+    public Map<Optype, Integer> auth() {
+        return this.pot.auth(this.opPlayer());
     }
 }

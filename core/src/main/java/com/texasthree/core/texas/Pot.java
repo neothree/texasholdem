@@ -1,6 +1,4 @@
-package com.texasthree.core;
-
-import com.alibaba.fastjson.JSONObject;
+package com.texasthree.core.texas;
 
 import java.util.*;
 
@@ -277,7 +275,7 @@ public class Pot {
         this.legalRaiseId = dealer.getId();
     }
 
-    Map<Optype, Integer> opMap(Player op) {
+    Map<Optype, Integer> auth(Player op) {
         int chipsLeft = op.getChips();
         int opBetChips = this.chipsThisCircle(op.getId());
         int maxBetChips = chipsLeft + opBetChips;

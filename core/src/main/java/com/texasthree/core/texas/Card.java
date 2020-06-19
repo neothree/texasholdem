@@ -1,6 +1,4 @@
-package com.texasthree.core;
-
-import java.util.Comparator;
+package com.texasthree.core.texas;
 
 public class Card implements Comparable<Card> {
     /**

@@ -1,4 +1,4 @@
-package com.texasthree.core;
+package com.texasthree.core.texas;
 
 import java.util.function.Predicate;
 
