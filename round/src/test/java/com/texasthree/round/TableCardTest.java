@@ -31,9 +31,4 @@ public class TableCardTest {
         pair.forEach(v -> set.add(v.getId()));
         assertEquals(54, set.size());
     }
-
-    @Test
-    public void testGrpc() throws Exception {
-        
-    }
 }

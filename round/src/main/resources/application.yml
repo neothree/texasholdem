@@ -1,0 +1,5 @@
+grpc:
+  port: 6566
+  enableReflection: true
+#  inProcessServerName: myTestServer (2)
+
