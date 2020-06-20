@@ -11,5 +11,8 @@
 
     <artifactId>room</artifactId>
 
+    <dependencies>
+
+    </dependencies>
 
 </project>
