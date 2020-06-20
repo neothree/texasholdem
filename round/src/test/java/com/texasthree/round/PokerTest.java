@@ -1,18 +1,22 @@
 package com.texasthree.round;
 
+import com.texasthree.round.AllCard;
 import com.texasthree.round.texas.Card;
 import com.texasthree.round.texas.CardType;
 import com.texasthree.round.texas.Hand;
 import com.texasthree.round.texas.Poker;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 
 /**
  * Poker Tester.

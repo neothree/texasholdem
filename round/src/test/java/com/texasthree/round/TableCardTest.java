@@ -8,8 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
@@ -30,5 +29,11 @@ public class TableCardTest {
         Set<Integer> set = new HashSet<>();
         pair.forEach(v -> set.add(v.getId()));
         assertEquals(54, set.size());
+    }
+
+    @Test
+    public void testRpc() throws Exception {
+        GrpcClient client = new GrpcClient("127.0.0.1", 6566);
+        client.send("hello", "world");
     }
 }

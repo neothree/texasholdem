@@ -36,6 +36,7 @@ public class GrpcServer {
                     break;
             }
 
+            logger.info("rpc收到消息:" + req.getName());
             CommandReply reply = CommandReply.newBuilder().setRetcode(0).build();
             responseObserver.onNext(reply);
             responseObserver.onCompleted();
