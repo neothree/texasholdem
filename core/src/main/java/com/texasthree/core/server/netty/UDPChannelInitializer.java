@@ -5,6 +5,7 @@ import com.texasthree.core.handlers.netty.UDPUpstreamHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.DatagramChannel;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
@@ -16,9 +17,12 @@ public class UDPChannelInitializer extends ChannelInitializer<DatagramChannel> {
      * different channels as the protocol is essentially "connection-less"
      */
     ChannelPipeline pipeline;
+
+    @Autowired
     private UDPEventEncoder udpEventEncoder;
 
     // Create a default pipeline implementation.
+    @Autowired
     private UDPUpstreamHandler upstream;
 
     public UDPChannelInitializer() {

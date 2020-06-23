@@ -4,6 +4,7 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
+import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 import java.util.Map;
@@ -11,6 +12,7 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PreDestroy;
@@ -27,7 +29,7 @@ public class NettyTCPServer extends AbstractNettyServer {
 
     private ServerBootstrap serverBootstrap;
 
-    public NettyTCPServer(NettyConfig nettyConfig, ProtocolMultiplexerChannelInitializer channelInitializer) {
+    public NettyTCPServer(@Qualifier("tcpConfig") NettyConfig nettyConfig, ProtocolMultiplexerChannelInitializer channelInitializer) {
         super(nettyConfig, channelInitializer);
     }
 

@@ -37,7 +37,7 @@ public class TextWebsocketDecoder extends MessageToMessageDecoder<TextWebSocketF
      * This will be put into the {@link ChannelHandlerContext} the first time
      * attr method is invoked on it. The get is also a set.
      */
-    private final AttributeKey<Class<? extends Event>> eventClass = new AttributeKey<Class<? extends Event>>("eventClass");
+    private final AttributeKey<Class<? extends Event>> eventClass = AttributeKey.newInstance("eventClass");
 
     @Override
     protected void decode(ChannelHandlerContext ctx, TextWebSocketFrame frame,

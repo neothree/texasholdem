@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @author Abraham Menacherry
  */
-@Component()
+@Component
 public class SimpleTaskManagerService extends ScheduledThreadPoolExecutor implements
         TaskManagerService {
     /**
@@ -28,8 +28,8 @@ public class SimpleTaskManagerService extends ScheduledThreadPoolExecutor implem
      */
     private AtomicInteger taskNum;
 
-    public SimpleTaskManagerService(int corePoolSize) {
-        super(corePoolSize);
+    public SimpleTaskManagerService() {
+        super(0);
         taskNum = new AtomicInteger(0);
     }
 

@@ -8,7 +8,10 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
 
 
 @Service
@@ -17,6 +20,18 @@ public class ServerManagerImpl implements ServerManager {
     private static final Logger LOG = LoggerFactory.getLogger(ServerManagerImpl.class);
 
     private Set<AbstractNettyServer> servers = new HashSet<AbstractNettyServer>();
+
+    @Autowired
+    private NettyTCPServer tcpServer;
+
+    @Autowired
+    private NettyUDPServer udpServer;
+
+    @PostConstruct
+    private void init() {
+        servers.add(tcpServer);
+        servers.add(udpServer);
+    }
 
     @Override
     public void startServers(int tcpPort, int udpPort) throws Exception {
@@ -37,12 +52,9 @@ public class ServerManagerImpl implements ServerManager {
 
     @Override
     public void startServers() throws Exception {
-        AbstractNettyServer tcpServer = (AbstractNettyServer) AppContext.getBean(AppContext.TCP_SERVER);
-        tcpServer.startServer();
-        servers.add(tcpServer);
-        AbstractNettyServer udpServer = (AbstractNettyServer) AppContext.getBean(AppContext.UDP_SERVER);
-        udpServer.startServer();
-        servers.add(udpServer);
+        for (AbstractNettyServer nettyServer : servers) {
+            nettyServer.startServer();
+        }
     }
 
     @Override

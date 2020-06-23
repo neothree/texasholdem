@@ -11,6 +11,7 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PreDestroy;
@@ -33,7 +34,7 @@ public class NettyUDPServer extends AbstractNettyServer {
 
     private Bootstrap bootstrap;
 
-    public NettyUDPServer(NettyConfig nettyConfig, UDPChannelInitializer channelInitializer) {
+    public NettyUDPServer(@Qualifier("udpConfig") NettyConfig nettyConfig, UDPChannelInitializer channelInitializer) {
         super(nettyConfig, channelInitializer);
     }
 

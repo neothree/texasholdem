@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component;
  *
  * @author Abraham Menacherry
  */
-@Component
 public class DefaultToServerHandler extends SimpleChannelInboundHandler<Event> {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultToServerHandler.class);
 
