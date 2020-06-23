@@ -11,6 +11,9 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.PreDestroy;
 
 /**
  * This server does UDP connection less broadcast. Since it does not store the
@@ -20,71 +23,67 @@ import org.slf4j.LoggerFactory;
  * cannot be modified refer to <a
  * href="http://www.jboss.org/netty/community.html#nabble-f685700">nabble
  * post</a>
- * 
+ *
  * @author Abraham Menacherry
- * 
  */
-public class NettyUDPServer extends AbstractNettyServer 
-{
-	private static final Logger LOG = LoggerFactory
-			.getLogger(NettyUDPServer.class);
-	private Bootstrap bootstrap;
-	
-	public NettyUDPServer(NettyConfig nettyConfig, ChannelInitializer<? extends Channel> channelInitializer) 
-	{
-		super(nettyConfig, channelInitializer);
-	}
+@Service
+public class NettyUDPServer extends AbstractNettyServer {
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public void startServer() throws Exception 
-	{
-		try 
-		{
-			bootstrap = new Bootstrap();
-			Map<ChannelOption<?>, Object> channelOptions = nettyConfig
-					.getChannelOptions();
-			if (null != channelOptions) 
-			{
-				Set<ChannelOption<?>> keySet = channelOptions.keySet();
-				for (@SuppressWarnings("rawtypes") ChannelOption option : keySet) 
-				{
-					bootstrap.option(option, channelOptions.get(option));
-				}
-			}
-			Channel channel = bootstrap.group(getBossGroup())
-					.channel(NioDatagramChannel.class)
-					.handler(getChannelInitializer())
-					.bind(nettyConfig.getSocketAddress()).channel();
-			ALL_CHANNELS.add(channel);
-		} 
-		catch (Exception e) 
-		{
-			LOG.error("UDP Server start error {}, going to shut down", e);
-			super.stopServer();
-			throw e;
-		}
-	}
+    private static final Logger LOG = LoggerFactory.getLogger(NettyUDPServer.class);
 
-	@Override
-	public TransmissionProtocol getTransmissionProtocol() 
-	{
-		return TRANSMISSION_PROTOCOL.UDP;
-	}
+    private Bootstrap bootstrap;
 
-	@Override
-	public String toString() 
-	{
-		return "NettyUDPServer [socketAddress=" + nettyConfig.getSocketAddress()
-				+ ", portNumber=" + nettyConfig.getPortNumber() + "]";
-	}
+    public NettyUDPServer(NettyConfig nettyConfig, UDPChannelInitializer channelInitializer) {
+        super(nettyConfig, channelInitializer);
+    }
 
-	@Override
-	public void setChannelInitializer(
-			ChannelInitializer<? extends Channel> initializer) 
-	{
-		this.channelInitializer = initializer;
-		bootstrap.handler(initializer);
-	}
+    @SuppressWarnings("unchecked")
+    @Override
+    public void startServer() throws Exception {
+        try {
+            bootstrap = new Bootstrap();
+            Map<ChannelOption<?>, Object> channelOptions = nettyConfig
+                    .getChannelOptions();
+            if (null != channelOptions) {
+                Set<ChannelOption<?>> keySet = channelOptions.keySet();
+                for (@SuppressWarnings("rawtypes") ChannelOption option : keySet) {
+                    bootstrap.option(option, channelOptions.get(option));
+                }
+            }
+            Channel channel = bootstrap.group(getBossGroup())
+                    .channel(NioDatagramChannel.class)
+                    .handler(getChannelInitializer())
+                    .bind(nettyConfig.getSocketAddress()).channel();
+            ALL_CHANNELS.add(channel);
+        } catch (Exception e) {
+            LOG.error("UDP Server start error {}, going to shut down", e);
+            super.stopServer();
+            throw e;
+        }
+    }
+
+    @Override
+    public TransmissionProtocol getTransmissionProtocol() {
+        return TRANSMISSION_PROTOCOL.UDP;
+    }
+
+    @Override
+    public String toString() {
+        return "NettyUDPServer [socketAddress=" + nettyConfig.getSocketAddress()
+                + ", portNumber=" + nettyConfig.getPortNumber() + "]";
+    }
+
+    @Override
+    public void setChannelInitializer(
+            ChannelInitializer<? extends Channel> initializer) {
+        this.channelInitializer = initializer;
+        bootstrap.handler(initializer);
+    }
+
+    @Override
+    @PreDestroy
+    public void stopServer() throws Exception  {
+        super.stopServer();
+    }
 
 }

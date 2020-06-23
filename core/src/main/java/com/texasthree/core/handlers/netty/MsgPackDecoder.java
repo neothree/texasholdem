@@ -11,36 +11,35 @@ import java.util.List;
 
 import org.msgpack.MessagePack;
 import org.msgpack.type.Value;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 @Sharable
-public class MsgPackDecoder extends MessageToMessageDecoder<ByteBuf> 
-{
+@Component
+public class MsgPackDecoder extends MessageToMessageDecoder<ByteBuf> {
 
-	private MessagePack msgPack;
+    @Autowired
+    private MessagePack msgPack;
 
-	@Override
-	protected void decode(ChannelHandlerContext ctx, ByteBuf msg,
-			List<Object> out) throws Exception 
-	{
-		int opcode = msg.readUnsignedByte();
-		if (Events.LOG_IN == opcode || Events.RECONNECT == opcode) 
-		{
-			msg.readUnsignedByte();// To read-destroy the protocol version byte.
-		}
+    @Override
+    protected void decode(ChannelHandlerContext ctx, ByteBuf msg,
+                          List<Object> out) throws Exception {
+        int opcode = msg.readUnsignedByte();
+        if (Events.LOG_IN == opcode || Events.RECONNECT == opcode) {
+            msg.readUnsignedByte();// To read-destroy the protocol version byte.
+        }
 
-		Value source = msgPack.read(NettyUtils.toByteArray(msg, true));
-		out.add(Events.event(source, opcode));
-	}
+        Value source = msgPack.read(NettyUtils.toByteArray(msg, true));
+        out.add(Events.event(source, opcode));
+    }
 
-	public MessagePack getMsgPack() 
-	{
-		return msgPack;
-	}
+    public MessagePack getMsgPack() {
+        return msgPack;
+    }
 
-	public void setMsgPack(MessagePack msgPack) 
-	{
-		this.msgPack = msgPack;
-	}
+    public void setMsgPack(MessagePack msgPack) {
+        this.msgPack = msgPack;
+    }
 
 
 }

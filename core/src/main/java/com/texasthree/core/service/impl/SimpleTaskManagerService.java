@@ -2,12 +2,14 @@ package com.texasthree.core.service.impl;
 
 import com.texasthree.core.app.Task;
 import com.texasthree.core.service.TaskManagerService;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
+import javax.annotation.PreDestroy;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-
 
 
 /**
@@ -15,54 +17,53 @@ import java.util.concurrent.atomic.AtomicInteger;
  * >ScheduledThreadPoolExecutor</a> class. It is used so as to keep track of all
  * the tasks. In future they could be made durable tasks which can be
  * transferred between multiple nodes for fail over, etc.
- * 
+ *
  * @author Abraham Menacherry
- * 
  */
+@Component()
 public class SimpleTaskManagerService extends ScheduledThreadPoolExecutor implements
-		TaskManagerService
-{
-	/**
-	 * Used to create a unique identifier for each task
-	 */
-	private AtomicInteger taskNum;
+        TaskManagerService {
+    /**
+     * Used to create a unique identifier for each task
+     */
+    private AtomicInteger taskNum;
 
-	public SimpleTaskManagerService(int corePoolSize)
-	{
-		super(corePoolSize);
-		taskNum = new AtomicInteger(0);
-	}
+    public SimpleTaskManagerService(int corePoolSize) {
+        super(corePoolSize);
+        taskNum = new AtomicInteger(0);
+    }
 
-	@Override
-	public void execute(Task task)
-	{
-		super.execute(task);
-	}
+    @Override
+    public void execute(Task task) {
+        super.execute(task);
+    }
 
-	@Override
-	@SuppressWarnings("rawtypes")
-	public ScheduledFuture schedule(final Task task, long delay, TimeUnit unit)
-	{
-		task.setId(taskNum.incrementAndGet());
-		return super.schedule(task, delay, unit);
-	}
+    @Override
+    @SuppressWarnings("rawtypes")
+    public ScheduledFuture schedule(final Task task, long delay, TimeUnit unit) {
+        task.setId(taskNum.incrementAndGet());
+        return super.schedule(task, delay, unit);
+    }
 
-	@Override
-	@SuppressWarnings("rawtypes")
-	public ScheduledFuture scheduleAtFixedRate(Task task, long initialDelay,
-			long period, TimeUnit unit)
-	{
-		task.setId(taskNum.incrementAndGet());
-		return super.scheduleAtFixedRate(task, initialDelay, period, unit);
-	}
+    @Override
+    @SuppressWarnings("rawtypes")
+    public ScheduledFuture scheduleAtFixedRate(Task task, long initialDelay, long period, TimeUnit unit) {
+        task.setId(taskNum.incrementAndGet());
+        return super.scheduleAtFixedRate(task, initialDelay, period, unit);
+    }
 
-	@Override
-	@SuppressWarnings("rawtypes")
-	public ScheduledFuture scheduleWithFixedDelay(Task task,
-			long initialDelay, long delay, TimeUnit unit)
-	{
-		task.setId(taskNum.incrementAndGet());
-		return super.scheduleWithFixedDelay(task, initialDelay, delay, unit);
-	}
+    @Override
+    @SuppressWarnings("rawtypes")
+    public ScheduledFuture scheduleWithFixedDelay(Task task, long initialDelay, long delay, TimeUnit unit) {
+        task.setId(taskNum.incrementAndGet());
+        return super.scheduleWithFixedDelay(task, initialDelay, delay, unit);
+    }
+
+    @PreDestroy
+    @Override
+    public void shutdown() {
+        super.shutdown();
+    }
+
 
 }

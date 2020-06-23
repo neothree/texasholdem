@@ -13,6 +13,8 @@ import io.netty.util.AttributeKey;
 import java.util.List;
 
 import org.codehaus.jackson.map.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * This class will convert an incoming {@link TextWebSocketFrame} to an
@@ -24,10 +26,11 @@ import org.codehaus.jackson.map.ObjectMapper;
  *
  * @author Abraham Menacherry
  */
+@Component
 @Sharable
-public class TextWebsocketDecoder extends
-        MessageToMessageDecoder<TextWebSocketFrame> {
+public class TextWebsocketDecoder extends MessageToMessageDecoder<TextWebSocketFrame> {
 
+    @Autowired
     private ObjectMapper jackson;
 
     /**

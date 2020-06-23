@@ -10,48 +10,35 @@
 	
 	<context:annotation-config />
 	
-	<bean id="amf3Protocol"  class="io.nadron.protocols.impl.AMF3Protocol">
-		<property name="lengthFieldPrepender" ref="lengthFieldPrepender" />
-		<property name="javaObjectToAMF3Encoder" ref="javaToAMF3Encoder" />
-	</bean>
-	
-	<bean id="amf3StringProtocol" class="io.nadron.protocols.impl.AMF3StringProtocol">
-		<property name="maxFrameSize" value="4096" />
-		<property name="nulEncoder" ref="nulEncoder" />
-		<property name="base64Decoder" ref="base64Decoder" />
-		<property name="base64Encoder" ref="base64Encoder" />
-		<property name="javaObjectToAMF3Encoder" ref="javaToAMF3Encoder" />
-	</bean>
-	
-	<bean id="stringProtocol" class="io.nadron.protocols.impl.StringProtocol">
+	<bean id="stringProtocol" class="com.texasthree.core.protocols.impl.StringProtocol">
 		<property name="frameSize" value="4096" />
 		<property name="nulEncoder" ref="nulEncoder" />
 		<property name="stringDecoder" ref="stringDecoder" />
 		<property name="stringEncoder" ref="stringMessageEncoder" />
 	</bean>
 	
-	<bean id="channelBufferProtocol" class="io.nadron.protocols.impl.ChannelBufferProtocol">
+	<bean id="channelBufferProtocol" class="com.texasthree.core.protocols.impl.ChannelBufferProtocol">
 		<property name="eventDecoder" ref="eventDecoder" />
 		<property name="lengthFieldPrepender" ref="lengthFieldPrepender" />
 		<property name="eventEncoder" ref="eventEncoder" />
 	</bean>
 	
-	<bean id="messageBufferProtocol" class="io.nadron.protocols.impl.MessageBufferProtocol">
+	<bean id="messageBufferProtocol" class="com.texasthree.core.protocols.impl.MessageBufferProtocol">
 		<property name="lengthFieldPrepender" ref="lengthFieldPrepender" />
 		<property name="messageBufferEventDecoder" ref="messageBufferEventDecoder" />
 		<property name="messageBufferEventEncoder" ref="messageBufferEventEncoder" />
 	</bean>
 
-	<bean id="webSocketProtocol" class="io.nadron.protocols.impl.WebSocketProtocol">
+	<bean id="webSocketProtocol" class="com.texasthree.core.protocols.impl.WebSocketProtocol">
 		<property name="textWebsocketDecoder" ref="textWebsocketDecoder" />
 		<property name="textWebsocketEncoder" ref="textWebsocketEncoder" />
 	</bean>
 	
-	<bean id="nettyObjectProtocol" class="io.nadron.protocols.impl.NettyObjectProtocol">
+	<bean id="nettyObjectProtocol" class="com.texasthree.core.protocols.impl.NettyObjectProtocol">
 		<property name="lengthFieldPrepender" ref="lengthFieldPrepender" />
 	</bean>
 	
-	<bean id="msgPackProtocol" class="io.nadron.protocols.impl.MsgPackProtocol">
+	<bean id="msgPackProtocol" class="com.texasthree.core.protocols.impl.MsgPackProtocol">
 		<property name="lengthFieldPrepender" ref="lengthFieldPrepender" />
 		<property name="msgPackDecoder" ref="msgPackDecoder" />
 		<property name="msgPackEncoder" ref="msgPackEncoder" />
@@ -59,18 +46,18 @@
 	
 	<!-- Login Protocols these decide what handlers are in the pipeline during 
 		login of a client to nadron -->
-	<bean id="httpLoginProtocol" class="io.nadron.handlers.netty.LoginProtocol.HTTPProtocol">
+	<bean id="httpLoginProtocol" class="com.texasthree.core.handlers.netty.LoginProtocol.HTTPProtocol">
 		<property name="webSocketLoginHandler" ref="webSocketLoginHandler" />
 	</bean>
 	
-	<bean id="defaultNadLoginProtocol" class="io.nadron.handlers.netty.LoginProtocol.DefaultNadProtocol">
+	<bean id="defaultNadLoginProtocol" class="com.texasthree.core.handlers.netty.LoginProtocol.DefaultNadProtocol">
 		<property name="eventDecoder" ref="eventDecoder" />
 		<property name="loginHandler" ref="loginHandler" />
 		<property name="lengthFieldPrepender" ref="lengthFieldPrepender" />
 	</bean>
 	
 	
-	<bean id="compositeLoginProtocol" class="io.nadron.handlers.netty.LoginProtocol.CompositeProtocol" scope="prototype">
+	<bean id="compositeLoginProtocol" class="com.texasthree.core.handlers.netty.LoginProtocol.CompositeProtocol" scope="prototype">
 		<property name="protocols">
 			<list>
 				<ref bean="defaultNadLoginProtocol" />

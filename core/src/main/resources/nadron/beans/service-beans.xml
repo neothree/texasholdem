@@ -8,25 +8,25 @@
 		also allowed -->
 	<context:property-placeholder location="nadron/props/nadron.properties" />
 
-	<bean id="taskManagerService" class="io.nadron.service.impl.SimpleTaskManagerService"
+	<bean id="taskManagerService" class="com.texasthree.core.service.impl.SimpleTaskManagerService"
 		destroy-method="shutdown">
 		<constructor-arg type="int" index="0" value="2" />
 	</bean>
 
-	<bean id="gameAdminService" class="io.nadron.service.impl.SimpleGameAdminService">
+	<bean id="gameAdminService" class="com.texasthree.core.service.impl.SimpleGameAdminService">
 		<property name="games">
 			<set></set>
 		</property>
 	</bean>
 
-	<bean id="udpSessionRegistry" class="io.nadron.service.impl.SessionRegistry" />
+	<bean id="udpSessionRegistry" class="com.texasthree.core.service.impl.SessionRegistry" />
 
-	<bean id="reconnectSessionRegistry" class="io.nadron.service.impl.ReconnectSessionRegistry">
+	<bean id="reconnectSessionRegistry" class="com.texasthree.core.service.impl.ReconnectSessionRegistry">
 		<property name="taskManagerService" ref="taskManagerService" />
 		<property name="reconnectDelay" value="${reconnect.delay}" />
 	</bean>
 
-	<bean id="simpleUniqueIdGenerator" class="io.nadron.service.impl.SimpleUniqueIdGenerator" />
+	<bean id="simpleUniqueIdGenerator" class="com.texasthree.core.service.impl.SimpleUniqueIdGenerator" />
 
 	<bean id="jackson" class="org.codehaus.jackson.map.ObjectMapper" />
 

@@ -14,44 +14,31 @@
 		location="nadron/props/nadron.properties" />
 		
 	<!-- The Spring application context -->
-	<bean id="appContext" class="io.nadron.context.AppContext" />
+	<bean id="appContext" class="com.texasthree.core.context.AppContext" />
 	
 	<!-- Configure the three servers. By default tcp and udp runs at 18090 and flash at 843 -->
-	<bean id="serverManager" class="io.nadron.server.netty.ServerManagerImpl" />
+	<bean id="serverManager" class="com.texasthree.core.server.netty.ServerManagerImpl" />
 	
-	<bean id="tcpServer" class= "io.nadron.server.netty.NettyTCPServer"
+	<bean id="tcpServer" class= "com.texasthree.core.server.netty.NettyTCPServer"
 		destroy-method="stopServer">
 		<constructor-arg ref="tcpConfig" />
 		<constructor-arg ref="protocolMultiplexerChannelInitializer" />
 		<property name="gameAdminService" ref="gameAdminService" />
 	</bean>
 
-	<bean id="udpServer" class="io.nadron.server.netty.NettyUDPServer"
+	<bean id="udpServer" class="com.texasthree.core.server.netty.NettyUDPServer"
 		destroy-method="stopServer">
 		<constructor-arg ref="udpConfig" />
 		<constructor-arg ref="udpChannelInitializer" />
 		<property name="gameAdminService" ref="gameAdminService" />
 	</bean>
 
-	<!-- Configure the Flash policy server. By default it runs at 843 -->
-	<bean id="flashPolicyServer" class="io.nadron.server.netty.NettyTCPServer"
-		destroy-method="stopServer">
-		<constructor-arg ref="flashConfig" />
-		<constructor-arg ref="flashPolicyServerChannelInitializer" />
-		<property name="gameAdminService" ref="gameAdminService" />
-	</bean>
-
-	<!-- All the pipeline factory beans are now defined -->
-	<bean id="flashPolicyServerChannelInitializer" class="io.nadron.server.netty.FlashPolicyServerChannelInitalizer">
-		<lookup-method name="getFlashPolicyServerHandler" bean="flashPolicyServerHandler" />
-	</bean>
-		
-	<bean id="udpChannelInitializer" class="io.nadron.server.netty.UDPChannelInitializer">
+	<bean id="udpChannelInitializer" class="com.texasthree.core.server.netty.UDPChannelInitializer">
 		<property name="udpEventEncoder" ref="udpEventEncoder" />
 		<property name="upstream" ref="udpUpstreamHandler" />
 	</bean>
 	
-	<bean id="protocolMultiplexerChannelInitializer" class="io.nadron.server.netty.ProtocolMultiplexerChannelInitializer">
+	<bean id="protocolMultiplexerChannelInitializer" class="com.texasthree.core.server.netty.ProtocolMultiplexerChannelInitializer">
 		<property name="bytesForProtocolCheck" value="5" />
 		<property name="loginProtocol" ref="compositeLoginProtocol" />
 	</bean>

@@ -6,106 +6,93 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 
-public class GameStateManager implements GameStateManagerService
-{
-	private static final Logger LOG = LoggerFactory.getLogger(GameStateManager.class);
-	
-	private Object state;
-	byte [] serializedBytes;
-	private AtomicInteger syncKey;
+@Service
+public class GameStateManager implements GameStateManagerService {
+    private static final Logger LOG = LoggerFactory.getLogger(GameStateManager.class);
 
-	public GameStateManager()
-	{
-		state = null;
-		syncKey = new AtomicInteger(-1);
-	}
+    private Object state;
+    byte[] serializedBytes;
+    private AtomicInteger syncKey;
 
-	public GameStateManager(Object state, AtomicInteger syncKey)
-	{
-		super();
-		this.state = state;
-		this.syncKey = syncKey;
-	}
+    public GameStateManager() {
+        state = null;
+        syncKey = new AtomicInteger(-1);
+    }
 
-	@Override
-	public Object getState()
-	{
-		return state;
-	}
+    public GameStateManager(Object state, AtomicInteger syncKey) {
+        super();
+        this.state = state;
+        this.syncKey = syncKey;
+    }
 
-	@Override
-	public void setState(Object state)
-	{
-		this.state = state;
-	}
-	
-	@Override
-	public boolean compareAndSetState(Object key, Object state)
-	{
-		boolean syncKeySet = compareAndSetSyncKey(key);
-		if(compareAndSetSyncKey(key))
-		{
-			this.state = state;
-		}
-		return syncKeySet;
-	}
-	
-	@Override
-	public Object getSyncKey()
-	{
-		return syncKey.get();
-	}
+    @Override
+    public Object getState() {
+        return state;
+    }
 
-	@Override
-	public boolean compareAndSetSyncKey(Object key)
-	{
-		if (null == key || !(key instanceof Integer))
-		{
-			LOG.error("Invalid key provided: {}", key);
-			return false;
-		}
+    @Override
+    public void setState(Object state) {
+        this.state = state;
+    }
 
-		Integer newKey = (Integer) key;
-		return syncKey.compareAndSet(newKey, (++newKey));
-	}
+    @Override
+    public boolean compareAndSetState(Object key, Object state) {
+        boolean syncKeySet = compareAndSetSyncKey(key);
+        if (compareAndSetSyncKey(key)) {
+            this.state = state;
+        }
+        return syncKeySet;
+    }
 
-	@Override
-	public byte[] getSerializedByteArray()
-	{
-		return serializedBytes;
-	}
+    @Override
+    public Object getSyncKey() {
+        return syncKey.get();
+    }
 
-	@Override
-	public void setSerializedByteArray(byte[] serializedBytes)
-	{
-		this.serializedBytes = serializedBytes;
-	}
-	
-	@Override
-	public Object computeAndSetNextState(Object state, Object syncKey,
-			Object stateAlgorithm) throws UnsupportedOperationException
-	{
-		throw new UnsupportedOperationException("computeAndSetNextState"
-				+ "(Object state, Object syncKey,"
-				+ "Object stateAlgorithm) not supported yet");
-	}
+    @Override
+    public boolean compareAndSetSyncKey(Object key) {
+        if (null == key || !(key instanceof Integer)) {
+            LOG.error("Invalid key provided: {}", key);
+            return false;
+        }
 
-	@Override
-	public Object computeNextState(Object state, Object syncKey,
-			Object stateAlgorithm) throws UnsupportedOperationException
-	{
-		throw new UnsupportedOperationException("computeNextState"
-				+ "(Object state, Object syncKey, Object stateAlgorithm)"
-				+ " not supported yet");
-	}
+        Integer newKey = (Integer) key;
+        return syncKey.compareAndSet(newKey, (++newKey));
+    }
 
-	@Override
-	public Object getStateAlgorithm() throws UnsupportedOperationException
-	{
-		throw new UnsupportedOperationException("getStateAlgorithm()"
-				+ " not supported yet");
-	}
+    @Override
+    public byte[] getSerializedByteArray() {
+        return serializedBytes;
+    }
+
+    @Override
+    public void setSerializedByteArray(byte[] serializedBytes) {
+        this.serializedBytes = serializedBytes;
+    }
+
+    @Override
+    public Object computeAndSetNextState(Object state, Object syncKey,
+                                         Object stateAlgorithm) throws UnsupportedOperationException {
+        throw new UnsupportedOperationException("computeAndSetNextState"
+                + "(Object state, Object syncKey,"
+                + "Object stateAlgorithm) not supported yet");
+    }
+
+    @Override
+    public Object computeNextState(Object state, Object syncKey,
+                                   Object stateAlgorithm) throws UnsupportedOperationException {
+        throw new UnsupportedOperationException("computeNextState"
+                + "(Object state, Object syncKey, Object stateAlgorithm)"
+                + " not supported yet");
+    }
+
+    @Override
+    public Object getStateAlgorithm() throws UnsupportedOperationException {
+        throw new UnsupportedOperationException("getStateAlgorithm()"
+                + " not supported yet");
+    }
 
 }
