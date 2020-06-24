@@ -14,7 +14,6 @@ import com.texasthree.core.event.NetworkEvent;
  */
 public class DefaultNetworkEvent extends DefaultEvent implements NetworkEvent {
     private DeliveryGuaranty guaranty = DeliveryGuarantyOptions.RELIABLE;
-    ;
     private static final long serialVersionUID = 6486454029499527617L;
 
     /**

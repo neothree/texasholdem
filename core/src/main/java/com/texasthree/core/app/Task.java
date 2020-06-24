@@ -9,22 +9,19 @@ import com.texasthree.core.service.TaskManagerService;
  * will automatically store the task such that restarts of the server do not
  * stop recurring tasks from stopping. In future, this may also be used for
  * sending tasks from one server node to another during node shutdown etc.
- * 
+ *
  * @author Abraham Menacherry
- * 
  */
-public interface Task extends Runnable
-{
-	/**
-	 * @return returns the unique task id of the task. For future
-	 *         implementations, this value has to be unique across multiple
-	 *         server nodes.
-	 */
-	Object getId();
+public interface Task extends Runnable {
+    /**
+     * @return returns the unique task id of the task. For future
+     * implementations, this value has to be unique across multiple
+     * server nodes.
+     */
+    Object getId();
 
-	/**
-	 * @param id
-	 *            Set the unique task id.
-	 */
-	void setId(Object id);
+    /**
+     * @param id Set the unique task id.
+     */
+    void setId(Object id);
 }
