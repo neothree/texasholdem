@@ -128,8 +128,7 @@ public class LoginHandler extends SimpleChannelInboundHandler<Event> {
 
     public void handleLogin(Player player, ChannelHandlerContext ctx, ByteBuf buffer) {
         if (null != player) {
-            ctx.channel().write(NettyUtils
-                    .createBufferForOpcode(Events.LOG_IN_SUCCESS));
+            ctx.channel().write(NettyUtils.createBufferForOpcode(Events.LOG_IN_SUCCESS));
             handleGameRoomJoin(player, ctx, buffer);
         } else {
             // Write future and close channel

@@ -15,8 +15,11 @@ import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -50,7 +53,9 @@ public interface LoginProtocol {
      *
      * @author Abraham Menacherry
      */
+    @Component
     public static class HTTPProtocol implements LoginProtocol {
+
         @Autowired
         private WebSocketLoginHandler webSocketLoginHandler;
 
@@ -112,7 +117,7 @@ public interface LoginProtocol {
      *
      * @author Abraham Menacherry
      */
-    @Component
+    @Component("defaultNadLoginProtocol")
     public static class DefaultNadProtocol implements LoginProtocol {
 
         private int frameSize = 1024;
@@ -185,9 +190,23 @@ public interface LoginProtocol {
         }
     }
 
-    @Component
-    public static class CompositeProtocol implements LoginProtocol {
-        private List<LoginProtocol> protocols;
+    @Component("compositeProtocol")
+    class CompositeProtocol implements LoginProtocol {
+
+
+        private List<LoginProtocol> protocols = new ArrayList<>();
+
+        @Autowired
+        private DefaultNadProtocol defaultNadLoginProtocol;
+
+        @Autowired
+        private HTTPProtocol httpLoginProtocol;
+
+        @PostConstruct
+        private void init() {
+            this.protocols.add(defaultNadLoginProtocol);
+            this.protocols.add(httpLoginProtocol);
+        }
 
         @Override
         public boolean applyProtocol(ByteBuf buffer,

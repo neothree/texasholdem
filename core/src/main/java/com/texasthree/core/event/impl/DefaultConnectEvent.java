@@ -17,75 +17,62 @@ import com.texasthree.core.handlers.netty.UDPUpstreamHandler;
  * event and then forward it to the {@link Session}. <b>Note</b> Trying to reset
  * the event type of this class using {@link Event#setType(int)} will result in
  * an {@link UnsupportedOperationException}.
- * 
+ *
  * @author Abraham Menacherry
- * 
  */
-public class DefaultConnectEvent extends DefaultEvent implements ConnectEvent
-{
-	private static final long serialVersionUID = 1L;
+public class DefaultConnectEvent extends DefaultEvent implements ConnectEvent {
+    private static final long serialVersionUID = 1L;
 
-	protected Reliable tcpSender;
-	protected Fast udpSender;
+    protected Reliable tcpSender;
+    protected Fast udpSender;
 
-	public DefaultConnectEvent(Reliable tcpSender)
-	{
-		this(tcpSender, null);
-	}
+    public DefaultConnectEvent(Reliable tcpSender) {
+        this(tcpSender, null);
+    }
 
-	public DefaultConnectEvent(Fast udpSender)
-	{
-		this(null, udpSender);
-	}
+    public DefaultConnectEvent(Fast udpSender) {
+        this(null, udpSender);
+    }
 
-	public DefaultConnectEvent(Reliable tcpSender, Fast udpSender)
-	{
-		this.tcpSender = tcpSender;
-		this.udpSender = udpSender;
-	}
+    public DefaultConnectEvent(Reliable tcpSender, Fast udpSender) {
+        this.tcpSender = tcpSender;
+        this.udpSender = udpSender;
+    }
 
-	@Override
-	public int getType()
-	{
-		return Events.CONNECT;
-	}
+    @Override
+    public int getType() {
+        return Events.CONNECT;
+    }
 
-	@Override
-	public void setType(int type)
-	{
-		throw new UnsupportedOperationException(
-				"Type field is final, it cannot be reset");
-	}
+    @Override
+    public void setType(int type) {
+        throw new UnsupportedOperationException(
+                "Type field is final, it cannot be reset");
+    }
 
-	@Override
-	public MessageSender getSource()
-	{
-		return tcpSender;
-	}
+    @Override
+    public MessageSender getSource() {
+        return tcpSender;
+    }
 
-	@Override
-	public void setSource(Object source)
-	{
-		this.tcpSender = (Reliable) source;
-	}
+    @Override
+    public void setSource(Object source) {
+        this.tcpSender = (Reliable) source;
+    }
 
-	public Reliable getTcpSender()
-	{
-		return tcpSender;
-	}
+    public Reliable getTcpSender() {
+        return tcpSender;
+    }
 
-	public void setTcpSender(Reliable tcpSender)
-	{
-		this.tcpSender = tcpSender;
-	}
+    public void setTcpSender(Reliable tcpSender) {
+        this.tcpSender = tcpSender;
+    }
 
-	public Fast getUdpSender()
-	{
-		return udpSender;
-	}
+    public Fast getUdpSender() {
+        return udpSender;
+    }
 
-	public void setUdpSender(Fast udpSender)
-	{
-		this.udpSender = udpSender;
-	}
+    public void setUdpSender(Fast udpSender) {
+        this.udpSender = udpSender;
+    }
 }

@@ -28,8 +28,7 @@ import org.slf4j.LoggerFactory;
 
 public class JetlangEventDispatcher implements EventDispatcher
 {
-	private static final Logger LOG = LoggerFactory
-			.getLogger(JetlangEventDispatcher.class);
+	private static final Logger LOG = LoggerFactory.getLogger(JetlangEventDispatcher.class);
 
 	// TODO make it as a setter/constructor parameters
 	private Map<Integer, List<EventHandler>> handlersByEventType;

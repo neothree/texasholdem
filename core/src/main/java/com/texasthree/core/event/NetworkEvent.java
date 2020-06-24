@@ -8,13 +8,11 @@ import com.texasthree.core.communication.DeliveryGuaranty;
  * the event so that messages can be transmitted either using TCP or UDP
  * transports based on the guaranty defined. Implementations can use RELIABLE as
  * default.
- * 
+ *
  * @author Abraham Menacherry
- * 
  */
-public interface NetworkEvent extends Event
-{
-	DeliveryGuaranty getDeliveryGuaranty();
+public interface NetworkEvent extends Event {
+    DeliveryGuaranty getDeliveryGuaranty();
 
-	void setDeliveryGuaranty(DeliveryGuaranty deliveryGuaranty);
+    void setDeliveryGuaranty(DeliveryGuaranty deliveryGuaranty);
 }

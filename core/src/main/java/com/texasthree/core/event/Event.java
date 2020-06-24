@@ -1,20 +1,19 @@
 package com.texasthree.core.event;
 
-public interface Event
-{
-	int getType();
+public interface Event {
+    int getType();
 
-	void setType(int type);
+    void setType(int type);
 
-	Object getSource();
+    Object getSource();
 
-	void setSource(Object source);
+    void setSource(Object source);
 
-	EventContext getEventContext();
+    EventContext getEventContext();
 
-	void setEventContext(EventContext context);
+    void setEventContext(EventContext context);
 
-	long getTimeStamp();
+    long getTimeStamp();
 
-	void setTimeStamp(long timeStamp);
+    void setTimeStamp(long timeStamp);
 }

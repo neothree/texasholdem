@@ -7,13 +7,18 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ProtocolMultiplexerChannelInitializer extends ChannelInitializer<SocketChannel> {
     // TODO make this configurable from spring.
     private static final int MAX_IDLE_SECONDS = 60;
-    private int bytesForProtocolCheck;
+
+    private int bytesForProtocolCheck = 5;
+
+    @Qualifier("compositeProtocol")
     private LoginProtocol loginProtocol;
 
     @Override
