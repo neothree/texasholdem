@@ -26,8 +26,7 @@ import java.util.List;
 public class EventEncoder extends MessageToMessageEncoder<Event> {
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, Event event,
-                          List<Object> out) throws Exception {
+    protected void encode(ChannelHandlerContext ctx, Event event, List<Object> out) throws Exception {
         ByteBuf opcode = ctx.alloc().buffer(1);
         opcode.writeByte(event.getType());
         if (null != event.getSource()) {

@@ -59,8 +59,7 @@ public class LoginHandler extends SimpleChannelInboundHandler<Event> {
     private static final AtomicInteger CHANNEL_COUNTER = new AtomicInteger(0);
 
     @Override
-    public void channelRead0(ChannelHandlerContext ctx,
-                             Event event) throws Exception {
+    public void channelRead0(ChannelHandlerContext ctx, Event event) throws Exception {
         final ByteBuf buffer = (ByteBuf) event.getSource();
         final Channel channel = ctx.channel();
         int type = event.getType();
@@ -76,8 +75,7 @@ public class LoginHandler extends SimpleChannelInboundHandler<Event> {
         } else {
             LOG.error("Invalid event {} sent from remote address {}. "
                             + "Going to close channel {}",
-                    new Object[]{event.getType(), channel.remoteAddress(),
-                            channel});
+                    new Object[]{event.getType(), channel.remoteAddress(), channel});
             closeChannelWithLoginFailure(channel);
         }
     }

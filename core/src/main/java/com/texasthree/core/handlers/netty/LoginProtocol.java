@@ -132,12 +132,10 @@ public interface LoginProtocol {
         private LengthFieldPrepender lengthFieldPrepender;
 
         @Override
-        public boolean applyProtocol(ByteBuf buffer,
-                                     ChannelPipeline pipeline) {
+        public boolean applyProtocol(ByteBuf buffer, ChannelPipeline pipeline) {
             boolean isThisProtocol = false;
             final int opcode = buffer.getUnsignedByte(buffer.readerIndex() + 2);
-            final int protocolVersion = buffer.getUnsignedByte(buffer
-                    .readerIndex() + 3);
+            final int protocolVersion = buffer.getUnsignedByte(buffer.readerIndex() + 3);
             if (isNadProtocol(opcode, protocolVersion)) {
                 pipeline.addLast("framer", createLengthBasedFrameDecoder());
                 pipeline.addLast("eventDecoder", eventDecoder);
@@ -193,7 +191,6 @@ public interface LoginProtocol {
     @Component("compositeProtocol")
     class CompositeProtocol implements LoginProtocol {
 
-
         private List<LoginProtocol> protocols = new ArrayList<>();
 
         @Autowired
@@ -209,8 +206,7 @@ public interface LoginProtocol {
         }
 
         @Override
-        public boolean applyProtocol(ByteBuf buffer,
-                                     ChannelPipeline pipeline) {
+        public boolean applyProtocol(ByteBuf buffer, ChannelPipeline pipeline) {
             if (null != protocols) {
                 for (LoginProtocol protocol : protocols) {
                     if (protocol.applyProtocol(buffer, pipeline)) {

@@ -15,8 +15,7 @@ import java.util.List;
 public class EventObjectDecoder extends MessageToMessageDecoder<ByteBuf> {
 
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf in,
-                          List<Object> out) throws Exception {
+    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
         if (null != in) {
             byte opcode = in.readByte();
             if (opcode == Events.NETWORK_MESSAGE) {

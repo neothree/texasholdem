@@ -17,8 +17,7 @@ import java.util.List;
 public class MessageBufferEventEncoder extends MessageToMessageEncoder<Event> {
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, Event event,
-                          List<Object> out) throws Exception {
+    protected void encode(ChannelHandlerContext ctx, Event event, List<Object> out) throws Exception {
         out.add(encode(ctx, event));
     }
 

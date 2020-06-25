@@ -46,6 +46,5 @@ public interface Protocol {
      * @param clearExistingProtocolHandlers Clears the pipeline of existing protocol handlers if set to
      *                                      true.
      */
-    public void applyProtocol(PlayerSession playerSession,
-                              boolean clearExistingProtocolHandlers);
+    public void applyProtocol(PlayerSession playerSession, boolean clearExistingProtocolHandlers);
 }

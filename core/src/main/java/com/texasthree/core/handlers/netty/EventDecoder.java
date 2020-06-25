@@ -14,9 +14,9 @@ import java.util.List;
 @Component
 @Sharable
 public class EventDecoder extends MessageToMessageDecoder<ByteBuf> {
+
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf msg,
-                          List<Object> out) throws Exception {
+    protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
         int opcode = msg.readUnsignedByte();
         if (Events.LOG_IN == opcode || Events.RECONNECT == opcode) {
             msg.readUnsignedByte();// To read-destroy the protocol version byte.

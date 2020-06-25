@@ -49,8 +49,7 @@ public class ProtocolMultiplexerDecoder extends ByteToMessageDecoder {
 
         if (!loginProtocol.applyProtocol(in, pipeline)) {
             byte[] headerBytes = new byte[bytesForProtocolCheck];
-            in.getBytes(in.readerIndex(), headerBytes, 0,
-                    bytesForProtocolCheck);
+            in.getBytes(in.readerIndex(), headerBytes, 0, bytesForProtocolCheck);
             LOG.error(
                     "Unknown protocol, discard everything and close the connection {}. Incoming Bytes {}",
                     ctx.channel(),
