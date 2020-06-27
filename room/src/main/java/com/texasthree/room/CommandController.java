@@ -1,35 +1,48 @@
 package com.texasthree.room;
 
-import com.texasthree.core.app.Session;
-import com.texasthree.room.message.MessageController;
+
+import com.texasthree.core.app.PlayerSession;
+import com.texasthree.core.app.impl.GameRoomSession;
+import com.texasthree.core.message.MessageController;
 
 @MessageController
 public class CommandController {
+
     /**
      * 创建房间
      */
-    public static void createRoom(Cmd.CreateRoom data) {
+    public void createRoom(PlayerSession ps, Cmd.CreateRoom cmd) {
+        GameRoomSession session = new RoomSession(new GameRoomSession.GameRoomSessionBuilder());
+        Room room = new Room(cmd.data, session);
+    }
 
+    public void enterRoom(PlayerSession ps, Cmd.EnterRoom cmd) {
+        Room room = Room.getRoom(cmd.id);
+        User user = User.getUser(ps.getId().toString());
+        user.enter(room);
     }
 
     /**
      * 坐下
      */
-    public static void sitdown(Cmd.Sitdown data) {
-
+    public void sitdown(PlayerSession ps, Cmd.Sitdown cmd) {
+        User user = User.getUser(ps.getId().toString());
+        user.getRoom().sitdown(user, cmd.position);
     }
 
     /**
      * 站起
      */
-    public static void situp(Cmd.Situp data) {
-
+    public void situp(PlayerSession ps, Cmd.Situp cmd) {
+        User user = User.getUser(ps.getId().toString());
+        user.getRoom().situp(cmd.position);
     }
 
     /**
      * 开始游戏
      */
-    public static void startGame(Cmd.StartGame data) {
-
+    public void startGame(PlayerSession ps, Cmd.StartGame cmd) {
+        User user = User.getUser(ps.getId().toString());
+        user.getRoom().start();
     }
 }

@@ -1,9 +1,9 @@
-package com.texasthree.room.message;
+package com.texasthree.core.message;
 
 import java.lang.annotation.*;
 
 
-@Target({ElementType.TYPE}) //声明自定义的注解使用在方法上
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface MessageController {
 }

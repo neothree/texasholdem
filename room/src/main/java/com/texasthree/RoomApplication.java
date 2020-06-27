@@ -1,7 +1,8 @@
 package com.texasthree;
 
 import com.texasthree.core.server.ServerManager;
-import com.texasthree.room.message.MessageDispatcher;
+import com.texasthree.core.message.MessageDispatcher;
+import com.texasthree.room.Room;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,7 @@ public class RoomApplication {
     private void start() {
         try {
             serverManager.startServers();
-            dispatcher.init();
+            dispatcher.register("com.texasthree.room");
             LOG.info("Room 启动成功");
         } catch (Exception e) {
             e.printStackTrace();
