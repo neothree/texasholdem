@@ -49,13 +49,13 @@ public class SessionHandler extends DefaultSessionEventHandler implements GameCo
         try {
             cmd = mapper.readValue(buf.readString(), Cmd.Command.class);
             if (Cmd.CreateRoom.class.getName().equals(cmd.name)) {
-                CommandController.createRoom(this.getSession(), mapper.readValue(cmd.data, Cmd.CreateRoom.class));
+                CommandController.createRoom(mapper.readValue(cmd.data, Cmd.CreateRoom.class));
             } else if (Cmd.Sitdown.class.getName().equals(cmd.name)) {
-                CommandController.sitdown(this.getSession(), mapper.readValue(cmd.data, Cmd.Sitdown.class));
+                CommandController.sitdown(mapper.readValue(cmd.data, Cmd.Sitdown.class));
             } else if (Cmd.Sitdown.class.getName().equals(cmd.name)) {
-                CommandController.situp(this.getSession(), mapper.readValue(cmd.data, Cmd.Situp.class));
+                CommandController.situp(mapper.readValue(cmd.data, Cmd.Situp.class));
             } else if (Cmd.Sitdown.class.getName().equals(cmd.name)) {
-                CommandController.startGame(this.getSession(), mapper.readValue(cmd.data, Cmd.StartGame.class));
+                CommandController.startGame(mapper.readValue(cmd.data, Cmd.StartGame.class));
             } else {
                 LOG.info("消息错误: {}", buf.readString());
             }
