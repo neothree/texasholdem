@@ -142,7 +142,6 @@ public class ExecutorEventDispatcher implements EventDispatcher {
         }
         if (!isShuttingDown) {
             EXECUTOR.submit(new Runnable() {
-
                 @Override
                 public void run() {
                     for (EventHandler handler : genericHandlers) {
@@ -152,8 +151,7 @@ public class ExecutorEventDispatcher implements EventDispatcher {
                     // retrieval is not thread safe, but since we are not
                     // setting it to
                     // null anywhere it should be fine.
-                    List<EventHandler> handlers = handlersByEventType
-                            .get(event.getType());
+                    List<EventHandler> handlers = handlersByEventType.get(event.getType());
                     // Iteration is thread safe since we use copy on write.
                     if (null != handlers) {
                         for (EventHandler handler : handlers) {
@@ -163,10 +161,8 @@ public class ExecutorEventDispatcher implements EventDispatcher {
 
                 }
             });
-
         } else {
-            System.err.println("Discarding event: " + event
-                    + " as dispatcher is shutting down");
+            System.err.println("Discarding event: " + event + " as dispatcher is shutting down");
         }
 
     }

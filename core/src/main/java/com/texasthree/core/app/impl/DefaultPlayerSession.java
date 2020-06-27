@@ -72,8 +72,7 @@ public class DefaultPlayerSession extends DefaultSession implements PlayerSessio
         @Override
         protected void validateAndSetValues() {
             if (null == eventDispatcher) {
-                eventDispatcher = EventDispatchers.newJetlangEventDispatcher(
-                        parentGameRoom, LaneStrategies.GROUP_BY_ROOM);
+                eventDispatcher = EventDispatchers.newJetlangEventDispatcher(parentGameRoom, LaneStrategies.GROUP_BY_ROOM);
             }
             super.validateAndSetValues();
         }

@@ -71,7 +71,7 @@ public class PlayerSessionWithEventDispatcherTest {
             public void run() {
                 for (Session session : sessionList) {
                     for (int i = 1; i <= EVENTS_PER_SESSION; i++) {
-                        Event event = Events.event(null,Events.SESSION_MESSAGE);
+                        Event event = Events.event(null, Events.SESSION_MESSAGE);
                         session.onEvent(event);
                     }
                 }

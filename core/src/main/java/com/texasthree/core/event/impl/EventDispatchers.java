@@ -18,13 +18,11 @@ public class EventDispatchers {
         JetlangEventDispatcher dispatcher = null;
         if (null == room) {
             fiber = Fibers.pooledFiber();
-            dispatcher = new JetlangEventDispatcher(new MemoryChannel<Event>(),
-                    fiber, null);
+            dispatcher = new JetlangEventDispatcher(new MemoryChannel<Event>(), fiber, null);
         } else {
             Lane<String, ExecutorService> lane = strategy.chooseLane(room);
             fiber = Fibers.pooledFiber(lane);
-            dispatcher = new JetlangEventDispatcher(new MemoryChannel<Event>(),
-                    fiber, lane);
+            dispatcher = new JetlangEventDispatcher(new MemoryChannel<Event>(), fiber, lane);
         }
         dispatcher.initialize();
 

@@ -171,8 +171,7 @@ public class LoginHandler extends SimpleChannelInboundHandler<Event> {
         GameRoom gameRoom = lookupService.gameRoomLookup(refKey);
         if (null != gameRoom) {
             PlayerSession playerSession = gameRoom.createPlayerSession(player);
-            String reconnectKey = (String) idGeneratorService
-                    .generateFor(playerSession.getClass());
+            String reconnectKey = (String) idGeneratorService.generateFor(playerSession.getClass());
             playerSession.setAttribute(NadronConfig.RECONNECT_KEY, reconnectKey);
             playerSession.setAttribute(NadronConfig.RECONNECT_REGISTRY, reconnectRegistry);
             LOG.trace("Sending GAME_ROOM_JOIN_SUCCESS to channel {}", channel);

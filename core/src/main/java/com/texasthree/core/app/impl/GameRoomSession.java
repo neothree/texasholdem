@@ -66,8 +66,7 @@ public abstract class GameRoomSession extends DefaultSession implements GameRoom
         this.sessionFactory = gameRoomSessionBuilder.sessionFactory;
 
         if (null == gameRoomSessionBuilder.eventDispatcher) {
-            this.eventDispatcher = EventDispatchers.newJetlangEventDispatcher(
-                    this, gameRoomSessionBuilder.laneStrategy);
+            this.eventDispatcher = EventDispatchers.newJetlangEventDispatcher(this, gameRoomSessionBuilder.laneStrategy);
         }
     }
 
@@ -291,8 +290,6 @@ public abstract class GameRoomSession extends DefaultSession implements GameRoom
         // Add the handler to the game room's EventDispatcher so that it will
         // pass game room network events to player session session.
         this.eventDispatcher.addHandler(networkEventHandler);
-        LOG.trace("Added Network handler to "
-                        + "EventDispatcher of GameRoom {}, for session: {}", this,
-                playerSession);
+        LOG.trace("Added Network handler to " + "EventDispatcher of GameRoom {}, for session: {}", this, playerSession);
     }
 }

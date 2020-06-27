@@ -121,10 +121,8 @@ public class JetlangEventDispatcher implements EventDispatcher {
     protected void addANYHandler(final EventHandler eventHandler) {
         final int eventType = eventHandler.getEventType();
         if (eventType != Events.ANY) {
-            LOG.error("The incoming handler {} is not of type ANY",
-                    eventHandler);
-            throw new IllegalArgumentException(
-                    "The incoming handler is not of type ANY");
+            LOG.error("The incoming handler {} is not of type ANY",eventHandler);
+            throw new IllegalArgumentException("The incoming handler is not of type ANY");
         }
         anyHandler.add(eventHandler);
         Callback<List<Event>> eventCallback = createEventCallbackForHandler(eventHandler);
@@ -134,7 +132,7 @@ public class JetlangEventDispatcher implements EventDispatcher {
         disposableHandlerMap.put(eventHandler, disposable);
     }
 
-    protected Callback<List<Event>> createEventCallbackForHandler( final EventHandler eventHandler) {
+    protected Callback<List<Event>> createEventCallbackForHandler(final EventHandler eventHandler) {
         Callback<List<Event>> eventCallback = new Callback<List<Event>>() {
             @Override
             public void onMessage(List<Event> messages) {
@@ -154,8 +152,7 @@ public class JetlangEventDispatcher implements EventDispatcher {
         // retrieval is not thread safe, but since we are not setting it to
         // null
         // anywhere it should be fine.
-        List<EventHandler> handlers = handlersByEventType.get(event
-                .getType());
+        List<EventHandler> handlers = handlersByEventType.get(event.getType());
         // Iteration is thread safe since we use copy on write.
         if (null != handlers) {
             for (EventHandler handler : handlers) {
@@ -218,16 +215,14 @@ public class JetlangEventDispatcher implements EventDispatcher {
         LOG.trace("Entered removeHandlersForSession for session {}", session);
         List<EventHandler> removeList = new ArrayList<EventHandler>();
 
-        Collection<List<EventHandler>> eventHandlersList = new ArrayList<List<EventHandler>>(
-                handlersByEventType.values());
+        Collection<List<EventHandler>> eventHandlersList = new ArrayList<List<EventHandler>>(handlersByEventType.values());
         eventHandlersList.add(anyHandler);
 
         for (List<EventHandler> handlerList : eventHandlersList) {
             removeList.addAll(getHandlersToRemoveForSession(handlerList, session));
         }
 
-        LOG.trace("Going to remove {} handlers for session: {}",
-                removeList.size(), session);
+        LOG.trace("Going to remove {} handlers for session: {}",removeList.size(), session);
         for (EventHandler handler : removeList) {
             removeHandler(handler);
         }

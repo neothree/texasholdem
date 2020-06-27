@@ -52,7 +52,8 @@ public class NettyTCPServer extends AbstractNettyServer {
                     .channel();
             ALL_CHANNELS.add(serverChannel);
         } catch (Exception e) {
-            LOG.error("TCP Server start error {}, going to shut down", e);
+            e.printStackTrace();
+            LOG.error("TCP Server start error {}, going to shut down", e.getMessage());
             super.stopServer();
             throw e;
         }

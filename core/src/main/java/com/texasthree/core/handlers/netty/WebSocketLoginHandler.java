@@ -80,8 +80,7 @@ public class WebSocketLoginHandler extends SimpleChannelInboundHandler<TextWebSo
             LOG.error(
                     "Invalid event {} sent from remote address {}. "
                             + "Going to close channel {}",
-                    new Object[]{event.getType(),
-                            channel.remoteAddress(), channel});
+                    new Object[]{event.getType(), channel.remoteAddress(), channel});
             closeChannelWithLoginFailure(channel);
         }
     }
@@ -158,14 +157,11 @@ public class WebSocketLoginHandler extends SimpleChannelInboundHandler<TextWebSo
         GameRoom gameRoom = lookupService.gameRoomLookup(refKey);
         if (null != gameRoom) {
             PlayerSession playerSession = gameRoom.createPlayerSession(player);
-            String reconnectKey = (String) idGeneratorService
-                    .generateFor(playerSession.getClass());
+            String reconnectKey = (String) idGeneratorService.generateFor(playerSession.getClass());
             playerSession.setAttribute(NadronConfig.RECONNECT_KEY, reconnectKey);
             playerSession.setAttribute(NadronConfig.RECONNECT_REGISTRY, reconnectRegistry);
-            LOG.trace("Sending GAME_ROOM_JOIN_SUCCESS to channel {}",
-                    channel);
-            ChannelFuture future = channel.writeAndFlush(eventToFrame(
-                    Events.GAME_ROOM_JOIN_SUCCESS, reconnectKey));
+            LOG.trace("Sending GAME_ROOM_JOIN_SUCCESS to channel {}", channel);
+            ChannelFuture future = channel.writeAndFlush(eventToFrame(Events.GAME_ROOM_JOIN_SUCCESS, reconnectKey));
             connectToGameRoom(gameRoom, playerSession, future);
         } else {
             // Write failure and close channel.
@@ -178,20 +174,17 @@ public class WebSocketLoginHandler extends SimpleChannelInboundHandler<TextWebSo
         }
     }
 
-    public void connectToGameRoom(final GameRoom gameRoom,
-                                  final PlayerSession playerSession, ChannelFuture future) {
+    public void connectToGameRoom(final GameRoom gameRoom, final PlayerSession playerSession, ChannelFuture future) {
         future.addListener(new ChannelFutureListener() {
             @Override
-            public void operationComplete(ChannelFuture future)
-                    throws Exception {
+            public void operationComplete(ChannelFuture future) throws Exception {
                 Channel channel = future.channel();
                 LOG.trace(
                         "Sending GAME_ROOM_JOIN_SUCCESS to channel {} completed",
                         channel);
                 if (future.isSuccess()) {
                     // Set the tcp channel on the session.
-                    NettyTCPMessageSender tcpSender = new NettyTCPMessageSender(
-                            channel);
+                    NettyTCPMessageSender tcpSender = new NettyTCPMessageSender(channel);
                     playerSession.setTcpSender(tcpSender);
                     // Connect the pipeline to the game room.
                     gameRoom.connectSession(playerSession);
