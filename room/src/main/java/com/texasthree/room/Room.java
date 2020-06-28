@@ -15,42 +15,53 @@ public class Room {
 
     private static Map<String, Room> roomMap = new HashMap<>();
 
-    private GameRoomSession session;
-
+    private Cmd.RoomData data;
 
     private Desk desk;
 
-    private MessageDispatcher dispatcher;
-
-    private Cmd.RoomData data;
 
     public Room(Cmd.RoomData data, GameRoomSession session) {
-        this.session = session;
         this.data = data;
-        this.desk = new Desk();
+        this.desk = new Desk(session);
         roomMap.put(data.id, this);
     }
 
-    public void sitdown(User user, int position) {
+    public void addUser(User user) {
+        this.desk.addUser(user);
+    }
 
+    public void removeUser(User user) {
+        this.desk.removeUser(user);
+    }
+
+    public void sitdown(User user, int position) {
+        this.desk.sitdown(user, position);
     }
 
     public void situp(int position) {
+        this.desk.situp(position);
 
     }
 
     public void start() {
-
+        this.desk.start();
     }
-
-//    @Override
-//    public void onLogin(final PlayerSession playerSession) {
-//        SessionHandler listener = new SessionHandler(playerSession, dispatcher);
-//        playerSession.addHandler(listener);
-//        LOG.trace("Added event listener in Zombie Room");
-//    }
 
     public static Room getRoom(String id) {
         return roomMap.get(id);
+    }
+
+
+    public String getId() {
+        return this.data.id;
+    }
+
+    public String getName() {
+        return this.data.name;
+    }
+
+    @Override
+    public String toString() {
+        return this.getId() + ":" + this.getName();
     }
 }

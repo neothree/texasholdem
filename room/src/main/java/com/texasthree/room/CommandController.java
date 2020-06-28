@@ -4,15 +4,20 @@ package com.texasthree.room;
 import com.texasthree.core.app.PlayerSession;
 import com.texasthree.core.app.impl.GameRoomSession;
 import com.texasthree.core.message.MessageController;
+import com.texasthree.core.message.MessageDispatcher;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @MessageController
 public class CommandController {
+
+    @Autowired
+    private MessageDispatcher dispatcher;
 
     /**
      * 创建房间
      */
     public void createRoom(PlayerSession ps, Cmd.CreateRoom cmd) {
-        GameRoomSession session = new RoomSession(new GameRoomSession.GameRoomSessionBuilder());
+        GameRoomSession session = new RoomSession(new GameRoomSession.GameRoomSessionBuilder(), dispatcher);
         Room room = new Room(cmd.data, session);
     }
 
@@ -20,6 +25,12 @@ public class CommandController {
         Room room = Room.getRoom(cmd.id);
         User user = User.getUser(ps.getId().toString());
         user.enter(room);
+    }
+
+    public void leaveRoom(PlayerSession ps, Cmd.LeaveRoom cmd) {
+        User user = User.getUser(ps.getId().toString());
+        Room room = user.getRoom();
+        user.leave(room);
     }
 
     /**

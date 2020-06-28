@@ -17,11 +17,21 @@ public class User {
     }
 
     public void enter(Room room) {
+        room.addUser(this);
+        this.room = room;
+    }
 
+    public void leave(Room room) {
+        room.removeUser(this);
+        this.room = null;
     }
 
     public Room getRoom() {
         return this.room;
+    }
+
+    public String getId() {
+        return this.data.id;
     }
 
     public static User getUser(String id) {

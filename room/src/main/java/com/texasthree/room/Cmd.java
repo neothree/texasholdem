@@ -7,6 +7,7 @@ public class Cmd {
 
     public static class RoomData {
         String id;
+        String name;
         String creator;
     }
 
@@ -21,6 +22,11 @@ public class Cmd {
     }
 
     public static class EnterRoom {
+        public String id;
+
+    }
+
+    public static class LeaveRoom {
         public String id;
 
     }
