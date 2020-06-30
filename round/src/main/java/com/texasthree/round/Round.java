@@ -11,7 +11,7 @@ public class Round {
 
     }
 
-    public RoundInfo getData() {
+    public RoundState getData() {
         return null;
     }
 

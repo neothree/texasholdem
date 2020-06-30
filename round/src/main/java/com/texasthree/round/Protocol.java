@@ -10,7 +10,7 @@ public class Protocol {
     /**
      * 创建
      */
-    public static RoundInfo create(String id) {
+    public static RoundState create(String id) {
         Round round = new Round(id);
         all.put(id, round);
 
@@ -28,7 +28,7 @@ public class Protocol {
     /**
      * 获取牌局数据
      */
-    public static RoundInfo getData(String id) {
+    public static RoundState getData(String id) {
         Round round = all.get(id);
         if (round != null) {
             return null;
@@ -40,7 +40,7 @@ public class Protocol {
     /**
      * 押注
      */
-    public static RoundInfo action(String id) {
+    public static RoundState action(String id) {
         Round round = all.get(id);
         if (round != null) {
             return null;

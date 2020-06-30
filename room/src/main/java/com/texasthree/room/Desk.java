@@ -53,4 +53,8 @@ public class Desk {
         this.round.start(new RoundBuilder());
     }
 
+    public void loop() {
+        this.loop();
+    }
+
 }

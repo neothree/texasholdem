@@ -1,14 +1,14 @@
 package com.texasthree.room;
 
-import com.texasthree.core.app.PlayerSession;
 import com.texasthree.core.app.impl.GameRoomSession;
-import com.texasthree.core.message.MessageDispatcher;
-import io.netty.util.internal.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class Room {
     private static final Logger LOG = LoggerFactory.getLogger(Room.class);
@@ -19,11 +19,18 @@ public class Room {
 
     private Desk desk;
 
+    /**
+     * 定时器
+     */
+    private ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
+
 
     public Room(Cmd.RoomData data, GameRoomSession session) {
         this.data = data;
         this.desk = new Desk(session);
         roomMap.put(data.id, this);
+
+        service.scheduleAtFixedRate(() -> loop(), 1000L, 200L, TimeUnit.MILLISECONDS);
     }
 
     public void addUser(User user) {
@@ -63,5 +70,9 @@ public class Room {
     @Override
     public String toString() {
         return this.getId() + ":" + this.getName();
+    }
+
+    private void loop() {
+        this.desk.loop();
     }
 }

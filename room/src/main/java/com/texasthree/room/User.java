@@ -7,6 +7,10 @@ public class User {
 
     private static Map<String, User> userMap = new HashMap<>();
 
+    public static User getUser(String id) {
+        return userMap.get(id);
+    }
+
     private Cmd.UserData data;
 
     private Room room;
@@ -34,7 +38,8 @@ public class User {
         return this.data.id;
     }
 
-    public static User getUser(String id) {
-        return userMap.get(id);
+    @Override
+    public String toString() {
+        return this.data.name + ":" + this.data.id;
     }
 }

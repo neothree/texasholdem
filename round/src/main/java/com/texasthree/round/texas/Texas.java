@@ -1,6 +1,7 @@
 package com.texasthree.round.texas;
 
 import com.alibaba.fastjson.JSONObject;
+import com.texasthree.round.RoundState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -356,5 +357,9 @@ public class Texas {
 
     public Map<Optype, Integer> auth() {
         return this.pot.auth(this.opPlayer());
+    }
+
+    public RoundState state() {
+        return null;
     }
 }
