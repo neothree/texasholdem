@@ -18,6 +18,7 @@ public class ProtocolMultiplexerChannelInitializer extends ChannelInitializer<So
 
     private int bytesForProtocolCheck = 5;
 
+    @Autowired
     @Qualifier("compositeProtocol")
     private LoginProtocol loginProtocol;
 

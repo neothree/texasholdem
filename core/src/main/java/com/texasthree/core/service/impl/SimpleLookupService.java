@@ -6,7 +6,6 @@ import com.texasthree.core.app.Player;
 import com.texasthree.core.app.impl.DefaultPlayer;
 import com.texasthree.core.service.LookupService;
 import com.texasthree.core.util.Credentials;
-import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +18,6 @@ import java.util.Map;
  *
  * @author Abraham Menacherry
  */
-@Service
 public class SimpleLookupService implements LookupService {
     private final Map<String, GameRoom> refKeyGameRoomMap;
 

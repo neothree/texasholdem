@@ -9,9 +9,9 @@ public class Cmd {
     }
 
     public static class RoomData {
-        String id;
-        String name;
-        String creator;
+        public String id;
+        public String name;
+        public String creator;
     }
 
     public static class Command {

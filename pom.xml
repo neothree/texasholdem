@@ -12,6 +12,7 @@
         <module>core</module>
         <module>room</module>
         <module>round</module>
+        <module>shell</module>
     </modules>
 
     <parent>

@@ -1,6 +1,8 @@
 package com.texasthree.room;
 
+import com.texasthree.core.app.PlayerSession;
 import com.texasthree.core.app.impl.GameRoomSession;
+import com.texasthree.core.message.MessageDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,7 +12,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class Room {
+public class Room extends GameRoomSession {
     private static final Logger LOG = LoggerFactory.getLogger(Room.class);
 
     private static Map<String, Room> roomMap = new HashMap<>();
@@ -19,15 +21,21 @@ public class Room {
 
     private Desk desk;
 
+    private MessageDispatcher dispatcher;
     /**
      * 定时器
      */
     private ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
 
+    public Room(GameRoomSessionBuilder gameRoomSessionBuilder) {
+        super(gameRoomSessionBuilder);
+    }
 
-    public Room(Cmd.RoomData data, GameRoomSession session) {
+    public Room(GameRoomSessionBuilder gameRoomSessionBuilder, Cmd.RoomData data, MessageDispatcher dispatcher) {
+        super(gameRoomSessionBuilder);
+        this.dispatcher = dispatcher;
         this.data = data;
-        this.desk = new Desk(session);
+        this.desk = new Desk(this);
         roomMap.put(data.id, this);
 
         service.scheduleAtFixedRate(() -> loop(), 1000L, 200L, TimeUnit.MILLISECONDS);
@@ -58,7 +66,7 @@ public class Room {
         return roomMap.get(id);
     }
 
-
+    @Override
     public String getId() {
         return this.data.id;
     }
@@ -75,4 +83,12 @@ public class Room {
     private void loop() {
         this.desk.loop();
     }
+
+    @Override
+    public void onLogin(PlayerSession playerSession) {
+        SessionHandler listener = new SessionHandler(playerSession, dispatcher);
+        playerSession.addHandler(listener);
+        LOG.trace("Added event listener in Zombie Room");
+    }
+
 }

@@ -2,7 +2,6 @@ package com.texasthree.room;
 
 
 import com.texasthree.core.app.PlayerSession;
-import com.texasthree.core.app.impl.GameRoomSession;
 import com.texasthree.core.message.MessageController;
 import com.texasthree.core.message.MessageDispatcher;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +16,8 @@ public class CommandController {
      * 创建房间
      */
     public void createRoom(PlayerSession ps, Cmd.CreateRoom cmd) {
-        GameRoomSession session = new RoomSession(new GameRoomSession.GameRoomSessionBuilder(), dispatcher);
-        Room room = new Room(cmd.data, session);
+//        GameRoomSession session = new RoomSession(new GameRoomSession.GameRoomSessionBuilder(), dispatcher);
+//        Room room = new Room(cmd.data, session);
     }
 
     public void enterRoom(PlayerSession ps, Cmd.EnterRoom cmd) {

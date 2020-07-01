@@ -31,5 +31,4 @@ public class SimpleUniqueIdGenerator implements UniqueIDGeneratorService {
     public Object generateFor(@SuppressWarnings("rawtypes") Class klass) {
         return klass.getSimpleName() + ID.incrementAndGet();
     }
-
 }
