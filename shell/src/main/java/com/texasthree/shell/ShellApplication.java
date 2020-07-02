@@ -1,15 +1,15 @@
 package com.texasthree.shell;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.nadron.client.app.Session;
-import io.nadron.client.app.impl.SessionFactory;
-import io.nadron.client.communication.DeliveryGuaranty;
-import io.nadron.client.communication.NettyMessageBuffer;
-import io.nadron.client.event.Event;
-import io.nadron.client.event.Events;
-import io.nadron.client.event.NetworkEvent;
-import io.nadron.client.event.impl.AbstractSessionEventHandler;
-import io.nadron.client.util.LoginHelper;
+import com.texasthree.shell.client.util.LoginHelper;
+import com.texasthree.shell.client.app.Session;
+import com.texasthree.shell.client.app.impl.SessionFactory;
+import com.texasthree.shell.client.communication.DeliveryGuaranty;
+import com.texasthree.shell.client.communication.NettyMessageBuffer;
+import com.texasthree.shell.client.event.Event;
+import com.texasthree.shell.client.event.Events;
+import com.texasthree.shell.client.event.NetworkEvent;
+import com.texasthree.shell.client.event.impl.AbstractSessionEventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
