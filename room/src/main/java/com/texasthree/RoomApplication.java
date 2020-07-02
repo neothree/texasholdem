@@ -13,7 +13,6 @@ import com.texasthree.room.Room;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.Banner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -36,15 +35,13 @@ public class RoomApplication {
     private Protocol messageBufferProtocol;
 
     public static void main(String[] args) throws Exception {
-        SpringApplication app = new SpringApplication(RoomApplication.class);
-        app.setBannerMode(Banner.Mode.OFF);
-        app.run(args);
+        SpringApplication.run(RoomApplication.class);
     }
 
     @PostConstruct
     private void start() {
         try {
-            dispatcher.register("com.texasthr=e.room");
+            dispatcher.register("com.texasthree.room");
             serverManager.startServers();
             LOG.info("Room 启动成功");
 

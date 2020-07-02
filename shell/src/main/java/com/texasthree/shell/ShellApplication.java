@@ -12,34 +12,28 @@ import io.nadron.client.event.impl.AbstractSessionEventHandler;
 import io.nadron.client.util.LoginHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.util.Scanner;
 
 /**
  * @author : neo
  * create at:  2020-06-30  22:54
  * @description:
  */
-@SpringBootApplication
-public class ShellApplication implements CommandLineRunner {
+public class ShellApplication {
     private static final Logger LOG = LoggerFactory.getLogger(ShellApplication.class);
 
-    public static void main(String[] args) throws Exception {
-        SpringApplication.run(ShellApplication.class, args);
-    }
+    static ObjectMapper mapper = new ObjectMapper();
 
-    //access command line arguments
-    @Override
-    public void run(String... args) throws Exception {
-        //do something
+    public static void main(String[] args) throws Exception {
 
         LOG.info("开始启动");
         LoginHelper.LoginBuilder builder = new LoginHelper.LoginBuilder()
                 .username("user")
                 .password("pass")
                 .connectionKey("Room")
-                .nadronTcpHostName("localhost").tcpPort(18090);
+                .nadronTcpHostName("localhost")
+                .tcpPort(18090);
         LoginHelper helper = builder.build();
         SessionFactory sessionFactory = new SessionFactory(helper);
         Session session = sessionFactory.createAndConnectSession();
@@ -52,13 +46,33 @@ public class ShellApplication implements CommandLineRunner {
         session.addHandler(handler);
         LOG.info("启动成功");
 
-        Thread.sleep(1000);
-        NettyMessageBuffer buffer = new NettyMessageBuffer();
-        ObjectMapper mapper = new ObjectMapper();
+        while (true) {
+            try {
+                Scanner scan = new Scanner(System.in);
+                String text = scan.nextLine();
+                if (text == null || "".equals(text)) {
+                    continue;
+                }
 
-        buffer.writeString(mapper.writeValueAsString(new Greet()));
-        NetworkEvent event = Events.networkEvent(buffer, DeliveryGuaranty.DeliveryGuarantyOptions.RELIABLE);
-        session.onEvent(event);
+                LOG.info("输入命令: {}", text);
+                NettyMessageBuffer buffer = new NettyMessageBuffer();
+                Cmd.Heartbeat heartbeat = new Cmd.Heartbeat();
+                heartbeat.timestamp = System.currentTimeMillis();
+
+                Cmd.Command cmd = new Cmd.Command();
+                cmd.name = heartbeat.getClass().getSimpleName();
+                cmd.data = mapper.writeValueAsString(heartbeat);
+                String send = mapper.writeValueAsString(cmd);
+                LOG.info("发送数据 {}", send);
+
+                buffer.writeString(send);
+                NetworkEvent event = Events.networkEvent(buffer, DeliveryGuaranty.DeliveryGuarantyOptions.RELIABLE);
+                session.onEvent(event);
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.exit(1);
+            }
+        }
+
     }
-
 }

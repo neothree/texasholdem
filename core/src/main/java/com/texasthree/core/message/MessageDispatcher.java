@@ -2,9 +2,7 @@ package com.texasthree.core.message;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.texasthree.core.app.PlayerSession;
 import com.texasthree.core.app.Session;
-import com.texasthree.core.app.impl.InvalidCommandException;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +25,8 @@ public class MessageDispatcher {
 
     private final ConcurrentHashMap<String, Method> messageMap = new ConcurrentHashMap<>();
 
+    private Object object;
+
     public void register(String prefix) {
         //包名且不可忘记，不然扫描全部项目包，包括引用的jar
         Reflections reflections = new Reflections(prefix);
@@ -34,6 +34,11 @@ public class MessageDispatcher {
         //获取带MessageController注解的类
         Set<Class<?>> typesAnnotatedWith = reflections.getTypesAnnotatedWith(MessageController.class);
         for (Class clazz : typesAnnotatedWith) {
+            try {
+                object = clazz.newInstance();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             Method[] methods = clazz.getDeclaredMethods();
             for (Method method : methods) {
                 if (Modifier.isPublic(method.getModifiers())) {
@@ -51,9 +56,9 @@ public class MessageDispatcher {
             return;
         }
         try {
-            Class cl = method.getParameterTypes()[0];
+            Class cl = method.getParameterTypes()[1];
             Object o = mapper.readValue(data, cl);
-            method.invoke(session, o);
+            method.invoke(object, session, o);
         } catch (Exception e) {
             e.printStackTrace();
             LOG.error("消息派发失败 name={} data={}", name, data);

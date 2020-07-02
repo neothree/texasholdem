@@ -4,10 +4,14 @@ package com.texasthree.room;
 import com.texasthree.core.app.PlayerSession;
 import com.texasthree.core.message.MessageController;
 import com.texasthree.core.message.MessageDispatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @MessageController
 public class CommandController {
+
+    private static final Logger LOG = LoggerFactory.getLogger(CommandController.class);
 
     @Autowired
     private MessageDispatcher dispatcher;
@@ -54,5 +58,12 @@ public class CommandController {
     public void startGame(PlayerSession ps, Cmd.StartGame cmd) {
         User user = User.getUser(ps.getId().toString());
         user.getRoom().start();
+    }
+
+    /**
+     * 开始游戏
+     */
+    public void heartbeat(PlayerSession ps, Cmd.Heartbeat cmd) {
+        LOG.info("收到心跳 id={} time={}", ps.getId(), cmd.timestamp);
     }
 }
