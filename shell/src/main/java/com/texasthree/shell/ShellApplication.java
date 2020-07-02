@@ -1,8 +1,13 @@
 package com.texasthree.shell;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nadron.client.app.Session;
 import io.nadron.client.app.impl.SessionFactory;
+import io.nadron.client.communication.DeliveryGuaranty;
+import io.nadron.client.communication.NettyMessageBuffer;
 import io.nadron.client.event.Event;
+import io.nadron.client.event.Events;
+import io.nadron.client.event.NetworkEvent;
 import io.nadron.client.event.impl.AbstractSessionEventHandler;
 import io.nadron.client.util.LoginHelper;
 import org.slf4j.Logger;
@@ -46,6 +51,14 @@ public class ShellApplication implements CommandLineRunner {
         };
         session.addHandler(handler);
         LOG.info("启动成功");
+
+        Thread.sleep(1000);
+        NettyMessageBuffer buffer = new NettyMessageBuffer();
+        ObjectMapper mapper = new ObjectMapper();
+
+        buffer.writeString(mapper.writeValueAsString(new Greet()));
+        NetworkEvent event = Events.networkEvent(buffer, DeliveryGuaranty.DeliveryGuarantyOptions.RELIABLE);
+        session.onEvent(event);
     }
 
 }
