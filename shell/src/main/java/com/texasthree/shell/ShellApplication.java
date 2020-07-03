@@ -1,7 +1,6 @@
 package com.texasthree.shell;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.texasthree.shell.client.util.LoginHelper;
 import com.texasthree.shell.client.app.Session;
 import com.texasthree.shell.client.app.impl.SessionFactory;
 import com.texasthree.shell.client.communication.DeliveryGuaranty;
@@ -10,6 +9,7 @@ import com.texasthree.shell.client.event.Event;
 import com.texasthree.shell.client.event.Events;
 import com.texasthree.shell.client.event.NetworkEvent;
 import com.texasthree.shell.client.event.impl.AbstractSessionEventHandler;
+import com.texasthree.shell.client.util.LoginHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +32,7 @@ public class ShellApplication {
                 .username("user")
                 .password("pass")
                 .connectionKey("Room")
-                .nadronTcpHostName("localhost")
+                .tcpHostName("localhost")
                 .tcpPort(18090);
         LoginHelper helper = builder.build();
         SessionFactory sessionFactory = new SessionFactory(helper);
@@ -40,7 +40,8 @@ public class ShellApplication {
         AbstractSessionEventHandler handler = new AbstractSessionEventHandler(session) {
             @Override
             public void onDataIn(Event event) {
-                System.out.println("Received event: " + event);
+                NettyMessageBuffer buffer = (NettyMessageBuffer) event.getSource();
+                LOG.info("Received event: {} {}", buffer.readString(), event.getSource());
             }
         };
         session.addHandler(handler);
@@ -55,7 +56,6 @@ public class ShellApplication {
                 }
 
                 LOG.info("输入命令: {}", text);
-                NettyMessageBuffer buffer = new NettyMessageBuffer();
                 Cmd.Heartbeat heartbeat = new Cmd.Heartbeat();
                 heartbeat.timestamp = System.currentTimeMillis();
 
@@ -65,6 +65,7 @@ public class ShellApplication {
                 String send = mapper.writeValueAsString(cmd);
                 LOG.info("发送数据 {}", send);
 
+                NettyMessageBuffer buffer = new NettyMessageBuffer();
                 buffer.writeString(send);
                 NetworkEvent event = Events.networkEvent(buffer, DeliveryGuaranty.DeliveryGuarantyOptions.RELIABLE);
                 session.onEvent(event);
@@ -73,6 +74,5 @@ public class ShellApplication {
                 System.exit(1);
             }
         }
-
     }
 }

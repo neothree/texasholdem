@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 public interface ReconnectPolicy {
     void applyPolicy(Session session);
 
-    com.texasthree.shell.client.communication.ReconnectPolicy NO_RECONNECT = new NoReconnect();
+    ReconnectPolicy NO_RECONNECT = new NoReconnect();
 
     /**
      * This reconnect policy class will try to reconnect to server for n times
@@ -28,7 +28,7 @@ public interface ReconnectPolicy {
      *
      * @author Abraham Menacherry
      */
-    public static class ReconnectNTimes implements com.texasthree.shell.client.communication.ReconnectPolicy {
+    public static class ReconnectNTimes implements ReconnectPolicy {
         protected final int times;
         protected final int delay;
         protected final LoginHelper loginHelper;
@@ -94,7 +94,7 @@ public interface ReconnectPolicy {
 
     }
 
-    class NoReconnect implements com.texasthree.shell.client.communication.ReconnectPolicy {
+    class NoReconnect implements ReconnectPolicy {
         @Override
         public void applyPolicy(Session session) {
             session.close();

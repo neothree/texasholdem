@@ -264,5 +264,4 @@ public class NettyUDPClient {
     public ChannelInitializer<DatagramChannel> getPipelineFactory() {
         return pipelineFactory;
     }
-
 }

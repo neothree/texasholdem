@@ -151,14 +151,12 @@ public class NettyTCPClient {
             future = bootstrap.connect(serverAddress);
             future.addListener(new ChannelFutureListener() {
                 @Override
-                public void operationComplete(ChannelFuture future)
-                        throws Exception {
+                public void operationComplete(ChannelFuture future) throws Exception {
                     if (future.isSuccess()) {
                         future.channel().writeAndFlush(loginEvent);
                     } else {
                         future.cause().printStackTrace();
-                        throw new RuntimeException(future.cause()
-                                .getMessage());
+                        throw new RuntimeException(future.cause().getMessage());
                     }
                 }
             });

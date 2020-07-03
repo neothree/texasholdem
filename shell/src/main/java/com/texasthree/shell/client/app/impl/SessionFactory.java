@@ -5,7 +5,6 @@ import com.texasthree.shell.client.NettyUDPClient;
 import com.texasthree.shell.client.app.Player;
 import com.texasthree.shell.client.app.PlayerSession;
 import com.texasthree.shell.client.app.Session;
-import com.texasthree.shell.client.app.impl.DefaultPlayerSession;
 import com.texasthree.shell.client.app.impl.DefaultSession.SessionBuilder;
 import com.texasthree.shell.client.communication.MessageBuffer;
 import com.texasthree.shell.client.communication.MessageSender.Fast;
@@ -68,8 +67,7 @@ public class SessionFactory {
         if (null == udpAddress) {
             udpClient = null;
         } else {
-            udpClient = new NettyUDPClient(udpAddress,
-                    UDPPipelineFactory.getInstance(udpAddress), null);
+            udpClient = new NettyUDPClient(udpAddress, UDPPipelineFactory.getInstance(udpAddress), null);
         }
     }
 
@@ -136,9 +134,7 @@ public class SessionFactory {
      * @throws InterruptedException
      * @throws Exception
      */
-    public void connectSession(final Session session,
-                               EventHandler... eventHandlers) throws InterruptedException,
-            Exception {
+    public void connectSession(final Session session, EventHandler... eventHandlers) throws InterruptedException, Exception {
         InetSocketAddress udpAddress = null;
         if (null != udpClient) {
             udpAddress = doUdpConnection(session);
@@ -153,8 +149,7 @@ public class SessionFactory {
             }
         }
 
-        MessageBuffer<ByteBuf> buffer = loginHelper
-                .getLoginBuffer(udpAddress);
+        MessageBuffer<ByteBuf> buffer = loginHelper.getLoginBuffer(udpAddress);
         Event loginEvent = Events.event(buffer, Events.LOG_IN);
         doTcpConnection(session, loginEvent);
     }
@@ -172,8 +167,7 @@ public class SessionFactory {
      * @throws InterruptedException
      * @throws Exception
      */
-    public void reconnectSession(final Session session, String reconnectKey)
-            throws InterruptedException, Exception {
+    public void reconnectSession(final Session session, String reconnectKey) throws InterruptedException, Exception {
         session.getTcpMessageSender().close();
         if (null != session.getUdpMessageSender())
             session.getUdpMessageSender().close();
@@ -183,15 +177,11 @@ public class SessionFactory {
             udpAddress = doUdpConnection(session);
         }
 
-        Event reconnectEvent = Events.event(
-                loginHelper.getReconnectBuffer(reconnectKey, udpAddress),
-                Events.RECONNECT);
-
+        Event reconnectEvent = Events.event(loginHelper.getReconnectBuffer(reconnectKey, udpAddress), Events.RECONNECT);
         doTcpConnection(session, reconnectEvent);
     }
 
-    protected void doTcpConnection(final Session session, Event event)
-            throws Exception, InterruptedException {
+    protected void doTcpConnection(final Session session, Event event) throws Exception, InterruptedException {
         // This will in turn invoke the startEventHandler when server sends
         // Events.START event.
         Channel channel = tcpClient.connect(getTCPPipelineFactory(session), event);
@@ -210,8 +200,7 @@ public class SessionFactory {
      *                that it can send messages to it.
      * @return
      */
-    protected synchronized ChannelInitializer<SocketChannel> getTCPPipelineFactory(
-            final Session session) {
+    protected synchronized ChannelInitializer<SocketChannel> getTCPPipelineFactory(final Session session) {
         if (null == channelInitializer) {
             channelInitializer = new TCPPipelineFactory(session);
         }
@@ -228,12 +217,9 @@ public class SessionFactory {
         this.channelInitializer = channelInitializer;
     }
 
-    protected InetSocketAddress doUdpConnection(final Session session)
-            throws UnknownHostException, InterruptedException {
-        InetSocketAddress localAddress;
-        final DatagramChannel datagramChannel = udpClient
-                .createDatagramChannel();
-        localAddress = datagramChannel.localAddress();
+    protected InetSocketAddress doUdpConnection(final Session session) throws UnknownHostException, InterruptedException {
+        final DatagramChannel datagramChannel = udpClient.createDatagramChannel();
+        InetSocketAddress localAddress = datagramChannel.localAddress();
         // Add a start event handler to the session which will send the udp
         // connect on server START signal.
         final EventHandler startEventHandler = new EventHandler() {
@@ -256,8 +242,7 @@ public class SessionFactory {
             }
         };
         session.addHandler(startEventHandler);
-        Fast udpMessageSender = new NettyUDPMessageSender(
-                udpClient.getServerAddress(), datagramChannel);
+        Fast udpMessageSender = new NettyUDPMessageSender(udpClient.getServerAddress(), datagramChannel);
         session.setUdpMessageSender(udpMessageSender);
         return localAddress;
     }
