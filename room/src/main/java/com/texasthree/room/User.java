@@ -38,6 +38,10 @@ public class User {
         return this.data.id;
     }
 
+    public int getChips() {
+        return this.data.chips;
+    }
+
     @Override
     public String toString() {
         return this.data.name + ":" + this.data.id;

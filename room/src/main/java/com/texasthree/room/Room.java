@@ -55,7 +55,6 @@ public class Room extends GameRoomSession {
 
     public void situp(int position) {
         this.desk.situp(position);
-
     }
 
     public void start() {
@@ -90,5 +89,4 @@ public class Room extends GameRoomSession {
         playerSession.addHandler(listener);
         LOG.trace("Added event listener in Zombie Room");
     }
-
 }

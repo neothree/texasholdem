@@ -26,8 +26,7 @@ public class NettyObjectProtocol extends AbstractNettyProtocol {
 
     @Override
     public void applyProtocol(PlayerSession playerSession) {
-        LOG.trace("Going to apply {} on session: {}", getProtocolName(),
-                playerSession);
+        LOG.trace("Going to apply {} on session: {}", getProtocolName(), playerSession);
         ChannelPipeline pipeline = NettyUtils.getPipeLineOfConnection(playerSession);
         NettyUtils.clearPipeline(pipeline);
 

@@ -4,21 +4,21 @@ import com.texasthree.room.game.TexasGame;
 
 public class RoundClient {
 
-    /*
-     * 庄家位
-     */
-    private int dealer = 0;
-
     private TexasGame texas;
 
-    public void start(RoundBuilder builder) {
+    private Desk desk;
+
+    public RoundClient(Desk desk) {
+        this.desk = desk;
+    }
+
+    public void start() {
         if (texas != null) {
             return;
         }
 
-
+        this.texas = new TexasGame(desk, null);
     }
-
 
 
     public boolean runing() {

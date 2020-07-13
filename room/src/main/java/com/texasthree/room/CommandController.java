@@ -24,12 +24,18 @@ public class CommandController {
 //        Room room = new Room(cmd.data, session);
     }
 
+    /**
+     * 进入房间
+     */
     public void enterRoom(PlayerSession ps, Cmd.EnterRoom cmd) {
         Room room = Room.getRoom(cmd.id);
         User user = User.getUser(ps.getId().toString());
         user.enter(room);
     }
 
+    /**
+     * 离开房间
+     */
     public void leaveRoom(PlayerSession ps, Cmd.LeaveRoom cmd) {
         User user = User.getUser(ps.getId().toString());
         Room room = user.getRoom();
@@ -61,7 +67,7 @@ public class CommandController {
     }
 
     /**
-     * 开始游戏
+     * 心跳
      */
     public void heartbeat(PlayerSession ps, Cmd.Heartbeat cmd) {
         LOG.info("收到心跳 id={} time={}", ps.getId(), cmd.timestamp);

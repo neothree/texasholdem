@@ -6,6 +6,7 @@ public class Cmd {
     public static class UserData {
         String id;
         String name;
+        int chips;
     }
 
     public static class RoomData {

@@ -50,11 +50,20 @@ public class Desk {
     }
 
     public void start() {
-        this.round.start(new RoundBuilder());
+        this.round.start();
     }
 
     public void loop() {
         this.loop();
     }
 
+    public void send(Object data) {
+    }
+
+    public void send(Object data, User user) {
+
+    }
+    public User[] getUsers() {
+        return this.seats;
+    }
 }

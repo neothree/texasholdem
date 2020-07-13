@@ -41,7 +41,7 @@ public class ShellApplication {
             @Override
             public void onDataIn(Event event) {
                 NettyMessageBuffer buffer = (NettyMessageBuffer) event.getSource();
-                LOG.info("Received event: {} {}", buffer.readString(), event.getSource());
+                LOG.info("Received event: {} ", buffer.readString());
             }
         };
         session.addHandler(handler);
@@ -49,13 +49,13 @@ public class ShellApplication {
 
         while (true) {
             try {
+                LOG.info("请输入命令: ");
                 Scanner scan = new Scanner(System.in);
                 String text = scan.nextLine();
                 if (text == null || "".equals(text)) {
                     continue;
                 }
 
-                LOG.info("输入命令: {}", text);
                 Cmd.Heartbeat heartbeat = new Cmd.Heartbeat();
                 heartbeat.timestamp = System.currentTimeMillis();
 

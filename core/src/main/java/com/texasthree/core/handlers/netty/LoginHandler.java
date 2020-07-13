@@ -19,21 +19,16 @@ import com.texasthree.core.util.NettyUtils;
 import com.texasthree.core.util.SimpleCredentials;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.*;
 import io.netty.channel.ChannelHandler.Sharable;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
-
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 @Sharable
@@ -64,7 +59,7 @@ public class LoginHandler extends SimpleChannelInboundHandler<Event> {
         final Channel channel = ctx.channel();
         int type = event.getType();
         if (Events.LOG_IN == type) {
-            LOG.debug("Login attempt from {}", channel.remoteAddress());
+            LOG.info("Login attempt from {}", channel.remoteAddress());
             Player player = lookupPlayer(buffer, channel);
             handleLogin(player, ctx, buffer);
         } else if (Events.RECONNECT == type) {

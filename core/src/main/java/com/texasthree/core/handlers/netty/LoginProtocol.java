@@ -1,9 +1,5 @@
 package com.texasthree.core.handlers.netty;
 
-import static com.texasthree.core.event.Events.LOG_IN;
-import static com.texasthree.core.event.Events.PROTCOL_VERSION;
-import static com.texasthree.core.event.Events.RECONNECT;
-
 import com.texasthree.core.event.Events;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
@@ -14,13 +10,16 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.texasthree.core.event.Events.*;
 
 
 /**
@@ -119,6 +118,7 @@ public interface LoginProtocol {
      */
     @Component("defaultNadLoginProtocol")
     public static class DefaultNadProtocol implements LoginProtocol {
+        private static final Logger LOG = LoggerFactory.getLogger(DefaultNadProtocol.class);
 
         private int frameSize = 1024;
 
@@ -137,6 +137,8 @@ public interface LoginProtocol {
             final int opcode = buffer.getUnsignedByte(buffer.readerIndex() + 2);
             final int protocolVersion = buffer.getUnsignedByte(buffer.readerIndex() + 3);
             if (isNadProtocol(opcode, protocolVersion)) {
+                LOG.info("defaultNadLoginProtocol 登录");
+
                 pipeline.addLast("framer", createLengthBasedFrameDecoder());
                 pipeline.addLast("eventDecoder", eventDecoder);
                 pipeline.addLast(LOGIN_HANDLER_NAME, loginHandler);

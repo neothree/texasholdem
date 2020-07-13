@@ -7,10 +7,8 @@ import com.texasthree.core.event.Events;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.timeout.IdleStateEvent;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 
 /**
@@ -61,9 +59,7 @@ public class DefaultToServerHandler extends SimpleChannelInboundHandler<Event> {
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) {
         if (evt instanceof IdleStateEvent) {
-            LOG.warn(
-                    "Channel {} has been idle, exception event will be raised now: ",
-                    ctx.channel());
+            LOG.warn("Channel {} has been idle, exception event will be raised now: ", ctx.channel());
             // TODO check if setting payload as non-throwable cause issue?
             Event event = Events.event(evt, Events.EXCEPTION);
             playerSession.onEvent(event);

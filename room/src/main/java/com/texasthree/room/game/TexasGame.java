@@ -1,18 +1,12 @@
 package com.texasthree.room.game;
 
-import com.texasthree.room.Cmd;
-import com.texasthree.room.RoundBuilder;
-import com.texasthree.room.ScheduledEvent;
-import com.texasthree.room.User;
+import com.texasthree.room.*;
 import com.texasthree.round.RoundState;
 import com.texasthree.round.texas.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -23,9 +17,19 @@ import java.util.stream.Collectors;
 public class TexasGame {
     private static final Logger LOG = LoggerFactory.getLogger(TexasGame.class);
 
-    private RoundState state;
+    /*
+     * 庄家位
+     */
+    private int dealer = 0;
 
+    private Runnable onShowdown;
+
+    private Desk desk;
+
+    ///////////// 一局数据 ///////////////
     private Texas texas;
+
+    private RoundState state;
 
     private ScheduledEvent opEvent;
 
@@ -37,25 +41,29 @@ public class TexasGame {
 
     private int actDuarion = 15000;
 
-    private Runnable onShowdown;
-
-    public TexasGame(RoundBuilder builder, Runnable onShowdown) {
-
+    public TexasGame(Desk desk, Runnable onShowdown) {
+        this.desk = desk;
         this.onShowdown = onShowdown;
-        texas = builder.build();
-        try {
-            texas.start();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        state = texas.state();
     }
 
 
     public void start() {
+        // 位置图谱
+        List<User> users = new ArrayList<>();
+        Map<String, Integer> pos = new HashMap<>();
+        for (int i = 0; i < desk.getUsers().length; i++) {
+            User v = desk.getUsers()[i];
+            if (v != null) {
+                users.add(v);
+                pos.put(v.getId(), i);
+            }
+        }
+        texas = new TexasBuilder()
+                .users(users)
+                .position(pos)
+                .build();
         try {
-            this.texas.start();
+            texas.start();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -281,11 +289,11 @@ public class TexasGame {
 
 
     private void send(Object data) {
-
+        this.desk.send(data);
     }
 
     private void send(Object data, User user) {
-
+        this.desk.send(data, user);
     }
 
     private void printStart() {
