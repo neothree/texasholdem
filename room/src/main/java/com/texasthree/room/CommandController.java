@@ -1,23 +1,23 @@
 package com.texasthree.room;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.texasthree.core.app.PlayerSession;
+import com.texasthree.core.communication.DeliveryGuaranty;
+import com.texasthree.core.communication.NettyMessageBuffer;
+import com.texasthree.core.event.Events;
+import com.texasthree.core.event.NetworkEvent;
 import com.texasthree.core.message.MessageController;
-import com.texasthree.core.message.MessageDispatcher;
 import com.texasthree.proto.Cmd;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @MessageController
 public class CommandController {
 
     private static final Logger LOG = LoggerFactory.getLogger(CommandController.class);
 
-    @Autowired
-    private MessageDispatcher dispatcher;
-
-    public void setName(PlayerSession ps, Cmd.SetName cmd) {
+    public void setName(PlayerSession ps, Cmd.SetName cmd) throws Exception {
         User user = User.getUser(ps.getId().toString());
         if (user != null) {
             return;
@@ -28,7 +28,7 @@ public class CommandController {
         data.chips = 1000;
         user = new User(data);
 
-        LOG.info("玩家填写姓名 name={}", cmd.name);
+        sendCmd(ps, cmd);
     }
 
     /**
@@ -86,5 +86,20 @@ public class CommandController {
      */
     public void heartbeat(PlayerSession ps, Cmd.Heartbeat cmd) {
         LOG.info("收到心跳 id={} time={}", ps.getId(), cmd.timestamp);
+    }
+
+    static ObjectMapper mapper = new ObjectMapper();
+
+    private void sendCmd(PlayerSession ps, Object msg) throws Exception {
+        Cmd.Command cmd = new Cmd.Command();
+        cmd.name = msg.getClass().getSimpleName();
+        cmd.data = mapper.writeValueAsString(msg);
+        String send = mapper.writeValueAsString(cmd);
+        LOG.info("发送数据 {}", send);
+
+        NettyMessageBuffer buffer = new NettyMessageBuffer();
+        buffer.writeString(send);
+        NetworkEvent event = Events.networkEvent(buffer, DeliveryGuaranty.DeliveryGuarantyOptions.RELIABLE);
+        ps.onEvent(event);
     }
 }

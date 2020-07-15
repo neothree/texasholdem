@@ -4,21 +4,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.texasthree.core.app.GameCommandInterpreter;
 import com.texasthree.core.app.Session;
 import com.texasthree.core.app.impl.InvalidCommandException;
-import com.texasthree.core.communication.DeliveryGuaranty;
 import com.texasthree.core.communication.MessageBuffer;
-import com.texasthree.core.communication.NettyMessageBuffer;
 import com.texasthree.core.event.Event;
-import com.texasthree.core.event.Events;
-import com.texasthree.core.event.NetworkEvent;
 import com.texasthree.core.event.impl.DefaultSessionEventHandler;
 import com.texasthree.core.message.MessageDispatcher;
+import com.texasthree.proto.Cmd;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
 @SuppressWarnings("rawtypes")
-public class SessionHandler extends DefaultSessionEventHandler implements GameCommandInterpreter {
-    private static final Logger LOG = LoggerFactory.getLogger(SessionHandler.class);
+public class CommandHandler extends DefaultSessionEventHandler implements GameCommandInterpreter {
+    private static final Logger LOG = LoggerFactory.getLogger(CommandHandler.class);
 
     volatile int cmdCount;
 
@@ -26,7 +23,7 @@ public class SessionHandler extends DefaultSessionEventHandler implements GameCo
 
     private MessageDispatcher dispatcher;
 
-    public SessionHandler(Session session, MessageDispatcher dispatcher) {
+    public CommandHandler(Session session, MessageDispatcher dispatcher) {
         super(session);
         this.dispatcher = dispatcher;
     }
@@ -49,11 +46,6 @@ public class SessionHandler extends DefaultSessionEventHandler implements GameCo
             Session session = this.getSession();
             Cmd.Command cmd = mapper.readValue(buf.readString(), Cmd.Command.class);
             this.dispatcher.dispatch(cmd.name, cmd.data, session);
-
-            NettyMessageBuffer send = new NettyMessageBuffer();
-            send.writeString("收到了");
-            NetworkEvent event = Events.networkEvent(send, DeliveryGuaranty.DeliveryGuarantyOptions.RELIABLE);
-            session.onEvent(event);
         } catch (Exception e) {
             e.printStackTrace();
             throw new InvalidCommandException("消息错误: " + buf.readString());

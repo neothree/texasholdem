@@ -8,7 +8,7 @@ import com.texasthree.core.protocols.Protocol;
 import com.texasthree.core.server.ServerManager;
 import com.texasthree.core.service.LookupService;
 import com.texasthree.core.service.impl.SimpleLookupService;
-import com.texasthree.room.Cmd;
+import com.texasthree.proto.Cmd;
 import com.texasthree.room.Room;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

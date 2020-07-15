@@ -1,8 +1,8 @@
-package com.texasthree.core.message;
+package com.texasthree.shell.client.message;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.texasthree.core.app.Session;
+import com.texasthree.shell.client.app.Session;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

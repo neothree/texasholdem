@@ -1,10 +1,13 @@
 package com.texasthree.shell;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.texasthree.proto.Cmd;
 import com.texasthree.shell.client.app.Session;
 import com.texasthree.shell.client.app.impl.SessionFactory;
 import com.texasthree.shell.client.communication.NettyMessageBuffer;
 import com.texasthree.shell.client.event.Event;
 import com.texasthree.shell.client.event.impl.AbstractSessionEventHandler;
+import com.texasthree.shell.client.message.MessageDispatcher;
 import com.texasthree.shell.client.util.LoginHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,8 +20,12 @@ import org.slf4j.LoggerFactory;
 public class ShellApplication {
     private static final Logger LOG = LoggerFactory.getLogger(ShellApplication.class);
 
+    private static ObjectMapper mapper = new ObjectMapper();
 
+    private static MessageDispatcher dispatcher;
     public static void main(String[] args) throws Exception {
+        dispatcher = new MessageDispatcher();
+        dispatcher.register("com.texasthree.shell");
 
         LOG.info("开始启动");
         LoginHelper.LoginBuilder builder = new LoginHelper.LoginBuilder()
@@ -33,8 +40,14 @@ public class ShellApplication {
         AbstractSessionEventHandler handler = new AbstractSessionEventHandler(session) {
             @Override
             public void onDataIn(Event event) {
-                NettyMessageBuffer buffer = (NettyMessageBuffer) event.getSource();
-                LOG.info("Received event: {} ", buffer.readString());
+                NettyMessageBuffer buf = (NettyMessageBuffer) event.getSource();
+                try {
+                    Session session = this.getSession();
+                    Cmd.Command cmd = mapper.readValue(buf.readString(), Cmd.Command.class);
+                    dispatcher.dispatch(cmd.name, cmd.data, session);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         };
         session.addHandler(handler);
