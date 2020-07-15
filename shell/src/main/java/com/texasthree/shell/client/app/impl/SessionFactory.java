@@ -2,8 +2,6 @@ package com.texasthree.shell.client.app.impl;
 
 import com.texasthree.shell.client.NettyTCPClient;
 import com.texasthree.shell.client.NettyUDPClient;
-import com.texasthree.shell.client.app.Player;
-import com.texasthree.shell.client.app.PlayerSession;
 import com.texasthree.shell.client.app.Session;
 import com.texasthree.shell.client.app.impl.DefaultSession.SessionBuilder;
 import com.texasthree.shell.client.communication.MessageBuffer;
@@ -245,13 +243,6 @@ public class SessionFactory {
         Fast udpMessageSender = new NettyUDPMessageSender(udpClient.getServerAddress(), datagramChannel);
         session.setUdpMessageSender(udpMessageSender);
         return localAddress;
-    }
-
-    public PlayerSession createPlayerSession(Player player) {
-        SessionBuilder sessionBuilder = new SessionBuilder();
-        DefaultPlayerSession playerSession = new DefaultPlayerSession(
-                sessionBuilder, player);
-        return playerSession;
     }
 
     public LoginHelper getLoginHelper() {

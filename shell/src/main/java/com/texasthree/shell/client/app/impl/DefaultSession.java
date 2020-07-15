@@ -1,7 +1,6 @@
 package com.texasthree.shell.client.app.impl;
 
 import com.texasthree.shell.client.app.Session;
-import com.texasthree.shell.client.app.impl.SessionFactory;
 import com.texasthree.shell.client.communication.MessageSender.Fast;
 import com.texasthree.shell.client.communication.MessageSender.Reliable;
 import com.texasthree.shell.client.communication.ReconnectPolicy;
@@ -9,7 +8,6 @@ import com.texasthree.shell.client.event.Event;
 import com.texasthree.shell.client.event.EventDispatcher;
 import com.texasthree.shell.client.event.EventHandler;
 import com.texasthree.shell.client.event.impl.DefaultEventDispatcher;
-import com.texasthree.shell.client.protocol.Protocol;
 import com.texasthree.shell.client.util.Config;
 import com.texasthree.shell.client.util.LoginHelper;
 
@@ -322,11 +320,6 @@ public class DefaultSession implements Session {
     @Override
     public void setUdpMessageSender(Fast udpMessageSender) {
         this.udpMessageSender = udpMessageSender;
-    }
-
-    @Override
-    public void resetProtocol(Protocol protocol) {
-        protocol.applyProtocol(this);
     }
 
     @Override

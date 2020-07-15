@@ -8,7 +8,6 @@ import com.texasthree.shell.client.event.Event;
 import com.texasthree.shell.client.event.EventDispatcher;
 import com.texasthree.shell.client.event.EventHandler;
 import com.texasthree.shell.client.event.Events;
-import com.texasthree.shell.client.protocol.Protocol;
 import com.texasthree.shell.client.util.LoginHelper;
 
 import java.util.List;
@@ -97,13 +96,6 @@ public interface Session {
 
     Reliable getTcpMessageSender();
 
-    /**
-     * Implementations will generally clear the internal netty pipeline and
-     * apply new set of handlers
-     *
-     * @param protocol
-     */
-    void resetProtocol(Protocol protocol);
 
     void reconnect(LoginHelper loginHelper);
 
