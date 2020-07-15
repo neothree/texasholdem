@@ -6,12 +6,11 @@ package com.texasthree.core.server;
  * @author Abraham Menacherry
  */
 public interface ServerManager {
-    public void startServers(int tcpPort, int udpPort) throws Exception;
 
-    public void startServers() throws Exception;
+    void startServers() throws Exception;
 
     /**
      * Used to stop the server and manage cleanup of resources.
      */
-    public void stopServers() throws Exception;
+    void stopServers() throws Exception;
 }

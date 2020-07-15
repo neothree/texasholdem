@@ -41,8 +41,8 @@ public class RoomApplication {
     @PostConstruct
     private void start() {
         try {
-            dispatcher.register("com.texasthree.room");
             serverManager.startServers();
+            dispatcher.register("com.texasthree.room");
             LOG.info("Room 启动成功");
 
             this.createRoom();

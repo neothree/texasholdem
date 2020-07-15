@@ -1,11 +1,6 @@
 package com.texasthree.core.app.impl;
 
-import com.texasthree.core.app.Game;
-import com.texasthree.core.app.GameRoom;
-import com.texasthree.core.app.Player;
-import com.texasthree.core.app.PlayerSession;
-import com.texasthree.core.app.Session;
-import com.texasthree.core.app.SessionFactory;
+import com.texasthree.core.app.*;
 import com.texasthree.core.concurrent.LaneStrategy;
 import com.texasthree.core.concurrent.LaneStrategy.LaneStrategies;
 import com.texasthree.core.event.Event;
@@ -17,14 +12,13 @@ import com.texasthree.core.event.impl.NetworkEventListener;
 import com.texasthree.core.protocols.Protocol;
 import com.texasthree.core.service.GameStateManagerService;
 import com.texasthree.core.service.impl.GameStateManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 public abstract class GameRoomSession extends DefaultSession implements GameRoom {
@@ -157,7 +151,7 @@ public abstract class GameRoomSession extends DefaultSession implements GameRoom
             playerSession.setGameRoom(this);
             LOG.trace("Protocol to be applied is: {}", protocol.getClass().getName());
             protocol.applyProtocol(playerSession, true);
-            createAndAddEventHandlers(playerSession);
+            this.createAndAddEventHandlers(playerSession);
             playerSession.setStatus(Session.Status.CONNECTED);
             afterSessionConnect(playerSession);
             return true;

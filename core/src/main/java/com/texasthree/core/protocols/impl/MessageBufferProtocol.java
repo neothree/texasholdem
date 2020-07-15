@@ -8,11 +8,9 @@ import com.texasthree.core.protocols.AbstractNettyProtocol;
 import com.texasthree.core.util.NettyUtils;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.LengthFieldPrepender;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -37,17 +35,14 @@ public class MessageBufferProtocol extends AbstractNettyProtocol {
 
     @Override
     public void applyProtocol(PlayerSession playerSession) {
-        LOG.trace("Going to apply {} on session: {}", getProtocolName(),
-                playerSession);
+        LOG.trace("Going to apply {} on session: {}", getProtocolName(), playerSession);
 
-        ChannelPipeline pipeline = NettyUtils
-                .getPipeLineOfConnection(playerSession);
+        ChannelPipeline pipeline = NettyUtils.getPipeLineOfConnection(playerSession);
         // Upstream handlers or encoders (i.e towards server) are added to
         // pipeline now.
         pipeline.addLast("lengthDecoder", createLengthBasedFrameDecoder());
         pipeline.addLast("messageBufferEventDecoder", messageBufferEventDecoder);
-        pipeline.addLast("eventHandler", new DefaultToServerHandler(
-                playerSession));
+        pipeline.addLast("eventHandler", new DefaultToServerHandler(playerSession));
 
         // Downstream handlers - Filter for data which flows from server to
         // client. Note that the last handler added is actually the first

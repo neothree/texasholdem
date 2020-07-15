@@ -202,8 +202,7 @@ public class LoginHandler extends SimpleChannelInboundHandler<Event> {
     public void connectToGameRoom(final GameRoom gameRoom, final PlayerSession playerSession, ChannelFuture future) {
         future.addListener(new ChannelFutureListener() {
             @Override
-            public void operationComplete(ChannelFuture future)
-                    throws Exception {
+            public void operationComplete(ChannelFuture future) throws Exception {
                 Channel channel = future.channel();
                 LOG.trace("Sending GAME_ROOM_JOIN_SUCCESS to channel {} completed", channel);
                 if (future.isSuccess()) {

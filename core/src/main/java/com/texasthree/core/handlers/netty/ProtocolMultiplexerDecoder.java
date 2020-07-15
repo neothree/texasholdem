@@ -6,12 +6,10 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.ByteToMessageDecoder;
-
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * This class can be used to switch login-protocol based on the incoming bytes
@@ -47,7 +45,9 @@ public class ProtocolMultiplexerDecoder extends ByteToMessageDecoder {
 
         ChannelPipeline pipeline = ctx.pipeline();
 
-        if (!loginProtocol.applyProtocol(in, pipeline)) {
+        if (loginProtocol.applyProtocol(in, pipeline)) {
+            pipeline.remove(this);
+        } else {
             byte[] headerBytes = new byte[bytesForProtocolCheck];
             in.getBytes(in.readerIndex(), headerBytes, 0, bytesForProtocolCheck);
             LOG.error(
@@ -55,8 +55,6 @@ public class ProtocolMultiplexerDecoder extends ByteToMessageDecoder {
                     ctx.channel(),
                     BinaryUtils.getHexString(headerBytes));
             close(in, ctx);
-        } else {
-            pipeline.remove(this);
         }
     }
 

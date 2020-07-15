@@ -1,11 +1,12 @@
-package com.texasthree.shell;
+package com.texasthree.proto;
 
 import java.util.List;
 
 public class Cmd {
     public static class UserData {
-        String id;
-        String name;
+        public String id;
+        public String name;
+        public int chips;
     }
 
     public static class RoomData {
@@ -19,9 +20,13 @@ public class Cmd {
         public String data;
     }
 
+    public static class SetName {
+        public String name;
+    }
+
+
     public static class CreateRoom {
         public RoomData data;
-
     }
 
     public static class EnterRoom {
@@ -95,5 +100,4 @@ public class Cmd {
     public static class Heartbeat {
         public long timestamp;
     }
-
 }

@@ -13,6 +13,7 @@
         <module>room</module>
         <module>round</module>
         <module>shell</module>
+        <module>proto</module>
     </modules>
 
     <parent>

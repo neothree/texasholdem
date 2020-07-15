@@ -26,8 +26,7 @@ import java.util.List;
 public class MessageBufferEventDecoder extends MessageToMessageDecoder<ByteBuf> {
 
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf buffer,
-                          List<Object> out) throws Exception {
+    protected void decode(ChannelHandlerContext ctx, ByteBuf buffer, List<Object> out) throws Exception {
         out.add(decode(ctx, buffer));
     }
 

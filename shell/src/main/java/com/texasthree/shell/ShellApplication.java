@@ -1,19 +1,13 @@
 package com.texasthree.shell;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.texasthree.shell.client.app.Session;
 import com.texasthree.shell.client.app.impl.SessionFactory;
-import com.texasthree.shell.client.communication.DeliveryGuaranty;
 import com.texasthree.shell.client.communication.NettyMessageBuffer;
 import com.texasthree.shell.client.event.Event;
-import com.texasthree.shell.client.event.Events;
-import com.texasthree.shell.client.event.NetworkEvent;
 import com.texasthree.shell.client.event.impl.AbstractSessionEventHandler;
 import com.texasthree.shell.client.util.LoginHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Scanner;
 
 /**
  * @author : neo
@@ -23,7 +17,6 @@ import java.util.Scanner;
 public class ShellApplication {
     private static final Logger LOG = LoggerFactory.getLogger(ShellApplication.class);
 
-    static ObjectMapper mapper = new ObjectMapper();
 
     public static void main(String[] args) throws Exception {
 
@@ -47,32 +40,9 @@ public class ShellApplication {
         session.addHandler(handler);
         LOG.info("启动成功");
 
-        while (true) {
-            try {
-                LOG.info("请输入命令: ");
-                Scanner scan = new Scanner(System.in);
-                String text = scan.nextLine();
-                if (text == null || "".equals(text)) {
-                    continue;
-                }
+        Thread.sleep(1000);
 
-                Cmd.Heartbeat heartbeat = new Cmd.Heartbeat();
-                heartbeat.timestamp = System.currentTimeMillis();
-
-                Cmd.Command cmd = new Cmd.Command();
-                cmd.name = heartbeat.getClass().getSimpleName();
-                cmd.data = mapper.writeValueAsString(heartbeat);
-                String send = mapper.writeValueAsString(cmd);
-                LOG.info("发送数据 {}", send);
-
-                NettyMessageBuffer buffer = new NettyMessageBuffer();
-                buffer.writeString(send);
-                NetworkEvent event = Events.networkEvent(buffer, DeliveryGuaranty.DeliveryGuarantyOptions.RELIABLE);
-                session.onEvent(event);
-            } catch (Exception e) {
-                e.printStackTrace();
-                System.exit(1);
-            }
-        }
+        new Shell(session).start();
     }
+
 }

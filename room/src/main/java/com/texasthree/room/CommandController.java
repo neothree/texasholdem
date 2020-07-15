@@ -4,6 +4,7 @@ package com.texasthree.room;
 import com.texasthree.core.app.PlayerSession;
 import com.texasthree.core.message.MessageController;
 import com.texasthree.core.message.MessageDispatcher;
+import com.texasthree.proto.Cmd;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,20 @@ public class CommandController {
 
     @Autowired
     private MessageDispatcher dispatcher;
+
+    public void setName(PlayerSession ps, Cmd.SetName cmd) {
+        User user = User.getUser(ps.getId().toString());
+        if (user != null) {
+            return;
+        }
+        Cmd.UserData data = new Cmd.UserData();
+        data.name = cmd.name;
+        data.id = ps.getId().toString();
+        data.chips = 1000;
+        user = new User(data);
+
+        LOG.info("玩家填写姓名 name={}", cmd.name);
+    }
 
     /**
      * 创建房间

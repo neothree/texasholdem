@@ -31,22 +31,19 @@ public class DefaultToServerHandler extends SimpleChannelInboundHandler<Event> {
     }
 
     @Override
-    public void channelRead0(ChannelHandlerContext ctx,
-                             Event msg) throws Exception {
+    public void channelRead0(ChannelHandlerContext ctx, Event msg) throws Exception {
         playerSession.onEvent(msg);
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
-            throws Exception {
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         LOG.error("Exception during network communication: {}.", cause);
         Event event = Events.event(cause, Events.EXCEPTION);
         playerSession.onEvent(event);
     }
 
     @Override
-    public void channelInactive(ChannelHandlerContext ctx)
-            throws Exception {
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         LOG.debug("Netty Channel {} is closed.", ctx.channel());
         if (!playerSession.isShuttingDown()) {
             // Should not send close to session, since reconnection/other

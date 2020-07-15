@@ -4,18 +4,15 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
-import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-
-import java.util.Map;
-import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PreDestroy;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This class is used for TCP IP communications with client. It uses Netty tcp
@@ -29,7 +26,8 @@ public class NettyTCPServer extends AbstractNettyServer {
 
     private ServerBootstrap serverBootstrap;
 
-    public NettyTCPServer(@Qualifier("tcpConfig") NettyConfig nettyConfig, ProtocolMultiplexerChannelInitializer channelInitializer) {
+    public NettyTCPServer(@Qualifier("tcpConfig") NettyConfig nettyConfig,
+                          ProtocolMultiplexerChannelInitializer channelInitializer) {
         super(nettyConfig, channelInitializer);
     }
 
@@ -48,7 +46,9 @@ public class NettyTCPServer extends AbstractNettyServer {
             serverBootstrap.group(getBossGroup(), getWorkerGroup())
                     .channel(NioServerSocketChannel.class)
                     .childHandler(getChannelInitializer());
-            Channel serverChannel = serverBootstrap.bind(nettyConfig.getSocketAddress()).sync()
+            Channel serverChannel = serverBootstrap
+                    .bind(nettyConfig.getSocketAddress())
+                    .sync()
                     .channel();
             ALL_CHANNELS.add(serverChannel);
         } catch (Exception e) {
@@ -78,7 +78,7 @@ public class NettyTCPServer extends AbstractNettyServer {
 
     @Override
     @PreDestroy
-    public void stopServer() throws Exception  {
+    public void stopServer() throws Exception {
         super.stopServer();
     }
 }

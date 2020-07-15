@@ -1,5 +1,7 @@
 package com.texasthree.room;
 
+import com.texasthree.proto.Cmd;
+
 import java.util.HashMap;
 import java.util.Map;
 
