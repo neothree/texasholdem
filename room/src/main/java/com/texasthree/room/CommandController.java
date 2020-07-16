@@ -1,12 +1,8 @@
 package com.texasthree.room;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.texasthree.RoomApplication;
 import com.texasthree.core.app.PlayerSession;
-import com.texasthree.core.communication.DeliveryGuaranty;
-import com.texasthree.core.communication.NettyMessageBuffer;
-import com.texasthree.core.event.Events;
-import com.texasthree.core.event.NetworkEvent;
 import com.texasthree.core.message.MessageController;
 import com.texasthree.proto.Cmd;
 import org.slf4j.Logger;
@@ -26,9 +22,27 @@ public class CommandController {
         data.name = cmd.name;
         data.id = ps.getId().toString();
         data.chips = 1000;
-        user = new User(data);
+        user = new User(data, ps);
 
-        sendCmd(ps, cmd);
+        User.send(ps, cmd);
+
+        Room room = RoomApplication.room;
+        room.addUser(user);
+        room.sitdown(user, 0);
+        for (int i = 1; i <= 2; i++) {
+            Cmd.UserData d = new Cmd.UserData();
+            data.name = "robot_" + i;
+            data.id = i + "";
+            data.chips = 1000;
+            User v = new User(d, null);
+            room.addUser(v);
+            room.sitdown(user, i);
+        }
+        room.start();
+    }
+
+    private void giveRobot() {
+
     }
 
     /**
@@ -88,18 +102,4 @@ public class CommandController {
         LOG.info("收到心跳 id={} time={}", ps.getId(), cmd.timestamp);
     }
 
-    static ObjectMapper mapper = new ObjectMapper();
-
-    private void sendCmd(PlayerSession ps, Object msg) throws Exception {
-        Cmd.Command cmd = new Cmd.Command();
-        cmd.name = msg.getClass().getSimpleName();
-        cmd.data = mapper.writeValueAsString(msg);
-        String send = mapper.writeValueAsString(cmd);
-        LOG.info("发送数据 {}", send);
-
-        NettyMessageBuffer buffer = new NettyMessageBuffer();
-        buffer.writeString(send);
-        NetworkEvent event = Events.networkEvent(buffer, DeliveryGuaranty.DeliveryGuarantyOptions.RELIABLE);
-        ps.onEvent(event);
-    }
 }

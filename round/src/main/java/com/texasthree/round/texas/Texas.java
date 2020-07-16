@@ -226,9 +226,6 @@ public class Texas {
 
         // 从庄家下一位开始
         Player op = this.nextOpPlayer(this.dealer().getId());
-        if (op == null) {
-            System.out.println("222222222222222");
-        }
         ring = this.ring.move(v -> v == op);
     }
 

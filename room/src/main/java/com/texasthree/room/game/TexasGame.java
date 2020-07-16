@@ -1,7 +1,6 @@
 package com.texasthree.room.game;
 
 import com.texasthree.proto.Cmd;
-import com.texasthree.room.Desk;
 import com.texasthree.room.ScheduledEvent;
 import com.texasthree.room.User;
 import com.texasthree.round.RoundState;
@@ -13,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -27,10 +27,6 @@ public class TexasGame {
      * 庄家位
      */
     private int dealer = 0;
-
-    private Runnable onShowdown;
-
-    private Desk desk;
 
     ///////////// 一局数据 ///////////////
     private Texas texas;
@@ -47,32 +43,45 @@ public class TexasGame {
 
     private int actDuarion = 15000;
 
-    public TexasGame(Desk desk, Runnable onShowdown) {
-        this.desk = desk;
-        this.onShowdown = onShowdown;
+    private Consumer<Object> send;
+
+    private User[] users;
+
+    public TexasGame(User[] users, Consumer send) {
+        this.users = users;
+        this.send = send;
     }
 
 
-    public void start() {
+    public void start() throws Exception {
         // 位置图谱
-        List<User> users = new ArrayList<>();
+        List<User> players = new ArrayList<>();
         Map<String, Integer> pos = new HashMap<>();
-        for (int i = 0; i < desk.getUsers().length; i++) {
-            User v = desk.getUsers()[i];
+        for (int i = 0; i < this.users.length; i++) {
+            User v = this.users[i];
             if (v != null) {
-                users.add(v);
+                players.add(v);
                 pos.put(v.getId(), i);
             }
         }
-        texas = new TexasBuilder()
-                .users(users)
-                .position(pos)
-                .build();
-        try {
-            texas.start();
-        } catch (Exception e) {
-            e.printStackTrace();
+        // 玩法
+        Map<Law, Integer> laws = new HashMap<>();
+        laws.put(Law.SmallBlind, 1);
+        laws.put(Law.Dealer, 0);
+        if (players.size() == 2) {
+            laws.put(Law.SB, 0);
+            laws.put(Law.BB, 1);
+        } else {
+            laws.put(Law.SB, 1);
+            laws.put(Law.BB, 2);
         }
+        texas = new TexasBuilder()
+                .users(players)
+                .position(pos)
+                .laws(laws)
+                .build();
+        texas.start();
+
 
         this.state = texas.state();
 
@@ -149,7 +158,7 @@ public class TexasGame {
             Cmd.HandUpdate update = new Cmd.HandUpdate();
             update.hands = new ArrayList<>();
             update.hands.add(this.getHand(v.user.getId()));
-            this.send(update, v.user);
+            v.user.send(update);
         }
     }
 
@@ -242,8 +251,6 @@ public class TexasGame {
         this.send(result);
 
         printResult(result);
-
-        this.onShowdown.run();
     }
 
     /**
@@ -295,11 +302,9 @@ public class TexasGame {
 
 
     private void send(Object data) {
-        this.desk.send(data);
-    }
-
-    private void send(Object data, User user) {
-        this.desk.send(data, user);
+        if (this.send != null) {
+            this.send.accept(data);
+        }
     }
 
     private void printStart() {

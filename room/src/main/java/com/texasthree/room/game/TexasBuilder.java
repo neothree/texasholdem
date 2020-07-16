@@ -4,7 +4,6 @@ import com.texasthree.room.User;
 import com.texasthree.round.texas.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +18,13 @@ public class TexasBuilder {
 
     private Map<String, Integer> position;
 
+    private Map<Law, Integer> laws;
+
+    public TexasBuilder laws(Map<Law, Integer> laws) {
+        this.laws = laws;
+        return this;
+    }
+
     public TexasBuilder users(List<User> users) {
         this.users = users;
         return this;
@@ -30,7 +36,6 @@ public class TexasBuilder {
     }
 
     public Texas build() {
-        Map<Law, Integer> laws = new HashMap<>();
         List<Card> leftCard = TableCard.getInstance().shuffle();
 
         Ring<Player> ring = Ring.create(users.size());
@@ -39,7 +44,7 @@ public class TexasBuilder {
             ring.setValue(new Player(position.get(v.getId()), v.getChips(), new Hand(leftCard.subList(i, i + 2))));
             ring = ring.getNext();
         }
-        leftCard = leftCard.subList(users.size() * 2, users.size());
+        leftCard = leftCard.subList(users.size() * 2, leftCard.size());
         return new Texas(laws, ring, leftCard);
     }
 }

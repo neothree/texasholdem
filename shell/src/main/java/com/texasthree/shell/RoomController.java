@@ -8,9 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @MessageController
-public class CommandController {
+public class RoomController {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CommandController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RoomController.class);
 
     public void setName(Session ps, Cmd.SetName cmd) throws Exception {
         System.out.println("名称设置成功: " + cmd.name);

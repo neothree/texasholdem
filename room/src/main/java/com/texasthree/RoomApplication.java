@@ -22,6 +22,8 @@ import javax.annotation.PostConstruct;
 public class RoomApplication {
     private static final Logger LOG = LoggerFactory.getLogger(RoomApplication.class);
 
+    public static Room room;
+
     @Autowired
     private ServerManager serverManager;
 
@@ -55,7 +57,7 @@ public class RoomApplication {
 
     private void createRoom() {
         String name = "Room";
-        Game game = new SimpleGame(1001, "Texasholdm");
+        Game game = new SimpleGame(1001, "Texasholdem");
         GameRoomSession.GameRoomSessionBuilder sessionBuilder = new GameRoomSession.GameRoomSessionBuilder();
         sessionBuilder.parentGame(game)
                 .gameRoomName(name)
@@ -65,7 +67,7 @@ public class RoomApplication {
         data.id = name;
         data.name = name;
         data.creator = name;
-        Room room = new Room(sessionBuilder, data, dispatcher);
+        room = new Room(sessionBuilder, data, dispatcher);
         ((SimpleLookupService) this.lookupService).getRefKeyGameRoomMap().put(room.getId(), room);
     }
 }

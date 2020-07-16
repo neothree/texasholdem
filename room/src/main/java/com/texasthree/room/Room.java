@@ -14,6 +14,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class Room extends GameRoomSession {
+
     private static final Logger LOG = LoggerFactory.getLogger(Room.class);
 
     private static Map<String, Room> roomMap = new HashMap<>();
@@ -59,6 +60,7 @@ public class Room extends GameRoomSession {
     }
 
     public void start() {
+        LOG.info("房间牌局开始");
         this.desk.start();
     }
 
