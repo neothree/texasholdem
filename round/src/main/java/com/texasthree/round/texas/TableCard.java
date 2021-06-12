@@ -1,9 +1,11 @@
 package com.texasthree.round.texas;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -19,30 +21,31 @@ public class TableCard {
         return instance;
     }
 
-    private List<Card> all = new ArrayList<Card>();
+    private List<Card> all;
 
 
     private TableCard() {
-        String fileName = this.getClass().getClassLoader().getResource("table_card.json").getPath();
+        var fileName = this.getClass().getClassLoader().getResource("table_card.json").getPath();
         try {
-            File jsonFile = new File(fileName);
-
-            FileReader fileReader = new FileReader(fileName);
-            Reader reader = new InputStreamReader(new FileInputStream(jsonFile), "utf-8");
-            int ch = 0;
-            StringBuffer sb = new StringBuffer();
+            var fileReader = new FileReader(fileName);
+            var reader = new InputStreamReader(new FileInputStream(new File(fileName)), "utf-8");
+            var ch = 0;
+            var sb = new StringBuffer();
             while ((ch = reader.read()) != -1) {
                 sb.append((char) ch);
             }
             fileReader.close();
             reader.close();
-            JSONArray array = JSONArray.parseArray(sb.toString());
-            for (int i = 0; i < array.size(); i++) {
-                JSONObject obj = array.getJSONObject(i);
-                all.add(new Card(obj.getString("name"), obj.getInteger("point"), obj.getInteger("suit")));
+
+            all = new ArrayList<>();
+            var mapper = new ObjectMapper();
+            var cards = mapper.readTree(sb.toString());
+            for (var v : cards) {
+                all.add(new Card(v.get("name").asText(), v.get("point").asInt(), v.get("suit").asInt()));
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new IllegalArgumentException();
         }
     }
 

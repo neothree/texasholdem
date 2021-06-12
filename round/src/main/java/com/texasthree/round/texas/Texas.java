@@ -1,6 +1,5 @@
 package com.texasthree.round.texas;
 
-import com.alibaba.fastjson.JSONObject;
 import com.texasthree.round.RoundState;
 
 import java.util.ArrayList;
@@ -75,9 +74,7 @@ public class Texas {
         Map<Optype, Integer> auth = this.pot.auth(this.opPlayer());
         if (!auth.containsKey(act.op) ||
                 (Optype.Raise.equals(act.op) && act.chipsAdd < auth.get(act.op))) {
-            System.out.println(JSONObject.toJSONString(auth));
-            System.out.println(JSONObject.toJSONString(act));
-            throw new Exception("押注错误");
+            throw new IllegalArgumentException("押注错误");
         }
 
 

@@ -5,6 +5,7 @@ import com.texasthree.room.ScheduledEvent;
 import com.texasthree.room.User;
 import com.texasthree.round.RoundState;
 import com.texasthree.round.texas.*;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
  * create at:  2020-06-29  15:26
  * @description: 德扑游戏
  */
+@Slf4j
 public class TexasGame {
     public static int TIMEOUT_ACTION = 15000;
     public static int TIMEOUT_MOVE_FOLD = 800;
@@ -218,7 +220,7 @@ public class TexasGame {
 
         this.opEvent = new ScheduledEvent(() -> this.onOpTimeout(), this.actDuarion);
         this.send(this.opInfo());
-//        log.info("轮到下一位进行押注 opId={} position={}", this.opPlayer.user.getId(), this.opPlayer.position);
+        log.info("轮到下一位进行押注 opId={} position={}", this.opPlayer.user.getId(), this.opPlayer.position);
     }
 
     /**
@@ -266,7 +268,7 @@ public class TexasGame {
             return;
         }
 
-//        log.info("压住超时: {}", this.opPlayer.toString());
+        log.info("压住超时: {}", this.opPlayer.toString());
         Optype op = state.ops.stream().anyMatch(v -> Optype.Check.equals(v.op)) ? Optype.Check : Optype.Fold;
         Action action = new Action(op);
         action.id = this.opPlayer.position;
