@@ -1,6 +1,6 @@
 package com.texasthree.room.game;
 
-import com.texasthree.proto.Cmd;
+import com.texasthree.room.Cmd;
 import com.texasthree.room.ScheduledEvent;
 import com.texasthree.room.User;
 import com.texasthree.round.RoundState;
@@ -23,16 +23,22 @@ import java.util.stream.Collectors;
 public class TexasGame {
     private static final Logger LOG = LoggerFactory.getLogger(TexasGame.class);
 
+    public static int TIMEOUT_ACTION = 15000;
+    public static int TIMEOUT_MOVE_FOLD = 800;
+    public static int TIMEOUT_MOVE_ACTION = 500;
+    public static int TIMEOUT_MOVE_CIRCLE = 2000;
     /*
      * 庄家位
      */
     private int dealer = 0;
 
-    ///////////// 一局数据 ///////////////
     private Texas texas;
 
     private RoundState state;
 
+    /**
+     * 计时器
+     */
     private ScheduledEvent opEvent;
 
     private PlayerInfo opPlayer;
@@ -121,9 +127,9 @@ public class TexasGame {
         if (Optype.Check.equals(action.op)) {
             this.move(state.move);
         } else if (Optype.Fold.equals(action.op)) {
-            this.opEvent = new ScheduledEvent(() -> this.move(state.move), Define.TIMEOUT_MOVE_FOLD);
+            this.opEvent = new ScheduledEvent(() -> this.move(state.move), TIMEOUT_MOVE_FOLD);
         } else {
-            this.opEvent = new ScheduledEvent(() -> this.move(state.move), Define.TIMEOUT_MOVE_ACTION);
+            this.opEvent = new ScheduledEvent(() -> this.move(state.move), TIMEOUT_MOVE_ACTION);
         }
 
     }

@@ -30,10 +30,4 @@ public class TableCardTest {
         pair.forEach(v -> set.add(v.getId()));
         assertEquals(54, set.size());
     }
-
-    @Test
-    public void testRpc() throws Exception {
-        GrpcClient client = new GrpcClient("127.0.0.1", 6566);
-        client.send("hello", "world");
-    }
 }

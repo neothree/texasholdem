@@ -6,69 +6,69 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-class Profile {
-
-    public List<Card> list;
-
-    public Map<Integer, List<Card>> pointMap;
-
-    public Map<Integer, List<Card>> suitMap;
-
-    public Map<Integer, List<List<Card>>> pointCountMap;
-
-    public int min = 2;
-
-    public Profile(List<Card> list, int min) {
-        this.list = list;
-        this.pointMap = this.toPointMap(list);
-        this.pointCountMap = this.toPointCountMap(this.pointMap);
-        this.suitMap = this.toSuitMap(list);
-        this.min = min;
-
-    }
-
-    public Profile(List<Card> list) {
-        this(list, 2);
-    }
-
-    private Map<Integer, List<Card>> toPointMap(List<Card> list) {
-        Map<Integer, List<Card>> ret = new HashMap<>();
-        for (Card v : list) {
-            if (!ret.containsKey(v.point)) {
-                ret.put(v.point, new ArrayList<>());
-            }
-            ret.get(v.point).add(v);
-        }
-        return ret;
-    }
-
-    private Map<Integer, List<Card>> toSuitMap(List<Card> list) {
-        Map<Integer, List<Card>> ret = new HashMap<>();
-        for (Card v : list) {
-            if (!ret.containsKey(v.suit)) {
-                ret.put(v.suit, new ArrayList<>());
-            }
-            ret.get(v.suit).add(v);
-        }
-        return ret;
-    }
-
-    private Map<Integer, List<List<Card>>> toPointCountMap(Map<Integer, List<Card>> pointMap) {
-        Map<Integer, List<List<Card>>> ret = new HashMap<>();
-        for (Integer key : pointMap.keySet()) {
-            List<Card> value = pointMap.get(key);
-            if (!ret.containsKey(value.size())) {
-                ret.put(value.size(), new ArrayList<>());
-            }
-            ret.get(value.size()).add(value);
-        }
-        return ret;
-    }
-
-}
-
 
 public class Poker {
+
+    static class Profile {
+
+        public List<Card> list;
+
+        public Map<Integer, List<Card>> pointMap;
+
+        public Map<Integer, List<Card>> suitMap;
+
+        public Map<Integer, List<List<Card>>> pointCountMap;
+
+        public int min = 2;
+
+        public Profile(List<Card> list, int min) {
+            this.list = list;
+            this.pointMap = this.toPointMap(list);
+            this.pointCountMap = this.toPointCountMap(this.pointMap);
+            this.suitMap = this.toSuitMap(list);
+            this.min = min;
+
+        }
+
+        public Profile(List<Card> list) {
+            this(list, 2);
+        }
+
+        private Map<Integer, List<Card>> toPointMap(List<Card> list) {
+            Map<Integer, List<Card>> ret = new HashMap<>();
+            for (Card v : list) {
+                if (!ret.containsKey(v.point)) {
+                    ret.put(v.point, new ArrayList<>());
+                }
+                ret.get(v.point).add(v);
+            }
+            return ret;
+        }
+
+        private Map<Integer, List<Card>> toSuitMap(List<Card> list) {
+            Map<Integer, List<Card>> ret = new HashMap<>();
+            for (Card v : list) {
+                if (!ret.containsKey(v.suit)) {
+                    ret.put(v.suit, new ArrayList<>());
+                }
+                ret.get(v.suit).add(v);
+            }
+            return ret;
+        }
+
+        private Map<Integer, List<List<Card>>> toPointCountMap(Map<Integer, List<Card>> pointMap) {
+            Map<Integer, List<List<Card>>> ret = new HashMap<>();
+            for (Integer key : pointMap.keySet()) {
+                List<Card> value = pointMap.get(key);
+                if (!ret.containsKey(value.size())) {
+                    ret.put(value.size(), new ArrayList<>());
+                }
+                ret.get(value.size()).add(value);
+            }
+            return ret;
+        }
+
+    }
 
     public static int MIN_POINT = 2;
 

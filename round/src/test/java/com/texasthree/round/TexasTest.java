@@ -10,51 +10,6 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class TexasConfig {
-    int playerNum = 2;
-    int smallBlind = 1;
-    int ante = 0;
-    int initChips = 100;
-    Ring<Player> ring;
-    List<Card> leftCard = TableCard.getInstance().shuffle();
-    Map<Law, Integer> laws;
-
-    public TexasConfig() {
-
-    }
-
-    public TexasConfig(int playerNum) {
-        this.playerNum = playerNum;
-    }
-
-    Texas make() {
-        if (ring == null) {
-            ring = Ring.create(playerNum);
-            for (int i = 1; i <= playerNum; i++) {
-                ring.setValue(new Player(i, initChips, new Hand(leftCard.subList(i * 2, i * 2 + 2))));
-                ring = ring.getNext();
-            }
-        }
-        if (laws == null) {
-            laws = new HashMap<>();
-        }
-
-        laws.put(Law.SmallBlind, smallBlind);
-        laws.put(Law.Ante, ante);
-        laws.put(Law.Dealer, 1);
-
-        if (ring.size() == 2) {
-            laws.put(Law.SB, 1);
-            laws.put(Law.BB, 2);
-        } else {
-            laws.put(Law.SB, 2);
-            laws.put(Law.BB, 3);
-        }
-
-        return new Texas(laws, ring, leftCard);
-    }
-}
-
 /**
  * Texas Tester.
  *
@@ -63,6 +18,52 @@ class TexasConfig {
  * @since <pre>Jun 17, 2020</pre>
  */
 public class TexasTest {
+
+    static class TexasConfig {
+        int playerNum = 2;
+        int smallBlind = 1;
+        int ante = 0;
+        int initChips = 100;
+        Ring<Player> ring;
+        List<Card> leftCard = TableCard.getInstance().shuffle();
+        Map<Law, Integer> laws;
+
+        public TexasConfig() {
+
+        }
+
+        public TexasConfig(int playerNum) {
+            this.playerNum = playerNum;
+        }
+
+        Texas make() {
+            if (ring == null) {
+                ring = Ring.create(playerNum);
+                for (int i = 1; i <= playerNum; i++) {
+                    ring.setValue(new Player(i, initChips, new Hand(leftCard.subList(i * 2, i * 2 + 2))));
+                    ring = ring.getNext();
+                }
+            }
+            if (laws == null) {
+                laws = new HashMap<>();
+            }
+
+            laws.put(Law.SmallBlind, smallBlind);
+            laws.put(Law.Ante, ante);
+            laws.put(Law.Dealer, 1);
+
+            if (ring.size() == 2) {
+                laws.put(Law.SB, 1);
+                laws.put(Law.BB, 2);
+            } else {
+                laws.put(Law.SB, 2);
+                laws.put(Law.BB, 3);
+            }
+
+            return new Texas(laws, ring, leftCard);
+        }
+    }
+
 
     private static AllCard c;
 

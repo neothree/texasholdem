@@ -6,7 +6,6 @@ import com.texasthree.core.communication.DeliveryGuaranty;
 import com.texasthree.core.communication.NettyMessageBuffer;
 import com.texasthree.core.event.Events;
 import com.texasthree.core.event.NetworkEvent;
-import com.texasthree.proto.Cmd;
 import com.texasthree.room.game.TexasGame;
 
 import java.util.HashMap;
@@ -20,12 +19,9 @@ public class Desk {
 
     private TexasGame round;
 
-    private GameRoomSession session;
-
     private Map<String, User> audience = new HashMap<>();
 
-    public Desk(GameRoomSession session) {
-        this.session = session;
+    public Desk() {
     }
 
     public void addUser(User user) {
@@ -79,10 +75,6 @@ public class Desk {
             cmd.data = mapper.writeValueAsString(msg);
             String send = mapper.writeValueAsString(cmd);
 
-            NettyMessageBuffer buffer = new NettyMessageBuffer();
-            buffer.writeString(send);
-            NetworkEvent event = Events.networkEvent(buffer, DeliveryGuaranty.DeliveryGuarantyOptions.RELIABLE);
-            session.onEvent(event);
         } catch (Exception e) {
             e.printStackTrace();
         }

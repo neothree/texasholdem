@@ -1,4 +1,4 @@
-package com.texasthree.proto;
+package com.texasthree.room;
 
 import java.util.List;
 

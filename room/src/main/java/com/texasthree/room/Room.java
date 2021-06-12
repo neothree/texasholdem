@@ -1,9 +1,5 @@
 package com.texasthree.room;
 
-import com.texasthree.core.app.PlayerSession;
-import com.texasthree.core.app.impl.GameRoomSession;
-import com.texasthree.core.message.MessageDispatcher;
-import com.texasthree.proto.Cmd;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +9,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class Room extends GameRoomSession {
+public class Room {
 
     private static final Logger LOG = LoggerFactory.getLogger(Room.class);
 
@@ -23,21 +19,15 @@ public class Room extends GameRoomSession {
 
     private Desk desk;
 
-    private MessageDispatcher dispatcher;
     /**
      * 定时器
      */
     private ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
 
-    public Room(GameRoomSessionBuilder gameRoomSessionBuilder) {
-        super(gameRoomSessionBuilder);
-    }
 
-    public Room(GameRoomSessionBuilder gameRoomSessionBuilder, Cmd.RoomData data, MessageDispatcher dispatcher) {
-        super(gameRoomSessionBuilder);
-        this.dispatcher = dispatcher;
+    public Room(Cmd.RoomData data) {
         this.data = data;
-        this.desk = new Desk(this);
+        this.desk = new Desk();
         roomMap.put(data.id, this);
 
         service.scheduleAtFixedRate(() -> loop(), 1000L, 200L, TimeUnit.MILLISECONDS);
@@ -68,28 +58,16 @@ public class Room extends GameRoomSession {
         return roomMap.get(id);
     }
 
-    @Override
-    public String getId() {
-        return this.data.id;
-    }
-
     public String getName() {
         return this.data.name;
     }
 
     @Override
     public String toString() {
-        return this.getId() + ":" + this.getName();
+        return this.getName();
     }
 
     private void loop() {
         this.desk.loop();
-    }
-
-    @Override
-    public void onLogin(PlayerSession playerSession) {
-        CommandHandler listener = new CommandHandler(playerSession, dispatcher);
-        playerSession.addHandler(listener);
-        LOG.trace("Added event listener in Zombie Room");
     }
 }

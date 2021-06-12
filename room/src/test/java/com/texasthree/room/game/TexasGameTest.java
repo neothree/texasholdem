@@ -1,6 +1,6 @@
 package com.texasthree.room.game;
 
-import com.texasthree.proto.Cmd;
+import com.texasthree.room.Cmd;
 import com.texasthree.room.User;
 import org.junit.jupiter.api.Test;
 

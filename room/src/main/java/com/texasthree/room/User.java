@@ -6,7 +6,6 @@ import com.texasthree.core.communication.DeliveryGuaranty;
 import com.texasthree.core.communication.NettyMessageBuffer;
 import com.texasthree.core.event.Events;
 import com.texasthree.core.event.NetworkEvent;
-import com.texasthree.proto.Cmd;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,8 +13,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class User {
-
-    private static final Logger LOG = LoggerFactory.getLogger(CommandController.class);
 
     static ObjectMapper mapper = new ObjectMapper();
 

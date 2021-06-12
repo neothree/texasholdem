@@ -3,12 +3,10 @@ package com.texasthree;
 import com.texasthree.core.app.Game;
 import com.texasthree.core.app.impl.GameRoomSession;
 import com.texasthree.core.app.impl.SimpleGame;
-import com.texasthree.core.message.MessageDispatcher;
 import com.texasthree.core.protocols.Protocol;
 import com.texasthree.core.server.ServerManager;
 import com.texasthree.core.service.LookupService;
-import com.texasthree.core.service.impl.SimpleLookupService;
-import com.texasthree.proto.Cmd;
+import com.texasthree.room.Cmd;
 import com.texasthree.room.Room;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,8 +25,6 @@ public class RoomApplication {
     @Autowired
     private ServerManager serverManager;
 
-    @Autowired
-    private MessageDispatcher dispatcher;
 
     @Autowired
     protected LookupService lookupService;
@@ -44,7 +40,6 @@ public class RoomApplication {
     private void start() {
         try {
             serverManager.startServers();
-            dispatcher.register("com.texasthree.room");
             LOG.info("Room 启动成功");
 
             this.createRoom();
@@ -67,7 +62,7 @@ public class RoomApplication {
         data.id = name;
         data.name = name;
         data.creator = name;
-        room = new Room(sessionBuilder, data, dispatcher);
-        ((SimpleLookupService) this.lookupService).getRefKeyGameRoomMap().put(room.getId(), room);
+//        room = new Room(sessionBuilder, data, null);
+//        ((SimpleLookupService) this.lookupService).getRefKeyGameRoomMap().put(room.getId(), room);
     }
 }
