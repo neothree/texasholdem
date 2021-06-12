@@ -1,7 +1,5 @@
 package com.texasthree.room;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,9 +7,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class Room {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Room.class);
+public class Room {
 
     private static Map<String, Room> roomMap = new HashMap<>();
 
@@ -50,7 +47,6 @@ public class Room {
     }
 
     public void start() {
-        LOG.info("房间牌局开始");
         this.desk.start();
     }
 

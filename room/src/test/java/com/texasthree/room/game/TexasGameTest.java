@@ -11,10 +11,10 @@ class TexasGameTest {
         User[] users = new User[3];
         for (int i = 0; i < 3; i++) {
             Cmd.UserData data = new Cmd.UserData();
-            data.id = i+"";
+            data.id = i + "";
             data.name = data.id;
             data.chips = 1000;
-            User u = new User(data, null);
+            User u = new User(data);
             users[i] = u;
         }
         TexasGame game = new TexasGame(users, null);

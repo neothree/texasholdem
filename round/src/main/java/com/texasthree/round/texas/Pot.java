@@ -245,7 +245,7 @@ public class Pot {
         int chipsAdd = chipsBet - chipsBetOld;
         if (chipsAdd > player.getChips()) {
             System.out.println(chipsAdd +": "+player.getChips());
-            throw new TexasException();
+            throw new IllegalArgumentException();
         }
         return new Action(player.getId(), action.op, chipsBet, chipsAdd, chipsLeft, this.sumPot());
 

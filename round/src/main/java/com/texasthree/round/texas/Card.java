@@ -29,7 +29,7 @@ public class Card implements Comparable<Card> {
     /**
      * 花色
      */
-    public final Integer suit;
+    public final int suit;
 
     public Card(String name, int point, int suit) {
         this.name = name;

@@ -5,8 +5,6 @@ import com.texasthree.room.ScheduledEvent;
 import com.texasthree.room.User;
 import com.texasthree.round.RoundState;
 import com.texasthree.round.texas.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,8 +19,6 @@ import java.util.stream.Collectors;
  * @description: 德扑游戏
  */
 public class TexasGame {
-    private static final Logger LOG = LoggerFactory.getLogger(TexasGame.class);
-
     public static int TIMEOUT_ACTION = 15000;
     public static int TIMEOUT_MOVE_FOLD = 800;
     public static int TIMEOUT_MOVE_ACTION = 500;
@@ -61,10 +57,10 @@ public class TexasGame {
 
     public void start() throws Exception {
         // 位置图谱
-        List<User> players = new ArrayList<>();
-        Map<String, Integer> pos = new HashMap<>();
+        var players = new ArrayList<User>();
+        var pos = new HashMap<String, Integer>();
         for (int i = 0; i < this.users.length; i++) {
-            User v = this.users[i];
+            var v = this.users[i];
             if (v != null) {
                 players.add(v);
                 pos.put(v.getId(), i);
@@ -222,7 +218,7 @@ public class TexasGame {
 
         this.opEvent = new ScheduledEvent(() -> this.onOpTimeout(), this.actDuarion);
         this.send(this.opInfo());
-        LOG.info("轮到下一位进行押注 opId={} position={}", this.opPlayer.user.getId(), this.opPlayer.position);
+//        log.info("轮到下一位进行押注 opId={} position={}", this.opPlayer.user.getId(), this.opPlayer.position);
     }
 
     /**
@@ -270,7 +266,7 @@ public class TexasGame {
             return;
         }
 
-        LOG.info("压住超时: {}", this.opPlayer.toString());
+//        log.info("压住超时: {}", this.opPlayer.toString());
         Optype op = state.ops.stream().anyMatch(v -> Optype.Check.equals(v.op)) ? Optype.Check : Optype.Fold;
         Action action = new Action(op);
         action.id = this.opPlayer.position;

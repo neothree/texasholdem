@@ -1,13 +1,6 @@
 package com.texasthree.room;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.texasthree.core.app.PlayerSession;
-import com.texasthree.core.communication.DeliveryGuaranty;
-import com.texasthree.core.communication.NettyMessageBuffer;
-import com.texasthree.core.event.Events;
-import com.texasthree.core.event.NetworkEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,11 +17,9 @@ public class User {
 
     private Cmd.UserData data;
 
-    private PlayerSession session;
-
     private Room room;
 
-    public User(Cmd.UserData data, PlayerSession session) {
+    public User(Cmd.UserData data) {
         this.data = data;
         userMap.put(data.id, this);
     }
@@ -61,24 +52,6 @@ public class User {
     }
 
     public void send(Object msg) {
-        if (session != null) {
-            send(this.session, msg);
-        }
-    }
 
-    public static void send(PlayerSession ps, Object msg) {
-        try {
-            Cmd.Command cmd = new Cmd.Command();
-            cmd.name = msg.getClass().getSimpleName();
-            cmd.data = mapper.writeValueAsString(msg);
-            String send = mapper.writeValueAsString(cmd);
-
-            NettyMessageBuffer buffer = new NettyMessageBuffer();
-            buffer.writeString(send);
-            NetworkEvent event = Events.networkEvent(buffer, DeliveryGuaranty.DeliveryGuarantyOptions.RELIABLE);
-            ps.onEvent(event);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }

@@ -9,86 +9,25 @@ import java.util.stream.Collectors;
 
 public class Poker {
 
-    static class Profile {
-
-        public List<Card> list;
-
-        public Map<Integer, List<Card>> pointMap;
-
-        public Map<Integer, List<Card>> suitMap;
-
-        public Map<Integer, List<List<Card>>> pointCountMap;
-
-        public int min = 2;
-
-        public Profile(List<Card> list, int min) {
-            this.list = list;
-            this.pointMap = this.toPointMap(list);
-            this.pointCountMap = this.toPointCountMap(this.pointMap);
-            this.suitMap = this.toSuitMap(list);
-            this.min = min;
-
-        }
-
-        public Profile(List<Card> list) {
-            this(list, 2);
-        }
-
-        private Map<Integer, List<Card>> toPointMap(List<Card> list) {
-            Map<Integer, List<Card>> ret = new HashMap<>();
-            for (Card v : list) {
-                if (!ret.containsKey(v.point)) {
-                    ret.put(v.point, new ArrayList<>());
-                }
-                ret.get(v.point).add(v);
-            }
-            return ret;
-        }
-
-        private Map<Integer, List<Card>> toSuitMap(List<Card> list) {
-            Map<Integer, List<Card>> ret = new HashMap<>();
-            for (Card v : list) {
-                if (!ret.containsKey(v.suit)) {
-                    ret.put(v.suit, new ArrayList<>());
-                }
-                ret.get(v.suit).add(v);
-            }
-            return ret;
-        }
-
-        private Map<Integer, List<List<Card>>> toPointCountMap(Map<Integer, List<Card>> pointMap) {
-            Map<Integer, List<List<Card>>> ret = new HashMap<>();
-            for (Integer key : pointMap.keySet()) {
-                List<Card> value = pointMap.get(key);
-                if (!ret.containsKey(value.size())) {
-                    ret.put(value.size(), new ArrayList<>());
-                }
-                ret.get(value.size()).add(value);
-            }
-            return ret;
-        }
-
-    }
-
-    public static int MIN_POINT = 2;
+    static int MIN_POINT = 2;
 
     /**
      * 计算牌型
      */
-    public static Hand typeOf(List<Card> list) {
+    static Hand typeOf(List<Card> list) {
         return typeOf(list, MIN_POINT);
     }
 
     /**
      * 计算牌型
      */
-    public static Hand typeOf(List<Card> list, int min) {
+    static Hand typeOf(List<Card> list, int min) {
         // 从小到大排列
         sort(list, true);
-        Profile profile = new Profile(list, min);
+        var profile = new Profile(list, min);
 
         // 金刚
-        Hand hand = findFourOfKind(profile);
+        var hand = findFourOfKind(profile);
         if (hand != null) {
             return hand;
         }
@@ -159,11 +98,11 @@ public class Poker {
     /**
      * 比较手牌a, b的大小
      */
-    public static int compare(Hand a, Hand b) {
+    static int compare(Hand a, Hand b) {
         return compare(a, b, MIN_POINT);
     }
 
-    public static int compare(Hand a, Hand b, int min) {
+    static int compare(Hand a, Hand b, int min) {
         if (min != MIN_POINT) {
             if (CardType.Flush.equals(a.getType()) && CardType.FullHouse.equals(b.getType())) {
                 return 1;
@@ -204,18 +143,18 @@ public class Poker {
      * 金刚
      */
     private static Hand findFourOfKind(Profile p) {
-        List<List<Card>> four = p.pointCountMap.get(4);
+        var four = p.pointCountMap.get(4);
         if (four == null) {
             return null;
         }
 
         // 最大的四张牌
         sortList(four, false);
-        List<Card> list = four.get(0);
+        var list = four.get(0);
 
         // 一张剩余的最大牌
-        Integer max = 0;
-        for (Integer key : p.pointMap.keySet()) {
+        var max = 0;
+        for (var key : p.pointMap.keySet()) {
             if (key > max && !p.pointMap.get(key).get(0).point.equals(list.get(0).point)) {
                 max = key;
             }
@@ -241,7 +180,7 @@ public class Poker {
 
         sort(list, true);
         for (int last = list.size() - 1; last >= 4; last--) {
-            boolean find = true;
+            var find = true;
             for (int i = last; i >= last - 3; i--) {
                 if (list.get(i).point - list.get(i - 1).point != 1) {
                     find = false;
@@ -258,7 +197,7 @@ public class Poker {
                 && list.get(1).point == min + 1
                 && list.get(2).point == min + 2
                 && list.get(3).point == min + 3) {
-            List<Card> find = list.subList(0, 4);
+            var find = list.subList(0, 4);
             find.add(list.get(list.size() - 1));
             return new Hand(find, CardType.Straight);
         }
@@ -267,8 +206,8 @@ public class Poker {
 
     private static Hand findFlush(Profile p, CardType type) {
         Hand ret = null;
-        for (Integer suit : p.suitMap.keySet()) {
-            List<Card> v = p.suitMap.get(suit);
+        for (var suit : p.suitMap.keySet()) {
+            var v = p.suitMap.get(suit);
             if (v.size() < 5) {
                 continue;
             }
@@ -280,7 +219,7 @@ public class Poker {
                     ret = other;
                 }
             } else {
-                Hand straight = findStraight(v, p.min);
+                var straight = findStraight(v, p.min);
                 if (straight != null
                         && ((CardType.RoyalFlush.equals(type) && straight.getBest().get(4).point == 14 && straight.getBest().get(0).point == 10) || CardType.StraightFlush.equals(type))
                         && (ret == null || compare(straight, ret) == 1)) {
@@ -317,8 +256,8 @@ public class Poker {
      * 葫芦
      */
     private static Hand findFullHouse(Profile p) {
-        List<List<Card>> three = p.pointCountMap.get(3);
-        List<List<Card>> two = p.pointCountMap.get(2);
+        var three = p.pointCountMap.get(3);
+        var two = p.pointCountMap.get(2);
         if (three == null || (three.size() == 1 && two == null)) {
             return null;
         }
@@ -326,8 +265,7 @@ public class Poker {
 
         // 找出三张
         sortList(three, false);
-        List<Card> list = new ArrayList<>();
-        list.addAll(three.get(0));
+        var list = new ArrayList<>(three.get(0));
 
         // 找出两张
         if (three.size() == 2) {
@@ -344,13 +282,12 @@ public class Poker {
      * 三张
      */
     private static Hand findThreeOfKind(Profile p) {
-        List<List<Card>> three = p.pointCountMap.get(3);
+        var three = p.pointCountMap.get(3);
         if (three == null) {
             return null;
         }
 
-        List<Card> find = new ArrayList<>();
-        find.addAll(three.get(0));
+        var find = new ArrayList<Card>(three.get(0));
         sort(p.list, false);
         if (p.list.get(0).point.equals(p.list.get(1).point)) {
             if (p.list.size() > 3) {
@@ -376,7 +313,7 @@ public class Poker {
      * 两对
      */
     private static Hand findTwoPairs(Profile p) {
-        List<List<Card>> two = p.pointCountMap.get(2);
+        var two = p.pointCountMap.get(2);
         if (two == null || two.size() < 2) {
             return null;
         }
@@ -385,10 +322,10 @@ public class Poker {
 
         // 两对已经确定，找出剩余牌里的最大一张
         // 从单张中找出剩余一张
-        Integer max = 0;
-        List<List<Card>> one = p.pointCountMap.get(1);
+        var max = 0;
+        var one = p.pointCountMap.get(1);
         if (one != null) {
-            for (List<Card> v : one) {
+            for (var v : one) {
                 if (v.get(0).point > max) {
                     max = v.get(0).point;
                 }
@@ -400,7 +337,7 @@ public class Poker {
             max = two.get(2).get(0).point;
         }
 
-        List<Card> find = new ArrayList<>();
+        var find = new ArrayList<Card>();
         find.addAll(two.get(0));
         find.addAll(two.get(1));
         find.add(p.pointMap.get(max).get(0));
@@ -411,15 +348,14 @@ public class Poker {
      * 一对
      */
     private static Hand findOnePair(Profile p) {
-        List<List<Card>> two = p.pointCountMap.get(2);
+        var two = p.pointCountMap.get(2);
         if (two == null || two.size() != 1) {
             return null;
         }
 
-        List<Card> find = new ArrayList<>();
-        find.addAll(two.get(0));
+        var find = new ArrayList<>(two.get(0));
         for (int i = 14; i >= 2; i--) {
-            List<Card> v = p.pointMap.get(i);
+            var v = p.pointMap.get(i);
             if (v != null && v.size() == 1) {
                 find.add(v.get(0));
                 if (find.size() == 5) {
@@ -434,13 +370,13 @@ public class Poker {
      * 寻找高牌
      */
     private static Hand findHighCard(List<Card> list) {
-        List<Card> find = list.stream().filter(distinctByKey(v -> v.point)).collect(Collectors.toList());
+        var find = list.stream().filter(distinctByKey(v -> v.point)).collect(Collectors.toList());
         sort(find, false);
         return new Hand(find.size() >= 5 ? find.subList(0, 5) : find, CardType.HighCard);
     }
 
     private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
-        Map<Object, Boolean> seen = new ConcurrentHashMap<>();
+        var seen = new ConcurrentHashMap<Object, Boolean>();
         return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
     }
 
@@ -482,8 +418,8 @@ public class Poker {
      * 一对比较
      */
     private static int compreOnePair(List<Card> a, List<Card> b) {
-        Integer ap = findSamePoint(a);
-        Integer bp = findSamePoint(b);
+        var ap = findSamePoint(a);
+        var bp = findSamePoint(b);
         if (ap > bp) {
             return 1;
         } else if (ap < bp) {
@@ -493,8 +429,8 @@ public class Poker {
     }
 
     private static int compareTwoPairs(List<Card> a, List<Card> b) {
-        List<Integer> al = new ArrayList<>();
-        List<Integer> bl = new ArrayList<>();
+        var al = new ArrayList<Integer>();
+        var bl = new ArrayList<Integer>();
         for (int i = 0; i < a.size() - 1; i++) {
             if (a.get(i).point.equals(a.get(i + 1).point)) {
                 al.add(a.get(i).point);
@@ -517,7 +453,6 @@ public class Poker {
     }
 
     private static int compareStraight(List<Card> a, List<Card> b, int min) {
-
         if (a.get(4).point == 14 && a.get(0).point == min && b.get(4).point != 14) {
             return -1;
         }
@@ -546,7 +481,6 @@ public class Poker {
 
         int ret = a3.compareTo(b3);
         return ret != 0 ? ret : a2.compareTo(b2);
-
     }
 
     private static void sort(List<Card> list, boolean asc) {
@@ -563,5 +497,66 @@ public class Poker {
         } else {
             Collections.sort(list, (a, b) -> b.get(0).point.compareTo(a.get(0).point));
         }
+    }
+
+    private static class Profile {
+
+        public List<Card> list;
+
+        Map<Integer, List<Card>> pointMap;
+
+        Map<Integer, List<Card>> suitMap;
+
+        Map<Integer, List<List<Card>>> pointCountMap;
+
+        int min = 2;
+
+        Profile(List<Card> list, int min) {
+            this.list = list;
+            this.pointMap = this.toPointMap(list);
+            this.pointCountMap = this.toPointCountMap(this.pointMap);
+            this.suitMap = this.toSuitMap(list);
+            this.min = min;
+
+        }
+
+        public Profile(List<Card> list) {
+            this(list, 2);
+        }
+
+        private Map<Integer, List<Card>> toPointMap(List<Card> list) {
+            var ret = new HashMap<Integer, List<Card>>();
+            for (var v : list) {
+                if (!ret.containsKey(v.point)) {
+                    ret.put(v.point, new ArrayList<>());
+                }
+                ret.get(v.point).add(v);
+            }
+            return ret;
+        }
+
+        private Map<Integer, List<Card>> toSuitMap(List<Card> list) {
+            var ret = new HashMap<Integer, List<Card>>();
+            for (var v : list) {
+                if (!ret.containsKey(v.suit)) {
+                    ret.put(v.suit, new ArrayList<>());
+                }
+                ret.get(v.suit).add(v);
+            }
+            return ret;
+        }
+
+        private Map<Integer, List<List<Card>>> toPointCountMap(Map<Integer, List<Card>> pointMap) {
+            var ret = new HashMap<Integer, List<List<Card>>>();
+            for (var key : pointMap.keySet()) {
+                var value = pointMap.get(key);
+                if (!ret.containsKey(value.size())) {
+                    ret.put(value.size(), new ArrayList<>());
+                }
+                ret.get(value.size()).add(value);
+            }
+            return ret;
+        }
+
     }
 }
