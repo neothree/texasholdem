@@ -1,7 +1,6 @@
 package com.texasthree.round.texas;
 
 public enum Circle {
-    None,
     /**
      * 底牌圈 / 前翻牌圈 - 公共牌出现以前的第一轮叫注
      */

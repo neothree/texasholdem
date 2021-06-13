@@ -1,12 +1,8 @@
 package com.texasthree.round.texas;
 
-import com.texasthree.round.RoundState;
 import com.texasthree.round.TableCard;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Predicate;
 
 /**
@@ -56,6 +52,7 @@ public class Texas {
         private Ring<Player> ring;
         private List<Card> leftCard;
         private Map<Regulation, Integer> regulations;
+        private List<Player> players;
 
         public Builder() {
 
@@ -95,16 +92,37 @@ public class Texas {
             return this;
         }
 
+        public Builder players(List<Player> players) {
+            this.players = players;
+            return this;
+        }
+
+        public Builder players(Player... players) {
+            this.players = Arrays.asList(players);
+            return this;
+        }
+
         public Builder leftCard(List<Card> leftCard) {
             this.leftCard = leftCard;
             return this;
         }
 
+        public Builder leftCard(Card... leftCard) {
+            this.leftCard = Arrays.asList(leftCard);
+            return this;
+        }
+
         Texas build() {
             if (ring == null) {
-                ring = Ring.create(playerNum);
-                for (int i = 1; i <= playerNum; i++) {
-                    ring.setValue(new Player(i, initChips));
+                if (players == null) {
+                    players = new ArrayList<>(playerNum);
+                    for (int i = 1; i <= playerNum; i++) {
+                        players.add(new Player(i, initChips));
+                    }
+                }
+                ring = Ring.create(players.size());
+                for (var v : players) {
+                    ring.setValue(v);
                     ring = ring.getNext();
                 }
             }
@@ -324,6 +342,10 @@ public class Texas {
         this.ring = this.ring.move(v -> v == this.bbPlayer());
     }
 
+    List<Divide> divide() {
+        return this.pot.divide();
+    }
+
     private Move actionStraddle() {
         return null;
     }
@@ -374,7 +396,7 @@ public class Texas {
 
         this.isOver = true;
 
-        this.pot.showdown();
+        this.pot.showdown(this.board(), this);
 
         this.freshHand();
     }
@@ -382,8 +404,8 @@ public class Texas {
     /**
      * 玩家离开
      */
-    public Move leave(String id) throws Exception {
-        var player = this.getPlayer(id);
+    public Move leave(Integer id) throws Exception {
+        var player = this.getPlayerById(id);
         if (player == null || player.isLeave()) {
             return null;
         }
@@ -406,15 +428,14 @@ public class Texas {
         return null;
     }
 
+    Player opPlayer() {
+        return this.ring.value;
+    }
+
     private boolean straddleEnable() {
         // 必须三个玩家以上触发
         return this.regulations.containsKey(Regulation.Straddle) && this.playerNum > 3;
     }
-
-    public Player opPlayer() {
-        return this.ring.value;
-    }
-
 
     /**
      * 牌面
@@ -435,33 +456,37 @@ public class Texas {
         }
     }
 
-    private boolean isCompareShowdown() {
+    boolean isCompareShowdown() {
         return this.isOver && this.playerNum - this.leaveOrFoldNum() > 1;
     }
 
-    private Player getPlayer(String id) {
-        return null;
+    int sumPot() {
+        return this.pot.sumPot();
     }
 
-    public int smallBlind() {
+    int smallBlind() {
         return this.regulations.getOrDefault(Regulation.SmallBlind, 0);
     }
 
-    public int ante() {
+    int ante() {
         return this.regulations.getOrDefault(Regulation.Ante, 0);
     }
 
-    public Player dealer() {
+    int anteSum() {
+        return this.pot.anteSum();
+    }
+
+    Player dealer() {
         var id = this.regulations.get(Regulation.Dealer);
         return this.getPlayer(v -> v.getId() == id);
     }
 
-    public Player sbPlayer() {
+    Player sbPlayer() {
         var id = this.regulations.get(Regulation.SB);
         return this.getPlayer(v -> v.getId() == id);
     }
 
-    public Player bbPlayer() {
+    Player bbPlayer() {
         var id = this.regulations.get(Regulation.BB);
         return this.getPlayer(v -> v.getId() == id);
     }
@@ -471,19 +496,24 @@ public class Texas {
         return r != null ? r.value : null;
     }
 
-    public Circle circle() {
+
+    Player getPlayerById(Integer id) {
+        return this.getPlayer(v -> v.getId() == id);
+    }
+
+    Circle circle() {
         return this.pot.circle();
     }
 
-    public boolean isOver() {
+    boolean isOver() {
         return this.isOver;
     }
 
-    public Map<Optype, Integer> auth() {
+    Map<Optype, Integer> auth() {
         return this.pot.auth(this.opPlayer());
     }
 
-    public RoundState state() {
-        return null;
+    int notFoldNum() {
+        return this.pot.notFoldNum();
     }
 }

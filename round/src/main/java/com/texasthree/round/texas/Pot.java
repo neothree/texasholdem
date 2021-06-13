@@ -1,5 +1,7 @@
 package com.texasthree.round.texas;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.*;
 
 public class Pot {
@@ -32,7 +34,9 @@ public class Pot {
 
     private Map<Integer, Integer> anteBet = new HashMap<>();
 
-    private List<Integer> devide;
+    private List<Divide> divides;
+
+    private Player giveback;
 
     Pot(int playerNum, int smallBind, int ante) {
         this.smallBind = smallBind;
@@ -40,114 +44,34 @@ public class Pot {
         this.payerNum = playerNum;
     }
 
-
-    /**
-     * 一圈开始
-     */
-    void circleStart() {
-        if (Circle.River.equals(circle)) {
+    void actionAnte(Ring<Player> ring, int ante) {
+        if (ante <= 0) {
             return;
         }
-
-        // 下一圈
-        this.circle = nextCircle(circle);
-
-        if (smallBind > 0) {
-            this.amplitude = this.smallBind * 2;
-        } else {
-            this.amplitude = this.ante * 2;
-        }
-
-        this.going = new CircleRecord(this.circle, this.sumPot(), this.notFoldNum());
-    }
-
-    /**
-     * 一圈结束
-     */
-    void circleEnd(List<Card> board) {
-        // TODO 分池
-        this.going.board = board;
-        this.records.add(this.going);
-        this.lastBetOrRaise = this.getStandardId();
-        this.standardAct = null;
-    }
-
-    void action(Player player, Action act) throws Exception {
-        act = this.parseAction(player, act);
-        if (act.chipsAdd > 0) {
-            player.changeChips(-act.chipsAdd);
-            if (player.getChips() <= 0) {
-                act.op = Optype.Allin;
+        for (var i = 0; i < ring.size(); i++) {
+            var player = ring.value;
+            if (player.getChips() >= ante) {
+                this.anteBet.put(player.getId(), ante);
+            } else {
+                this.anteBet.put(player.getId(), player.getChips());
+                this.allin.add(player.getId());
             }
-        }
-        this.going.actions.add(act);
-
-        int ampl = act.chipsBet - this.getStandard();
-        if (this.standardAct == null || ampl > 0) {
-            // 每轮刚开始 standardAct 为 nil, 有人押注后直接为 standardAct
-            this.standardAct = act;
-            if (act.op == null) {
-                throw new Exception("错误");
-            }
-            // 翻牌前有加注
-            if (Circle.Preflop.equals(circle)) {
-                this.flopRaise.add(player.getId());
-            }
-            // 加注增幅
-            if (ampl >= this.amplitude) {
-                this.amplitude = ampl;
-                this.legalRaiseId = player.getId();
-            }
+            player.changeChips(-this.anteBet.get(player.getId()));
+            ring = ring.getNext();
         }
 
-        // 记录 弃牌 和 allin
-        if (Optype.Fold.equals(act.op)) {
-            this.fold.add(player.getId());
-        } else if (Optype.Allin.equals(act.op)) {
-            this.allin.add(player.getId());
-        }
-    }
-
-    int sumPot() {
-        return -1;
-    }
-
-    Action getAction(int id) {
-        if (this.going == null) {
-            return null;
-        }
-        for (int i = this.going.actions.size() - 1; i >= 0; i--) {
-            Action action = this.going.actions.get(i);
-            if (action.id == id) {
-                return action;
-            }
-        }
-        return null;
-    }
-
-
-    int getStandard() {
-        return this.standardAct != null ? standardAct.chipsBet : 0;
-    }
-
-    Integer getStandardId() {
-        return this.standardAct != null ? standardAct.id : null;
-    }
-
-    void setStandardInfo(int chips, int id) {
-        this.standardAct = new Action(id, null, chips, 0, 0, 0);
-    }
-
-
-    void showdown() {
-
+        // 分池
+        this.divides = this.makeDivide(false);
     }
 
     void actionBlind(Player sb, Player bb) {
+        if (sb == null || bb == null) {
+            throw new IllegalArgumentException();
+        }
         // 小盲注
-        int chipsBet = sb.getChips() > this.smallBind ? this.smallBind : sb.getChips();
+        var chipsBet = sb.getChips() > this.smallBind ? this.smallBind : sb.getChips();
         sb.changeChips(-chipsBet);
-        Action actSb = new Action(sb.getId(), Optype.SmallBlind, chipsBet, chipsBet, sb.getChips(), 0);
+        var actSb = new Action(sb.getId(), Optype.SmallBlind, chipsBet, chipsBet, sb.getChips(), 0);
         this.going.actions.add(actSb);
         if (sb.getChips() == 0) {
             this.allin.add(sb.getId());
@@ -171,24 +95,288 @@ public class Pot {
         }
     }
 
-    void actionAnte(Ring<Player> ring, int ante) {
-        for (int i = 0; i < ring.size(); i++) {
-            Player player = ring.value;
-            if (player.getChips() >= ante) {
-                this.anteBet.put(player.getId(), ante);
-            } else {
-                this.anteBet.put(player.getId(), player.getChips());
-                this.allin.add(player.getId());
-            }
-            player.changeChips(-this.anteBet.get(player.getId()));
-            ring = ring.getNext();
+    void actionDealerAnte(Player dealer, int ante) throws Exception {
+        if (dealer.getChips() <= 0) {
+            return;
         }
-
-        // 分池
-        this.devide = this.makeDevide();
+        var chipsBet = dealer.getChips() >= ante ? ante : dealer.getChips();
+        dealer.changeChips(-chipsBet);
+        var action = new Action(dealer.getId(), Optype.DealerAnte, chipsBet, chipsBet, 0, 0);
+        this.action(dealer, action);
+        this.legalRaiseId = action.id;
     }
 
-    private List<Integer> makeDevide() {
+    /**
+     * 将action中的数据补充完整
+     */
+    Action parseAction(Player player, Action action) throws Exception {
+        var chipsBetOld = this.chipsThisCircle(player.getId());
+        var chipsBet = chipsBetOld;
+        var chipsLeft = player.getChips();
+        if (Optype.Raise.equals(action.op) || Optype.DealerAnte.equals(action.op)) {
+            chipsBet = chipsBetOld + action.chipsAdd;
+        } else if (Optype.Allin.equals(action.op)) {
+            chipsBet = chipsBetOld + chipsLeft;
+        } else if (Optype.Call.equals(action.op)) {
+            chipsBet = this.getStandard();
+        }
+        var chipsAdd = chipsBet - chipsBetOld;
+        if (chipsAdd > player.getChips()) {
+            throw new IllegalArgumentException();
+        }
+        return new Action(player.getId(), action.op, chipsBet, chipsAdd, chipsLeft, this.sumPot());
+
+    }
+
+    void action(Player player, Action act) throws Exception {
+        // 解析
+        act = this.parseAction(player, act);
+        if (act.chipsAdd > 0) {
+            player.changeChips(-act.chipsAdd);
+            if (player.getChips() <= 0) {
+                act.op = Optype.Allin;
+            }
+        }
+
+        // 记录
+        this.going.actions.add(act);
+
+        // 标准注
+        var ampl = act.chipsBet - this.getStandard();
+        if (this.standardAct == null || ampl > 0) {
+            // 每轮刚开始 standardAct 为 nil, 有人押注后直接为 standardAct
+            this.standardAct = act;
+            if (act.op == null) {
+                throw new Exception("错误");
+            }
+            // 翻牌前有加注
+            if (Circle.Preflop.equals(circle)) {
+                this.flopRaise.add(player.getId());
+            }
+            // 加注增幅
+            if (ampl >= this.amplitude) {
+                this.amplitude = ampl;
+                this.legalRaiseId = player.getId();
+            }
+        }
+
+        // 弃牌 和 allin
+        if (Optype.Fold.equals(act.op)) {
+            this.fold.add(player.getId());
+        } else if (Optype.Allin.equals(act.op)) {
+            this.allin.add(player.getId());
+        }
+    }
+
+
+    /**
+     * 一圈开始
+     */
+    void circleStart() {
+        if (Circle.River.equals(circle)) {
+            return;
+        }
+
+        // 下一圈
+        this.circle = nextCircle(circle);
+
+        if (smallBind > 0) {
+            this.amplitude = this.smallBind * 2;
+        } else {
+            this.amplitude = this.ante * 2;
+        }
+
+        this.going = new CircleRecord(this.circle, this.sumPot(), this.notFoldNum());
+        this.records.add(going);
+    }
+
+    /**
+     * 一圈结束
+     */
+    void circleEnd(List<Card> board) {
+        this.going.setBoard(board);
+        this.divides = this.makeDivide(false);
+        this.lastBetOrRaise = this.getStandardId();
+        this.standardAct = null;
+    }
+
+
+    void showdown(List<Card> board, Texas texas) {
+        this.circleEnd(board);
+
+        var com = texas.isCompareShowdown();
+        this.divides = makeDivide(com);
+        var last = this.divides.get(divides.size() - 1);
+        if (last.getMembers().size() == 1) {
+            var id = last.getMembers().keySet().stream().findFirst().get();
+            var player = texas.getPlayerById(id);
+            if (!player.isLeave() && com) {
+                this.givebackLastSinglePlayerPot();
+            }
+        }
+
+        var record = new CircleRecord();
+        record.setPotChips(this.sumPot());
+        record.setBoard(board);
+        record.setPlayerNum(this.notFoldNum());
+        this.records.add(record);
+    }
+
+    Map<Optype, Integer> auth(Player op) {
+        var chipsLeft = op.getChips();
+        var opBetChips = this.chipsThisCircle(op.getId());
+        var maxBetChips = chipsLeft + opBetChips;
+        var ret = new HashMap<Optype, Integer>();
+        ret.put(Optype.Fold, 0);
+        ret.put(Optype.Allin, chipsLeft);
+
+        if (opBetChips == this.getStandard()) {
+            ret.put(Optype.Check, 0);
+        } else if (maxBetChips > this.getStandard()) {
+            ret.put(Optype.Call, this.getStandard() - opBetChips);
+        }
+
+        if (chipsLeft + opBetChips > this.raiseLine()) {
+            ret.put(Optype.Raise, this.raiseLine());
+        }
+        return ret;
+
+    }
+
+    /**
+     * 返回最后的单人单池筹码
+     */
+    private void givebackLastSinglePlayerPot() {
+        var putin = this.divides.get(divides.size() - 1).getPutin();
+        if (putin.size() == 1) {
+            var entry = putin.entrySet().stream().findFirst().get();
+            this.giveback = new Player(entry.getKey(), entry.getValue());
+        }
+    }
+
+    /**
+     * 这一圈的押注数
+     */
+    int chipsThisCircle(int id) {
+        for (var i = this.going.actions.size() - 1; i >= 0; i--) {
+            Action act = this.going.actions.get(i);
+            if (act.id == id) {
+                return act.chipsBet;
+            }
+        }
+        return 0;
+    }
+
+    public List<Divide> divide() {
+        return this.divides;
+    }
+
+
+    private List<Divide> makeDivide(boolean com) {
+        var divides = new ArrayList<Divide>();
+        var mapChips = this.mapWhoChipsAll();
+        var single = new Divide();
+        while (!mapChips.isEmpty()) {
+            var min = mapChips.values()
+                    .stream()
+                    .min(Comparator.comparing(Integer::intValue))
+                    .get();
+
+            // 以 min 为分池标准
+            for (var key : mapChips.keySet()) {
+                mapChips.put(key, mapChips.get(key) - min);
+
+                var putin = single.getPutin();
+                putin.put(key, putin.getOrDefault(key, 0) + min);
+                if (!this.fold.contains(key)) {
+                    single.getMembers().put(key, putin.get(key));
+                }
+            }
+            single.setChips(single.getChips() + mapChips.size() * min);
+
+            // 是否需要添加一个分池
+            var append = false;
+            for (var v : mapChips.keySet().toArray()) {
+                if (mapChips.get(v) == 0) {
+                    mapChips.remove(v);
+                    // 如果需要比牌, 最后一个单人单池筹码返回
+                    if (this.allin.contains(v)
+                            || (com && mapChips.size() <= 1)) {
+                        append = true;
+                    }
+                }
+            }
+            if (append) {
+                divides.add(single);
+                single = new Divide();
+            }
+        }
+        if (single.getChips() > 0) {
+            divides.add(single);
+        }
+        return divides;
+    }
+
+    Action getAction(int id) {
+        if (this.going == null) {
+            return null;
+        }
+        for (var i = this.going.actions.size() - 1; i >= 0; i--) {
+            Action action = this.going.actions.get(i);
+            if (action.id == id) {
+                return action;
+            }
+        }
+        return null;
+    }
+
+    private Map<Integer, Integer> mapWhoChipsAll() {
+        var ret = new HashMap<Integer, Integer>();
+        for (var circle : Circle.values()) {
+            var m = this.mapWhoChipsCircle(circle);
+            for (var v : m.entrySet()) {
+                ret.put(v.getKey(), ret.getOrDefault(v.getKey(), 0) + v.getValue());
+            }
+        }
+
+        for (var v : anteBet.entrySet()) {
+            ret.put(v.getKey(), ret.getOrDefault(v.getKey(), 0) + v.getValue());
+        }
+
+        return ret;
+    }
+
+    /**
+     * 在 circle 圈所有人的押注数
+     */
+    private Map<Integer, Integer> mapWhoChipsCircle(Circle circle) {
+        if (circle == null) {
+            circle = this.circle;
+        }
+
+        var ret = new HashMap<Integer, Integer>();
+        var record = this.getCircleRecord(circle);
+        if (record == null) {
+            return ret;
+        }
+        for (var i = record.actions.size() - 1; i > 0; i--) {
+            var action = record.actions.get(i);
+            if (!ret.containsKey(action.id)) {
+                ret.put(action.id, action.chipsBet);
+            }
+        }
+        return ret;
+    }
+
+    private CircleRecord getCircleRecord(Circle circle) {
+        if (going != null && this.going.getCircle().equals(circle)) {
+            return this.going;
+        }
+        for (var v : this.records) {
+            if (v.getCircle().equals(circle)) {
+                return v;
+            }
+        }
         return null;
     }
 
@@ -228,76 +416,35 @@ public class Pot {
         }
     }
 
-    /**
-     * 将action中的数据补充完整
-     */
-    Action parseAction(Player player, Action action) throws Exception {
-        int chipsBetOld = this.chipsThisCircle(player.getId());
-        int chipsBet = chipsBetOld;
-        int chipsLeft = player.getChips();
-        if (Optype.Raise.equals(action.op) || Optype.DealerAnte.equals(action.op)) {
-            chipsBet = chipsBetOld + action.chipsAdd;
-        } else if (Optype.Allin.equals(action.op)) {
-            chipsBet = chipsBetOld + chipsLeft;
-        } else if (Optype.Call.equals(action.op)) {
-            chipsBet = this.getStandard();
-        }
-        int chipsAdd = chipsBet - chipsBetOld;
-        if (chipsAdd > player.getChips()) {
-            System.out.println(chipsAdd +": "+player.getChips());
-            throw new IllegalArgumentException();
-        }
-        return new Action(player.getId(), action.op, chipsBet, chipsAdd, chipsLeft, this.sumPot());
-
+    int sumPot() {
+        return this.mapWhoChipsAll()
+                .values()
+                .stream()
+                .reduce(Integer::sum)
+                .orElse(0);
     }
 
-    /**
-     * 这一圈的押注数
-     */
-    int chipsThisCircle(int id) {
-        for (int i = this.going.actions.size() - 1; i >= 0; i--) {
-            Action act = this.going.actions.get(i);
-            if (act.id == id) {
-                return act.chipsBet;
-            }
-        }
-        return 0;
-    }
-
-
-    void actionDealerAnte(Player dealer, int ante) throws Exception {
-        if (dealer.getChips() <= 0) {
-            return;
-        }
-        int chipsBet = dealer.getChips() >= ante ? ante : dealer.getChips();
-        Action action = new Action(dealer.getId(), Optype.DealerAnte, chipsBet, chipsBet, 0, 0);
-        this.action(dealer, action);
-        this.legalRaiseId = dealer.getId();
-    }
-
-    Map<Optype, Integer> auth(Player op) {
-        int chipsLeft = op.getChips();
-        int opBetChips = this.chipsThisCircle(op.getId());
-        int maxBetChips = chipsLeft + opBetChips;
-        Map<Optype, Integer> ret = new HashMap<>();
-        ret.put(Optype.Fold, 0);
-        ret.put(Optype.Allin, chipsLeft);
-
-        if (opBetChips == this.getStandard()) {
-            ret.put(Optype.Check, 0);
-        } else if (maxBetChips > this.getStandard()) {
-            ret.put(Optype.Call, this.getStandard() - opBetChips);
-        }
-
-        if (chipsLeft + opBetChips > this.raiseLine()) {
-            ret.put(Optype.Raise, this.raiseLine());
-        }
-        return ret;
-
+    int anteSum() {
+        return this.anteBet.values()
+                .stream()
+                .reduce(Integer::sum)
+                .orElse(0);
     }
 
     private int raiseLine() {
         return this.getStandard() + this.amplitude;
+    }
+
+    int getStandard() {
+        return this.standardAct != null ? standardAct.chipsBet : 0;
+    }
+
+    Integer getStandardId() {
+        return this.standardAct != null ? standardAct.id : null;
+    }
+
+    void setStandardInfo(int chips, int id) {
+        this.standardAct = new Action(id, null, chips, 0, 0, 0);
     }
 }
 
