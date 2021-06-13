@@ -24,7 +24,7 @@ public class TexasTest {
      */
     @Test
     public void testOther() throws Exception {
-        var texas = new TexasBuilder(3)
+        var texas = Texas.builder(3)
                 .smallBlind(1)
                 .ante(1)
                 .build();
@@ -45,7 +45,7 @@ public class TexasTest {
         Ring<Player> ring = Ring.create(2);
         ring.setValue(new Player(1, 500));
         ring.getNext().setValue(new Player(2, 50));
-        var builder = new TexasBuilder()
+        var builder = Texas.builder()
                 .ring(ring)
                 .smallBlind(50);
         var texas = builder.build();
@@ -59,7 +59,7 @@ public class TexasTest {
 
     @Test
     public void testCircle() throws Exception {
-        var builder = new TexasBuilder(5);
+        var builder = Texas.builder(5);
         Texas texas = builder.build();
         texas.start();
 
@@ -80,7 +80,7 @@ public class TexasTest {
 
 
         ////////////////////////////////////////////////////////////////////////
-        builder = new TexasBuilder(5);
+        builder = Texas.builder(5);
         texas = builder.build();
         texas.start();
 
@@ -100,7 +100,7 @@ public class TexasTest {
         assertEquals(Circle.Turn, texas.circle());
 
         ////////////////////////////////////////////////////////////////////////
-        builder = new TexasBuilder(5);
+        builder = Texas.builder(5);
         texas = builder.build();
         texas.start();
 
@@ -115,21 +115,21 @@ public class TexasTest {
 
     @Test
     public void testAction() throws Exception {
-        var texas = new TexasBuilder(2).initChips(200).build();
+        var texas = Texas.builder(2).initChips(200).build();
         texas.start();
         assertEquals(Move.NextOp, texas.action(createRaise(198)));
 
         /**
          * 第一圈都 call, 大盲多一次押注
          */
-        texas = new TexasBuilder(3).build();
+        texas = Texas.builder(3).build();
         assertEquals(Move.NextOp, texas.start());
         assertEquals(Move.NextOp, texas.action(new Action(Optype.Call)));
         assertEquals(Move.NextOp, texas.action(new Action(Optype.Call)));
         assertEquals(Move.CircleEnd, texas.action(new Action(Optype.Check)));
 
         // 小盲为0
-        texas = new TexasBuilder(2).initChips(100).smallBlind(0).build();
+        texas = Texas.builder(2).initChips(100).smallBlind(0).build();
         assertEquals(Move.NextOp, texas.start());
         assertEquals(Move.NextOp, texas.action(new Action(Optype.Check)));
         assertEquals(Move.CircleEnd, texas.action(new Action(Optype.Check)));
@@ -139,7 +139,7 @@ public class TexasTest {
         ring.setValue(new Player(1, 100));
         ring.getNext().setValue(new Player(2, 200));
         ring.getPrev().setValue(new Player(3, 200));
-        var config = new TexasBuilder().ring(ring);
+        var config = Texas.builder().ring(ring);
         texas = config.build();
         assertEquals(Move.NextOp, texas.start());
         equalsOp(1, new Action(Optype.Allin), Move.NextOp, texas);
@@ -150,7 +150,7 @@ public class TexasTest {
 
     @Test
     public void testOpPlayer() throws Exception {
-        TexasBuilder config = new TexasBuilder(5);
+        var config = Texas.builder(5);
         Texas texas = config.build();
         texas.start();
 
@@ -184,7 +184,7 @@ public class TexasTest {
             ring = ring.getNext();
         }
         ring.setValue(new Player(5, 50));
-        config = new TexasBuilder().ring(ring);
+        config = Texas.builder().ring(ring);
         texas = config.build();
         texas.start();
 
@@ -206,7 +206,7 @@ public class TexasTest {
 
 
         ////////////////////////////////////////////////////////////////////////
-        config = new TexasBuilder();
+        config = Texas.builder();
         texas = config.build();
         texas.start();
 
@@ -220,7 +220,7 @@ public class TexasTest {
         //  短牌：在“两倍前注”下, 开局后，所有玩家都call，最后应该到庄家还有一次option
         var regulations = new HashMap<Regulation, Integer>();
         regulations.put(Regulation.DoubleAnte, 1);
-        config = new TexasBuilder()
+        config = Texas.builder()
                 .smallBlind(0)
                 .ante(1)
                 .regulations(regulations);
@@ -231,7 +231,7 @@ public class TexasTest {
 
         ////////////////////////////////////////////////////////////////////////
         //  短牌：在“smallBlind == 0”下, 开局后，所有玩家都check，最后应该到庄家还有一次option
-        config = new TexasBuilder().smallBlind(0).ante(1);
+        config = Texas.builder().smallBlind(0).ante(1);
         texas = config.build();
         texas.start();
         equalsOp(2, new Action(Optype.Check), Move.NextOp, texas);
@@ -240,7 +240,7 @@ public class TexasTest {
 
     @Test
     public void testAuth() throws Exception {
-        TexasBuilder config = new TexasBuilder(5);
+        var config = Texas.builder(5);
         Texas texas = config.build();
         texas.start();
 
