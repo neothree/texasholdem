@@ -10,10 +10,9 @@ public class Player {
 
     private Hand hand;
 
-    public Player(int id, int chips, Hand hand) {
+    public Player(int id, int chips) {
         this.id = id;
         this.chips = chips;
-        this.hand = hand;
     }
 
     public int getId() {
@@ -38,5 +37,9 @@ public class Player {
 
     public Hand getHand() {
         return hand;
+    }
+
+    public void setHand(Hand hand) {
+        this.hand = hand;
     }
 }

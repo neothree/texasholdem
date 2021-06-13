@@ -1,6 +1,7 @@
-package com.texasthree.round.texas;
+package com.texasthree.round;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.texasthree.round.texas.Card;
 
 import java.io.File;
 import java.io.FileInputStream;

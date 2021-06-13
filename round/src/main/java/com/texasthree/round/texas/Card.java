@@ -37,9 +37,9 @@ public class Card implements Comparable<Card> {
         this.suit = suit;
     }
 
-    @Override
-    public String toString() {
-        return name;
+
+    public int getId() {
+        return point * 10 + suit;
     }
 
     @Override
@@ -47,7 +47,17 @@ public class Card implements Comparable<Card> {
         return this.point.compareTo(other.point);
     }
 
-    public int getId() {
-        return point * 10 + suit;
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof Card)) {
+            return false;
+        }
+        var o = (Card) other;
+        return this.point.equals(o.point) && this.suit == o.suit;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

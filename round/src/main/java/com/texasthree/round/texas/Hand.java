@@ -1,5 +1,7 @@
 package com.texasthree.round.texas;
 
+import lombok.Getter;
+
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -9,6 +11,7 @@ import java.util.stream.Collectors;
 /**
  * 手牌
  */
+@Getter
 public class Hand implements Comparable<Hand> {
     /**
      * 手里的两张牌
@@ -40,7 +43,7 @@ public class Hand implements Comparable<Hand> {
         this.type = type;
     }
 
-    public void fresh(List<Card> bottom) {
+    void fresh(List<Card> bottom) {
         this.bottom = bottom;
         var list = new ArrayList<>(this.hold);
         list.addAll(this.bottom);
@@ -57,31 +60,27 @@ public class Hand implements Comparable<Hand> {
 
     @Override
     public String toString() {
-        var sb = new StringBuilder();
-        for (var v : best) {
-            sb.append(v).append(" ");
+        var sb = new StringBuilder().append("hold: ");
+        if (hold != null) {
+            for (var v : hold) {
+                sb.append(v).append(" ");
+            }
         }
-        return sb.toString() + type;
-    }
+        sb.append("\nbest: ");
+        if (best != null) {
+            for (var v : best) {
+                sb.append(v).append(" ");
+            }
 
-    public List<Card> getHold() {
-        return hold;
-    }
-
-    public CardType getType() {
-        return type;
-    }
-
-    public List<Card> getBest() {
-        return best;
-    }
-
-    public List<Card> getKeys() {
-        return keys;
-    }
-
-    public List<Card> getBottom() {
-        return bottom;
+        }
+        sb.append(type);
+        sb.append("\nkeys: ");
+        if (keys != null) {
+            for (var v : keys) {
+                sb.append(v).append(" ");
+            }
+        }
+        return sb.toString();
     }
 
     static int MIN_POINT = 2;
@@ -463,7 +462,7 @@ public class Hand implements Comparable<Hand> {
         sort(a, false);
         sort(b, false);
 
-        int size = Math.max(a.size(),b.size());
+        int size = Math.max(a.size(), b.size());
         for (int i = 0; i < size; i++) {
             if (a.size() <= i) {
                 return -1;

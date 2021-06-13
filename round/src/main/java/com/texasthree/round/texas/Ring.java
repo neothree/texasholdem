@@ -10,7 +10,7 @@ public class Ring<T> {
 
     public static <T> Ring<T> create(int num) {
         if (num < 0) {
-            return null;
+            throw new IllegalArgumentException();
         }
         Ring<T> r = new Ring<>();
         for (int i = 1; i < num; i++) {

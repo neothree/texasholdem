@@ -1,15 +1,13 @@
-package com.texasthree.round;
+package com.texasthree.round.texas;
 
 
-import com.texasthree.round.texas.*;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Texas Tester.
@@ -20,101 +18,16 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TexasTest {
 
-    static class TexasConfig {
-        int playerNum = 2;
-        int smallBlind = 1;
-        int ante = 0;
-        int initChips = 100;
-        Ring<Player> ring;
-        List<Card> leftCard = TableCard.getInstance().shuffle();
-        Map<Regulation, Integer> laws;
-
-        public TexasConfig() {
-
-        }
-
-        public TexasConfig(int playerNum) {
-            this.playerNum = playerNum;
-        }
-
-        Texas make() {
-            if (ring == null) {
-                ring = Ring.create(playerNum);
-                for (int i = 1; i <= playerNum; i++) {
-                    ring.setValue(new Player(i, initChips, new Hand(leftCard.subList(i * 2, i * 2 + 2))));
-                    ring = ring.getNext();
-                }
-            }
-            if (laws == null) {
-                laws = new HashMap<>();
-            }
-
-            laws.put(Regulation.SmallBlind, smallBlind);
-            laws.put(Regulation.Ante, ante);
-            laws.put(Regulation.Dealer, 1);
-
-            if (ring.size() == 2) {
-                laws.put(Regulation.SB, 1);
-                laws.put(Regulation.BB, 2);
-            } else {
-                laws.put(Regulation.SB, 2);
-                laws.put(Regulation.BB, 3);
-            }
-
-            return new Texas(laws, ring, leftCard);
-        }
-    }
-
-
-    private Texas create(int playerNum) {
-        return create(playerNum, 100);
-    }
-
-
-    private Texas create(int playerNum, int initChips) {
-        return create(playerNum, initChips, 1);
-    }
-
-    private Texas create(int playerNum, int initChips, int smallBlind) {
-        Map<Regulation, Integer> law = new HashMap<>();
-        law.put(Regulation.SmallBlind, smallBlind);
-
-        List<Card> leftCard = TableCard.getInstance().shuffle();
-
-        Ring<Player> ring = Ring.create(playerNum);
-        for (int i = 0; i < playerNum; i++) {
-            ring.setValue(new Player(i, initChips, new Hand(leftCard.subList(i * 2, i * 2 + 2))));
-            ring = ring.getNext();
-        }
-        assertNotNull(ring.value);
-
-        leftCard = leftCard.subList(ring.size(), leftCard.size());
-        return create(ring, leftCard, law);
-    }
-
-    private Texas create(Ring ring, List<Card> leftCard, Map<Regulation, Integer> law) {
-        law.put(Regulation.Dealer, 0);
-
-        if (ring.size() == 2) {
-            law.put(Regulation.SB, 0);
-            law.put(Regulation.BB, 1);
-        } else {
-            law.put(Regulation.SB, 1);
-            law.put(Regulation.BB, 2);
-        }
-
-        return new Texas(law, ring, leftCard);
-    }
 
     /**
      * Method: start()
      */
     @Test
     public void testOther() throws Exception {
-        TexasConfig config = new TexasConfig(3);
-        config.smallBlind = 1;
-        config.ante = 1;
-        Texas texas = config.make();
+        var texas = new TexasBuilder(3)
+                .smallBlind(1)
+                .ante(1)
+                .build();
         texas.start();
 
         assertEquals(1, texas.dealer().getId());
@@ -129,14 +42,14 @@ public class TexasTest {
      */
     @Test
     public void testStart() throws Exception {
-        TexasConfig config = new TexasConfig();
         Ring<Player> ring = Ring.create(2);
-        ring.setValue(new Player(1, 500, new Hand(new ArrayList<>())));
-        ring.getNext().setValue(new Player(2, 50, new Hand(new ArrayList<>())));
-        config.ring = ring;
-        config.smallBlind = 50;
-        Texas texas = config.make();
-        Move move = texas.start();
+        ring.setValue(new Player(1, 500));
+        ring.getNext().setValue(new Player(2, 50));
+        var builder = new TexasBuilder()
+                .ring(ring)
+                .smallBlind(50);
+        var texas = builder.build();
+        var move = texas.start();
         assertEquals(1, texas.dealer().getId());
         assertEquals(1, texas.sbPlayer().getId());
         assertEquals(2, texas.bbPlayer().getId());
@@ -146,8 +59,8 @@ public class TexasTest {
 
     @Test
     public void testCircle() throws Exception {
-        TexasConfig config = new TexasConfig(5);
-        Texas texas = config.make();
+        var builder = new TexasBuilder(5);
+        Texas texas = builder.build();
         texas.start();
 
         equalsOp(4, new Action(Optype.Call), Circle.Preflop, texas);
@@ -167,8 +80,8 @@ public class TexasTest {
 
 
         ////////////////////////////////////////////////////////////////////////
-        config = new TexasConfig(5);
-        texas = config.make();
+        builder = new TexasBuilder(5);
+        texas = builder.build();
         texas.start();
 
         equalsOp(4, new Action(Optype.Call), Circle.Preflop, texas);
@@ -187,8 +100,8 @@ public class TexasTest {
         assertEquals(Circle.Turn, texas.circle());
 
         ////////////////////////////////////////////////////////////////////////
-        config = new TexasConfig(5);
-        texas = config.make();
+        builder = new TexasBuilder(5);
+        texas = builder.build();
         texas.start();
 
         equalsOp(4, new Action(Optype.Raise, 4), Circle.Preflop, texas);
@@ -202,33 +115,32 @@ public class TexasTest {
 
     @Test
     public void testAction() throws Exception {
-        Texas texas = create(2, 200);
+        var texas = new TexasBuilder(2).initChips(200).build();
         texas.start();
         assertEquals(Move.NextOp, texas.action(createRaise(198)));
 
         /**
          * 第一圈都 call, 大盲多一次押注
          */
-        texas = create(3);
+        texas = new TexasBuilder(3).build();
         assertEquals(Move.NextOp, texas.start());
         assertEquals(Move.NextOp, texas.action(new Action(Optype.Call)));
         assertEquals(Move.NextOp, texas.action(new Action(Optype.Call)));
         assertEquals(Move.CircleEnd, texas.action(new Action(Optype.Check)));
 
         // 小盲为0
-        texas = create(2, 100, 0);
+        texas = new TexasBuilder(2).initChips(100).smallBlind(0).build();
         assertEquals(Move.NextOp, texas.start());
         assertEquals(Move.NextOp, texas.action(new Action(Optype.Check)));
         assertEquals(Move.CircleEnd, texas.action(new Action(Optype.Check)));
 
         // 复现
         Ring<Player> ring = Ring.create(3);
-        ring.setValue(new Player(1, 100, new Hand(new ArrayList<>())));
-        ring.getNext().setValue(new Player(2, 200, new Hand(new ArrayList<>())));
-        ring.getPrev().setValue(new Player(3, 200, new Hand(new ArrayList<>())));
-        TexasConfig config = new TexasConfig();
-        config.ring = ring;
-        texas = config.make();
+        ring.setValue(new Player(1, 100));
+        ring.getNext().setValue(new Player(2, 200));
+        ring.getPrev().setValue(new Player(3, 200));
+        var config = new TexasBuilder().ring(ring);
+        texas = config.build();
         assertEquals(Move.NextOp, texas.start());
         equalsOp(1, new Action(Optype.Allin), Move.NextOp, texas);
         equalsOp(2, new Action(Optype.Call), Move.NextOp, texas);
@@ -238,8 +150,8 @@ public class TexasTest {
 
     @Test
     public void testOpPlayer() throws Exception {
-        TexasConfig config = new TexasConfig(5);
-        Texas texas = config.make();
+        TexasBuilder config = new TexasBuilder(5);
+        Texas texas = config.build();
         texas.start();
 
         // Preflop
@@ -268,13 +180,12 @@ public class TexasTest {
         //////////////////////////////////////////////////////////////////
         Ring<Player> ring = Ring.create(5);
         for (int i = 1; i <= 4; i++) {
-            ring.setValue(new Player(i, 100, new Hand(new ArrayList<>())));
+            ring.setValue(new Player(i, 100));
             ring = ring.getNext();
         }
-        ring.setValue(new Player(5, 50, new Hand(new ArrayList<>())));
-        config = new TexasConfig();
-        config.ring = ring;
-        texas = config.make();
+        ring.setValue(new Player(5, 50));
+        config = new TexasBuilder().ring(ring);
+        texas = config.build();
         texas.start();
 
         equalsOp(4, new Action(Optype.Raise, 4), Move.NextOp, texas);
@@ -295,8 +206,8 @@ public class TexasTest {
 
 
         ////////////////////////////////////////////////////////////////////////
-        config = new TexasConfig();
-        texas = config.make();
+        config = new TexasBuilder();
+        texas = config.build();
         texas.start();
 
         equalsOp(1, new Action(Optype.Call), Move.NextOp, texas);
@@ -307,22 +218,21 @@ public class TexasTest {
 
         ////////////////////////////////////////////////////////////////////////
         //  短牌：在“两倍前注”下, 开局后，所有玩家都call，最后应该到庄家还有一次option
-        config = new TexasConfig();
-        config.smallBlind = 0;
-        config.ante = 1;
-        config.laws = new HashMap<>();
-        config.laws.put(Regulation.DoubleAnte, 1);
-        texas = config.make();
+        var regulations = new HashMap<Regulation, Integer>();
+        regulations.put(Regulation.DoubleAnte, 1);
+        config = new TexasBuilder()
+                .smallBlind(0)
+                .ante(1)
+                .regulations(regulations);
+        texas = config.build();
         texas.start();
         equalsOp(2, new Action(Optype.Call), Move.NextOp, texas);
         equalsOp(1, new Action(Optype.Check), Move.CircleEnd, texas);
 
         ////////////////////////////////////////////////////////////////////////
         //  短牌：在“smallBlind == 0”下, 开局后，所有玩家都check，最后应该到庄家还有一次option
-        config = new TexasConfig();
-        config.smallBlind = 0;
-        config.ante = 1;
-        texas = config.make();
+        config = new TexasBuilder().smallBlind(0).ante(1);
+        texas = config.build();
         texas.start();
         equalsOp(2, new Action(Optype.Check), Move.NextOp, texas);
         equalsOp(1, new Action(Optype.Check), Move.CircleEnd, texas);
@@ -330,8 +240,8 @@ public class TexasTest {
 
     @Test
     public void testAuth() throws Exception {
-        TexasConfig config = new TexasConfig(5);
-        Texas texas = config.make();
+        TexasBuilder config = new TexasBuilder(5);
+        Texas texas = config.build();
         texas.start();
 
         // chips: 2

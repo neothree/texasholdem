@@ -48,6 +48,8 @@ public class HandTest extends AllCard {
 
         cardList = Arrays.asList(diamond12, club12, heart12, spades12, spades13, spades5, heart5);
         testTypeOf(cardList, Arrays.asList(diamond12, club12, heart12, spades12, spades13), CardType.FourOfKind);
+
+        System.out.println(Hand.typeOf(cardList));
     }
 
     @Test

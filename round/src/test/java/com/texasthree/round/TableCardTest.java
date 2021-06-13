@@ -1,7 +1,6 @@
 package com.texasthree.round;
 
 import com.texasthree.round.texas.Card;
-import com.texasthree.round.texas.TableCard;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;

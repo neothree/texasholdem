@@ -79,13 +79,8 @@ public class TexasGame {
             laws.put(Regulation.SB, 1);
             laws.put(Regulation.BB, 2);
         }
-        texas = new TexasBuilder()
-                .users(players)
-                .position(pos)
-                .laws(laws)
-                .build();
-        texas.start();
 
+        texas = null;
 
         this.state = texas.state();
 
