@@ -1,6 +1,6 @@
 package com.texasthree.round.texas;
 
-public enum Law {
+public enum Regulation {
     /**
      * 小盲
      */
@@ -32,6 +32,6 @@ public enum Law {
 
 
 
-    private Law() {
+    private Regulation() {
     }
 }

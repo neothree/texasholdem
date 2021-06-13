@@ -21,11 +21,11 @@ public class Texas {
 
     private List<Card> leftCard;
 
-    private Map<Law, Integer> laws;
+    private Map<Regulation, Integer> laws;
 
     private Ring<Player> ring;
 
-    public Texas(Map<Law, Integer> laws, Ring<Player> ring, List<Card> leftCard) {
+    public Texas(Map<Regulation, Integer> laws, Ring<Player> ring, List<Card> leftCard) {
         this.laws = laws;
         this.ring = ring;
         this.leftCard = leftCard;
@@ -50,7 +50,7 @@ public class Texas {
         if (this.smallBlind() > 0) {
             // 盲注
             this.actionBlind();
-        } else if (this.ante() > 0 && this.laws.containsKey(Law.DoubleAnte)) {
+        } else if (this.ante() > 0 && this.laws.containsKey(Regulation.DoubleAnte)) {
             // 庄家前注
             this.actionDealerAnte();
         }
@@ -141,10 +141,10 @@ public class Texas {
 
         // 2. 第一圈, 没有小盲, 开始全跟注/或, 轮到庄家, 庄家还有一次说话机会
         if (this.smallBlind() == 0 && this.dealer() == opNext) {
-            if (this.laws.containsKey(Law.DoubleAnte) && standard == this.ante()) {
+            if (this.laws.containsKey(Regulation.DoubleAnte) && standard == this.ante()) {
                 return true;
             }
-            if (!this.laws.containsKey(Law.DoubleAnte) && standard == 0) {
+            if (!this.laws.containsKey(Regulation.DoubleAnte) && standard == 0) {
                 return true;
             }
         }
@@ -278,7 +278,7 @@ public class Texas {
 
     private boolean straddleEnable() {
         // 必须三个玩家以上触发
-        return this.laws.containsKey(Law.Straddle) && this.playerNum > 3;
+        return this.laws.containsKey(Regulation.Straddle) && this.playerNum > 3;
     }
 
     public Player opPlayer() {
@@ -314,25 +314,25 @@ public class Texas {
     }
 
     public int smallBlind() {
-        return this.laws.getOrDefault(Law.SmallBlind, 0);
+        return this.laws.getOrDefault(Regulation.SmallBlind, 0);
     }
 
     public int ante() {
-        return this.laws.getOrDefault(Law.Ante, 0);
+        return this.laws.getOrDefault(Regulation.Ante, 0);
     }
 
     public Player dealer() {
-        Integer id = this.laws.get(Law.Dealer);
+        Integer id = this.laws.get(Regulation.Dealer);
         return this.getPlayer(v -> v.getId() == id);
     }
 
     public Player sbPlayer() {
-        Integer id = this.laws.get(Law.SB);
+        Integer id = this.laws.get(Regulation.SB);
         return this.getPlayer(v -> v.getId() == id);
     }
 
     public Player bbPlayer() {
-        Integer id = this.laws.get(Law.BB);
+        Integer id = this.laws.get(Regulation.BB);
         return this.getPlayer(v -> v.getId() == id);
     }
 

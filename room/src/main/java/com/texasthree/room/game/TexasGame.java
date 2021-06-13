@@ -69,15 +69,15 @@ public class TexasGame {
             }
         }
         // 玩法
-        Map<Law, Integer> laws = new HashMap<>();
-        laws.put(Law.SmallBlind, 1);
-        laws.put(Law.Dealer, 0);
+        Map<Regulation, Integer> laws = new HashMap<>();
+        laws.put(Regulation.SmallBlind, 1);
+        laws.put(Regulation.Dealer, 0);
         if (players.size() == 2) {
-            laws.put(Law.SB, 0);
-            laws.put(Law.BB, 1);
+            laws.put(Regulation.SB, 0);
+            laws.put(Regulation.BB, 1);
         } else {
-            laws.put(Law.SB, 1);
-            laws.put(Law.BB, 2);
+            laws.put(Regulation.SB, 1);
+            laws.put(Regulation.BB, 2);
         }
         texas = new TexasBuilder()
                 .users(players)
@@ -178,8 +178,8 @@ public class TexasGame {
         Player player = this.state.players.stream().filter(v -> v.getId() == position).findFirst().orElse(null);
         Cmd.Hand info = new Cmd.Hand();
         info.best = cardList(player.getHand().getBest());
-        info.cards = cardList(player.getHand().getList());
-        info.key = cardList(player.getHand().getKey());
+        info.cards = cardList(player.getHand().getHold());
+        info.key = cardList(player.getHand().getKeys());
         info.type = player.getHand().getType().name();
         info.position = position;
         return info;

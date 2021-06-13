@@ -2,11 +2,12 @@ package com.texasthree.round;
 
 
 import com.texasthree.round.texas.*;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -26,7 +27,7 @@ public class TexasTest {
         int initChips = 100;
         Ring<Player> ring;
         List<Card> leftCard = TableCard.getInstance().shuffle();
-        Map<Law, Integer> laws;
+        Map<Regulation, Integer> laws;
 
         public TexasConfig() {
 
@@ -48,29 +49,22 @@ public class TexasTest {
                 laws = new HashMap<>();
             }
 
-            laws.put(Law.SmallBlind, smallBlind);
-            laws.put(Law.Ante, ante);
-            laws.put(Law.Dealer, 1);
+            laws.put(Regulation.SmallBlind, smallBlind);
+            laws.put(Regulation.Ante, ante);
+            laws.put(Regulation.Dealer, 1);
 
             if (ring.size() == 2) {
-                laws.put(Law.SB, 1);
-                laws.put(Law.BB, 2);
+                laws.put(Regulation.SB, 1);
+                laws.put(Regulation.BB, 2);
             } else {
-                laws.put(Law.SB, 2);
-                laws.put(Law.BB, 3);
+                laws.put(Regulation.SB, 2);
+                laws.put(Regulation.BB, 3);
             }
 
             return new Texas(laws, ring, leftCard);
         }
     }
 
-
-    private static AllCard c;
-
-    @BeforeAll
-    public static void before() {
-        c = AllCard.getInstance();
-    }
 
     private Texas create(int playerNum) {
         return create(playerNum, 100);
@@ -82,8 +76,8 @@ public class TexasTest {
     }
 
     private Texas create(int playerNum, int initChips, int smallBlind) {
-        Map<Law, Integer> law = new HashMap<>();
-        law.put(Law.SmallBlind, smallBlind);
+        Map<Regulation, Integer> law = new HashMap<>();
+        law.put(Regulation.SmallBlind, smallBlind);
 
         List<Card> leftCard = TableCard.getInstance().shuffle();
 
@@ -98,15 +92,15 @@ public class TexasTest {
         return create(ring, leftCard, law);
     }
 
-    private Texas create(Ring ring, List<Card> leftCard, Map<Law, Integer> law) {
-        law.put(Law.Dealer, 0);
+    private Texas create(Ring ring, List<Card> leftCard, Map<Regulation, Integer> law) {
+        law.put(Regulation.Dealer, 0);
 
         if (ring.size() == 2) {
-            law.put(Law.SB, 0);
-            law.put(Law.BB, 1);
+            law.put(Regulation.SB, 0);
+            law.put(Regulation.BB, 1);
         } else {
-            law.put(Law.SB, 1);
-            law.put(Law.BB, 2);
+            law.put(Regulation.SB, 1);
+            law.put(Regulation.BB, 2);
         }
 
         return new Texas(law, ring, leftCard);
@@ -317,7 +311,7 @@ public class TexasTest {
         config.smallBlind = 0;
         config.ante = 1;
         config.laws = new HashMap<>();
-        config.laws.put(Law.DoubleAnte, 1);
+        config.laws.put(Regulation.DoubleAnte, 1);
         texas = config.make();
         texas.start();
         equalsOp(2, new Action(Optype.Call), Move.NextOp, texas);

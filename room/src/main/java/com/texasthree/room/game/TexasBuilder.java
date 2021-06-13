@@ -18,9 +18,9 @@ public class TexasBuilder {
 
     private Map<String, Integer> position;
 
-    private Map<Law, Integer> laws;
+    private Map<Regulation, Integer> laws;
 
-    public TexasBuilder laws(Map<Law, Integer> laws) {
+    public TexasBuilder laws(Map<Regulation, Integer> laws) {
         this.laws = laws;
         return this;
     }
