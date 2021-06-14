@@ -366,7 +366,7 @@ public class Pot {
         if (record == null) {
             return ret;
         }
-        for (var i = record.actions.size() - 1; i > 0; i--) {
+        for (var i = record.actions.size() - 1; i >= 0; i--) {
             var action = record.actions.get(i);
             if (!ret.containsKey(action.id)) {
                 ret.put(action.id, action.chipsBet);
