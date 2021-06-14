@@ -48,7 +48,7 @@ public class TexasTest extends AllCard {
         circleEquals(2, makeAct(Optype.Fold), Circle.Preflop, texas);
         circleEquals(3, makeAct(Optype.Fold), Circle.Preflop, texas);
 
-        circleEquals(4, createRaise(2), Circle.Flop, texas);
+        circleEquals(4, Action.raise(2), Circle.Flop, texas);
         circleEquals(5, makeAct(Optype.Fold), Circle.Flop, texas);
         circleEquals(1, makeAct(Optype.Call), Circle.Flop, texas);
 
@@ -70,7 +70,7 @@ public class TexasTest extends AllCard {
 
 
         circleEquals(2, makeAct(Optype.Fold), Circle.Flop, texas);
-        circleEquals(3, new Action(Optype.Raise, 2), Circle.Flop, texas);
+        circleEquals(3, Action.raise(2), Circle.Flop, texas);
         circleEquals(4, makeAct(Optype.Fold), Circle.Flop, texas);
         circleEquals(5, makeAct(Optype.Fold), Circle.Flop, texas);
         circleEquals(1, makeAct(Optype.Call), Circle.Flop, texas);
@@ -81,7 +81,7 @@ public class TexasTest extends AllCard {
         texas = Texas.builder(5).build();
         texas.start();
 
-        circleEquals(4, new Action(Optype.Raise, 4), Circle.Preflop, texas);
+        circleEquals(4, Action.raise(4), Circle.Preflop, texas);
         circleEquals(5, makeAct(Optype.Allin), Circle.Preflop, texas);
         circleEquals(1, makeAct(Optype.Allin), Circle.Preflop, texas);
         circleEquals(2, makeAct(Optype.Fold), Circle.Preflop, texas);
@@ -96,7 +96,7 @@ public class TexasTest extends AllCard {
                 .initChips(200)
                 .build();
         texas.start();
-        assertEquals(Move.NextOp, texas.action(createRaise(198)));
+        assertEquals(Move.NextOp, texas.action(Action.raise(198)));
 
         // 第一圈都 call, 大盲多一次押注
         texas = Texas.builder(3).build();
@@ -154,16 +154,16 @@ public class TexasTest extends AllCard {
         // Flop
         circleEquals(2, makeAct(Optype.Fold), Move.NextOp, texas);
         circleEquals(3, makeAct(Optype.Fold), Move.NextOp, texas);
-        circleEquals(4, new Action(Optype.Raise, 2), Move.NextOp, texas);
+        circleEquals(4, Action.raise(2), Move.NextOp, texas);
         circleEquals(5, makeAct(Optype.Call), Move.NextOp, texas);
         circleEquals(1, makeAct(Optype.Fold), Move.CircleEnd, texas);
 
         // Turn
-        circleEquals(4, new Action(Optype.Raise, 2), Move.NextOp, texas);
+        circleEquals(4, Action.raise(2), Move.NextOp, texas);
         circleEquals(5, makeAct(Optype.Call), Move.CircleEnd, texas);
 
         // River
-        circleEquals(4, new Action(Optype.Raise, 2), Move.NextOp, texas);
+        circleEquals(4, Action.raise(2), Move.NextOp, texas);
         circleEquals(5, makeAct(Optype.Call), Move.Showdown, texas);
 
         //////////////////////////////////////////////////////////////////
@@ -178,7 +178,7 @@ public class TexasTest extends AllCard {
                 .build();
         texas.start();
 
-        circleEquals(4, new Action(Optype.Raise, 4), Move.NextOp, texas);
+        circleEquals(4, Action.raise(4), Move.NextOp, texas);
         circleEquals(5, makeAct(Optype.Allin), Move.NextOp, texas);
         circleEquals(1, makeAct(Optype.Call), Move.NextOp, texas);
         circleEquals(2, makeAct(Optype.Fold), Move.NextOp, texas);
@@ -187,11 +187,11 @@ public class TexasTest extends AllCard {
 
         circleEquals(3, makeAct(Optype.Check), Move.NextOp, texas);
         circleEquals(4, makeAct(Optype.Check), Move.NextOp, texas);
-        circleEquals(1, new Action(Optype.Raise, 4), Move.NextOp, texas);
+        circleEquals(1, Action.raise(4), Move.NextOp, texas);
         circleEquals(3, makeAct(Optype.Fold), Move.NextOp, texas);
         circleEquals(4, makeAct(Optype.Call), Move.CircleEnd, texas);
 
-        circleEquals(4, new Action(Optype.Raise, 5), Move.NextOp, texas);
+        circleEquals(4, Action.raise(5), Move.NextOp, texas);
         circleEquals(1, makeAct(Optype.Call), Move.CircleEnd, texas);
 
 
@@ -245,7 +245,7 @@ public class TexasTest extends AllCard {
 
         // chips: 10
         player.changeChips(10 - player.getChips());
-//        equals(texas.auth(), Optype.Fold, Optype.Allin, Optype.Call);
+//        equals(texas.auth(), Optype.fold, Optype.Allin, Optype.Call);
         circleEquals(4, makeAct(Optype.Call), Move.NextOp, texas);
 
         // chips: 1
@@ -286,7 +286,7 @@ public class TexasTest extends AllCard {
         assertTrue(texas.isOver());
         // TODO
 //        local result = round:MakeResult()
-//        assert(result.playerList[1].profit == 10)
+//        assert(result.playersMap[1].profit == 10)
     }
 
     /**
@@ -316,10 +316,6 @@ public class TexasTest extends AllCard {
         }
     }
 
-    private Action createRaise(int chipsAdd) {
-        return new Action(-1, Optype.Raise, 0, chipsAdd, 0, 0);
-    }
-
     private void circleEquals(Integer opId, Action act, Move move, Texas texas) throws Exception {
         assertEquals(opId, texas.opPlayer().getId());
         assertEquals(move, texas.action(act));
@@ -332,6 +328,6 @@ public class TexasTest extends AllCard {
     }
 
     private Action makeAct(Optype optype) {
-        return new Action(optype);
+        return Action.of(optype);
     }
 }

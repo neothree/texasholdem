@@ -27,6 +27,10 @@ public class Player {
         return leave;
     }
 
+    public Boolean inGame() {
+        return !leave;
+    }
+
     public void leave() {
         leave = true;
     }

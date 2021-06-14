@@ -1,5 +1,7 @@
 package com.texasthree.round.texas;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Predicate;
 
 public class Ring<T> {
@@ -28,7 +30,7 @@ public class Ring<T> {
         this.value = v;
     }
 
-    void link(T v) {
+    private void link(T v) {
         Ring<T> node = new Ring<>();
         node.value = v;
 
@@ -69,5 +71,17 @@ public class Ring<T> {
 
     Ring<T> getPrev() {
         return prev;
+    }
+
+    List<T> iterator() {
+        var ret = new ArrayList<T>();
+        var limit = this.size();
+        var r = this;
+        while (limit > 0) {
+            ret.add(r.value);
+            limit--;
+            r = r.next;
+        }
+        return ret;
     }
 }

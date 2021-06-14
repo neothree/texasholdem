@@ -82,8 +82,6 @@ public class TexasGame {
 
         texas = null;
 
-        this.state = texas.state();
-
         this.printStart();
 
         this.opEvent = new ScheduledEvent(() -> this.move(state.move), 2000);
@@ -112,7 +110,7 @@ public class TexasGame {
 
         try {
             this.texas.action(action);
-            state = texas.state();
+//            state = texas.state();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -265,7 +263,7 @@ public class TexasGame {
 
         log.info("压住超时: {}", this.opPlayer.toString());
         Optype op = state.ops.stream().anyMatch(v -> Optype.Check.equals(v.op)) ? Optype.Check : Optype.Fold;
-        Action action = new Action(op);
+        Action action = Action.of(op);
         action.id = this.opPlayer.position;
         this.action(action);
     }

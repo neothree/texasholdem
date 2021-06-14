@@ -337,7 +337,7 @@ public class Pot {
         return null;
     }
 
-    private Map<Integer, Integer> mapWhoChipsAll() {
+    Map<Integer, Integer> mapWhoChipsAll() {
         var ret = new HashMap<Integer, Integer>();
         for (var circle : Circle.values()) {
             var m = this.mapWhoChipsCircle(circle);
@@ -373,6 +373,10 @@ public class Pot {
             }
         }
         return ret;
+    }
+
+    Map<Integer, Statistic> makeBetStatistic(Set<Integer> winners) {
+        return null;
     }
 
     private CircleRecord getCircleRecord(Circle circle) {
@@ -448,6 +452,10 @@ public class Pot {
 
     Integer getStandardId() {
         return this.standardAct != null ? standardAct.id : null;
+    }
+
+    Player giveback() {
+        return this.giveback;
     }
 
     void setStandardInfo(int chips, int id) {

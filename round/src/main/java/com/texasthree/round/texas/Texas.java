@@ -4,6 +4,7 @@ import com.texasthree.round.TableCard;
 
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * 德扑牌局
@@ -173,7 +174,7 @@ public class Texas {
     /**
      * 开始
      */
-    public Move start() throws Exception {
+    Move start() throws Exception {
         this.pot = new Pot(playerNum, this.smallBlind(), this.ante());
 
         // 一圈开始
@@ -204,6 +205,36 @@ public class Texas {
         return move;
     }
 
+    /**
+     * 前注
+     */
+    private void actionAnte() {
+        this.pot.actionAnte(this.ring, this.ante());
+    }
+
+    /**
+     * 盲注
+     */
+    private void actionBlind() {
+        this.pot.actionBlind(this.sbPlayer(), this.bbPlayer());
+        this.ring = this.ring.move(v -> v == this.bbPlayer());
+    }
+
+    /**
+     * 强制盲注
+     */
+    private Move actionStraddle() throws Exception {
+        var act = Action.straddleBlind(this.straddleBlind());
+        return this.action(act);
+    }
+
+    /**
+     * 庄家前注
+     */
+    private void actionDealerAnte() throws Exception {
+        this.pot.actionDealerAnte(this.dealer(), this.ante());
+    }
+
     public Move action(Action action) throws Exception {
         if (this.isOver) {
             return null;
@@ -217,7 +248,7 @@ public class Texas {
 
         // 如果下一位玩家离开则自动弃牌
         if (Move.NextOp.equals(move) && this.opPlayer().isLeave()) {
-            move = this.action(Action.Fold());
+            move = this.action(Action.fold());
         }
 
         return move;
@@ -257,6 +288,170 @@ public class Texas {
         }
 
         return move;
+    }
+
+    private void circleStart() throws Exception {
+        this.pot.circleStart();
+
+        this.freshHand();
+
+        if (this.opPlayer().isLeave()) {
+            this.action(Action.fold());
+        }
+    }
+
+    private void circleEnd() {
+        this.pot.circleEnd(this.board());
+
+        // 从庄家下一位开始
+        Player op = this.nextOpPlayer(this.dealer().getId());
+        ring = this.ring.move(v -> v == op);
+    }
+
+    /**
+     * 摊牌
+     */
+    private void showdown() {
+
+        this.isOver = true;
+
+        this.pot.showdown(this.board(), this);
+
+        this.freshHand();
+    }
+
+    void makeResult() {
+        var result = new Result();
+        var open = this.showCardStrategy();
+        var allBet = this.pot.mapWhoChipsAll();
+        for (var v : this.ring.iterator()) {
+            var info = new ResultPlayer();
+            info.setId(v.getId());
+            info.setBetSum(allBet.getOrDefault(v.getId(), 0));
+            info.cardShow = open.contains(v.getId());
+            result.playersMap.put(v.getId(), info);
+        }
+
+        // 单池返回的钱
+        var potback = this.pot.giveback();
+        if (potback != null) {
+            result.playersMap.get(potback.getId()).potback = potback.getChips();
+        }
+
+        // 最后从池里的输赢
+        var potWin = divideMoney();
+        result.playersMap.forEach((k, v) -> v.pot = potWin.getOrDefault(k, new HashMap<>()));
+
+
+        // 押注统计
+        var stats = this.pot.makeBetStatistic(result.getWinners());
+        result.playersMap.forEach((k, v) -> v.statistic = stats.getOrDefault(k, new Statistic()));
+
+    }
+
+    private Map<Integer, Map<Integer, Integer>> divideMoney() {
+        this.freshHand();
+
+        var divide = this.divide();
+        var ret = new HashMap<Integer, Map<Integer, Integer>>();
+        var inGameNum = this.ring.iterator().stream().filter(v -> v.inGame()).count();
+        // 只剩下一个玩家没有离开,不用经过比牌,全部给他
+        if (inGameNum == 1) {
+            var give = new HashMap<Integer, Integer>();
+            for (var i = 0; i < divide.size(); i++) {
+                give.put(i, divide.get(0).getChips());
+            }
+            var p = this.getPlayer(v -> v.inGame());
+            ret.put(p.getId(), give);
+        }
+
+        // 有多个玩家,主池肯定有玩家比牌
+        Set<Integer> mainPotWinner = null;
+        for (var potId = 0; potId < divide.size(); potId++) {
+            var pot = divide.get(potId);
+            var members = pot.getMembers()
+                    .keySet()
+                    .stream()
+                    .map(key -> this.getPlayerById(key))
+                    .filter(Player::inGame)
+                    .collect(Collectors.toSet());
+
+            var index = potId;
+            if (!members.isEmpty()) {
+                // 有玩家比牌, 正常计算输赢
+                var winner = winner(members);
+                if (potId == 0) {
+                    mainPotWinner = winner;
+                }
+                var singleWin = this.singlePotWinChips(winner, pot.getChips());
+                singleWin.forEach((k, v) -> {
+                    var give = ret.getOrDefault(k, new HashMap<>());
+                    give.put(index, v);
+                    ret.put(k, give);
+                });
+            } else {
+                // 没有人了，主池玩家平分
+                var average = (int) Math.floor(pot.getChips() / mainPotWinner.size());
+                mainPotWinner.forEach(k -> {
+                    var give = ret.getOrDefault(k, new HashMap<>());
+                    give.put(index, average);
+                    ret.put(k, give);
+                });
+            }
+        }
+        return ret;
+    }
+
+    private Map<Integer, Integer> singlePotWinChips(Set<Integer> winner, int sum) {
+        // 如果只有一个赢家则全给他
+        var ret = new HashMap<Integer, Integer>();
+        if (winner.size() == 1) {
+            ret.put(winner.stream().findFirst().get(), sum);
+            return ret;
+        }
+
+        // 个池中的赢家都会分有至少averageChips 个筹码，
+        // 如果有 oneMoreNum 个筹码余下，则从小盲位开始分，靠后的玩家没有
+        var averageChips = (int) Math.floor(sum / winner.size());
+        var oneMoreNum = sum % winner.size();
+        var r = this.ring.move(v -> v.getId() == this.bbPlayer().getId());
+        for (var v : r.iterator()) {
+            if (winner.contains(v.getId())) {
+                if (oneMoreNum > 0) {
+                    ret.put(v.getId(), averageChips + 1);
+                    oneMoreNum--;
+                } else {
+                    ret.put(v.getId(), averageChips);
+                }
+            }
+        }
+        return ret;
+    }
+
+    private Set<Integer> winner(Collection<Player> players) {
+        var winner = new HashSet<Integer>();
+        Player win = null;
+        for (var v : players) {
+            if (winner.isEmpty()) {
+                winner.add(v.getId());
+                win = v;
+            } else {
+                var com = v.getHand().compareTo(win.getHand());
+                if (com >= 1) {
+                    win = v;
+                    winner = new HashSet<>();
+                    winner.add(v.getId());
+                } else if (com == 0) {
+                    winner.add(v.getId());
+                }
+            }
+        }
+        return winner;
+    }
+
+    private Set<Integer> showCardStrategy() {
+        // TODO
+        return new HashSet<>();
     }
 
     /**
@@ -306,65 +501,6 @@ public class Texas {
         return r.value;
     }
 
-    private int chipsThisCircle(int id) {
-        return this.pot.chipsThisCircle(id);
-    }
-
-    private int leaveOrFoldNum() {
-        // TODO 加上leave数量
-        return this.pot.foldNum();
-    }
-
-    /**
-     * 前注
-     */
-    private void actionAnte() {
-        this.pot.actionAnte(this.ring, this.ante());
-    }
-
-    /**
-     * 盲注
-     */
-    private void actionBlind() {
-        this.pot.actionBlind(this.sbPlayer(), this.bbPlayer());
-        // 模拟操作位是大盲
-        this.ring = this.ring.move(v -> v == this.bbPlayer());
-    }
-
-    List<Divide> divide() {
-        return this.pot.divide();
-    }
-
-    private Move actionStraddle() {
-        return null;
-    }
-
-    /**
-     * 庄家前注
-     */
-    private void actionDealerAnte() throws Exception {
-        this.pot.actionDealerAnte(this.dealer(), this.ante());
-    }
-
-    private void circleStart() throws Exception {
-        this.pot.circleStart();
-
-        this.freshHand();
-
-        if (this.opPlayer().isLeave()) {
-            this.action(Action.Fold());
-        }
-    }
-
-
-    private void circleEnd() {
-        this.pot.circleEnd(this.board());
-
-        // 从庄家下一位开始
-        Player op = this.nextOpPlayer(this.dealer().getId());
-        ring = this.ring.move(v -> v == op);
-    }
-
     private void freshHand() {
         var r = this.ring;
         var board = this.board();
@@ -378,22 +514,24 @@ public class Texas {
         this.ring = this.ring.move(v -> !this.pot.isAllin(v.getId()) && !this.pot.isFold(v.getId()));
     }
 
-    /**
-     * 摊牌
-     */
-    private void showdown() {
-
-        this.isOver = true;
-
-        this.pot.showdown(this.board(), this);
-
-        this.freshHand();
+    private int chipsThisCircle(int id) {
+        return this.pot.chipsThisCircle(id);
     }
+
+    private int leaveOrFoldNum() {
+        // TODO 加上leave数量
+        return this.pot.foldNum();
+    }
+
+    List<Divide> divide() {
+        return this.pot.divide();
+    }
+
 
     /**
      * 玩家离开
      */
-    public Move leave(Integer id) throws Exception {
+    Move leave(Integer id) throws Exception {
         var player = this.getPlayerById(id);
         if (player == null || player.isLeave()) {
             return null;
@@ -407,7 +545,7 @@ public class Texas {
 
         // 如果是正在押注玩家直接弃牌
         if (this.opPlayer() == player) {
-            return this.action(Action.Fold());
+            return this.action(Action.fold());
         }
 
         if (this.playerNum - this.leaveOrFoldNum() == 1) {
@@ -424,6 +562,14 @@ public class Texas {
     private boolean straddleEnable() {
         // 必须三个玩家以上触发
         return this.regulations.containsKey(Regulation.Straddle) && this.playerNum > 3;
+    }
+
+    private int straddleBlind() {
+        return this.smallBlind() * 4;
+    }
+
+    private Player straddler() {
+        return this.straddleEnable() ? this.nextOpPlayer(this.bbPlayer().getId()) : null;
     }
 
     /**
@@ -490,7 +636,7 @@ public class Texas {
         return this.getPlayer(v -> v.getId() == id);
     }
 
-    Circle circle() {
+    public Circle circle() {
         return this.pot.circle();
     }
 
