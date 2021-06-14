@@ -1,7 +1,5 @@
 package com.texasthree.round.texas;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.*;
 
 public class Pot {
@@ -102,14 +100,17 @@ public class Pot {
         var chipsBet = dealer.getChips() >= ante ? ante : dealer.getChips();
         dealer.changeChips(-chipsBet);
         var action = new Action(dealer.getId(), Optype.DealerAnte, chipsBet, chipsBet, 0, 0);
-        this.action(dealer, action);
+        this.action(dealer, action, false);
         this.legalRaiseId = action.id;
     }
 
     /**
      * 将action中的数据补充完整
      */
-    Action parseAction(Player player, Action action) throws Exception {
+    private Action parseAction(Player player, Action action) throws Exception {
+        if (action.op == null) {
+            throw new IllegalArgumentException();
+        }
         var chipsBetOld = this.chipsThisCircle(player.getId());
         var chipsBet = chipsBetOld;
         var chipsLeft = player.getChips();
@@ -128,9 +129,17 @@ public class Pot {
 
     }
 
-    void action(Player player, Action act) throws Exception {
+    void action(Player player, Action act, boolean check) throws Exception {
         // 解析
         act = this.parseAction(player, act);
+        if (check) {
+            var auth = this.auth(player);
+            if (!auth.containsKey(act.op) ||
+                    (Optype.Raise.equals(act.op) && act.chipsAdd < auth.get(act.op))) {
+                throw new IllegalArgumentException("押注错误");
+            }
+        }
+
         if (act.chipsAdd > 0) {
             player.changeChips(-act.chipsAdd);
             if (player.getChips() <= 0) {
@@ -142,20 +151,18 @@ public class Pot {
         this.going.actions.add(act);
 
         // 标准注
-        var ampl = act.chipsBet - this.getStandard();
-        if (this.standardAct == null || ampl > 0) {
+        var amplitude = act.chipsBet - this.getStandard();
+        if (this.standardAct == null || amplitude > 0) {
             // 每轮刚开始 standardAct 为 nil, 有人押注后直接为 standardAct
             this.standardAct = act;
-            if (act.op == null) {
-                throw new Exception("错误");
-            }
+
             // 翻牌前有加注
             if (Circle.Preflop.equals(circle)) {
                 this.flopRaise.add(player.getId());
             }
             // 加注增幅
-            if (ampl >= this.amplitude) {
-                this.amplitude = ampl;
+            if (amplitude >= this.amplitude) {
+                this.amplitude = amplitude;
                 this.legalRaiseId = player.getId();
             }
         }
@@ -267,7 +274,7 @@ public class Pot {
         return 0;
     }
 
-    public List<Divide> divide() {
+    List<Divide> divide() {
         return this.divides;
     }
 

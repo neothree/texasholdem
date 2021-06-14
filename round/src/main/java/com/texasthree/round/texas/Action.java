@@ -28,4 +28,8 @@ public class Action {
         this.sumPot = sumPot;
     }
 
+    public static Action Fold() {
+        return new Action(Optype.Fold);
+    }
+
 }

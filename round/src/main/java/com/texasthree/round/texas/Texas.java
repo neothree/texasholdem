@@ -34,11 +34,11 @@ public class Texas {
      */
     private Ring<Player> ring;
 
-    public static Texas.Builder builder() {
+    static Texas.Builder builder() {
         return new Texas.Builder();
     }
 
-    public static Texas.Builder builder(int playerNum) {
+    static Texas.Builder builder(int playerNum) {
         var builder = new Texas.Builder();
         builder.playerNum = playerNum;
         return builder;
@@ -56,10 +56,6 @@ public class Texas {
 
         public Builder() {
 
-        }
-
-        public Builder(int playerNum) {
-            this.playerNum = playerNum;
         }
 
         public Builder playerNum(int playerNum) {
@@ -213,22 +209,15 @@ public class Texas {
             return null;
         }
 
-        var act = this.pot.parseAction(this.opPlayer(), action);
-        var auth = this.pot.auth(this.opPlayer());
-        if (!auth.containsKey(act.op) ||
-                (Optype.Raise.equals(act.op) && act.chipsAdd < auth.get(act.op))) {
-            throw new IllegalArgumentException("押注错误");
-        }
-
         // 执行下注
-        this.pot.action(this.opPlayer(), act);
+        this.pot.action(this.opPlayer(), action, true);
 
         // 轮转
         var move = this.turn();
 
         // 如果下一位玩家离开则自动弃牌
         if (Move.NextOp.equals(move) && this.opPlayer().isLeave()) {
-            move = this.action(new Action(Optype.Fold));
+            move = this.action(Action.Fold());
         }
 
         return move;
@@ -249,7 +238,7 @@ public class Texas {
         } else if (opNext != null && opNext.getId() == this.pot.getStandardId()) {
             if (Circle.River.equals(this.pot.circle()) || leftNum <= 1) {
                 move = Move.Showdown;
-            } else if (this.preflopOnceAction(standard, opNext)) {
+            } else if (this.isPreflopOnceAction(standard, opNext)) {
                 var player = this.nextOpPlayer(opNext.getId());
                 var action = this.pot.getAction(player.getId());
                 this.pot.setStandardInfo(action.chipsBet, player.getId());
@@ -273,7 +262,7 @@ public class Texas {
     /**
      * Preflop多一次押注
      */
-    private boolean preflopOnceAction(int standard, Player opNext) {
+    private boolean isPreflopOnceAction(int standard, Player opNext) {
         if (!Circle.Preflop.equals(this.pot.circle())) {
             return false;
         }
@@ -363,7 +352,7 @@ public class Texas {
         this.freshHand();
 
         if (this.opPlayer().isLeave()) {
-            this.action(new Action(Optype.Fold));
+            this.action(Action.Fold());
         }
     }
 
@@ -418,7 +407,7 @@ public class Texas {
 
         // 如果是正在押注玩家直接弃牌
         if (this.opPlayer() == player) {
-            return this.action(new Action(Optype.Fold));
+            return this.action(Action.Fold());
         }
 
         if (this.playerNum - this.leaveOrFoldNum() == 1) {

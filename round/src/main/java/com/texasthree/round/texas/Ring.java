@@ -6,9 +6,9 @@ public class Ring<T> {
     private Ring<T> next;
     private Ring<T> prev;
 
-    public T value;
+    T value;
 
-    public static <T> Ring<T> create(int num) {
+    static <T> Ring<T> create(int num) {
         if (num < 0) {
             throw new IllegalArgumentException();
         }
@@ -19,16 +19,16 @@ public class Ring<T> {
         return r;
     }
 
-    public Ring() {
+    Ring() {
         next = this;
         prev = this;
     }
 
-    public void setValue(T v) {
+    void setValue(T v) {
         this.value = v;
     }
 
-    public void link(T v) {
+    void link(T v) {
         Ring<T> node = new Ring<>();
         node.value = v;
 
@@ -39,17 +39,7 @@ public class Ring<T> {
         this.next = node;
     }
 
-
-    public Ring move(int n) {
-        Ring m = this;
-        while (n > 0) {
-            m = m.next;
-            n--;
-        }
-        return m;
-    }
-
-    public Ring<T> move(Predicate<T> filter) {
+    Ring<T> move(Predicate<T> filter) {
         int limit = this.size();
         Ring<T> n = this.next;
         while (limit > 0 && !filter.test(n.value)) {
@@ -59,7 +49,7 @@ public class Ring<T> {
         return filter.test(n.value) ? n : null;
     }
 
-    public int size() {
+    int size() {
         int size = 1;
         if (next == this) {
             return size;
@@ -73,11 +63,11 @@ public class Ring<T> {
         return size;
     }
 
-    public Ring<T> getNext() {
+    Ring<T> getNext() {
         return next;
     }
 
-    public Ring<T> getPrev() {
+    Ring<T> getPrev() {
         return prev;
     }
 }
