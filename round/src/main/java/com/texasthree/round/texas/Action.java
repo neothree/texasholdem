@@ -41,4 +41,10 @@ public class Action {
         return act;
     }
 
+    public boolean isInpot() {
+        if (this.straddle) {
+            return false;
+        }
+        return op == Optype.Raise || op == Optype.Allin || op == Optype.Call;
+    }
 }

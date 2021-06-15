@@ -229,6 +229,12 @@ class Pot {
         this.records.add(record);
     }
 
+    /**
+     * 计算操作位可以进行的押注动作
+     * <p>
+     * 1. call 显示数字为需要增加的筹码数
+     * 2. 剩下的为 加到的筹码数
+     */
     Map<Optype, Integer> auth(Player op) {
         var chipsLeft = op.getChips();
         var opBetChips = this.chipsThisCircle(op.getId());
@@ -246,8 +252,82 @@ class Pot {
         if (chipsLeft + opBetChips > this.raiseLine()) {
             ret.put(Optype.Raise, this.raiseLine());
         }
-        return ret;
 
+
+        // 如果有玩家allin没有达到有效raise, 但是这个玩家已经对这个加注call过
+        // 此后如果还没有有效加注,再次轮到这个玩家则不能加注
+        var onlyCall = false;
+
+        if (onlyCall) {
+            // 只能call, 筹码不够call的线则选择allin
+            ret.remove(Optype.Allin);
+        } else if (maxBetChips > this.raiseLine()) {
+            ret.put(Optype.Raise, this.raiseLine());
+        }
+
+        // 快捷加注
+        if (ret.containsKey(Optype.Raise)) {
+            ret.putAll(this.authShortcut(op));
+        }
+        return ret;
+    }
+
+    private Map<Optype, Integer> authShortcut(Player op) {
+        var chipsLeft = op.getChips();
+        var potSum = this.sumPot();
+        var bb = this.smallBind * 2;
+        var ret = new HashMap<Optype, Integer>();
+
+        // 第一次押注位, 有盲注计算
+        if (potSum <= this.smallBind * 3) {
+            // 2倍大盲
+            var bb2 = bb * 2;
+            if (chipsLeft < bb2) {
+                return ret;
+            }
+            ret.put(Optype.BBlind2, bb2);
+
+            // 3倍大盲
+            var bb3 = bb * 3;
+            if (chipsLeft < bb3) {
+                return ret;
+            }
+            ret.put(Optype.BBlind3, bb3);
+
+            // 4倍大盲
+            var bb4 = bb * 4;
+            if (chipsLeft < bb4) {
+                return ret;
+            }
+            ret.put(Optype.BBlind4, bb4);
+        }
+
+        var oldBetChips = this.chipsThisCircle(op.getId());
+        // 底池的计算值是call平后的总值
+        var addBase = this.getStandard() - oldBetChips;
+        potSum = potSum + addBase;
+
+        // 1/2 底池
+        var add1_2 = addBase + Math.ceil(potSum / 2);
+        if (chipsLeft < add1_2) {
+            return ret;
+        }
+        ret.put(Optype.Pot1_2, (int) add1_2 + oldBetChips);
+
+        // 2/3 底池
+        var add2_3 = addBase + Math.ceil(potSum * 2 / 3);
+        if (chipsLeft < add2_3) {
+            return ret;
+        }
+        ret.put(Optype.Pot2_3, (int) add2_3 + oldBetChips);
+
+        // 1倍底池
+        var add1_1 = addBase + potSum;
+        if (chipsLeft < add1_1) {
+            return ret;
+        }
+        ret.put(Optype.Pot1_1, add1_1 + oldBetChips);
+        return ret;
     }
 
     /**
@@ -260,24 +340,6 @@ class Pot {
             this.giveback = new Player(entry.getKey(), entry.getValue());
         }
     }
-
-    /**
-     * 这一圈的押注数
-     */
-    int chipsThisCircle(int id) {
-        for (var i = this.going.actions.size() - 1; i >= 0; i--) {
-            Action act = this.going.actions.get(i);
-            if (act.id == id) {
-                return act.chipsBet;
-            }
-        }
-        return 0;
-    }
-
-    List<Divide> divides() {
-        return this.divides;
-    }
-
 
     private List<Divide> makeDivide(boolean com) {
         var divides = new ArrayList<Divide>();
@@ -322,6 +384,37 @@ class Pot {
             divides.add(single);
         }
         return divides;
+    }
+
+    /**
+     * 押注统计信息
+     */
+    Map<Integer, Statistic> makeBetStatistic(Set<Integer> winners) {
+        var ret = new HashMap<Integer, Statistic>();
+        var preflop = this.getCircleRecord(Circle.Preflop);
+        for (var v : preflop.getActions()) {
+            var stat = ret.getOrDefault(v.id, new Statistic());
+            if (this.isAllin(v.id)) {
+                stat.setAllin(true);
+                if (winners.contains(v.id)) {
+                    stat.setAllinWin(true);
+                }
+            }
+
+            // 翻牌前加注
+            stat.setFlopRaise(flopRaise.contains(v.id));
+            ret.put(v.id, stat);
+        }
+
+        this.records.stream()
+                .map(CircleRecord::getActions)
+                .flatMap(v -> v.stream())
+                .forEach(act -> {
+                    if (act.isInpot()) {
+                        ret.get(act.id).setInpot(true);
+                    }
+                });
+        return ret;
     }
 
     Action getAction(int id) {
@@ -375,10 +468,6 @@ class Pot {
         return ret;
     }
 
-    Map<Integer, Statistic> makeBetStatistic(Set<Integer> winners) {
-        return null;
-    }
-
     private CircleRecord getCircleRecord(Circle circle) {
         if (going != null && this.going.getCircle().equals(circle)) {
             return this.going;
@@ -389,6 +478,23 @@ class Pot {
             }
         }
         return null;
+    }
+
+    /**
+     * 这一圈的押注数
+     */
+    int chipsThisCircle(int id) {
+        for (var i = this.going.actions.size() - 1; i >= 0; i--) {
+            Action act = this.going.actions.get(i);
+            if (act.id == id) {
+                return act.chipsBet;
+            }
+        }
+        return 0;
+    }
+
+    List<Divide> divides() {
+        return this.divides;
     }
 
     int allinNum() {

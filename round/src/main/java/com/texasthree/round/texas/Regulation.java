@@ -1,5 +1,10 @@
 package com.texasthree.round.texas;
 
+/**
+ * 玩法
+ *
+ * TODO 构造成对象
+ */
 public enum Regulation {
     /**
      * 小盲
