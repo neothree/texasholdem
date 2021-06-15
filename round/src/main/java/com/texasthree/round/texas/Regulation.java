@@ -28,8 +28,15 @@ public enum Regulation {
     /**
      * 强制盲注
      */
-    Straddle;
-
+    Straddle,
+    /**
+     *
+     */
+    AllinOrFold,
+    /**
+     * 自动埋牌
+     */
+    CoverCard;
 
 
     private Regulation() {

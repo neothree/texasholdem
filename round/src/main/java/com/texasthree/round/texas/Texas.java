@@ -286,7 +286,6 @@ public class Texas {
         } else {
             this.showdown();
         }
-
         return move;
     }
 
@@ -352,7 +351,7 @@ public class Texas {
     private Map<Integer, Map<Integer, Integer>> divideMoney() {
         this.freshHand();
 
-        var divide = this.divide();
+        var divide = this.divides();
         var ret = new HashMap<Integer, Map<Integer, Integer>>();
         var inGameNum = this.ring.iterator().stream().filter(v -> v.inGame()).count();
         // 只剩下一个玩家没有离开,不用经过比牌,全部给他
@@ -449,8 +448,70 @@ public class Texas {
         return winner;
     }
 
-    private Set<Integer> showCardStrategy() {
-        // TODO
+    /**
+     * 展示手牌
+     */
+    private Set<Player> showCardStrategy() {
+        var show = this.forceShow();
+        show.addAll(this.willingShow());
+        return show;
+    }
+
+    /**
+     * 系统强制展示手牌
+     */
+    private Set<Player> forceShow() {
+        // 没有进行比牌, 不用亮
+        var show = new HashSet<Player>();
+        if (!this.isCompareShowdown()) {
+            return show;
+        }
+
+        // 所有没弃牌的玩家亮牌
+        // 1. 非河牌圈, 因为allin结束
+        // 2. 没有自动埋牌策略
+        if (!this.regulations.containsKey(Regulation.CoverCard) || this.circle() != Circle.River) {
+            for (var v : this.ring.iterator()) {
+                if (!this.pot.isAllin(v)) {
+                    show.add(v);
+                }
+            }
+            return show;
+        }
+
+        // 河牌圈
+        var playerRing = this.ring.move(v -> v.equals(this.dealer()));
+        var stub = this.pot.lastBetOrRaise();
+        for (var divide : this.divides()) {
+            var pr = playerRing.move(player -> {
+                if (!divide.getMembers().containsKey(player.getId())) {
+                    return false;
+                }
+                return stub != null
+                        ? player.getId() == stub
+                        : !this.pot.isFold(player);
+            });
+            var last = pr.value;
+            show.add(last);
+            for (var player : pr.iterator()) {
+                // 大于等于必须亮牌
+                if (divide.getMembers().containsKey(player.getId())
+                        && !this.pot.isFold(player)
+                        && player.getHand().compareTo(last.getHand()) > -1) {
+                    show.add(player);
+                    last = player;
+                }
+            }
+        }
+        return show;
+    }
+
+    /**
+     * 玩家自愿展示手牌
+     * <p>
+     * TODO 不属于牌局核心逻辑，应该放在外层
+     */
+    private Set<Player> willingShow() {
         return new HashSet<>();
     }
 
@@ -494,7 +555,7 @@ public class Texas {
             r = r.getNext();
         }
         var standardId = this.pot.getStandardId();
-        while ((this.pot.isFold(r.value.getId()) || this.pot.isAllin(r.value.getId()))
+        while ((this.pot.isFold(r.value) || this.pot.isAllin(r.value))
                 && (standardId == null || r.value.getId() != standardId)) {
             r = r.getNext();
         }
@@ -511,7 +572,7 @@ public class Texas {
     }
 
     private void nextOp() {
-        this.ring = this.ring.move(v -> !this.pot.isAllin(v.getId()) && !this.pot.isFold(v.getId()));
+        this.ring = this.ring.move(v -> !this.pot.isAllin(v) && !this.pot.isFold(v));
     }
 
     private int chipsThisCircle(int id) {
@@ -523,8 +584,8 @@ public class Texas {
         return this.pot.foldNum();
     }
 
-    List<Divide> divide() {
-        return this.pot.divide();
+    List<Divide> divides() {
+        return this.pot.divides();
     }
 
 
@@ -644,8 +705,18 @@ public class Texas {
         return this.isOver;
     }
 
+    /**
+     * 获取押注操作权限
+     */
     Map<Optype, Integer> auth() {
-        return this.pot.auth(this.opPlayer());
+        var auth = this.pot.auth(this.opPlayer());
+        if (this.regulations.containsKey(Regulation.AllinOrFold)) {
+            var m = new HashMap<Optype, Integer>();
+            m.put(Optype.Allin, auth.get(Optype.Allin));
+            m.put(Optype.Fold, auth.get(Optype.Fold));
+            auth = m;
+        }
+        return auth;
     }
 
     int notFoldNum() {

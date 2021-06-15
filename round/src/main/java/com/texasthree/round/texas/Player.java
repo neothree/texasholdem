@@ -46,4 +46,24 @@ public class Player {
     public void setHand(Hand hand) {
         this.hand = hand;
     }
+
+    @Override
+    public String toString() {
+        return new StringBuilder()
+                .append("id=").append(id)
+                .append(", chips=").append(chips)
+                .append(", leave=").append(leave)
+                .append(", hand=").append(hand)
+                .toString();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return (other instanceof Player) && ((Player) other).getId() == this.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }

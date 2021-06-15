@@ -2,7 +2,7 @@ package com.texasthree.round.texas;
 
 import java.util.*;
 
-public class Pot {
+class Pot {
 
     private Circle circle;
 
@@ -274,7 +274,7 @@ public class Pot {
         return 0;
     }
 
-    List<Divide> divide() {
+    List<Divide> divides() {
         return this.divides;
     }
 
@@ -407,8 +407,16 @@ public class Pot {
         return fold.contains(i);
     }
 
+    boolean isFold(Player player) {
+        return fold.contains(player.getId());
+    }
+
     boolean isAllin(int i) {
         return allin.contains(i);
+    }
+
+    boolean isAllin(Player player) {
+        return allin.contains(player.getId());
     }
 
     Circle circle() {
@@ -456,6 +464,10 @@ public class Pot {
 
     Player giveback() {
         return this.giveback;
+    }
+
+    Integer lastBetOrRaise() {
+        return this.legalRaiseId;
     }
 
     void setStandardInfo(int chips, int id) {
