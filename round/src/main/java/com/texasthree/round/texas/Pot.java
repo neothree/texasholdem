@@ -1,5 +1,7 @@
 package com.texasthree.round.texas;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.*;
 
 class Pot {
@@ -46,8 +48,7 @@ class Pot {
         if (ante <= 0) {
             return;
         }
-        for (var i = 0; i < ring.size(); i++) {
-            var player = ring.value;
+        for (var player : ring.iterator()) {
             if (player.getChips() >= ante) {
                 this.anteBet.put(player.getId(), ante);
             } else {
@@ -136,7 +137,9 @@ class Pot {
             var auth = this.auth(player);
             if (!auth.containsKey(act.op) ||
                     (Optype.Raise.equals(act.op) && act.chipsAdd < auth.get(act.op))) {
-                throw new IllegalArgumentException("押注错误");
+                var str = "auth = " + new ObjectMapper().writeValueAsString(auth) + "\n";
+                str = str + "action = " + act;
+                throw new IllegalArgumentException("押注错误 " + str);
             }
         }
 
@@ -277,6 +280,7 @@ class Pot {
         var potSum = this.sumPot();
         var bb = this.smallBind * 2;
         var ret = new HashMap<Optype, Integer>();
+        var oldBetChips = this.chipsThisCircle(op.getId());
 
         // 第一次押注位, 有盲注计算
         if (potSum <= this.smallBind * 3) {
@@ -285,24 +289,24 @@ class Pot {
             if (chipsLeft < bb2) {
                 return ret;
             }
-            ret.put(Optype.BBlind2, bb2);
+            ret.put(Optype.BBlind2, bb2 + oldBetChips);
 
             // 3倍大盲
             var bb3 = bb * 3;
             if (chipsLeft < bb3) {
                 return ret;
             }
-            ret.put(Optype.BBlind3, bb3);
+            ret.put(Optype.BBlind3, bb3 + oldBetChips);
 
             // 4倍大盲
             var bb4 = bb * 4;
             if (chipsLeft < bb4) {
                 return ret;
             }
-            ret.put(Optype.BBlind4, bb4);
+            ret.put(Optype.BBlind4, bb4 + oldBetChips);
+            return ret;
         }
 
-        var oldBetChips = this.chipsThisCircle(op.getId());
         // 底池的计算值是call平后的总值
         var addBase = this.getStandard() - oldBetChips;
         potSum = potSum + addBase;

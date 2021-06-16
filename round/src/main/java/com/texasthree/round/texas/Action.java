@@ -7,8 +7,11 @@ public class Action {
     public Optype op;
 
     public final int chipsBet;
+
     public final int chipsAdd;
+
     public final int chipsLeft;
+
     public final int sumPot;
 
     public boolean straddle;
@@ -46,5 +49,18 @@ public class Action {
             return false;
         }
         return op == Optype.Raise || op == Optype.Allin || op == Optype.Call;
+    }
+
+    @Override
+    public String toString() {
+        return new StringBuilder()
+                .append("[id=").append(id)
+                .append(", op=").append(op)
+                .append(", chipsBet=").append(chipsAdd)
+                .append(", chipsLeft=").append(chipsLeft)
+                .append(", sumPot=").append(sumPot)
+                .append(", straddle=").append(straddle)
+                .append("]")
+                .toString();
     }
 }

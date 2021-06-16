@@ -48,16 +48,19 @@ public class Card implements Comparable<Card> {
     }
 
     @Override
+    public String toString() {
+        return name;
+    }
+
+    @Override
     public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        }
         if (!(other instanceof Card)) {
             return false;
         }
         var o = (Card) other;
         return this.point.equals(o.point) && this.suit == o.suit;
-    }
-
-    @Override
-    public String toString() {
-        return name;
     }
 }

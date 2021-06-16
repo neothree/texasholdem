@@ -1,14 +1,13 @@
 package com.texasthree.round.texas;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.texasthree.round.AllCard;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
-import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Texas Tester.
@@ -96,22 +95,22 @@ public class TexasTest extends AllCard {
                 .initChips(200)
                 .build();
         texas.start();
-        assertEquals(Move.NextOp, texas.action(Action.raise(198)));
+        assertEquals(Texas.NEXT_OP, texas.action(Action.raise(198)));
 
         // 第一圈都 call, 大盲多一次押注
         texas = Texas.builder(3).build();
-        assertEquals(Move.NextOp, texas.start());
-        assertEquals(Move.NextOp, texas.action(makeAct(Optype.Call)));
-        assertEquals(Move.NextOp, texas.action(makeAct(Optype.Call)));
-        assertEquals(Move.CircleEnd, texas.action(makeAct(Optype.Check)));
+        assertEquals(Texas.NEXT_OP, texas.start());
+        assertEquals(Texas.NEXT_OP, texas.action(makeAct(Optype.Call)));
+        assertEquals(Texas.NEXT_OP, texas.action(makeAct(Optype.Call)));
+        assertEquals(Texas.CIRCLE_END, texas.action(makeAct(Optype.Check)));
 
         // 小盲为0
         texas = Texas.builder()
                 .smallBlind(0)
                 .build();
-        assertEquals(Move.NextOp, texas.start());
-        assertEquals(Move.NextOp, texas.action(makeAct(Optype.Check)));
-        assertEquals(Move.CircleEnd, texas.action(makeAct(Optype.Check)));
+        assertEquals(Texas.NEXT_OP, texas.start());
+        assertEquals(Texas.NEXT_OP, texas.action(makeAct(Optype.Check)));
+        assertEquals(Texas.CIRCLE_END, texas.action(makeAct(Optype.Check)));
 
         // TODO 两倍前注
 //        var reg = new HashMap<Regulation, Integer>();
@@ -120,9 +119,9 @@ public class TexasTest extends AllCard {
 //                .smallBlind(0)
 //                .regulations(reg)
 //                .build();
-//        assertEquals(Move.NextOp, texas.start());
-//        assertEquals(Move.NextOp, texas.action(makeAct(Optype.Call)));
-//        assertEquals(Move.CircleEnd, texas.action(makeAct(Optype.Check)));
+//        assertEquals(Texas.NEXT_OP, texas.start());
+//        assertEquals(Texas.NEXT_OP, texas.action(makeAct(Optype.Call)));
+//        assertEquals(Texas.CIRCLE_END, texas.action(makeAct(Optype.Check)));
 
         // 复现
         Ring<Player> ring = Ring.create(3);
@@ -131,11 +130,11 @@ public class TexasTest extends AllCard {
         ring.getPrev().setValue(new Player(3, 200));
         var config = Texas.builder().ring(ring);
         texas = config.build();
-        assertEquals(Move.NextOp, texas.start());
-        circleEquals(1, makeAct(Optype.Allin), Move.NextOp, texas);
-        circleEquals(2, makeAct(Optype.Call), Move.NextOp, texas);
-        circleEquals(3, makeAct(Optype.Call), Move.CircleEnd, texas);
-        circleEquals(2, makeAct(Optype.Fold), Move.Showdown, texas);
+        assertEquals(Texas.NEXT_OP, texas.start());
+        circleEquals(1, makeAct(Optype.Allin), Texas.NEXT_OP, texas);
+        circleEquals(2, makeAct(Optype.Call), Texas.NEXT_OP, texas);
+        circleEquals(3, makeAct(Optype.Call), Texas.CIRCLE_END, texas);
+        circleEquals(2, makeAct(Optype.Fold), Texas.SHOWDOWN, texas);
     }
 
     @Test
@@ -144,27 +143,27 @@ public class TexasTest extends AllCard {
         texas.start();
 
         // Preflop
-        circleEquals(4, makeAct(Optype.Call), Move.NextOp, texas);
-        circleEquals(5, makeAct(Optype.Call), Move.NextOp, texas);
-        circleEquals(1, makeAct(Optype.Call), Move.NextOp, texas);
-        circleEquals(2, makeAct(Optype.Call), Move.NextOp, texas);
+        circleEquals(4, makeAct(Optype.Call), Texas.NEXT_OP, texas);
+        circleEquals(5, makeAct(Optype.Call), Texas.NEXT_OP, texas);
+        circleEquals(1, makeAct(Optype.Call), Texas.NEXT_OP, texas);
+        circleEquals(2, makeAct(Optype.Call), Texas.NEXT_OP, texas);
         // 第一圈，大盲这种情况下多一次押注
-        circleEquals(3, makeAct(Optype.Check), Move.CircleEnd, texas);
+        circleEquals(3, makeAct(Optype.Check), Texas.CIRCLE_END, texas);
 
         // Flop
-        circleEquals(2, makeAct(Optype.Fold), Move.NextOp, texas);
-        circleEquals(3, makeAct(Optype.Fold), Move.NextOp, texas);
-        circleEquals(4, Action.raise(2), Move.NextOp, texas);
-        circleEquals(5, makeAct(Optype.Call), Move.NextOp, texas);
-        circleEquals(1, makeAct(Optype.Fold), Move.CircleEnd, texas);
+        circleEquals(2, makeAct(Optype.Fold), Texas.NEXT_OP, texas);
+        circleEquals(3, makeAct(Optype.Fold), Texas.NEXT_OP, texas);
+        circleEquals(4, Action.raise(2), Texas.NEXT_OP, texas);
+        circleEquals(5, makeAct(Optype.Call), Texas.NEXT_OP, texas);
+        circleEquals(1, makeAct(Optype.Fold), Texas.CIRCLE_END, texas);
 
         // Turn
-        circleEquals(4, Action.raise(2), Move.NextOp, texas);
-        circleEquals(5, makeAct(Optype.Call), Move.CircleEnd, texas);
+        circleEquals(4, Action.raise(2), Texas.NEXT_OP, texas);
+        circleEquals(5, makeAct(Optype.Call), Texas.CIRCLE_END, texas);
 
         // River
-        circleEquals(4, Action.raise(2), Move.NextOp, texas);
-        circleEquals(5, makeAct(Optype.Call), Move.Showdown, texas);
+        circleEquals(4, Action.raise(2), Texas.NEXT_OP, texas);
+        circleEquals(5, makeAct(Optype.Call), Texas.SHOWDOWN, texas);
 
         //////////////////////////////////////////////////////////////////
         Ring<Player> ring = Ring.create(5);
@@ -178,29 +177,29 @@ public class TexasTest extends AllCard {
                 .build();
         texas.start();
 
-        circleEquals(4, Action.raise(4), Move.NextOp, texas);
-        circleEquals(5, makeAct(Optype.Allin), Move.NextOp, texas);
-        circleEquals(1, makeAct(Optype.Call), Move.NextOp, texas);
-        circleEquals(2, makeAct(Optype.Fold), Move.NextOp, texas);
-        circleEquals(3, makeAct(Optype.Call), Move.NextOp, texas);
-        circleEquals(4, makeAct(Optype.Call), Move.CircleEnd, texas);
+        circleEquals(4, Action.raise(4), Texas.NEXT_OP, texas);
+        circleEquals(5, makeAct(Optype.Allin), Texas.NEXT_OP, texas);
+        circleEquals(1, makeAct(Optype.Call), Texas.NEXT_OP, texas);
+        circleEquals(2, makeAct(Optype.Fold), Texas.NEXT_OP, texas);
+        circleEquals(3, makeAct(Optype.Call), Texas.NEXT_OP, texas);
+        circleEquals(4, makeAct(Optype.Call), Texas.CIRCLE_END, texas);
 
-        circleEquals(3, makeAct(Optype.Check), Move.NextOp, texas);
-        circleEquals(4, makeAct(Optype.Check), Move.NextOp, texas);
-        circleEquals(1, Action.raise(4), Move.NextOp, texas);
-        circleEquals(3, makeAct(Optype.Fold), Move.NextOp, texas);
-        circleEquals(4, makeAct(Optype.Call), Move.CircleEnd, texas);
+        circleEquals(3, makeAct(Optype.Check), Texas.NEXT_OP, texas);
+        circleEquals(4, makeAct(Optype.Check), Texas.NEXT_OP, texas);
+        circleEquals(1, Action.raise(4), Texas.NEXT_OP, texas);
+        circleEquals(3, makeAct(Optype.Fold), Texas.NEXT_OP, texas);
+        circleEquals(4, makeAct(Optype.Call), Texas.CIRCLE_END, texas);
 
-        circleEquals(4, Action.raise(5), Move.NextOp, texas);
-        circleEquals(1, makeAct(Optype.Call), Move.CircleEnd, texas);
+        circleEquals(4, Action.raise(5), Texas.NEXT_OP, texas);
+        circleEquals(1, makeAct(Optype.Call), Texas.CIRCLE_END, texas);
 
 
         ////////////////////////////////////////////////////////////////////////
         texas = Texas.builder().build();
         texas.start();
 
-        circleEquals(1, makeAct(Optype.Call), Move.NextOp, texas);
-        circleEquals(2, makeAct(Optype.Check), Move.CircleEnd, texas);
+        circleEquals(1, makeAct(Optype.Call), Texas.NEXT_OP, texas);
+        circleEquals(2, makeAct(Optype.Check), Texas.CIRCLE_END, texas);
 
         assertEquals(Circle.Flop, texas.circle());
         assertEquals(2, texas.opPlayer().getId());
@@ -215,8 +214,8 @@ public class TexasTest extends AllCard {
                 .regulations(regulations)
                 .build();
         texas.start();
-        circleEquals(2, makeAct(Optype.Call), Move.NextOp, texas);
-        circleEquals(1, makeAct(Optype.Check), Move.CircleEnd, texas);
+        circleEquals(2, makeAct(Optype.Call), Texas.NEXT_OP, texas);
+        circleEquals(1, makeAct(Optype.Check), Texas.CIRCLE_END, texas);
 
         ////////////////////////////////////////////////////////////////////////
         //  短牌：在“smallBlind == 0”下, 开局后，所有玩家都check，最后应该到庄家还有一次option
@@ -225,8 +224,13 @@ public class TexasTest extends AllCard {
                 .ante(1)
                 .build();
         texas.start();
-        circleEquals(2, makeAct(Optype.Check), Move.NextOp, texas);
-        circleEquals(1, makeAct(Optype.Check), Move.CircleEnd, texas);
+        circleEquals(2, makeAct(Optype.Check), Texas.NEXT_OP, texas);
+        circleEquals(1, makeAct(Optype.Check), Texas.CIRCLE_END, texas);
+    }
+
+    @Test
+    public void testMakeResult() throws Exception {
+        // TODO
     }
 
     @Test
@@ -234,25 +238,134 @@ public class TexasTest extends AllCard {
         var texas = Texas.builder(5).build();
         texas.start();
 
-        // chips: 2
-        Player player = texas.opPlayer();
-        player.changeChips(2 - player.getChips());
-        equals(texas.auth(), Optype.Fold, Optype.Allin);
+        equalsAuth(texas, 2, Optype.Fold, Optype.Allin);
+        texas.action(Action.of(Optype.Allin));
 
-        // chips: 3
-        player.changeChips(3 - player.getChips());
-        equals(texas.auth(), Optype.Fold, Optype.Allin, Optype.Call);
+        equalsAuth(texas, 3, Optype.Fold, Optype.Allin, Optype.Call);
+        texas.action(Action.of(Optype.Call));
 
-        // chips: 10
+        var player = texas.opPlayer();
         player.changeChips(10 - player.getChips());
-//        equals(texas.auth(), Optype.fold, Optype.Allin, Optype.Call);
-        circleEquals(4, makeAct(Optype.Call), Move.NextOp, texas);
+        texas.action(Action.of(Optype.Call));
 
-        // chips: 1
+        equalsAuth(texas, 1, Optype.Fold, Optype.Allin);
+        texas.action(Action.of(Optype.Allin));
+
+        equalsAuth(texas, 3, Optype.Raise, Optype.Fold, Optype.Allin, Optype.Check);
+        texas.action(Action.of(Optype.Check));
+
+        equalsAuth(texas, 2, Optype.Fold, Optype.Allin, Optype.Check);
+        texas.action(Action.of(Optype.Allin));
+
         player = texas.opPlayer();
-        player.changeChips(1 - player.getChips());
-        equals(texas.auth(), Optype.Fold, Optype.Allin);
-        circleEquals(5, makeAct(Optype.Allin), Move.NextOp, texas);
+        player.changeChips(10 - player.getChips());
+        texas.action(Action.of(Optype.Call));
+
+        ////////////////////////////////////////////////////////////////////////////////
+        texas = Texas.builder(5).build();
+        texas.start();
+
+        equalsAuth(texas, 10, Optype.Fold, Optype.Call, Optype.Raise, Optype.Allin, Optype.BBlind2, Optype.BBlind3, Optype.BBlind4);
+        texas.action(Action.raise(10));
+
+        texas.action(Action.of(Optype.Fold));
+
+        equalsAuth(texas, 40, Optype.Fold, Optype.Call, Optype.Raise, Optype.Allin, Optype.Pot1_1, Optype.Pot1_2, Optype.Pot2_3);
+
+        ////////////////////////////////////////////////////////////////////////////////
+        texas = Texas.builder().build();
+        texas.start();
+        var auth = texas.auth();
+        assertEquals(7, auth.size());
+        assertEquals(0, auth.get(Optype.Fold));
+        assertEquals(1, auth.get(Optype.Call));
+        assertEquals(4, auth.get(Optype.Raise));
+        assertEquals(99, auth.get(Optype.Allin));
+        assertEquals(5, auth.get(Optype.BBlind2));
+        assertEquals(7, auth.get(Optype.BBlind3));
+        assertEquals(9, auth.get(Optype.BBlind4));
+
+        texas.action(Action.raise(8));
+        auth = texas.auth();
+        assertEquals(7, auth.size());
+        assertEquals(0, auth.get(Optype.Fold));
+        assertEquals(7, auth.get(Optype.Call));
+        assertEquals(16, auth.get(Optype.Raise));
+        assertEquals(98, auth.get(Optype.Allin));
+        assertEquals(16 + 2, auth.get(Optype.Pot1_2));
+        assertEquals(19 + 2, auth.get(Optype.Pot2_3));
+        assertEquals(25 + 2, auth.get(Optype.Pot1_1));
+
+        // 最小加注线等于最大加注则只能allin, 没有加注
+        texas = Texas.builder()
+                .players(new Player(1, 10), new Player(2, 100))
+                .build();
+        texas.start();
+        texas.action(Action.of(Optype.Call));
+        texas.action(Action.of(Optype.Check));
+        texas.action(Action.raise(4));
+        auth = texas.auth();
+        assertTrue(auth.containsKey(Optype.Allin));
+        assertFalse(auth.containsKey(Optype.Raise));
+
+        // 只有弃牌操作复现
+        texas = Texas.builder()
+                .players(new Player(1, 100)
+                        , new Player(2, 110)
+                        , new Player(3, 110)
+                        , new Player(4, 100))
+                .build();
+        texas.start();
+        texas.action(Action.raise(70));
+        texas.action(Action.of(Optype.Allin));
+        texas.action(Action.of(Optype.Call));
+        texas.action(Action.of(Optype.Allin));
+        texas.action(Action.of(Optype.Fold));
+        equalsAuth(texas, null, Optype.Fold, Optype.Allin);
+
+        // 对allin不足的人call后不能再allin
+        // 需求先不要
+        texas = Texas.builder()
+                .players(new Player(1, 40)
+                        , new Player(2, 60)
+                        , new Player(3, 80))
+                .build();
+        texas.start();
+        texas.action(Action.of(Optype.Call));
+        texas.action(Action.of(Optype.Call));
+        texas.action(Action.raise(32));
+        texas.action(Action.of(Optype.Allin));
+        assertTrue(auth.containsKey(Optype.Call));
+//        equalsAuth(texas, null, Optype.Fold, Optype.Allin);
+
+        // AllinOrFold
+        texas = Texas.builder()
+                .players(new Player(1, 200)
+                        , new Player(2, 10000))
+                .smallBlind(100)
+                .regulation(Regulation.AllinOrFold, 1)
+                .build();
+        texas.start();
+        equalsAuth(texas, null, Optype.Fold, Optype.Allin);
+        texas.action(Action.of(Optype.Allin));
+        equalsAuth(texas, null, Optype.Fold, Optype.Allin);
+    }
+
+    private void equalsAuth(Texas texas, Integer chipsLeft, Optype... ops) throws Exception {
+        var player = texas.opPlayer();
+        if (chipsLeft != null) {
+            player.changeChips(chipsLeft - player.getChips());
+        }
+
+        var auth = texas.auth();
+        if (false) {
+            var mp = new ObjectMapper();
+            System.out.println(mp.writeValueAsString(auth));
+        }
+        assertEquals(auth.size(), ops.length);
+        for (var v : ops) {
+            assertTrue(auth.containsKey(v));
+        }
     }
 
     @Test
@@ -306,17 +419,10 @@ public class TexasTest extends AllCard {
         assertEquals(1, texas.sbPlayer().getId());
         assertEquals(2, texas.bbPlayer().getId());
         assertEquals(50, texas.smallBlind());
-        assertEquals(Move.Showdown, move);
+        assertEquals(Texas.SHOWDOWN, move);
     }
 
-    private void equals(Map<Optype, Integer> auth, Optype... ops) {
-        assertEquals(auth.size(), ops.length);
-        for (var v : ops) {
-            assertTrue(auth.containsKey(v));
-        }
-    }
-
-    private void circleEquals(Integer opId, Action act, Move move, Texas texas) throws Exception {
+    private void circleEquals(Integer opId, Action act, String move, Texas texas) throws Exception {
         assertEquals(opId, texas.opPlayer().getId());
         assertEquals(move, texas.action(act));
     }

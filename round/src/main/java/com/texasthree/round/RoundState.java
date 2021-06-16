@@ -1,13 +1,12 @@
 package com.texasthree.round;
 
 import com.texasthree.round.texas.Action;
-import com.texasthree.round.texas.Move;
 import com.texasthree.round.texas.Player;
 
 import java.util.List;
 
 public class RoundState {
-    public Move move;
+    public String move;
     public List<Player> players;
     public List<Action> ops;
     public int raiseLine;

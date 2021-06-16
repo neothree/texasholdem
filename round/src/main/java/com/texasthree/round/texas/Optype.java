@@ -5,10 +5,25 @@ package com.texasthree.round.texas;
  */
 public enum Optype {
     None,
+    /**
+     * 弃牌
+     */
     Fold,
+    /**
+     * 跟注
+     */
     Call,
+    /**
+     * 加注
+     */
     Raise,
+    /**
+     * 全压
+     */
     Allin,
+    /**
+     * 看牌
+     */
     Check,
 
     /**

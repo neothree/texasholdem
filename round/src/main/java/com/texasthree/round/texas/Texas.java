@@ -10,6 +10,9 @@ import java.util.stream.Collectors;
  * 德扑牌局
  */
 public class Texas {
+    public static final String NEXT_OP = "NEXT_OP";
+    public static final String CIRCLE_END = "CIRCLE_END";
+    public static final String SHOWDOWN = "SHOWDOWN";
     /**
      * 是否结束
      */
@@ -86,6 +89,14 @@ public class Texas {
 
         public Builder regulations(Map<Regulation, Integer> regulations) {
             this.regulations = regulations;
+            return this;
+        }
+
+        public Builder regulation(Regulation regulation, Integer value) {
+            if (this.regulations == null) {
+                this.regulations = new HashMap<>();
+            }
+            this.regulations.put(regulation, value);
             return this;
         }
 
@@ -174,7 +185,7 @@ public class Texas {
     /**
      * 开始
      */
-    Move start() throws Exception {
+    String start() throws Exception {
         this.pot = new Pot(playerNum, this.smallBlind(), this.ante());
 
         // 一圈开始
@@ -223,7 +234,7 @@ public class Texas {
     /**
      * 强制盲注
      */
-    private Move actionStraddle() throws Exception {
+    private String actionStraddle() throws Exception {
         var act = Action.straddleBlind(this.straddleBlind());
         return this.action(act);
     }
@@ -235,7 +246,7 @@ public class Texas {
         this.pot.actionDealerAnte(this.dealer(), this.ante());
     }
 
-    public Move action(Action action) throws Exception {
+    public String action(Action action) throws Exception {
         if (this.isOver) {
             return null;
         }
@@ -247,7 +258,7 @@ public class Texas {
         var move = this.turn();
 
         // 如果下一位玩家离开则自动弃牌
-        if (Move.NextOp.equals(move) && this.opPlayer().isLeave()) {
+        if (Texas.NEXT_OP.equals(move) && this.opPlayer().isLeave()) {
             move = this.action(Action.fold());
         }
 
@@ -257,30 +268,30 @@ public class Texas {
     /**
      * 操作位轮转
      */
-    private Move turn() throws Exception {
-        var move = Move.NextOp;
+    private String turn() throws Exception {
+        var move = Texas.NEXT_OP;
         var leftNum = this.playerNum - this.pot.allinNum() - this.pot.foldNum();
         var opNext = this.nextOpPlayer(this.opPlayer().getId());
         var standard = this.pot.getStandard();
         if ((this.playerNum - this.leaveOrFoldNum() == 1)
                 || (leftNum == 1 && standard == this.chipsThisCircle(opNext.getId()))
                 || leftNum == 0) {
-            move = Move.Showdown;
+            move = Texas.SHOWDOWN;
         } else if (opNext != null && opNext.getId() == this.pot.getStandardId()) {
             if (Circle.River.equals(this.pot.circle()) || leftNum <= 1) {
-                move = Move.Showdown;
+                move = Texas.SHOWDOWN;
             } else if (this.isPreflopOnceAction(standard, opNext)) {
                 var player = this.nextOpPlayer(opNext.getId());
                 var action = this.pot.getAction(player.getId());
                 this.pot.setStandardInfo(action.chipsBet, player.getId());
             } else {
-                move = Move.CircleEnd;
+                move = Texas.CIRCLE_END;
             }
         }
 
-        if (Move.NextOp.equals(move)) {
+        if (Texas.NEXT_OP.equals(move)) {
             this.nextOp();
-        } else if (Move.CircleEnd.equals(move)) {
+        } else if (Texas.CIRCLE_END.equals(move)) {
             this.circleEnd();
             this.circleStart();
         } else {
@@ -592,7 +603,7 @@ public class Texas {
     /**
      * 玩家离开
      */
-    Move leave(Integer id) throws Exception {
+    String leave(Integer id) throws Exception {
         var player = this.getPlayerById(id);
         if (player == null || player.isLeave()) {
             return null;
@@ -611,7 +622,7 @@ public class Texas {
 
         if (this.playerNum - this.leaveOrFoldNum() == 1) {
             this.showdown();
-            return Move.Showdown;
+            return Texas.SHOWDOWN;
         }
         return null;
     }
