@@ -63,4 +63,9 @@ public class Card implements Comparable<Card> {
         var o = (Card) other;
         return this.point.equals(o.point) && this.suit == o.suit;
     }
+
+    @Override
+    public int hashCode() {
+        return point * 10 + suit;
+    }
 }

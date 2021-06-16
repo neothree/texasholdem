@@ -124,9 +124,11 @@ class Pot {
         }
         var chipsAdd = chipsBet - chipsBetOld;
         if (chipsAdd > player.getChips()) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("action=" + action + "\n" + "player=" + player);
         }
-        return new Action(player.getId(), action.op, chipsBet, chipsAdd, chipsLeft, this.sumPot());
+        var ret = new Action(player.getId(), action.op, chipsBet, chipsAdd, chipsLeft, this.sumPot());
+        ret.straddle = action.straddle;
+        return ret;
 
     }
 
@@ -136,7 +138,7 @@ class Pot {
         if (check) {
             var auth = this.auth(player);
             if (!auth.containsKey(act.op) ||
-                    (Optype.Raise.equals(act.op) && act.chipsAdd < auth.get(act.op))) {
+                    (Optype.Raise.equals(act.op) && act.chipsBet < auth.get(act.op))) {
                 var str = "auth = " + new ObjectMapper().writeValueAsString(auth) + "\n";
                 str = str + "action = " + act;
                 throw new IllegalArgumentException("押注错误 " + str);

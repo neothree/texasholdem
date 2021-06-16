@@ -6,14 +6,25 @@ public class Action {
 
     public Optype op;
 
+    /**
+     * 押注后一共的筹码
+     */
     public final int chipsBet;
-
+    /**
+     * 这一注增加的筹码
+     */
     public final int chipsAdd;
-
+    /**
+     * 剩余的筹码
+     */
     public final int chipsLeft;
-
+    /**
+     * 底池的总筹码
+     */
     public final int sumPot;
-
+    /**
+     * 强制
+     */
     public boolean straddle;
 
     public Action(int id, Optype op, int chipsBet, int chipsAdd, int chipsLeft, int sumPot) {
@@ -26,8 +37,20 @@ public class Action {
         this.straddle = false;
     }
 
+    public static Action check() {
+        return Action.of(Optype.Check);
+    }
+
     public static Action fold() {
         return Action.of(Optype.Fold);
+    }
+
+    public static Action allin() {
+        return Action.of(Optype.Allin);
+    }
+
+    public static Action call() {
+        return Action.of(Optype.Call);
     }
 
     public static Action raise(int chipsAdd) {
@@ -39,7 +62,7 @@ public class Action {
     }
 
     public static Action straddleBlind(int chipsAdd) {
-        var act = new Action(-1, Optype.Raise, chipsAdd, 0, 0, 0);
+        var act = new Action(-1, Optype.Raise, 0, chipsAdd, 0, 0);
         act.straddle = true;
         return act;
     }
@@ -56,7 +79,8 @@ public class Action {
         return new StringBuilder()
                 .append("[id=").append(id)
                 .append(", op=").append(op)
-                .append(", chipsBet=").append(chipsAdd)
+                .append(", chipsBet=").append(chipsBet)
+                .append(", chipsAdd=").append(chipsAdd)
                 .append(", chipsLeft=").append(chipsLeft)
                 .append(", sumPot=").append(sumPot)
                 .append(", straddle=").append(straddle)

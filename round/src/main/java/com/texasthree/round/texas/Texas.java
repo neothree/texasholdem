@@ -10,8 +10,13 @@ import java.util.stream.Collectors;
  * 德扑牌局
  */
 public class Texas {
+    /**
+     * 轮到下一个操作位
+     */
     public static final String NEXT_OP = "NEXT_OP";
+
     public static final String CIRCLE_END = "CIRCLE_END";
+
     public static final String SHOWDOWN = "SHOWDOWN";
     /**
      * 是否结束
@@ -26,9 +31,9 @@ public class Texas {
      */
     private final int playerNum;
     /**
-     * 剩余的牌
+     * 桌面
      */
-    private List<Card> leftCard;
+    private List<Card> board;
     /**
      * 规则
      */
@@ -53,8 +58,9 @@ public class Texas {
         private int smallBlind = 1;
         private int ante = 0;
         private int initChips = 100;
+        private boolean straddle;
         private Ring<Player> ring;
-        private List<Card> leftCard;
+        private List<Card> board;
         private Map<Regulation, Integer> regulations;
         private List<Player> players;
 
@@ -74,6 +80,11 @@ public class Texas {
 
         public Builder ante(int ante) {
             this.ante = ante;
+            return this;
+        }
+
+        public Builder straddle() {
+            this.straddle = true;
             return this;
         }
 
@@ -110,13 +121,13 @@ public class Texas {
             return this;
         }
 
-        public Builder leftCard(List<Card> leftCard) {
-            this.leftCard = leftCard;
+        public Builder board(List<Card> board) {
+            this.board = board;
             return this;
         }
 
-        public Builder leftCard(Card... leftCard) {
-            this.leftCard = Arrays.asList(leftCard);
+        public Builder board(Card... board) {
+            this.board = Arrays.asList(board);
             return this;
         }
 
@@ -136,16 +147,7 @@ public class Texas {
             }
             this.playerNum = ring.size();
 
-            if (this.leftCard == null) {
-                this.leftCard = TableCard.getInstance().shuffle();
-            }
-            if (ring.value.getHand() == null) {
-                for (int i = 1; i <= playerNum; i++) {
-                    ring.value.setHand(new Hand(leftCard.subList(i * 2, i * 2 + 2)));
-                    ring = ring.getNext();
-                }
-                leftCard = leftCard.subList(ring.size(), leftCard.size());
-            }
+            this.deal();
 
             if (regulations == null) {
                 regulations = new HashMap<>();
@@ -160,6 +162,9 @@ public class Texas {
             if (!regulations.containsKey(Regulation.Dealer)) {
                 regulations.put(Regulation.Dealer, 1);
             }
+            if (straddle) {
+                regulations.put(Regulation.Straddle, 0);
+            }
 
             this.ring = this.ring.move(v -> v.getId() == regulations.get(Regulation.Dealer));
 
@@ -170,7 +175,25 @@ public class Texas {
                 regulations.put(Regulation.SB, this.ring.getNext().value.getId());
                 regulations.put(Regulation.BB, this.ring.getNext().getNext().value.getId());
             }
-            return new Texas(regulations, ring, leftCard);
+            return new Texas(regulations, ring, board);
+        }
+
+        private void deal() {
+            var leftCard = TableCard.getInstance().shuffle();
+            if (board == null || board.size() != 5) {
+                board = leftCard.subList(0, 5);
+                leftCard = leftCard.subList(5, leftCard.size());
+            } else {
+                var set = new HashSet<>(board);
+                leftCard = leftCard.stream().filter(v -> !set.contains(v)).collect(Collectors.toList());
+            }
+
+            if (ring.value.getHand() == null) {
+                for (int i = 1; i <= playerNum; i++) {
+                    ring.value.setHand(new Hand(leftCard.subList(i * 2, i * 2 + 2)));
+                    ring = ring.getNext();
+                }
+            }
         }
     }
 
@@ -178,7 +201,7 @@ public class Texas {
     private Texas(Map<Regulation, Integer> regulations, Ring<Player> ring, List<Card> leftCard) {
         this.regulations = regulations;
         this.ring = ring;
-        this.leftCard = leftCard;
+        this.board = leftCard;
         this.playerNum = ring.size();
     }
 
@@ -591,8 +614,10 @@ public class Texas {
     }
 
     private int leaveOrFoldNum() {
-        // TODO 加上leave数量
-        return this.pot.foldNum();
+        return (int) this.ring.iterator()
+                .stream()
+                .filter(v -> v.isLeave() || this.pot.isFold(v.getId()))
+                .count();
     }
 
     List<Divide> divides() {
@@ -616,7 +641,7 @@ public class Texas {
         }
 
         // 如果是正在押注玩家直接弃牌
-        if (this.opPlayer() == player) {
+        if (this.opPlayer().equals(player)) {
             return this.action(Action.fold());
         }
 
@@ -647,17 +672,17 @@ public class Texas {
     /**
      * 牌面
      */
-    private List<Card> board() {
+    List<Card> board() {
         if (this.isOver && this.isCompareShowdown()) {
-            return this.leftCard.subList(0, 5);
+            return this.board.subList(0, 5);
         }
         switch (this.pot.circle()) {
             case Flop:
-                return this.leftCard.subList(0, 3);
+                return this.board.subList(0, 3);
             case Turn:
-                return this.leftCard.subList(0, 4);
+                return this.board.subList(0, 4);
             case River:
-                return this.leftCard.subList(0, 5);
+                return this.board.subList(0, 5);
             default:
                 return new ArrayList<>();
         }

@@ -124,12 +124,9 @@ public class TexasTest extends AllCard {
 //        assertEquals(Texas.CIRCLE_END, texas.action(makeAct(Optype.Check)));
 
         // 复现
-        Ring<Player> ring = Ring.create(3);
-        ring.setValue(new Player(1, 100));
-        ring.getNext().setValue(new Player(2, 200));
-        ring.getPrev().setValue(new Player(3, 200));
-        var config = Texas.builder().ring(ring);
-        texas = config.build();
+        texas = Texas.builder()
+                .players(new Player(1, 100), new Player(2, 200), new Player(3, 200))
+                .build();
         assertEquals(Texas.NEXT_OP, texas.start());
         circleEquals(1, makeAct(Optype.Allin), Texas.NEXT_OP, texas);
         circleEquals(2, makeAct(Optype.Call), Texas.NEXT_OP, texas);
@@ -226,6 +223,91 @@ public class TexasTest extends AllCard {
         texas.start();
         circleEquals(2, makeAct(Optype.Check), Texas.NEXT_OP, texas);
         circleEquals(1, makeAct(Optype.Check), Texas.CIRCLE_END, texas);
+    }
+
+    @Test
+    public void testStraddle() throws Exception {
+        var texas = Texas.builder(4)
+                .straddle()
+                .build();
+        assertEquals(Texas.NEXT_OP, texas.start());
+//        assert(round:OpPlayer() == config.playerList[1])
+//        assert(config.playerList[4]:Chips() == 196)
+        assertEquals(texas.opPlayer().getId(), 1);
+        assertEquals(texas.getPlayerById(4).getChips(), 96);
+
+        // TODO
+//        local config = {
+//                leftCard = {c.club9, c.club10, c.spades1, c.heart13, c.club8},
+//                playerList = {
+//                        Player:Ctor(1, 1, 200),
+//                Player:Ctor(2, 2, 200),
+//                Player:Ctor(3, 3, 200),
+//                Player:Ctor(4, 4, 3),
+//        },
+//        playing = {straddle = true,}
+//    }
+//        local round = CreateRoundByConfig(config)
+//        local move = round:Start()
+//        round:Action({op = Texas.DefAction.Allin})
+//        round:Action({op = Texas.DefAction.Allin})
+//        round:Action({op = Texas.DefAction.Allin})
+//        local result = round:MakeResult()
+//        assert(result.playerList[4].profit == -3)
+    }
+
+    @Test
+    public void testLeave() throws Exception {
+        var texas = Texas.builder()
+                .build();
+        texas.start();
+        var move = texas.leave(1);
+        assertEquals(Texas.SHOWDOWN, move);
+        assertTrue(texas.isOver());
+
+        //////////////
+        texas = Texas.builder()
+                .build();
+        texas.start();
+        move = texas.leave(2);
+        assertEquals(Texas.SHOWDOWN, move);
+        assertTrue(texas.isOver());
+
+        //////////////
+        texas = Texas.builder(3)
+                .build();
+        texas.start();
+        texas.leave(1);
+        assertEquals(2, texas.opPlayer().getId());
+        assertFalse(texas.isOver());
+        texas.leave(2);
+        assertTrue(texas.isOver());
+
+        // 离开玩家自动弃牌
+        texas = Texas.builder(4)
+                .build();
+        texas.start();
+        texas.leave(1);
+        texas.action(Action.fold());
+        assertEquals(2, texas.opPlayer().getId());
+
+        //////////////////////////////
+        texas = Texas.builder(4).build();
+        texas.start();
+        texas.action(Action.call());
+        texas.action(Action.call());
+        texas.action(Action.call());
+        texas.leave(2);
+        texas.action(Action.check());
+        assertEquals(Circle.Flop, texas.circle());
+        assertEquals(3, texas.opPlayer().getId());
+
+        //////////////////////////////
+        texas = Texas.builder(3).build();
+        texas.start();
+        texas.leave(3);
+        texas.action(Action.fold());
+        assertTrue(texas.isOver());
     }
 
     @Test
@@ -420,6 +502,131 @@ public class TexasTest extends AllCard {
         assertEquals(2, texas.bbPlayer().getId());
         assertEquals(50, texas.smallBlind());
         assertEquals(Texas.SHOWDOWN, move);
+    }
+
+    @Test
+    public void testBoard() throws Exception {
+        var texas = Texas.builder()
+                .board(club9, club10, spadesA, heartK, club8)
+                .build();
+        texas.start();
+        assertTrue(texas.board().isEmpty());
+
+        texas.action(Action.call());
+        texas.action(Action.raise(2));
+        texas.action(Action.call());
+        equalsBoard(texas, club9, club10, spadesA);
+
+        texas.action(Action.check());
+        texas.action(Action.check());
+        equalsBoard(texas, club9, club10, spadesA, heartK);
+
+        texas.action(Action.check());
+        texas.action(Action.check());
+        equalsBoard(texas, club9, club10, spadesA, heartK, club8);
+
+        texas.action(Action.check());
+        texas.action(Action.check());
+        equalsBoard(texas, club9, club10, spadesA, heartK, club8);
+
+        texas = Texas.builder()
+                .board(club9, club10, spadesA, heartK, club8)
+                .players(new Player(1, 100), new Player(2, 200), new Player(3, 300))
+                .build();
+        texas.start();
+        texas.action(Action.allin());
+        texas.action(Action.call());
+        texas.action(Action.fold());
+        equalsBoard(texas, club9, club10, spadesA, heartK, club8);
+    }
+
+    @Test
+    public void testIsOver() throws Exception {
+        var texas = Texas.builder().build();
+        texas.start();
+
+        assertFalse(texas.isOver());
+        texas.action(Action.call());
+        assertFalse(texas.isOver());
+        texas.action(Action.fold());
+        assertTrue(texas.isOver());
+
+        ////////////////////////////////////
+        texas = Texas.builder().build();
+        texas.start();
+        assertFalse(texas.isOver());
+
+        texas.action(Action.call());
+        texas.action(Action.raise(2));
+        texas.action(Action.call());
+        assertFalse(texas.isOver());
+
+        texas.action(Action.check());
+        texas.action(Action.check());
+        assertFalse(texas.isOver());
+
+        texas.action(Action.check());
+        texas.action(Action.check());
+        assertFalse(texas.isOver());
+
+        texas.action(Action.check());
+        texas.action(Action.check());
+        assertTrue(texas.isOver());
+
+        ////////////////////////////////////
+        // 大盲直接allin结束
+        texas = Texas.builder()
+                .players(new Player(1, 600), new Player(2, 200))
+                .smallBlind(200)
+                .build();
+        texas.start();
+        assertTrue(texas.isOver());
+
+        // 大盲直接allin不结束
+        texas = Texas.builder()
+                .players(new Player(1, 600), new Player(2, 300))
+                .smallBlind(200)
+                .build();
+        texas.start();
+        assertFalse(texas.isOver());
+
+        // 小盲直接allin结束
+        texas = Texas.builder()
+                .players(new Player(1, 200), new Player(2, 600))
+                .smallBlind(200)
+                .build();
+        texas.start();
+        assertTrue(texas.isOver());
+
+        // 大小盲同时allin结束
+        texas = Texas.builder()
+                .players(new Player(1, 200), new Player(2, 300))
+                .smallBlind(200)
+                .build();
+        texas.start();
+        assertTrue(texas.isOver());
+
+        // 通过Raise将所有的筹码加上, 实际是allin
+        // 最低最低加注筹码刚好等于剩余筹码，只能allin
+        texas = Texas.builder()
+                .players(new Player(1, 750), new Player(2, 2000))
+                .smallBlind(20)
+                .build();
+        texas.start();
+        assertFalse(texas.isOver());
+
+        texas.action(Action.call());
+        texas.action(Action.raise(710));
+        texas.action(Action.allin());
+        assertTrue(texas.isOver());
+    }
+
+    private void equalsBoard(Texas texas, Card... cards) throws Exception {
+        var board = texas.board();
+        assertEquals(board.size(), cards.length);
+        for (var i = 0; i < cards.length; i++) {
+            assertEquals(board.get(i), cards[i]);
+        }
     }
 
     private void circleEquals(Integer opId, Action act, String move, Texas texas) throws Exception {
