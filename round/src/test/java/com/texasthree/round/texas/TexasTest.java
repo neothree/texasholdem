@@ -41,51 +41,51 @@ public class TexasTest extends AllCard {
         texas.start();
 
         // 1 dealer 2 sb 3 bb
-        circleEquals(4, makeAct(Optype.Call), Circle.Preflop, texas);
-        circleEquals(5, makeAct(Optype.Call), Circle.Preflop, texas);
-        circleEquals(1, makeAct(Optype.Call), Circle.Preflop, texas);
-        circleEquals(2, makeAct(Optype.Fold), Circle.Preflop, texas);
-        circleEquals(3, makeAct(Optype.Fold), Circle.Preflop, texas);
+        equalsCircle(4, makeAct(Optype.Call), Circle.PREFLOP, texas);
+        equalsCircle(5, makeAct(Optype.Call), Circle.PREFLOP, texas);
+        equalsCircle(1, makeAct(Optype.Call), Circle.PREFLOP, texas);
+        equalsCircle(2, makeAct(Optype.Fold), Circle.PREFLOP, texas);
+        equalsCircle(3, makeAct(Optype.Fold), Circle.PREFLOP, texas);
 
-        circleEquals(4, Action.raise(2), Circle.Flop, texas);
-        circleEquals(5, makeAct(Optype.Fold), Circle.Flop, texas);
-        circleEquals(1, makeAct(Optype.Call), Circle.Flop, texas);
+        equalsCircle(4, Action.raise(2), Circle.FLOP, texas);
+        equalsCircle(5, makeAct(Optype.Fold), Circle.FLOP, texas);
+        equalsCircle(1, makeAct(Optype.Call), Circle.FLOP, texas);
 
-        circleEquals(4, makeAct(Optype.Check), Circle.Turn, texas);
-        circleEquals(1, makeAct(Optype.Check), Circle.Turn, texas);
+        equalsCircle(4, makeAct(Optype.Check), Circle.TURN, texas);
+        equalsCircle(1, makeAct(Optype.Check), Circle.TURN, texas);
 
-        assertEquals(Circle.River, texas.circle());
+        assertEquals(Circle.RIVER, texas.circle());
 
 
         ////////////////////////////////////////////////////////////////////////
         texas = Texas.builder(5).build();
         texas.start();
 
-        circleEquals(4, makeAct(Optype.Call), Circle.Preflop, texas);
-        circleEquals(5, makeAct(Optype.Call), Circle.Preflop, texas);
-        circleEquals(1, makeAct(Optype.Call), Circle.Preflop, texas);
-        circleEquals(2, makeAct(Optype.Call), Circle.Preflop, texas);
-        circleEquals(3, makeAct(Optype.Check), Circle.Preflop, texas);
+        equalsCircle(4, makeAct(Optype.Call), Circle.PREFLOP, texas);
+        equalsCircle(5, makeAct(Optype.Call), Circle.PREFLOP, texas);
+        equalsCircle(1, makeAct(Optype.Call), Circle.PREFLOP, texas);
+        equalsCircle(2, makeAct(Optype.Call), Circle.PREFLOP, texas);
+        equalsCircle(3, makeAct(Optype.Check), Circle.PREFLOP, texas);
 
 
-        circleEquals(2, makeAct(Optype.Fold), Circle.Flop, texas);
-        circleEquals(3, Action.raise(2), Circle.Flop, texas);
-        circleEquals(4, makeAct(Optype.Fold), Circle.Flop, texas);
-        circleEquals(5, makeAct(Optype.Fold), Circle.Flop, texas);
-        circleEquals(1, makeAct(Optype.Call), Circle.Flop, texas);
+        equalsCircle(2, makeAct(Optype.Fold), Circle.FLOP, texas);
+        equalsCircle(3, Action.raise(2), Circle.FLOP, texas);
+        equalsCircle(4, makeAct(Optype.Fold), Circle.FLOP, texas);
+        equalsCircle(5, makeAct(Optype.Fold), Circle.FLOP, texas);
+        equalsCircle(1, makeAct(Optype.Call), Circle.FLOP, texas);
 
-        assertEquals(Circle.Turn, texas.circle());
+        assertEquals(Circle.TURN, texas.circle());
 
         ////////////////////////////////////////////////////////////////////////
         texas = Texas.builder(5).build();
         texas.start();
 
-        circleEquals(4, Action.raise(4), Circle.Preflop, texas);
-        circleEquals(5, makeAct(Optype.Allin), Circle.Preflop, texas);
-        circleEquals(1, makeAct(Optype.Allin), Circle.Preflop, texas);
-        circleEquals(2, makeAct(Optype.Fold), Circle.Preflop, texas);
-        circleEquals(3, makeAct(Optype.Allin), Circle.Preflop, texas);
-        circleEquals(4, makeAct(Optype.Allin), Circle.Preflop, texas);
+        equalsCircle(4, Action.raise(4), Circle.PREFLOP, texas);
+        equalsCircle(5, makeAct(Optype.Allin), Circle.PREFLOP, texas);
+        equalsCircle(1, makeAct(Optype.Allin), Circle.PREFLOP, texas);
+        equalsCircle(2, makeAct(Optype.Fold), Circle.PREFLOP, texas);
+        equalsCircle(3, makeAct(Optype.Allin), Circle.PREFLOP, texas);
+        equalsCircle(4, makeAct(Optype.Allin), Circle.PREFLOP, texas);
         assertTrue(texas.isOver());
     }
 
@@ -128,10 +128,10 @@ public class TexasTest extends AllCard {
                 .players(new Player(1, 100), new Player(2, 200), new Player(3, 200))
                 .build();
         assertEquals(Texas.NEXT_OP, texas.start());
-        circleEquals(1, makeAct(Optype.Allin), Texas.NEXT_OP, texas);
-        circleEquals(2, makeAct(Optype.Call), Texas.NEXT_OP, texas);
-        circleEquals(3, makeAct(Optype.Call), Texas.CIRCLE_END, texas);
-        circleEquals(2, makeAct(Optype.Fold), Texas.SHOWDOWN, texas);
+        equalsAction(1, makeAct(Optype.Allin), Texas.NEXT_OP, texas);
+        equalsAction(2, makeAct(Optype.Call), Texas.NEXT_OP, texas);
+        equalsAction(3, makeAct(Optype.Call), Texas.CIRCLE_END, texas);
+        equalsAction(2, makeAct(Optype.Fold), Texas.SHOWDOWN, texas);
     }
 
     @Test
@@ -139,28 +139,28 @@ public class TexasTest extends AllCard {
         var texas = Texas.builder(5).build();
         texas.start();
 
-        // Preflop
-        circleEquals(4, makeAct(Optype.Call), Texas.NEXT_OP, texas);
-        circleEquals(5, makeAct(Optype.Call), Texas.NEXT_OP, texas);
-        circleEquals(1, makeAct(Optype.Call), Texas.NEXT_OP, texas);
-        circleEquals(2, makeAct(Optype.Call), Texas.NEXT_OP, texas);
+        // PREFLOP
+        equalsAction(4, makeAct(Optype.Call), Texas.NEXT_OP, texas);
+        equalsAction(5, makeAct(Optype.Call), Texas.NEXT_OP, texas);
+        equalsAction(1, makeAct(Optype.Call), Texas.NEXT_OP, texas);
+        equalsAction(2, makeAct(Optype.Call), Texas.NEXT_OP, texas);
         // 第一圈，大盲这种情况下多一次押注
-        circleEquals(3, makeAct(Optype.Check), Texas.CIRCLE_END, texas);
+        equalsAction(3, makeAct(Optype.Check), Texas.CIRCLE_END, texas);
 
-        // Flop
-        circleEquals(2, makeAct(Optype.Fold), Texas.NEXT_OP, texas);
-        circleEquals(3, makeAct(Optype.Fold), Texas.NEXT_OP, texas);
-        circleEquals(4, Action.raise(2), Texas.NEXT_OP, texas);
-        circleEquals(5, makeAct(Optype.Call), Texas.NEXT_OP, texas);
-        circleEquals(1, makeAct(Optype.Fold), Texas.CIRCLE_END, texas);
+        // FLOP
+        equalsAction(2, makeAct(Optype.Fold), Texas.NEXT_OP, texas);
+        equalsAction(3, makeAct(Optype.Fold), Texas.NEXT_OP, texas);
+        equalsAction(4, Action.raise(2), Texas.NEXT_OP, texas);
+        equalsAction(5, makeAct(Optype.Call), Texas.NEXT_OP, texas);
+        equalsAction(1, makeAct(Optype.Fold), Texas.CIRCLE_END, texas);
 
-        // Turn
-        circleEquals(4, Action.raise(2), Texas.NEXT_OP, texas);
-        circleEquals(5, makeAct(Optype.Call), Texas.CIRCLE_END, texas);
+        // TURN
+        equalsAction(4, Action.raise(2), Texas.NEXT_OP, texas);
+        equalsAction(5, makeAct(Optype.Call), Texas.CIRCLE_END, texas);
 
-        // River
-        circleEquals(4, Action.raise(2), Texas.NEXT_OP, texas);
-        circleEquals(5, makeAct(Optype.Call), Texas.SHOWDOWN, texas);
+        // RIVER
+        equalsAction(4, Action.raise(2), Texas.NEXT_OP, texas);
+        equalsAction(5, makeAct(Optype.Call), Texas.SHOWDOWN, texas);
 
         //////////////////////////////////////////////////////////////////
         Ring<Player> ring = Ring.create(5);
@@ -174,31 +174,31 @@ public class TexasTest extends AllCard {
                 .build();
         texas.start();
 
-        circleEquals(4, Action.raise(4), Texas.NEXT_OP, texas);
-        circleEquals(5, makeAct(Optype.Allin), Texas.NEXT_OP, texas);
-        circleEquals(1, makeAct(Optype.Call), Texas.NEXT_OP, texas);
-        circleEquals(2, makeAct(Optype.Fold), Texas.NEXT_OP, texas);
-        circleEquals(3, makeAct(Optype.Call), Texas.NEXT_OP, texas);
-        circleEquals(4, makeAct(Optype.Call), Texas.CIRCLE_END, texas);
+        equalsAction(4, Action.raise(4), Texas.NEXT_OP, texas);
+        equalsAction(5, makeAct(Optype.Allin), Texas.NEXT_OP, texas);
+        equalsAction(1, makeAct(Optype.Call), Texas.NEXT_OP, texas);
+        equalsAction(2, makeAct(Optype.Fold), Texas.NEXT_OP, texas);
+        equalsAction(3, makeAct(Optype.Call), Texas.NEXT_OP, texas);
+        equalsAction(4, makeAct(Optype.Call), Texas.CIRCLE_END, texas);
 
-        circleEquals(3, makeAct(Optype.Check), Texas.NEXT_OP, texas);
-        circleEquals(4, makeAct(Optype.Check), Texas.NEXT_OP, texas);
-        circleEquals(1, Action.raise(4), Texas.NEXT_OP, texas);
-        circleEquals(3, makeAct(Optype.Fold), Texas.NEXT_OP, texas);
-        circleEquals(4, makeAct(Optype.Call), Texas.CIRCLE_END, texas);
+        equalsAction(3, makeAct(Optype.Check), Texas.NEXT_OP, texas);
+        equalsAction(4, makeAct(Optype.Check), Texas.NEXT_OP, texas);
+        equalsAction(1, Action.raise(4), Texas.NEXT_OP, texas);
+        equalsAction(3, makeAct(Optype.Fold), Texas.NEXT_OP, texas);
+        equalsAction(4, makeAct(Optype.Call), Texas.CIRCLE_END, texas);
 
-        circleEquals(4, Action.raise(5), Texas.NEXT_OP, texas);
-        circleEquals(1, makeAct(Optype.Call), Texas.CIRCLE_END, texas);
+        equalsAction(4, Action.raise(5), Texas.NEXT_OP, texas);
+        equalsAction(1, makeAct(Optype.Call), Texas.CIRCLE_END, texas);
 
 
         ////////////////////////////////////////////////////////////////////////
         texas = Texas.builder().build();
         texas.start();
 
-        circleEquals(1, makeAct(Optype.Call), Texas.NEXT_OP, texas);
-        circleEquals(2, makeAct(Optype.Check), Texas.CIRCLE_END, texas);
+        equalsAction(1, makeAct(Optype.Call), Texas.NEXT_OP, texas);
+        equalsAction(2, makeAct(Optype.Check), Texas.CIRCLE_END, texas);
 
-        assertEquals(Circle.Flop, texas.circle());
+        assertEquals(Circle.FLOP, texas.circle());
         assertEquals(2, texas.opPlayer().getId());
 
         ////////////////////////////////////////////////////////////////////////
@@ -211,8 +211,8 @@ public class TexasTest extends AllCard {
                 .regulations(regulations)
                 .build();
         texas.start();
-        circleEquals(2, makeAct(Optype.Call), Texas.NEXT_OP, texas);
-        circleEquals(1, makeAct(Optype.Check), Texas.CIRCLE_END, texas);
+        equalsAction(2, makeAct(Optype.Call), Texas.NEXT_OP, texas);
+        equalsAction(1, makeAct(Optype.Check), Texas.CIRCLE_END, texas);
 
         ////////////////////////////////////////////////////////////////////////
         //  短牌：在“smallBlind == 0”下, 开局后，所有玩家都check，最后应该到庄家还有一次option
@@ -221,8 +221,8 @@ public class TexasTest extends AllCard {
                 .ante(1)
                 .build();
         texas.start();
-        circleEquals(2, makeAct(Optype.Check), Texas.NEXT_OP, texas);
-        circleEquals(1, makeAct(Optype.Check), Texas.CIRCLE_END, texas);
+        equalsAction(2, makeAct(Optype.Check), Texas.NEXT_OP, texas);
+        equalsAction(1, makeAct(Optype.Check), Texas.CIRCLE_END, texas);
     }
 
     @Test
@@ -299,7 +299,7 @@ public class TexasTest extends AllCard {
         texas.action(Action.call());
         texas.leave(2);
         texas.action(Action.check());
-        assertEquals(Circle.Flop, texas.circle());
+        assertEquals(Circle.FLOP, texas.circle());
         assertEquals(3, texas.opPlayer().getId());
 
         //////////////////////////////
@@ -629,12 +629,12 @@ public class TexasTest extends AllCard {
         }
     }
 
-    private void circleEquals(Integer opId, Action act, String move, Texas texas) throws Exception {
+    private void equalsAction(Integer opId, Action act, String move, Texas texas) throws Exception {
         assertEquals(opId, texas.opPlayer().getId());
         assertEquals(move, texas.action(act));
     }
 
-    private void circleEquals(Integer opId, Action act, Circle circle, Texas texas) throws Exception {
+    private void equalsCircle(Integer opId, Action act, String circle, Texas texas) throws Exception {
         assertEquals(opId.toString(), texas.opPlayer().getId() + "");
         assertEquals(circle, texas.circle());
         texas.action(act);

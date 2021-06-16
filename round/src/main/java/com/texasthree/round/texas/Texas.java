@@ -301,7 +301,7 @@ public class Texas {
                 || leftNum == 0) {
             move = Texas.SHOWDOWN;
         } else if (opNext != null && opNext.getId() == this.pot.getStandardId()) {
-            if (Circle.River.equals(this.pot.circle()) || leftNum <= 1) {
+            if (Circle.RIVER.equals(this.pot.circle()) || leftNum <= 1) {
                 move = Texas.SHOWDOWN;
             } else if (this.isPreflopOnceAction(standard, opNext)) {
                 var player = this.nextOpPlayer(opNext.getId());
@@ -504,7 +504,7 @@ public class Texas {
         // 所有没弃牌的玩家亮牌
         // 1. 非河牌圈, 因为allin结束
         // 2. 没有自动埋牌策略
-        if (!this.regulations.containsKey(Regulation.CoverCard) || this.circle() != Circle.River) {
+        if (!this.regulations.containsKey(Regulation.CoverCard) || this.circle() != Circle.RIVER) {
             for (var v : this.ring.iterator()) {
                 if (!this.pot.isAllin(v)) {
                     show.add(v);
@@ -553,7 +553,7 @@ public class Texas {
      * Preflop多一次押注
      */
     private boolean isPreflopOnceAction(int standard, Player opNext) {
-        if (!Circle.Preflop.equals(this.pot.circle())) {
+        if (!Circle.PREFLOP.equals(this.pot.circle())) {
             return false;
         }
 
@@ -677,11 +677,11 @@ public class Texas {
             return this.board.subList(0, 5);
         }
         switch (this.pot.circle()) {
-            case Flop:
+            case Circle.FLOP:
                 return this.board.subList(0, 3);
-            case Turn:
+            case Circle.TURN:
                 return this.board.subList(0, 4);
-            case River:
+            case Circle.RIVER:
                 return this.board.subList(0, 5);
             default:
                 return new ArrayList<>();
@@ -733,7 +733,7 @@ public class Texas {
         return this.getPlayer(v -> v.getId() == id);
     }
 
-    public Circle circle() {
+    public String circle() {
         return this.pot.circle();
     }
 

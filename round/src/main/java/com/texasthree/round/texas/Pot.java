@@ -6,8 +6,6 @@ import java.util.*;
 
 class Pot {
 
-    private Circle circle;
-
     private final int smallBind;
 
     private final int ante;
@@ -26,9 +24,9 @@ class Pot {
 
     private Set<Integer> flopRaise = new HashSet<>();
 
-    private List<CircleRecord> records = new ArrayList<>();
+    private List<Circle> circles = new ArrayList<>();
 
-    private CircleRecord going;
+    private Circle going;
 
     private Action standardAct;
 
@@ -162,7 +160,7 @@ class Pot {
             this.standardAct = act;
 
             // 翻牌前有加注
-            if (Circle.Preflop.equals(circle)) {
+            if (Circle.PREFLOP.equals(this.circle())) {
                 this.flopRaise.add(player.getId());
             }
             // 加注增幅
@@ -185,12 +183,9 @@ class Pot {
      * 一圈开始
      */
     void circleStart() {
-        if (Circle.River.equals(circle)) {
+        if (Circle.RIVER.equals(circle())) {
             return;
         }
-
-        // 下一圈
-        this.circle = nextCircle(circle);
 
         if (smallBind > 0) {
             this.amplitude = this.smallBind * 2;
@@ -198,8 +193,10 @@ class Pot {
             this.amplitude = this.ante * 2;
         }
 
-        this.going = new CircleRecord(this.circle, this.sumPot(), this.notFoldNum());
-        this.records.add(going);
+        // 下一圈
+        var circle = this.going != null ? nextCircle(this.going.getCircle()) : Circle.PREFLOP;
+        this.going = new Circle(circle, this.sumPot(), this.notFoldNum());
+        this.circles.add(going);
     }
 
     /**
@@ -227,11 +224,11 @@ class Pot {
             }
         }
 
-        var record = new CircleRecord();
+        var record = new Circle();
         record.setPotChips(this.sumPot());
         record.setBoard(board);
         record.setPlayerNum(this.notFoldNum());
-        this.records.add(record);
+        this.circles.add(record);
     }
 
     /**
@@ -397,7 +394,7 @@ class Pot {
      */
     Map<Integer, Statistic> makeBetStatistic(Set<Integer> winners) {
         var ret = new HashMap<Integer, Statistic>();
-        var preflop = this.getCircleRecord(Circle.Preflop);
+        var preflop = this.getCircleRecord(Circle.PREFLOP);
         for (var v : preflop.getActions()) {
             var stat = ret.getOrDefault(v.id, new Statistic());
             if (this.isAllin(v.id)) {
@@ -412,8 +409,8 @@ class Pot {
             ret.put(v.id, stat);
         }
 
-        this.records.stream()
-                .map(CircleRecord::getActions)
+        this.circles.stream()
+                .map(Circle::getActions)
                 .flatMap(v -> v.stream())
                 .forEach(act -> {
                     if (act.isInpot()) {
@@ -455,9 +452,9 @@ class Pot {
     /**
      * 在 circle 圈所有人的押注数
      */
-    private Map<Integer, Integer> mapWhoChipsCircle(Circle circle) {
+    private Map<Integer, Integer> mapWhoChipsCircle(String circle) {
         if (circle == null) {
-            circle = this.circle;
+            circle = this.circle();
         }
 
         var ret = new HashMap<Integer, Integer>();
@@ -474,11 +471,11 @@ class Pot {
         return ret;
     }
 
-    private CircleRecord getCircleRecord(Circle circle) {
+    private Circle getCircleRecord(String circle) {
         if (going != null && this.going.getCircle().equals(circle)) {
             return this.going;
         }
-        for (var v : this.records) {
+        for (var v : this.circles) {
             if (v.getCircle().equals(circle)) {
                 return v;
             }
@@ -531,19 +528,19 @@ class Pot {
         return allin.contains(player.getId());
     }
 
-    Circle circle() {
-        return circle;
+    String circle() {
+        return this.going != null ? this.going.getCircle() : null;
     }
 
-    private static Circle nextCircle(Circle c) {
-        if (Circle.Preflop.equals(c)) {
-            return Circle.Flop;
-        } else if (Circle.Flop.equals(c)) {
-            return Circle.Turn;
-        } else if (Circle.Turn.equals(c)) {
-            return Circle.River;
+    private static String nextCircle(String c) {
+        if (Circle.PREFLOP.equals(c)) {
+            return Circle.FLOP;
+        } else if (Circle.FLOP.equals(c)) {
+            return Circle.TURN;
+        } else if (Circle.TURN.equals(c)) {
+            return Circle.RIVER;
         } else {
-            return Circle.Preflop;
+            return Circle.PREFLOP;
         }
     }
 

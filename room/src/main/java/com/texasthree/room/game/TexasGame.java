@@ -229,7 +229,7 @@ public class TexasGame {
 
         this.updateHand();
 
-        int time = this.texas.circle().equals(Circle.Flop) ? 2300 : 1300;
+        int time = this.texas.circle().equals(Circle.FLOP) ? 2300 : 1300;
         this.opEvent = new ScheduledEvent(() -> this.moveNextOp(), time);
     }
 
