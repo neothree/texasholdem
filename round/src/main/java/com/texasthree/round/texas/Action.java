@@ -21,7 +21,7 @@ public class Action {
     /**
      * 底池的总筹码
      */
-    public final int sumPot;
+    public int sumPot;
     /**
      * 强制
      */

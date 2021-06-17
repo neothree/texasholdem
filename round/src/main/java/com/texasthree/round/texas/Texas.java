@@ -219,7 +219,7 @@ public class Texas {
 
         // 转到dealer位
         this.ring = this.ring.move(v -> v == this.dealer());
-        this.pot.setStandardInfo(0, this.dealer().getId());
+        this.pot.setStandardInfo(this.dealer().getId());
 
         if (this.smallBlind() > 0) {
             // 盲注
@@ -293,11 +293,11 @@ public class Texas {
      */
     private String turn() throws Exception {
         var move = Texas.NEXT_OP;
-        var leftNum = this.playerNum - this.pot.allinNum() - this.pot.foldNum();
+        var leftNum = this.playerNum - this.pot.allinAndFoldNum();
         var opNext = this.nextOpPlayer(this.opPlayer().getId());
         var standard = this.pot.getStandard();
         if ((this.playerNum - this.leaveOrFoldNum() == 1)
-                || (leftNum == 1 && standard == this.chipsThisCircle(opNext.getId()))
+                || (leftNum == 1 && standard == this.pot.chipsThisCircle(opNext.getId()))
                 || leftNum == 0) {
             move = Texas.SHOWDOWN;
         } else if (opNext != null && opNext.getId() == this.pot.getStandardId()) {
@@ -305,8 +305,7 @@ public class Texas {
                 move = Texas.SHOWDOWN;
             } else if (this.isPreflopOnceAction(standard, opNext)) {
                 var player = this.nextOpPlayer(opNext.getId());
-                var action = this.pot.getAction(player.getId());
-                this.pot.setStandardInfo(action.chipsBet, player.getId());
+                this.pot.setStandardInfo(player.getId());
             } else {
                 move = Texas.CIRCLE_END;
             }
@@ -356,12 +355,12 @@ public class Texas {
     void makeResult() {
         var result = new Result();
         var open = this.showCardStrategy();
-        var allBet = this.pot.mapWhoChipsAll();
+        var allBet = this.pot.playerBetChips();
         for (var v : this.ring.iterator()) {
             var info = new ResultPlayer();
             info.setId(v.getId());
             info.setBetSum(allBet.getOrDefault(v.getId(), 0));
-            info.cardShow = open.contains(v.getId());
+            info.cardShow = open.contains(v);
             result.playersMap.put(v.getId(), info);
         }
 
@@ -385,7 +384,7 @@ public class Texas {
     private Map<Integer, Map<Integer, Integer>> divideMoney() {
         this.freshHand();
 
-        var divide = this.divides();
+        var divide = this.pot.divides();
         var ret = new HashMap<Integer, Map<Integer, Integer>>();
         var inGameNum = this.ring.iterator().stream().filter(v -> v.inGame()).count();
         // 只剩下一个玩家没有离开,不用经过比牌,全部给他
@@ -504,7 +503,7 @@ public class Texas {
         // 所有没弃牌的玩家亮牌
         // 1. 非河牌圈, 因为allin结束
         // 2. 没有自动埋牌策略
-        if (!this.regulations.containsKey(Regulation.CoverCard) || this.circle() != Circle.RIVER) {
+        if (!this.regulations.containsKey(Regulation.CoverCard) || !this.circle().equals(Circle.RIVER)) {
             for (var v : this.ring.iterator()) {
                 if (!this.pot.isAllin(v)) {
                     show.add(v);
@@ -516,7 +515,7 @@ public class Texas {
         // 河牌圈
         var playerRing = this.ring.move(v -> v.equals(this.dealer()));
         var stub = this.pot.lastBetOrRaise();
-        for (var divide : this.divides()) {
+        for (var divide : this.pot.divides()) {
             var pr = playerRing.move(player -> {
                 if (!divide.getMembers().containsKey(player.getId())) {
                     return false;
@@ -580,7 +579,7 @@ public class Texas {
      * 找到紧挨 id 的下一个没有allin 和 fold 的座位
      */
     private Player nextOpPlayer(int id) {
-        if (this.playerNum == this.pot.allinNum() + this.pot.foldNum()) {
+        if (this.playerNum == this.pot.allinAndFoldNum()) {
             return null;
         }
 
@@ -597,20 +596,14 @@ public class Texas {
     }
 
     private void freshHand() {
-        var r = this.ring;
         var board = this.board();
-        for (int i = 0; i < playerNum; i++) {
-            r.value.getHand().fresh(board);
-            r = r.getNext();
+        for (var v : this.ring.iterator()) {
+            v.getHand().fresh(board);
         }
     }
 
     private void nextOp() {
         this.ring = this.ring.move(v -> !this.pot.isAllin(v) && !this.pot.isFold(v));
-    }
-
-    private int chipsThisCircle(int id) {
-        return this.pot.chipsThisCircle(id);
     }
 
     private int leaveOrFoldNum() {
@@ -619,11 +612,6 @@ public class Texas {
                 .filter(v -> v.isLeave() || this.pot.isFold(v.getId()))
                 .count();
     }
-
-    List<Divide> divides() {
-        return this.pot.divides();
-    }
-
 
     /**
      * 玩家离开
@@ -684,7 +672,7 @@ public class Texas {
             case Circle.RIVER:
                 return this.board.subList(0, 5);
             default:
-                return new ArrayList<>();
+                return Collections.emptyList();
         }
     }
 
@@ -747,15 +735,12 @@ public class Texas {
     Map<Optype, Integer> auth() {
         var auth = this.pot.auth(this.opPlayer());
         if (this.regulations.containsKey(Regulation.AllinOrFold)) {
+            // TODO 押注权限检测在pot中，这个玩法会有漏洞
             var m = new HashMap<Optype, Integer>();
             m.put(Optype.Allin, auth.get(Optype.Allin));
             m.put(Optype.Fold, auth.get(Optype.Fold));
             auth = m;
         }
         return auth;
-    }
-
-    int notFoldNum() {
-        return this.pot.notFoldNum();
     }
 }
