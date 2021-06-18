@@ -4,7 +4,6 @@ package com.texasthree.round.texas;
  * 押注类型
  */
 public enum Optype {
-    None,
     /**
      * 弃牌
      */

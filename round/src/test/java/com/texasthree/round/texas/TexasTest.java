@@ -3,9 +3,13 @@ package com.texasthree.round.texas;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.texasthree.round.AllCard;
+import com.texasthree.round.TableCard;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -238,7 +242,7 @@ public class TexasTest extends AllCard {
 
         // TODO
 //        local config = {
-//                leftCard = {c.club9, c.club10, c.spades1, c.heart13, c.club8},
+//                leftCard = {club9, club10, spades1, heart13, club8},
 //                playerList = {
 //                        Player:Ctor(1, 1, 200),
 //                Player:Ctor(2, 2, 200),
@@ -312,7 +316,273 @@ public class TexasTest extends AllCard {
 
     @Test
     public void testMakeResult() throws Exception {
-        // TODO
+        var texas = Texas.builder(5).build();
+        texas.start();
+        texas.action(Action.fold());
+        texas.action(Action.fold());
+        texas.action(Action.fold());
+        texas.action(Action.fold());
+        var result = texas.makeResult();
+        assertEquals(5, result.playersMap.size());
+        assertEquals(3, result.playersMap.get(3).pot.values().stream().reduce(Integer::sum).get());
+
+
+        texas = Texas.builder()
+                .players(createPlayers(2, 100))
+                .board(club9, club10, spadesA, heartK, club8)
+                .build();
+        texas.start();
+        texas.action(Action.call());
+        texas.action(Action.raise(2));
+        texas.action(Action.call());
+
+        texas.action(Action.check());
+        texas.action(Action.check());
+
+        texas.action(Action.check());
+        texas.action(Action.check());
+
+        texas.action(Action.check());
+        texas.action(Action.check());
+        result = texas.makeResult();
+        assertEquals(2, result.playersMap.size());
+        assertEquals(8, result.playersMap.get(1).pot.values().stream().reduce(Integer::sum).get());
+
+        // 所有人都allin的话, 结算看5张底牌
+        texas = Texas.builder()
+                .players(createPlayers(2, 10))
+                .board(club9, club10, spadesA, heartK, club8)
+                .build();
+        texas.start();
+        texas.action(Action.allin());
+        texas.action(Action.allin());
+        result = texas.makeResult();
+        assertEquals(20, result.playersMap.get(1).pot.get(0));
+
+        // 有人离开
+        texas = SimpleTexas.builder()
+                .players(createPlayersByChips(100, 90, 80, 70))
+                .build();
+        texas.start();
+        texas.action(Action.allin());
+        texas.action(Action.allin());
+        texas.action(Action.allin());
+        texas.leave(1);
+        texas.leave(2);
+        texas.action(Action.allin());
+        assertTrue(texas.isOver());
+        result = texas.makeResult();
+        assertEquals(280, result.playersMap.get(4).pot.get(0));
+        assertEquals(30, result.playersMap.get(3).pot.get(1));
+        assertEquals(20, result.playersMap.get(4).pot.get(2));
+        assertEquals(10, result.playersMap.get(4).pot.get(3));
+
+        /////////////
+        texas = SimpleTexas.builder(3).build();
+        texas.start();
+
+        texas.leave(2);
+        texas.leave(3);
+        assertTrue(texas.isOver());
+        result = texas.makeResult();
+        assertEquals(3, result.playersMap.get(1).pot.get(0));
+
+        // TODO ------------- 短牌 --------------------------------
+//        local playerList = {
+//                Player:Ctor(1, 1, 20),
+//                Player:Ctor(2, 2, 20),
+//    }
+//        config = {
+//                playerCard = {{c.diamond1, c.diamond2}, {c.club1, c.heart1}},
+//                leftCard = {c.diamond4, c.diamond7, c.diamond8, c.heart7, c.spades1},
+//                smallBlind = 0,
+//                ante = 1,
+//                playerList = playerList,
+//                playing = {cardMinPoint = 6},
+//        }
+//        round = CreateRoundByConfig(config)
+//
+//        round:Start()
+//        round:Action({op = Texas.DefAction.Check})
+//        round:Action({op = Texas.DefAction.Check})
+//        round:Action({op = Texas.DefAction.Check})
+//
+//        round:Action({op = Texas.DefAction.Check})
+//        round:Action({op = Texas.DefAction.Check})
+//
+//        round:Action({op = Texas.DefAction.Check})
+//        round:Action({op = Texas.DefAction.Check})
+//
+//        round:Action({op = Texas.DefAction.Check})
+//        round:Action({op = Texas.DefAction.Check})
+//
+//        assert(round:IsOver())
+//        history = round:MakeResult()
+//        assert(history.playerList[1].pot[1] == 2)
+
+        // 结算后最后一个单人单池筹码返回
+        texas = SimpleTexas.builder()
+                .players(createPlayersByChips(10, 20))
+                .build();
+        texas.start();
+        texas.action(Action.allin());
+        texas.action(Action.allin());
+
+        result = texas.makeResult();
+        var info = result.playersMap.get(1);
+        assertEquals(20, info.pot.get(0));
+        assertEquals(10, info.getProfit());
+        assertFalse(info.pot.containsKey(1));
+        info = result.playersMap.get(2);
+        assertFalse(info.pot.containsKey(1));
+        assertEquals(-10, info.getProfit());
+
+        // 最后只有一个人的话不分池
+        texas = SimpleTexas.builder()
+                .players(createPlayersByChips(10, 20))
+                .build();
+        texas.start();
+        texas.action(Action.fold());
+
+        result = texas.makeResult();
+        info = result.playersMap.get(1);
+        assertFalse(info.pot.containsKey(1));
+        assertFalse(info.pot.containsKey(2));
+        assertEquals(-1, info.getProfit());
+        info = result.playersMap.get(2);
+        assertEquals(3, info.pot.get(0));
+        assertFalse(info.pot.containsKey(2));
+        assertEquals(1, info.getProfit());
+
+//        TODO -- 四张手牌
+//        config = {
+//                playerList = {
+//                        Player:Ctor(1, 1, 20),
+//                Player:Ctor(2, 2, 20),
+//        },
+//        playerCard = {
+//                {c.club10, c.heart8, c.diamond1, c.heart1},
+//                {c.club1, c.heart10, c.spades11, c.spades13}},
+//                leftCard = {c.diamond4, c.diamond7, c.spades8, c.heart7, c.spades1},
+//    }
+//        round = CreateRoundByConfig(config)
+//        round:Start()
+//        round:Action({op = Texas.DefAction.Allin})
+//        round:Action({op = Texas.DefAction.Allin})
+//        history = round:MakeResult()
+//        assert(history.playerList[1].pot[1] == 40)
+
+        // 10 A
+        // 10 20 B
+        // 10 20 10 C
+        // B 玩家弃牌，A 玩家赢
+        texas = SimpleTexas.builder()
+                .players(createPlayersByChips(10, 100, 40))
+                .build();
+        texas.start();
+        texas.action(Action.allin());
+        texas.action(Action.call());
+        texas.action(Action.call());
+        texas.action(Action.raise(20));
+        texas.action(Action.allin());
+        texas.action(Action.fold());
+
+        result = texas.makeResult();
+        assertEquals(20, result.playersMap.get(1).getProfit());
+        assertEquals(-30, result.playersMap.get(2).getProfit());
+        assertEquals(10, result.playersMap.get(3).getProfit());
+        assertEquals(10, result.playersMap.get(3).potback);
+
+        // 10 B
+        // 10 20 C
+        // 10 20 10 A
+        // B 玩家弃牌，C 玩家赢
+        texas = SimpleTexas.builder()
+                .players(createPlayersByChips(40, 10, 40))
+                .build();
+        texas.start();
+        texas.action(Action.call());
+        texas.action(Action.allin());
+        texas.action(Action.call());
+        texas.action(Action.call());
+
+        texas.action(Action.raise(20));
+        texas.action(Action.allin());
+        texas.action(Action.fold());
+
+        result = texas.makeResult();
+        assertEquals(40, result.playersMap.get(1).getProfit());
+        assertEquals(-10, result.playersMap.get(2).getProfit());
+        assertEquals(-30, result.playersMap.get(3).getProfit());
+        assertEquals(10, result.playersMap.get(1).potback);
+    }
+
+    private static class SimpleTexas {
+        private Texas.Builder builder = Texas.builder();
+
+        private static SimpleTexas builder() {
+            return new SimpleTexas();
+        }
+
+        private static SimpleTexas builder(int num) {
+            var ret = new SimpleTexas();
+            ret.builder.playerNum(num);
+            return ret;
+        }
+
+        SimpleTexas players(Player... players) {
+            this.builder.players(players);
+            return this;
+        }
+
+        SimpleTexas players(List<Player> players) {
+            this.builder.players(players);
+            return this;
+        }
+
+        SimpleTexas board(Card... board) {
+            this.builder.board(board);
+            return this;
+        }
+
+        Texas build() {
+            if (this.builder.getBoard() == null) {
+                this.builder.board(club9, club10, spadesA, heartK, club8);
+            }
+
+            return this.builder.build();
+        }
+    }
+
+    private List<Player> createPlayersByChips(int... initChips) {
+        var ret = new ArrayList<Player>();
+        for (var i = 0; i < initChips.length; i++) {
+            var player = new Player(i + 1, initChips[i]);
+            ret.add(player);
+        }
+        return giveHand(ret);
+    }
+
+    private List<Player> createPlayers(int num, int init) {
+        var list = new ArrayList<Player>();
+        for (var i = 1; i <= num; i++) {
+            list.add(new Player(i, init));
+        }
+        return giveHand(list);
+    }
+
+    private List<Player> giveHand(List<Player> players) {
+        players.get(0).setHand(new Hand(Arrays.asList(spadesA, heartA)));
+        for (var i = 2; i <= players.size(); i++) {
+            var p = players.get(i - 1);
+            var id = i * 10 + 4;
+            var c1 = TableCard.getInstance().getCardById(id);
+            assertNotNull(c1);
+            var c2 = TableCard.getInstance().getCardById(id - 1);
+            assertNotNull(c2);
+            p.setHand(new Hand(Arrays.asList(c1, c2)));
+        }
+        return players;
     }
 
     @Test

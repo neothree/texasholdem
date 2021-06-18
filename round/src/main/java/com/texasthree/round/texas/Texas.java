@@ -88,7 +88,7 @@ public class Texas {
             return this;
         }
 
-        public Builder initChips(int initChips) {
+        Builder initChips(int initChips) {
             this.initChips = initChips;
             return this;
         }
@@ -129,6 +129,10 @@ public class Texas {
         public Builder board(Card... board) {
             this.board = Arrays.asList(board);
             return this;
+        }
+
+        public List<Card> getBoard() {
+            return board;
         }
 
         Texas build() {
@@ -352,7 +356,7 @@ public class Texas {
         this.freshHand();
     }
 
-    void makeResult() {
+    Result makeResult() {
         var result = new Result();
         var open = this.showCardStrategy();
         var allBet = this.pot.playerBetChips();
@@ -371,14 +375,13 @@ public class Texas {
         }
 
         // 最后从池里的输赢
-        var potWin = divideMoney();
+        var potWin = this.divideMoney();
         result.playersMap.forEach((k, v) -> v.pot = potWin.getOrDefault(k, new HashMap<>()));
-
 
         // 押注统计
         var stats = this.pot.makeBetStatistic(result.getWinners());
         result.playersMap.forEach((k, v) -> v.statistic = stats.getOrDefault(k, new Statistic()));
-
+        return result;
     }
 
     private Map<Integer, Map<Integer, Integer>> divideMoney() {
@@ -386,15 +389,16 @@ public class Texas {
 
         var divide = this.pot.divides();
         var ret = new HashMap<Integer, Map<Integer, Integer>>();
-        var inGameNum = this.ring.iterator().stream().filter(v -> v.inGame()).count();
+        var inGameNum = this.ring.iterator().stream().filter(Player::inGame).count();
         // 只剩下一个玩家没有离开,不用经过比牌,全部给他
         if (inGameNum == 1) {
             var give = new HashMap<Integer, Integer>();
             for (var i = 0; i < divide.size(); i++) {
                 give.put(i, divide.get(0).getChips());
             }
-            var p = this.getPlayer(v -> v.inGame());
+            var p = this.getPlayer(Player::inGame);
             ret.put(p.getId(), give);
+            return ret;
         }
 
         // 有多个玩家,主池肯定有玩家比牌
@@ -504,11 +508,9 @@ public class Texas {
         // 1. 非河牌圈, 因为allin结束
         // 2. 没有自动埋牌策略
         if (!this.regulations.containsKey(Regulation.CoverCard) || !this.circle().equals(Circle.RIVER)) {
-            for (var v : this.ring.iterator()) {
-                if (!this.pot.isAllin(v)) {
-                    show.add(v);
-                }
-            }
+            this.ring.iterator().stream()
+                    .filter(v -> !this.pot.isAllin(v))
+                    .forEach(p -> show.add(p));
             return show;
         }
 
@@ -618,7 +620,10 @@ public class Texas {
      */
     String leave(Integer id) throws Exception {
         var player = this.getPlayerById(id);
-        if (player == null || player.isLeave()) {
+        if (player == null) {
+            throw new IllegalArgumentException(id + " 不存在");
+        }
+        if (player.isLeave()) {
             return null;
         }
 

@@ -136,6 +136,7 @@ class Pot {
         if (putin.size() == 1) {
             var entry = putin.entrySet().stream().findFirst().get();
             this.giveback = new Player(entry.getKey(), entry.getValue());
+            this.divides.remove(divides.size() - 1);
         }
     }
 
@@ -154,7 +155,8 @@ class Pot {
                 mapChips.put(key, mapChips.get(key) - min);
 
                 var putin = single.getPutin();
-                putin.put(key, putin.getOrDefault(key, 0) + min);
+                putin.putIfAbsent(key, 0);
+                putin.compute(key, (k, v) -> v + min);
                 if (!this.fold.contains(key)) {
                     single.getMembers().put(key, putin.get(key));
                 }

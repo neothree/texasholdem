@@ -1,5 +1,6 @@
 package com.texasthree.round.texas;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -11,7 +12,7 @@ import java.util.stream.Collectors;
  * @create: 2021-06-14 10:46
  */
 public class Result {
-    public Map<Integer, ResultPlayer> playersMap;
+    public Map<Integer, ResultPlayer> playersMap = new HashMap<>();
 
     public Set<Integer> getWinners() {
         return this.playersMap.values()
