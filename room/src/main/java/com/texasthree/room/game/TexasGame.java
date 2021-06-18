@@ -3,8 +3,8 @@ package com.texasthree.room.game;
 import com.texasthree.room.Cmd;
 import com.texasthree.room.ScheduledEvent;
 import com.texasthree.room.User;
-import com.texasthree.round.RoundState;
-import com.texasthree.round.texas.*;
+import com.texasthree.game.GameState;
+import com.texasthree.game.texas.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -32,7 +32,7 @@ public class TexasGame {
 
     private Texas texas;
 
-    private RoundState state;
+    private GameState state;
 
     /**
      * 计时器
@@ -285,7 +285,7 @@ public class TexasGame {
     private Cmd.CircleEnd boardInfo() {
         Cmd.CircleEnd info = new Cmd.CircleEnd();
         info.board = this.state.board;
-        info.devide = this.state.devide;
+        info.devide = this.state.divides;
         return info;
     }
 

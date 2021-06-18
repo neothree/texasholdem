@@ -12,7 +12,7 @@ public class Desk {
 
     public User[] seats = new User[8];
 
-    private TexasGame round;
+    private TexasGame game;
 
     private Map<String, User> audience = new HashMap<>();
 
@@ -50,12 +50,12 @@ public class Desk {
     }
 
     public void start() {
-        this.round = new TexasGame(this.seats, (Object msg) -> this.send(msg));
+        this.game = new TexasGame(this.seats, (Object msg) -> this.send(msg));
         try {
-            this.round.start();
+            this.game.start();
         } catch (Exception e) {
             e.printStackTrace();
-            this.round = null;
+            this.game = null;
         }
     }
 

@@ -14,7 +14,7 @@
     <dependencies>
         <dependency>
             <groupId>com.texasthree.texasholdem</groupId>
-            <artifactId>round</artifactId>
+            <artifactId>game</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 

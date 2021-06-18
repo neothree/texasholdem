@@ -10,7 +10,7 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>room</module>
-        <module>round</module>
+        <module>game</module>
     </modules>
 
     <!--版本维护-->
