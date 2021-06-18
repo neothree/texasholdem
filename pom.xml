@@ -29,9 +29,16 @@
         <junit-jupiter.version>5.4.0</junit-jupiter.version>
         <jackson.version>2.12.3</jackson.version>
         <lombok.version>1.18.20</lombok.version>
+        <vertx-web.version>4.1.0</vertx-web.version>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-web</artifactId>
+            <version>${vertx-web.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>

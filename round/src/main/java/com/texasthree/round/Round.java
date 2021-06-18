@@ -15,10 +15,6 @@ public class Round {
         return null;
     }
 
-    public SettleInfo settle() {
-        return null;
-    }
-
     public void action() {
         return;
     }
