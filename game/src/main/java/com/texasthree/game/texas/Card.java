@@ -29,7 +29,7 @@ public class Card implements Comparable<Card> {
     /**
      * 花色
      */
-    public final int suit;
+    public final Integer suit;
 
     public Card(String name, int point, int suit) {
         this.name = name;
@@ -45,6 +45,15 @@ public class Card implements Comparable<Card> {
     @Override
     public int compareTo(Card other) {
         return this.point.compareTo(other.point);
+    }
+
+    public int compareToWithSuit(Card other) {
+        var ret = this.compareTo(other);
+        if (ret != 0) {
+            return ret;
+        }
+        return this.suit.compareTo(other.suit);
+
     }
 
     @Override

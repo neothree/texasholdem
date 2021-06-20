@@ -8,7 +8,7 @@ public class Ring<T> {
     private Ring<T> next;
     private Ring<T> prev;
 
-    T value;
+    public T value;
 
     static <T> Ring<T> create(int num) {
         if (num < 0) {
@@ -41,7 +41,7 @@ public class Ring<T> {
         this.next = node;
     }
 
-    Ring<T> move(Predicate<T> filter) {
+    public Ring<T> move(Predicate<T> filter) {
         int limit = this.size();
         Ring<T> n = this.next;
         while (limit > 0 && !filter.test(n.value)) {
@@ -51,7 +51,7 @@ public class Ring<T> {
         return filter.test(n.value) ? n : null;
     }
 
-    int size() {
+    public int size() {
         int size = 1;
         if (next == this) {
             return size;
@@ -65,15 +65,15 @@ public class Ring<T> {
         return size;
     }
 
-    Ring<T> getNext() {
+    public Ring<T> getNext() {
         return next;
     }
 
-    Ring<T> getPrev() {
+    public Ring<T> getPrev() {
         return prev;
     }
 
-    List<T> iterator() {
+    public List<T> iterator() {
         var ret = new ArrayList<T>();
         var limit = this.size();
         var r = this;

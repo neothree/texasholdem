@@ -2,10 +2,14 @@ package com.texasthree.game.texas;
 
 /**
  * 玩法
- *
+ * <p>
  * TODO 构造成对象
  */
 public enum Regulation {
+    /**
+     * 同时发牌
+     */
+    Concurrent,
     /**
      * 小盲
      */
@@ -41,7 +45,8 @@ public enum Regulation {
     /**
      * 自动埋牌
      */
-    CoverCard;
+    CoverCard,
+    ;
 
 
     private Regulation() {
