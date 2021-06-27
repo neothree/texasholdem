@@ -33,7 +33,7 @@ public class Pineapple {
 
         private Integer dealer;
 
-        Map<Regulation, Integer> regulations;
+        private Map<Regulation, Integer> regulations;
 
         private Map<Integer, Card[]> playerCards = new HashMap<>();
 
@@ -56,16 +56,15 @@ public class Pineapple {
             if (ring == null) {
                 ring = Ring.create(playerNum);
                 for (var i = 0; i < playerNum; i++) {
-                    var lane = new Plate();
-                    lane.id = i;
+                    List<Card> left;
                     if (this.playerCards.containsKey(i)) {
-                        lane.left = Arrays.asList(this.playerCards.get(i));
-                        all = removeCard(all, lane.left);
+                        left = Arrays.asList(this.playerCards.get(i));
+                        all = removeCard(all, left);
                     } else {
-                        lane.left = all.subList(0, SUM_CARD_NUM);
+                        left = all.subList(0, SUM_CARD_NUM);
                         all = all.subList(SUM_CARD_NUM, all.size());
                     }
-                    ring.value = lane;
+                    ring.value = new Plate(i, left);
                     ring = ring.getNext();
                 }
             }
@@ -102,8 +101,6 @@ public class Pineapple {
      */
     private Ring<Plate> ring;
 
-    private Map<Integer, Plate> playerMap = new HashMap<>();
-
     private Integer dealer;
 
     private Set<Integer> fantasy = new HashSet<>();
@@ -116,11 +113,8 @@ public class Pineapple {
         this.ring = ring;
         this.regulations = regulations;
         this.dealer = dealer;
-        for (var v : ring.iterator()) {
-            if (v.left.size() != SUM_CARD_NUM) {
-                throw new IllegalArgumentException();
-            }
-            playerMap.put(v.getId(), v);
+        if (ring.toList().stream().anyMatch(v -> v.getLeft().size() != SUM_CARD_NUM)) {
+            throw new IllegalArgumentException();
         }
     }
 
@@ -133,13 +127,12 @@ public class Pineapple {
 
         // 同时发牌
         if (this.concurrent()) {
-            for (var entry : this.playerMap.entrySet()) {
-                if (!this.fantasy.contains(entry.getKey())) {
-                    this.giveCard(entry.getKey(), this.giveCardNum());
-                }
-            }
+            var num = this.giveCardNum();
+            this.ring.toList().stream()
+                    .filter(v -> !fantasy.contains(v.getId()))
+                    .forEach(v -> v.give(num));
         }
-        this.ring = this.ring.move(v -> v.id.equals(dealer));
+        this.ring = this.ring.move(v -> v.getId().equals(dealer));
         return this.turn(null);
     }
 
@@ -154,57 +147,10 @@ public class Pineapple {
             throw new IllegalArgumentException();
         }
 
-        var plate = this.playerMap.get(id);
-        var waits = new HashSet<>(plate.waits);
-
-        // 查看牌是否超过channel数量
-        int num0 = 0, num1 = 0, num2 = 0;
-        for (var v : rows) {
-            if (v == null || !waits.contains(v.card)) {
-                throw new IllegalArgumentException();
-            }
-            switch (v.row) {
-                case 0:
-                    num0++;
-                    break;
-                case 1:
-                    num1++;
-                    break;
-                case 2:
-                    num2++;
-                    break;
-                default:
-                    throw new IllegalArgumentException();
-            }
-        }
-        if (this.fantasy.contains(id)) {
-            // 范特西摆牌
-            if (num0 != 3 || num1 != 5 || num2 != 5) {
-                throw new IllegalArgumentException();
-            }
-        } else {
-            if (num0 + num1 + num2 != this.chooseCardNum(null)
-                    || this.getChannelCard(id, 0).size() + num0 > 3
-                    || this.getChannelCard(id, 1).size() + num1 > 5
-                    || this.getChannelCard(id, 2).size() + num2 > 5) {
-                throw new IllegalArgumentException();
-            }
-        }
-
         // 记录
         var con = !this.opPlayer().equals(id);
-        for (var v : rows) {
-            plate.layout.add(new RowCard(v.card, v.row, con));
-        }
-        this.sortLane(plate.layout);
-
-        // 弃牌
-        var set = rows.stream().map(v -> v.card).collect(Collectors.toSet());
-        plate.waits.stream()
-                .filter(v -> !set.contains(v))
-                .forEach(v -> plate.folds.add(v));
-
-        this.playerMap.get(id).waits = new ArrayList<>();
+        var plate = this.getPlateById(id);
+        plate.put(rows, con, this.fantasy.contains(id), this.chooseCardNum());
 
         return this.turn(id);
     }
@@ -226,7 +172,6 @@ public class Pineapple {
                     move = NEXT_OP;
                 } else {
                     this.showdown();
-                    ;
                     move = SHOWDOWN;
                 }
             } else {
@@ -257,13 +202,14 @@ public class Pineapple {
 
             // 发牌
             if (!this.concurrent()) {
-                this.giveCard(this.opPlayer(), this.giveCardNum());
+                var plate = this.getPlateById(this.opPlayer());
+                plate.give(this.giveCardNum());
             }
             return;
         }
 
         this.ring = ring.move(v -> this.fantasy.contains(v.getId()));
-        this.giveCard(this.ring.value.getId(), FANTASY_CARD_NUM);
+        this.ring.value.give(FANTASY_CARD_NUM);
     }
 
     private String doContinue() {
@@ -271,17 +217,9 @@ public class Pineapple {
         if (!this.continue1.contains(id)) {
             throw new IllegalStateException();
         }
-        for (var v : this.playerMap.get(id).layout) {
-            v.concurrent = false;
-        }
+        this.getPlateById(id).doContinue();
         this.continue1.remove(id);
         return this.turn(id);
-    }
-
-    private void giveCard(Integer id, int num) {
-        var lane = this.playerMap.get(id);
-        lane.waits = this.sort(lane.left.subList(0, num));
-        lane.left = lane.left.subList(num, lane.left.size());
     }
 
     void showdown() {
@@ -297,25 +235,9 @@ public class Pineapple {
     }
 
     boolean fantasyEnable() {
-        if (this.fantasy.isEmpty()) {
-            return false;
-        }
-        for (var v : this.fantasy) {
-            if (!this.playerMap.get(v).layout.isEmpty() || !this.playerMap.get(v).waits.isEmpty()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    List<Card> sort(List<Card> cards) {
-        cards.sort((a, b) -> a.compareToWithSuit(b));
-        return cards;
-    }
-
-    List<RowCard> sortLane(List<RowCard> cards) {
-        cards.sort((a, b) -> a.card.compareToWithSuit(b.card));
-        return cards;
+        return this.fantasy.stream()
+                .map(v -> this.getPlateById(v))
+                .noneMatch(Plate::isStart);
     }
 
     int giveCardNum() {
@@ -353,36 +275,22 @@ public class Pineapple {
             default:
                 throw new IllegalStateException();
         }
-        var ret = 0;
-        for (var info : this.playerMap.values()) {
-            var num = 0;
-            for (var v : info.layout) {
-                if (!v.concurrent) {
-                    num++;
-                }
-            }
-            if (num >= expect) {
-                ret++;
-            }
-        }
-        return ret;
+        var com = expect;
+        return (int) this.ring.toList()
+                .stream()
+                .filter(v -> v.notConcurrentNum() >= com)
+                .count();
     }
 
     boolean concurrent() {
         return this.regulations.containsKey(Regulation.Concurrent);
     }
 
-    private List<Card> getChannelCard(int id, int channel) {
-        var ret = new ArrayList<Card>();
+    private List<Card> getRowCards(int id, int channel) {
         if (this.getPlayerById(id) == null) {
-            return ret;
+            throw new IllegalArgumentException();
         }
-        for (var v : this.playerMap.get(id).layout) {
-            if (v.row == channel) {
-                ret.add(v.card);
-            }
-        }
-        return ret;
+        return this.getPlateById(id).getRowCards(channel);
     }
 
     int chooseCardNum() {
@@ -400,11 +308,14 @@ public class Pineapple {
     }
 
     Integer getPlayerById(Integer id) {
-        return this.ring.iterator().stream()
+        return this.getPlateById(id).getId();
+    }
+
+    Plate getPlateById(Integer id) {
+        return this.ring.toList().stream()
                 .filter(v -> v.getId().equals(id))
                 .findFirst()
-                .orElseThrow()
-                .getId();
+                .orElseThrow();
     }
 
     Integer opPlayer() {

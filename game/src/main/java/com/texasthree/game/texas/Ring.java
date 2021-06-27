@@ -76,7 +76,7 @@ public class Ring<T> {
         return prev;
     }
 
-    public List<T> iterator() {
+    public List<T> toList() {
         var ret = new ArrayList<T>();
         var limit = this.size();
         var r = this;

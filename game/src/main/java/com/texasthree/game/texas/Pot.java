@@ -35,7 +35,7 @@ class Pot {
         if (ante <= 0) {
             return;
         }
-        for (var player : ring.iterator()) {
+        for (var player : ring.toList()) {
             if (player.getChips() >= ante) {
                 this.anteBet.put(player.getId(), ante);
             } else {

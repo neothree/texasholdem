@@ -360,7 +360,7 @@ public class Texas {
         var result = new Result();
         var open = this.showCardStrategy();
         var allBet = this.pot.playerBetChips();
-        for (var v : this.ring.iterator()) {
+        for (var v : this.ring.toList()) {
             var info = new ResultPlayer();
             info.setId(v.getId());
             info.setBetSum(allBet.getOrDefault(v.getId(), 0));
@@ -389,7 +389,7 @@ public class Texas {
 
         var divide = this.pot.divides();
         var ret = new HashMap<Integer, Map<Integer, Integer>>();
-        var inGameNum = this.ring.iterator().stream().filter(Player::inGame).count();
+        var inGameNum = this.ring.toList().stream().filter(Player::inGame).count();
         // 只剩下一个玩家没有离开,不用经过比牌,全部给他
         if (inGameNum == 1) {
             var give = new HashMap<Integer, Integer>();
@@ -451,7 +451,7 @@ public class Texas {
         var averageChips = (int) Math.floor(sum / winner.size());
         var oneMoreNum = sum % winner.size();
         var r = this.ring.move(v -> v.getId() == this.bbPlayer().getId());
-        for (var v : r.iterator()) {
+        for (var v : r.toList()) {
             if (winner.contains(v.getId())) {
                 if (oneMoreNum > 0) {
                     ret.put(v.getId(), averageChips + 1);
@@ -508,7 +508,7 @@ public class Texas {
         // 1. 非河牌圈, 因为allin结束
         // 2. 没有自动埋牌策略
         if (!this.regulations.containsKey(Regulation.CoverCard) || !this.circle().equals(Circle.RIVER)) {
-            this.ring.iterator().stream()
+            this.ring.toList().stream()
                     .filter(v -> !this.pot.isAllin(v))
                     .forEach(p -> show.add(p));
             return show;
@@ -528,7 +528,7 @@ public class Texas {
             });
             var last = pr.value;
             show.add(last);
-            for (var player : pr.iterator()) {
+            for (var player : pr.toList()) {
                 // 大于等于必须亮牌
                 if (divide.getMembers().containsKey(player.getId())
                         && !this.pot.isFold(player)
@@ -599,7 +599,7 @@ public class Texas {
 
     private void freshHand() {
         var board = this.board();
-        for (var v : this.ring.iterator()) {
+        for (var v : this.ring.toList()) {
             v.getHand().fresh(board);
         }
     }
@@ -609,7 +609,7 @@ public class Texas {
     }
 
     private int leaveOrFoldNum() {
-        return (int) this.ring.iterator()
+        return (int) this.ring.toList()
                 .stream()
                 .filter(v -> v.isLeave() || this.pot.isFold(v.getId()))
                 .count();
