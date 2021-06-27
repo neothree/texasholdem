@@ -70,7 +70,7 @@ public class Card implements Comparable<Card> {
             return false;
         }
         var o = (Card) other;
-        return this.point.equals(o.point) && this.suit == o.suit;
+        return this.point.equals(o.point) && this.suit.equals(o.suit);
     }
 
     @Override

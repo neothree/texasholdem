@@ -1,8 +1,10 @@
 package com.texasthree.game.pineapple;
 
+import com.texasthree.game.TableCard;
 import com.texasthree.game.texas.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 大菠萝
@@ -13,6 +15,8 @@ import java.util.*;
 public class Pineapple {
 
     private static final int FANTASY_CARD_NUM = 14;
+
+    private static final int SUM_CARD_NUM = 17;
 
     public static final String NEXT_OP = "NEXT_OP";
 
@@ -25,14 +29,64 @@ public class Pineapple {
     public static class Builder {
         private int playerNum = 2;
 
+        private Ring<Plate> ring;
+
+        private Integer dealer;
+
+        Map<Regulation, Integer> regulations;
+
+        private Map<Integer, Card[]> playerCards = new HashMap<>();
+
         public Builder playerNum(int playerNum) {
             this.playerNum = playerNum;
             return this;
         }
 
-        Pineapple build() {
-            throw new IllegalArgumentException();
+        public Builder playerCards(int id, Card... cards) {
+            if (cards.length != SUM_CARD_NUM) {
+                throw new IllegalArgumentException();
+            }
+            playerCards.put(id, cards);
+            return this;
         }
+
+
+        Pineapple build() {
+            var all = TableCard.getInstance().shuffle();
+            if (ring == null) {
+                ring = Ring.create(playerNum);
+                for (var i = 0; i < playerNum; i++) {
+                    var lane = new Plate();
+                    lane.id = i;
+                    if (this.playerCards.containsKey(i)) {
+                        lane.left = Arrays.asList(this.playerCards.get(i));
+                        all = removeCard(all, lane.left);
+                    } else {
+                        lane.left = all.subList(0, SUM_CARD_NUM);
+                        all = all.subList(SUM_CARD_NUM, all.size());
+                    }
+                    ring.value = lane;
+                    ring = ring.getNext();
+                }
+            }
+            if (regulations == null) {
+                regulations = new HashMap<>();
+            }
+            if (dealer == null) {
+                dealer = 0;
+            }
+            var pineapple = new Pineapple(ring, regulations, dealer);
+            return pineapple;
+        }
+
+        private List<Card> removeCard(List<Card> all, List<Card> others) {
+            var set = new HashSet<>(others);
+            return all.stream().filter(v -> !set.contains(v)).collect(Collectors.toList());
+        }
+    }
+
+    static Builder builder() {
+        return new Builder();
     }
 
     private boolean isOver;
@@ -46,34 +100,31 @@ public class Pineapple {
     /**
      * 玩家的位置
      */
-    private Ring<Player> ring;
+    private Ring<Plate> ring;
 
-    private Map<Integer, Lane> playerMap;
+    private Map<Integer, Plate> playerMap = new HashMap<>();
 
-    private Map<Integer, List<Card>> playerCards;
-
-    private Player dealer;
+    private Integer dealer;
 
     private Set<Integer> fantasy = new HashSet<>();
 
     private Set<Integer> continue1 = new HashSet<>();
 
-    Pineapple(Ring<Player> ring,
-              Map<Regulation, Integer> regulations,
-              Map<Integer, Lane> playerMap,
-              Map<Integer, List<Card>> playerCards,
-              Player dealer) {
+    private Pineapple(Ring<Plate> ring,
+                      Map<Regulation, Integer> regulations,
+                      Integer dealer) {
         this.ring = ring;
         this.regulations = regulations;
-        this.playerMap = playerMap;
-        this.playerCards = playerCards;
         this.dealer = dealer;
+        for (var v : ring.iterator()) {
+            if (v.left.size() != SUM_CARD_NUM) {
+                throw new IllegalArgumentException();
+            }
+            playerMap.put(v.getId(), v);
+        }
     }
 
     void start() {
-        for (var v : ring.iterator()) {
-            playerMap.put(v.getId(), new Lane());
-        }
         this.circleStart();
     }
 
@@ -88,64 +139,79 @@ public class Pineapple {
                 }
             }
         }
-        this.ring = this.ring.move(v -> v.equals(dealer));
+        this.ring = this.ring.move(v -> v.id.equals(dealer));
         return this.turn(null);
     }
 
     void circleEnd() {
     }
 
-    void action(Integer id, List<List<Card>> channelList) {
+    String action(Integer id, List<RowCard> rows) {
         if (this.isOver
+                || rows == null
                 || this.getPlayerById(id) == null
-                || (id != this.opPlayer().getId() && !this.concurrent())) {
-            return;
-        }
-
-        var waits = new HashSet<>(this.playerMap.get(id).waits);
-        if (channelList.stream()
-                .flatMap(v -> v.stream())
-                .anyMatch(c -> !waits.contains(c))) {
+                || (!id.equals(this.opPlayer()) && !this.concurrent())) {
             throw new IllegalArgumentException();
         }
 
+        var plate = this.playerMap.get(id);
+        var waits = new HashSet<>(plate.waits);
+
         // 查看牌是否超过channel数量
+        int num0 = 0, num1 = 0, num2 = 0;
+        for (var v : rows) {
+            if (v == null || !waits.contains(v.card)) {
+                throw new IllegalArgumentException();
+            }
+            switch (v.row) {
+                case 0:
+                    num0++;
+                    break;
+                case 1:
+                    num1++;
+                    break;
+                case 2:
+                    num2++;
+                    break;
+                default:
+                    throw new IllegalArgumentException();
+            }
+        }
         if (this.fantasy.contains(id)) {
             // 范特西摆牌
-            if (channelList.get(0).size() != 3
-                    || channelList.get(1).size() != 5
-                    || channelList.get(2).size() != 5) {
+            if (num0 != 3 || num1 != 5 || num2 != 5) {
                 throw new IllegalArgumentException();
             }
         } else {
-            if (channelList.stream().mapToLong(v -> v.size()).sum() != this.chooseCardNum(null)
-                    || this.getChannelCard(id, 0).size() + channelList.get(0).size() > 3
-                    || this.getChannelCard(id, 1).size() + channelList.get(0).size() > 5
-                    || this.getChannelCard(id, 2).size() + channelList.get(0).size() > 5) {
+            if (num0 + num1 + num2 != this.chooseCardNum(null)
+                    || this.getChannelCard(id, 0).size() + num0 > 3
+                    || this.getChannelCard(id, 1).size() + num1 > 5
+                    || this.getChannelCard(id, 2).size() + num2 > 5) {
                 throw new IllegalArgumentException();
             }
         }
 
         // 记录
-        for (var i = 0; i < 3; i++) {
-            for (var v : channelList.get(0)) {
-                this.playerMap.get(id).hands.add(new LaneCard(v, i, this.opPlayer().getId() != id));
-            }
+        var con = !this.opPlayer().equals(id);
+        for (var v : rows) {
+            plate.layout.add(new RowCard(v.card, v.row, con));
         }
-        this.sortLane(this.playerMap.get(id).hands);
+        this.sortLane(plate.layout);
 
         // 弃牌
-        channelList.stream()
-                .flatMap(v -> v.stream())
-                .forEach(v -> this.playerMap.get(id).folds.add(v));
-        this.playerMap.get(id).waits.clear();
+        var set = rows.stream().map(v -> v.card).collect(Collectors.toSet());
+        plate.waits.stream()
+                .filter(v -> !set.contains(v))
+                .forEach(v -> plate.folds.add(v));
 
-        this.turn(id);
+        this.playerMap.get(id).waits = new ArrayList<>();
+
+        return this.turn(id);
     }
 
     private String turn(Integer id) {
         // 提前摆牌记录
-        if (id != null && id != this.opPlayer().getId()) {
+        if (id != null && !id.equals(this.opPlayer())) {
             this.continue1.add(id);
             return null;
         }
@@ -184,15 +250,14 @@ public class Pineapple {
         if (!fantasy) {
             if (this.playerNum() == 3) {
                 this.ring = ring.move(v -> this.fantasy.contains(v.getId()));
-            } else if (this.fantasy.isEmpty() || this.fantasy.contains(this.opPlayer().getId())) {
+            } else if (this.fantasy.isEmpty() || this.fantasy.contains(this.opPlayer())) {
                 // 两个有范特西的话，非范特西一直摆牌
                 this.ring = ring.getNext();
             }
 
             // 发牌
-            if (this.concurrent()) {
-                this.giveCard(this.opPlayer().getId(), this.giveCardNum());
-
+            if (!this.concurrent()) {
+                this.giveCard(this.opPlayer(), this.giveCardNum());
             }
             return;
         }
@@ -202,11 +267,11 @@ public class Pineapple {
     }
 
     private String doContinue() {
-        var id = this.opPlayer().getId();
+        var id = this.opPlayer();
         if (!this.continue1.contains(id)) {
             throw new IllegalStateException();
         }
-        for (var v : this.playerMap.get(id).hands) {
+        for (var v : this.playerMap.get(id).layout) {
             v.concurrent = false;
         }
         this.continue1.remove(id);
@@ -214,9 +279,9 @@ public class Pineapple {
     }
 
     private void giveCard(Integer id, int num) {
-        var left = this.playerCards.get(id);
-        this.playerMap.get(id).waits = this.sort(left.subList(0, num));
-        this.playerCards.put(id, left.subList(num, left.size()));
+        var lane = this.playerMap.get(id);
+        lane.waits = this.sort(lane.left.subList(0, num));
+        lane.left = lane.left.subList(num, lane.left.size());
     }
 
     void showdown() {
@@ -236,7 +301,7 @@ public class Pineapple {
             return false;
         }
         for (var v : this.fantasy) {
-            if (!this.playerMap.get(v).hands.isEmpty() || !this.playerMap.get(v).waits.isEmpty()) {
+            if (!this.playerMap.get(v).layout.isEmpty() || !this.playerMap.get(v).waits.isEmpty()) {
                 return false;
             }
         }
@@ -248,7 +313,7 @@ public class Pineapple {
         return cards;
     }
 
-    List<LaneCard> sortLane(List<LaneCard> cards) {
+    List<RowCard> sortLane(List<RowCard> cards) {
         cards.sort((a, b) -> a.card.compareToWithSuit(b.card));
         return cards;
     }
@@ -291,7 +356,7 @@ public class Pineapple {
         var ret = 0;
         for (var info : this.playerMap.values()) {
             var num = 0;
-            for (var v : info.hands) {
+            for (var v : info.layout) {
                 if (!v.concurrent) {
                     num++;
                 }
@@ -312,29 +377,37 @@ public class Pineapple {
         if (this.getPlayerById(id) == null) {
             return ret;
         }
-        for (var v : this.playerMap.get(id).hands) {
-            if (v.channel == channel) {
+        for (var v : this.playerMap.get(id).layout) {
+            if (v.row == channel) {
                 ret.add(v.card);
             }
         }
         return ret;
     }
 
-    private int chooseCardNum(Integer id) {
+    int chooseCardNum() {
         if (this.isOver) {
             return 0;
         }
+        return this.circle == 1 ? 5 : 2;
+    }
+
+    int chooseCardNum(Integer id) {
         if (id != null && this.fantasy.contains(id)) {
             return FANTASY_CARD_NUM;
         }
-        return this.circle == 1 ? 5 : 3;
+        return chooseCardNum();
     }
 
-    Player getPlayerById(Integer id) {
-        return this.ring.iterator().stream().filter(v -> v.getId() == id).findFirst().orElseThrow();
+    Integer getPlayerById(Integer id) {
+        return this.ring.iterator().stream()
+                .filter(v -> v.getId().equals(id))
+                .findFirst()
+                .orElseThrow()
+                .getId();
     }
 
-    Player opPlayer() {
-        return this.ring.value;
+    Integer opPlayer() {
+        return this.ring.value.getId();
     }
 }

@@ -10,7 +10,7 @@ public class Ring<T> {
 
     public T value;
 
-    static <T> Ring<T> create(int num) {
+    public static <T> Ring<T> create(int num) {
         if (num < 0) {
             throw new IllegalArgumentException();
         }
@@ -48,7 +48,10 @@ public class Ring<T> {
             limit--;
             n = n.next;
         }
-        return filter.test(n.value) ? n : null;
+        if (!filter.test(n.value)) {
+            throw new IllegalStateException();
+        }
+        return n;
     }
 
     public int size() {

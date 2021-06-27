@@ -6,14 +6,14 @@ import com.texasthree.game.texas.Card;
  * @author: neo
  * @create: 2021-06-20 09:58
  */
-public class LaneCard {
+public class RowCard {
     public Card card;
-    public int channel;
+    public int row;
     public boolean concurrent;
 
-    LaneCard(Card card, int channel, boolean concurrent) {
+    RowCard(Card card, int row, boolean concurrent) {
         this.card = card;
-        this.channel = channel;
+        this.row = row;
         this.concurrent = concurrent;
     }
 }
