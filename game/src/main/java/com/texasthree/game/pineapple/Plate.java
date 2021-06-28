@@ -8,14 +8,28 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
+ * 摆盘
+ *
  * @author: neo
  * @create: 2021-06-20 08:43
  */
 public class Plate {
     private Integer id;
+    /**
+     * 已经摆好的牌
+     */
     private List<RowCard> layout = new ArrayList<>();
+    /**
+     * 可用的牌
+     */
     private List<Card> waits = new ArrayList<>();
+    /**
+     * 弃掉的牌
+     */
     private List<Card> folds = new ArrayList<>();
+    /**
+     * 接下来发给玩家的牌
+     */
     private List<Card> left;
 
     Plate(Integer id, List<Card> left) {
@@ -23,11 +37,17 @@ public class Plate {
         this.left = left;
     }
 
-    void give(int num) {
+    /**
+     * 发牌
+     */
+    void deal(int num) {
         this.waits = this.sort(this.left.subList(0, num));
         this.left = this.left.subList(num, this.left.size());
     }
 
+    /**
+     * 摆牌
+     */
     void put(List<RowCard> rows, boolean con, boolean all, int chooseNum) {
         check(rows, all, chooseNum);
 
@@ -51,7 +71,7 @@ public class Plate {
         var waitsSet = new HashSet<>(waits);
         for (var v : rows) {
             if (v == null || !waitsSet.contains(v.card)) {
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException("摆牌错误 card=" + v);
             }
             switch (v.row) {
                 case 0:
@@ -93,12 +113,12 @@ public class Plate {
                 .collect(Collectors.toList());
     }
 
-    List<Card> sort(List<Card> cards) {
+    private List<Card> sort(List<Card> cards) {
         cards.sort((a, b) -> a.compareToWithSuit(b));
         return cards;
     }
 
-    List<RowCard> sortLane(List<RowCard> cards) {
+    private List<RowCard> sortLane(List<RowCard> cards) {
         cards.sort((a, b) -> a.card.compareToWithSuit(b.card));
         return cards;
     }
@@ -117,5 +137,17 @@ public class Plate {
 
     public List<Card> getLeft() {
         return left;
+    }
+
+    public List<Card> getFolds() {
+        return folds;
+    }
+
+    public List<RowCard> getLayout() {
+        return layout;
+    }
+
+    public List<Card> getWaits() {
+        return waits;
     }
 }

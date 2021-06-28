@@ -16,4 +16,16 @@ public class RowCard {
         this.row = row;
         this.concurrent = concurrent;
     }
+
+
+    @Override
+    public String toString() {
+        return new StringBuilder()
+                .append("[")
+                .append("card=").append(card)
+                .append("row=").append(row)
+                .append("concurrent=").append(concurrent)
+                .toString();
+    }
+
 }

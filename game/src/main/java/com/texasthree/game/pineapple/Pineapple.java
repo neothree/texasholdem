@@ -14,9 +14,9 @@ import java.util.stream.Collectors;
  */
 public class Pineapple {
 
-    private static final int FANTASY_CARD_NUM = 14;
+    public static final int FANTASY_CARD_NUM = 14;
 
-    private static final int SUM_CARD_NUM = 17;
+    public static final int SUM_CARD_NUM = 17;
 
     public static final String NEXT_OP = "NEXT_OP";
 
@@ -33,9 +33,26 @@ public class Pineapple {
 
         private Integer dealer;
 
-        private Map<Regulation, Integer> regulations;
+        private Map<Regulation, Integer> regulations = new HashMap<>();
 
         private Map<Integer, Card[]> playerCards = new HashMap<>();
+
+        private Set<Integer> fantasy = new HashSet<>();
+
+        public Builder dealer(Integer dealer) {
+            this.dealer = dealer;
+            return this;
+        }
+
+        public Builder fantasy(Integer id) {
+            fantasy.add(id);
+            return this;
+        }
+
+        public Builder concurrent() {
+            regulations.put(Regulation.Concurrent, 1);
+            return this;
+        }
 
         public Builder playerNum(int playerNum) {
             this.playerNum = playerNum;
@@ -74,7 +91,7 @@ public class Pineapple {
             if (dealer == null) {
                 dealer = 0;
             }
-            var pineapple = new Pineapple(ring, regulations, dealer);
+            var pineapple = new Pineapple(ring, regulations, fantasy, dealer);
             return pineapple;
         }
 
@@ -103,15 +120,17 @@ public class Pineapple {
 
     private Integer dealer;
 
-    private Set<Integer> fantasy = new HashSet<>();
+    private Set<Integer> fantasy;
 
     private Set<Integer> continue1 = new HashSet<>();
 
     private Pineapple(Ring<Plate> ring,
                       Map<Regulation, Integer> regulations,
+                      Set<Integer> fantasy,
                       Integer dealer) {
         this.ring = ring;
         this.regulations = regulations;
+        this.fantasy = fantasy;
         this.dealer = dealer;
         if (ring.toList().stream().anyMatch(v -> v.getLeft().size() != SUM_CARD_NUM)) {
             throw new IllegalArgumentException();
@@ -130,7 +149,7 @@ public class Pineapple {
             var num = this.giveCardNum();
             this.ring.toList().stream()
                     .filter(v -> !fantasy.contains(v.getId()))
-                    .forEach(v -> v.give(num));
+                    .forEach(v -> v.deal(num));
         }
         this.ring = this.ring.move(v -> v.getId().equals(dealer));
         return this.turn(null);
@@ -185,7 +204,7 @@ public class Pineapple {
         }
 
         // 触发提前摆牌
-        if (this.continue1.contains(id)) {
+        if (this.continue1.contains(this.opPlayer())) {
             move = CONTINUE;
         }
         return move;
@@ -194,7 +213,7 @@ public class Pineapple {
     void nextOp(boolean fantasy) {
         if (!fantasy) {
             if (this.playerNum() == 3) {
-                this.ring = ring.move(v -> this.fantasy.contains(v.getId()));
+                this.ring = ring.move(v -> !this.fantasy.contains(v.getId()));
             } else if (this.fantasy.isEmpty() || this.fantasy.contains(this.opPlayer())) {
                 // 两个有范特西的话，非范特西一直摆牌
                 this.ring = ring.getNext();
@@ -203,16 +222,16 @@ public class Pineapple {
             // 发牌
             if (!this.concurrent()) {
                 var plate = this.getPlateById(this.opPlayer());
-                plate.give(this.giveCardNum());
+                plate.deal(this.giveCardNum());
             }
             return;
         }
 
         this.ring = ring.move(v -> this.fantasy.contains(v.getId()));
-        this.ring.value.give(FANTASY_CARD_NUM);
+        this.ring.value.deal(FANTASY_CARD_NUM);
     }
 
-    private String doContinue() {
+    String doContinue() {
         var id = this.opPlayer();
         if (!this.continue1.contains(id)) {
             throw new IllegalStateException();
@@ -286,7 +305,7 @@ public class Pineapple {
         return this.regulations.containsKey(Regulation.Concurrent);
     }
 
-    private List<Card> getRowCards(int id, int channel) {
+    List<Card> getRowCards(int id, int channel) {
         if (this.getPlayerById(id) == null) {
             throw new IllegalArgumentException();
         }
@@ -320,5 +339,17 @@ public class Pineapple {
 
     Integer opPlayer() {
         return this.ring.value.getId();
+    }
+
+    List<Card> getFolds(Integer id) {
+        return this.getPlateById(id).getFolds();
+    }
+
+    List<Card> getWaits(Integer id) {
+        return this.getPlateById(id).getWaits();
+    }
+
+    Set<Integer> getFantasy() {
+        return this.fantasy;
     }
 }
