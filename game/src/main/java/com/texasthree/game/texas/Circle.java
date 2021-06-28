@@ -25,7 +25,7 @@ public class Circle {
     /**
      * 摊牌圈
      */
-    public static final String SHOWDOWN = "SHOWDOWN";
+    public static final String SHOWDOWN = "STATE_SHOWDOWN";
 
     private String circle;
 

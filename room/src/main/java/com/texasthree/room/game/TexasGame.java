@@ -192,11 +192,11 @@ public class TexasGame {
     }
 
     private void move(String move) {
-        if (Texas.NEXT_OP.equals(move)) {
+        if (Texas.STATE_NEXT_OP.equals(move)) {
             this.moveNextOp();
-        } else if (Texas.CIRCLE_END.equals(move)) {
+        } else if (Texas.STATE_CIRCLE_END.equals(move)) {
             this.moveCircleEnd();
-        } else if (Texas.SHOWDOWN.equals(move)) {
+        } else if (Texas.STATE_SHOWDOWN.equals(move)) {
             this.moveShowdown();
         }
     }

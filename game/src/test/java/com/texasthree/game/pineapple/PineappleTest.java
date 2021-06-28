@@ -35,45 +35,45 @@ class PineappleTest extends AllCard {
         assertEquals(1, game.opPlayer());
         assertEquals(5, game.giveCardNum());
         assertEquals(5, game.chooseCardNum());
-        var move = game.action(1, makeRowCards(null, 2, heartA, heart2, heart3, spadesA, spades2));
-        assertEquals(Pineapple.NEXT_OP, move);
-        move = game.action(0, makeRowCards(null, 2, diamondA, diamond2, diamond3, diamond4, diamond5));
-        assertEquals(Pineapple.CIRCLE_END, move);
+        var state = game.action(1, makeRowCards(null, 2, heartA, heart2, heart3, spadesA, spades2));
+        assertEquals(Pineapple.STATE_NEXT_OP, state);
+        state = game.action(0, makeRowCards(null, 2, diamondA, diamond2, diamond3, diamond4, diamond5));
+        assertEquals(Pineapple.STATE_CIRCLE_END, state);
 
         // 第2圈
         assertEquals(3, game.giveCardNum());
         assertEquals(2, game.chooseCardNum());
-        move = game.action(1, makeRowCards(null, 1, spades3, spades4));
-        assertEquals(Pineapple.NEXT_OP, move);
-        move = game.action(0, makeRowCards(null, 1, diamond6, diamond7));
-        assertEquals(Pineapple.CIRCLE_END, move);
+        state = game.action(1, makeRowCards(null, 1, spades3, spades4));
+        assertEquals(Pineapple.STATE_NEXT_OP, state);
+        state = game.action(0, makeRowCards(null, 1, diamond6, diamond7));
+        assertEquals(Pineapple.STATE_CIRCLE_END, state);
 
         // 第3圈
         assertEquals(3, game.giveCardNum());
         assertEquals(2, game.chooseCardNum());
-        move = game.action(1, makeRowCards(null, 1, spades6, spades7));
-        assertEquals(Pineapple.NEXT_OP, move);
-        move = game.action(0, makeRowCards(null, 1, diamond8, diamond9));
-        assertEquals(Pineapple.CIRCLE_END, move);
+        state = game.action(1, makeRowCards(null, 1, spades6, spades7));
+        assertEquals(Pineapple.STATE_NEXT_OP, state);
+        state = game.action(0, makeRowCards(null, 1, diamond8, diamond9));
+        assertEquals(Pineapple.STATE_CIRCLE_END, state);
 
         // 第4圈
         assertEquals(3, game.giveCardNum());
         assertEquals(2, game.chooseCardNum());
         var acts = makeRowCards(null, 0, heart8);
-        move = game.action(1, makeRowCards(acts, 1, heart5));
-        assertEquals(Pineapple.NEXT_OP, move);
+        state = game.action(1, makeRowCards(acts, 1, heart5));
+        assertEquals(Pineapple.STATE_NEXT_OP, state);
 
         acts = makeRowCards(null, 0, diamondJ);
-        move = game.action(0, makeRowCards(acts, 1, diamond10));
-        assertEquals(Pineapple.CIRCLE_END, move);
+        state = game.action(0, makeRowCards(acts, 1, diamond10));
+        assertEquals(Pineapple.STATE_CIRCLE_END, state);
 
         // 第5圈
         assertEquals(3, game.giveCardNum());
         assertEquals(2, game.chooseCardNum());
-        move = game.action(1, makeRowCards(null, 0, spadesQ, spadesK));
-        assertEquals(Pineapple.NEXT_OP, move);
-        move = game.action(0, makeRowCards(null, 0, clubJ, spadesJ));
-        assertEquals(Pineapple.SHOWDOWN, move);
+        state = game.action(1, makeRowCards(null, 0, spadesQ, spadesK));
+        assertEquals(Pineapple.STATE_NEXT_OP, state);
+        state = game.action(0, makeRowCards(null, 0, clubJ, spadesJ));
+        assertEquals(Pineapple.STATE_SHOWDOWN, state);
 
     }
 
@@ -117,33 +117,33 @@ class PineappleTest extends AllCard {
         equalsCards(game.getWaits(0), diamond6, diamond7, diamond8, diamond9, diamond10);
         equalsCards(game.getWaits(1), heartA, heart2, clubA, spadesA, spades2);
         equalsCards(game.getWaits(2), heart3, club2, club3, club4, club5);
-        var move = game.action(0, makeRowCards(null, 2, diamond6, diamond7, diamond8, diamond9, diamond10));
-        assertNull(move);
+        var state = game.action(0, makeRowCards(null, 2, diamond6, diamond7, diamond8, diamond9, diamond10));
+        assertNull(state);
 
         // 玩家 2 押注
         assertEquals(1, game.opPlayer());
         equalsCards(game.getWaits(0));
         equalsCards(game.getWaits(1), heartA, heart2, clubA, spadesA, spades2);
         equalsCards(game.getWaits(2), heart3, club2, club3, club4, club5);
-        move = game.action(2, makeRowCards(null, 1, heart3, club2, club3, club4, club5));
-        assertNull(move);
+        state = game.action(2, makeRowCards(null, 1, heart3, club2, club3, club4, club5));
+        assertNull(state);
 
         // 玩家 1 押注
         assertEquals(1, game.opPlayer());
         equalsCards(game.getWaits(0));
         equalsCards(game.getWaits(1), heartA, heart2, clubA, spadesA, spades2);
         equalsCards(game.getWaits(2));
-        move = game.action(1, makeRowCards(null, 2, heartA, heart2, clubA, spadesA, spades2));
-        assertEquals(Pineapple.CONTINUE, move);
+        state = game.action(1, makeRowCards(null, 2, heartA, heart2, clubA, spadesA, spades2));
+        assertEquals(Pineapple.STATE_CONTINUE, state);
 
-        // CONTINUE
+        // STATE_CONTINUE
         equalsCards(game.getWaits(0));
         equalsCards(game.getWaits(1));
         equalsCards(game.getWaits(2));
-        move = game.doContinue();
-        assertEquals(Pineapple.CONTINUE, move);
-        move = game.doContinue();
-        assertEquals(Pineapple.CIRCLE_END, move);
+        state = game.doContinue();
+        assertEquals(Pineapple.STATE_CONTINUE, state);
+        state = game.doContinue();
+        assertEquals(Pineapple.STATE_CIRCLE_END, state);
 
         equalsCards(game.getWaits(0), diamondA, diamond2, club7);
         equalsCards(game.getWaits(1), spades3, spades4, spades5);
@@ -405,28 +405,28 @@ class PineappleTest extends AllCard {
         assertEquals(Pineapple.FANTASY_CARD_NUM, game.chooseCardNum(0));
 
         // 第1圈
-        var move = game.action(1, makeRowCards(null, 2, heartA, heart2, clubA, spadesA, spades2));
-        assertEquals(Pineapple.CIRCLE_END, move);
+        var state = game.action(1, makeRowCards(null, 2, heartA, heart2, clubA, spadesA, spades2));
+        assertEquals(Pineapple.STATE_CIRCLE_END, state);
 
         // 第2圈
         assertEquals(1, game.opPlayer());
-        move = game.action(1, makeRowCards(null, 1, spades3, spades4));
-        assertEquals(Pineapple.CIRCLE_END, move);
+        state = game.action(1, makeRowCards(null, 1, spades3, spades4));
+        assertEquals(Pineapple.STATE_CIRCLE_END, state);
 
         // 第3圈
         assertEquals(1, game.opPlayer());
-        move = game.action(1, makeRowCards(null, 1, spades6, spades7));
-        assertEquals(Pineapple.CIRCLE_END, move);
+        state = game.action(1, makeRowCards(null, 1, spades6, spades7));
+        assertEquals(Pineapple.STATE_CIRCLE_END, state);
 
         // 第4圈
         assertEquals(1, game.opPlayer());
-        move = game.action(1, makeRowCards(makeRowCards(null, 0, heart8), 1, heart5));
-        assertEquals(Pineapple.CIRCLE_END, move);
+        state = game.action(1, makeRowCards(makeRowCards(null, 0, heart8), 1, heart5));
+        assertEquals(Pineapple.STATE_CIRCLE_END, state);
 
         // 第5圈
         assertEquals(1, game.opPlayer());
-        move = game.action(1, makeRowCards(null, 0, spadesQ, spadesK));
-        assertEquals(Pineapple.NEXT_OP, move);
+        state = game.action(1, makeRowCards(null, 0, spadesQ, spadesK));
+        assertEquals(Pineapple.STATE_NEXT_OP, state);
 
         assertEquals(0, game.opPlayer());
         assertEquals(Pineapple.FANTASY_CARD_NUM, game.getWaits(0).size());
@@ -434,8 +434,8 @@ class PineappleTest extends AllCard {
         var act = makeRowCards(null, 0, club7, club9, heart10);
         act = makeRowCards(act, 1, diamondA, diamond2, diamond3, diamond4, diamond5);
         act = makeRowCards(act, 2, diamond6, diamond7, diamond8, diamond9, diamond10);
-        move = game.action(0, act);
-        assertEquals(Pineapple.SHOWDOWN, move);
+        state = game.action(0, act);
+        assertEquals(Pineapple.STATE_SHOWDOWN, state);
 
 
         // 庄家不是 fantasy
@@ -466,28 +466,28 @@ class PineappleTest extends AllCard {
         assertEquals(Pineapple.FANTASY_CARD_NUM, game.chooseCardNum(1));
 
         // 第1圈
-        move = game.action(0, makeRowCards(null, 2, diamond6, diamond7, diamond8, diamond9, diamond10));
-        assertEquals(Pineapple.CIRCLE_END, move);
+        state = game.action(0, makeRowCards(null, 2, diamond6, diamond7, diamond8, diamond9, diamond10));
+        assertEquals(Pineapple.STATE_CIRCLE_END, state);
 
         // 第2圈
         assertEquals(0, game.opPlayer());
-        move = game.action(0, makeRowCards(null, 1, diamondA, diamond2));
-        assertEquals(Pineapple.CIRCLE_END, move);
+        state = game.action(0, makeRowCards(null, 1, diamondA, diamond2));
+        assertEquals(Pineapple.STATE_CIRCLE_END, state);
 
         // 第3圈
         assertEquals(0, game.opPlayer());
-        move = game.action(0, makeRowCards(null, 1, diamond3, diamond4));
-        assertEquals(Pineapple.CIRCLE_END, move);
+        state = game.action(0, makeRowCards(null, 1, diamond3, diamond4));
+        assertEquals(Pineapple.STATE_CIRCLE_END, state);
 
         // 第4圈
         assertEquals(0, game.opPlayer());
-        move = game.action(0, makeRowCards(makeRowCards(null, 0, diamondJ), 1, diamond5));
-        assertEquals(Pineapple.CIRCLE_END, move);
+        state = game.action(0, makeRowCards(makeRowCards(null, 0, diamondJ), 1, diamond5));
+        assertEquals(Pineapple.STATE_CIRCLE_END, state);
 
         // 第5圈
         assertEquals(0, game.opPlayer());
-        move = game.action(0, makeRowCards(null, 0, clubJ, spadesJ));
-        assertEquals(Pineapple.NEXT_OP, move);
+        state = game.action(0, makeRowCards(null, 0, clubJ, spadesJ));
+        assertEquals(Pineapple.STATE_NEXT_OP, state);
 
         assertEquals(1, game.opPlayer());
         assertEquals(Pineapple.FANTASY_CARD_NUM, game.getWaits(1).size());
@@ -495,8 +495,8 @@ class PineappleTest extends AllCard {
         act = makeRowCards(null, 0, heart9, heart8, spades5);
         act = makeRowCards(act, 1, spades3, spades4, spades6, spades7, heart5);
         act = makeRowCards(act, 2, heartA, heart2, clubA, spadesA, spades2);
-        move = game.action(1, act);
-        assertEquals(Pineapple.SHOWDOWN, move);
+        state = game.action(1, act);
+        assertEquals(Pineapple.STATE_SHOWDOWN, state);
 
         // 三人
         game = Pineapple.builder()
@@ -527,34 +527,34 @@ class PineappleTest extends AllCard {
         game.start();
 
         // 第1圈
-        move = game.action(0, makeRowCards(null, 2, diamond6, diamond7, diamond8, diamond9, diamond10));
-        assertEquals(Pineapple.NEXT_OP, move);
-        move = game.action(2, makeRowCards(null, 1, heart3, club2, club3, club4, club5));
-        assertEquals(Pineapple.CIRCLE_END, move);
+        state = game.action(0, makeRowCards(null, 2, diamond6, diamond7, diamond8, diamond9, diamond10));
+        assertEquals(Pineapple.STATE_NEXT_OP, state);
+        state = game.action(2, makeRowCards(null, 1, heart3, club2, club3, club4, club5));
+        assertEquals(Pineapple.STATE_CIRCLE_END, state);
 
         // 第2圈
-        move = game.action(0, makeRowCards(null, 1, diamondA, diamond2));
-        assertEquals(Pineapple.NEXT_OP, move);
-        move = game.action(2, makeRowCards(null, 2, spades10, heartJ));
-        assertEquals(Pineapple.CIRCLE_END, move);
+        state = game.action(0, makeRowCards(null, 1, diamondA, diamond2));
+        assertEquals(Pineapple.STATE_NEXT_OP, state);
+        state = game.action(2, makeRowCards(null, 2, spades10, heartJ));
+        assertEquals(Pineapple.STATE_CIRCLE_END, state);
 
         // 第3圈
-        move = game.action(0, makeRowCards(null, 1, diamond3, diamond4));
-        assertEquals(Pineapple.NEXT_OP, move);
-        move = game.action(2, makeRowCards(null, 2, spades9, heartK));
-        assertEquals(Pineapple.CIRCLE_END, move);
+        state = game.action(0, makeRowCards(null, 1, diamond3, diamond4));
+        assertEquals(Pineapple.STATE_NEXT_OP, state);
+        state = game.action(2, makeRowCards(null, 2, spades9, heartK));
+        assertEquals(Pineapple.STATE_CIRCLE_END, state);
 
         // 第4圈
-        move = game.action(0, makeRowCards(makeRowCards(null, 0, diamondJ), 1, diamond5));
-        assertEquals(Pineapple.NEXT_OP, move);
-        move = game.action(2, makeRowCards(makeRowCards(null, 0, heart7), 2, diamondQ));
-        assertEquals(Pineapple.CIRCLE_END, move);
+        state = game.action(0, makeRowCards(makeRowCards(null, 0, diamondJ), 1, diamond5));
+        assertEquals(Pineapple.STATE_NEXT_OP, state);
+        state = game.action(2, makeRowCards(makeRowCards(null, 0, heart7), 2, diamondQ));
+        assertEquals(Pineapple.STATE_CIRCLE_END, state);
 
         // 第5圈
-        move = game.action(0, makeRowCards(null, 0, clubJ, spadesJ));
-        assertEquals(Pineapple.NEXT_OP, move);
-        move = game.action(2, makeRowCards(null, 0, club10, clubQ));
-        assertEquals(Pineapple.NEXT_OP, move);
+        state = game.action(0, makeRowCards(null, 0, clubJ, spadesJ));
+        assertEquals(Pineapple.STATE_NEXT_OP, state);
+        state = game.action(2, makeRowCards(null, 0, club10, clubQ));
+        assertEquals(Pineapple.STATE_NEXT_OP, state);
 
         assertEquals(1, game.opPlayer());
         assertEquals(Pineapple.FANTASY_CARD_NUM, game.getWaits(1).size());
@@ -562,8 +562,8 @@ class PineappleTest extends AllCard {
         act = makeRowCards(null, 0, heart9, heart8, spades5);
         act = makeRowCards(act, 1, spades3, spades4, spades6, spades7, heart5);
         act = makeRowCards(act, 2, heartA, heart2, clubA, spadesA, spades2);
-        move = game.action(1, act);
-        assertEquals(Pineapple.SHOWDOWN, move);
+        state = game.action(1, act);
+        assertEquals(Pineapple.STATE_SHOWDOWN, state);
 
         // 两人范特西
         game = Pineapple.builder()
@@ -599,13 +599,13 @@ class PineappleTest extends AllCard {
         act = makeRowCards(null, 0, heart9, heart8, spades5);
         act = makeRowCards(act, 1, spades3, spades4, spades6, spades7, heart5);
         act = makeRowCards(act, 2, heartA, heart2, clubA, spadesA, spades2);
-        move = game.action(1, act);
-        assertEquals(Pineapple.NEXT_OP, move);
+        state = game.action(1, act);
+        assertEquals(Pineapple.STATE_NEXT_OP, state);
 
         act = makeRowCards(null, 0, club7, club9, heart10);
         act = makeRowCards(act, 1, diamondA, diamond2, diamond3, diamond4, diamond5);
         act = makeRowCards(act, 2, diamond6, diamond7, diamond8, diamond9, diamond10);
-        move = game.action(0, act);
-        assertEquals(Pineapple.SHOWDOWN, move);
+        state = game.action(0, act);
+        assertEquals(Pineapple.STATE_SHOWDOWN, state);
     }
 }

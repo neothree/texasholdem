@@ -18,13 +18,13 @@ public class Pineapple {
 
     public static final int SUM_CARD_NUM = 17;
 
-    public static final String NEXT_OP = "NEXT_OP";
+    public static final String STATE_NEXT_OP = "STATE_NEXT_OP";
 
-    public static final String CIRCLE_END = "CIRCLE_END";
+    public static final String STATE_CIRCLE_END = "STATE_CIRCLE_END";
 
-    public static final String SHOWDOWN = "SHOWDOWN";
+    public static final String STATE_SHOWDOWN = "STATE_SHOWDOWN";
 
-    public static final String CONTINUE = "CONTINUE";
+    public static final String STATE_CONTINUE = "STATE_CONTINUE";
 
     public static class Builder {
         private int playerNum = 2;
@@ -152,7 +152,7 @@ public class Pineapple {
                     .forEach(v -> v.deal(num));
         }
         this.ring = this.ring.move(v -> v.getId().equals(dealer));
-        return this.turn(null);
+        return this.transit(null);
     }
 
     void circleEnd() {
@@ -171,43 +171,43 @@ public class Pineapple {
         var plate = this.getPlateById(id);
         plate.put(rows, con, this.fantasy.contains(id), this.chooseCardNum());
 
-        return this.turn(id);
+        return this.transit(id);
     }
 
-    private String turn(Integer id) {
+    private String transit(Integer id) {
         // 提前摆牌记录
         if (id != null && !id.equals(this.opPlayer())) {
             this.continue1.add(id);
             return null;
         }
 
-        String move = null;
+        String state = null;
         var leftNum = this.playerNum() - this.finishTurnNum();
         // 如果剩余人数到了范特西，那肯定就是一圈结束(leftNum == 0)或者是范特西摆牌
         if (leftNum <= this.fantasy.size()) {
             if (this.playerNum() == this.fantasy.size() || this.circle == 5) {
                 if (leftNum > 0) {
                     this.nextOp(true);
-                    move = NEXT_OP;
+                    state = STATE_NEXT_OP;
                 } else {
                     this.showdown();
-                    move = SHOWDOWN;
+                    state = STATE_SHOWDOWN;
                 }
             } else {
                 this.circleEnd();
                 this.circleStart();
-                move = CIRCLE_END;
+                state = STATE_CIRCLE_END;
             }
         } else {
             this.nextOp(false);
-            move = NEXT_OP;
+            state = STATE_NEXT_OP;
         }
 
         // 触发提前摆牌
         if (this.continue1.contains(this.opPlayer())) {
-            move = CONTINUE;
+            state = STATE_CONTINUE;
         }
-        return move;
+        return state;
     }
 
     void nextOp(boolean fantasy) {
@@ -238,7 +238,7 @@ public class Pineapple {
         }
         this.getPlateById(id).doContinue();
         this.continue1.remove(id);
-        return this.turn(id);
+        return this.transit(id);
     }
 
     void showdown() {

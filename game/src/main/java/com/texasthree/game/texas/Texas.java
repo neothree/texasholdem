@@ -13,11 +13,11 @@ public class Texas {
     /**
      * 轮到下一个操作位
      */
-    public static final String NEXT_OP = "NEXT_OP";
+    public static final String STATE_NEXT_OP = "STATE_NEXT_OP";
 
-    public static final String CIRCLE_END = "CIRCLE_END";
+    public static final String STATE_CIRCLE_END = "STATE_CIRCLE_END";
 
-    public static final String SHOWDOWN = "SHOWDOWN";
+    public static final String STATE_SHOWDOWN = "STATE_SHOWDOWN";
     /**
      * 是否结束
      */
@@ -234,7 +234,7 @@ public class Texas {
         }
 
         // 轮转
-        var move = this.turn();
+        var move = this.transit();
 
         // 强制盲注
         if (this.straddleEnable()) {
@@ -282,10 +282,10 @@ public class Texas {
         this.pot.action(this.opPlayer(), action, true);
 
         // 轮转
-        var move = this.turn();
+        var move = this.transit();
 
         // 如果下一位玩家离开则自动弃牌
-        if (Texas.NEXT_OP.equals(move) && this.opPlayer().isLeave()) {
+        if (Texas.STATE_NEXT_OP.equals(move) && this.opPlayer().isLeave()) {
             move = this.action(Action.fold());
         }
 
@@ -293,37 +293,49 @@ public class Texas {
     }
 
     /**
-     * 操作位轮转
+     * 状态转移
      */
-    private String turn() throws Exception {
-        var move = Texas.NEXT_OP;
-        var leftNum = this.playerNum - this.pot.allinAndFoldNum();
+    private String transit() throws Exception {
+        String state;
+        var waitActionNum = this.waitActionNum();
         var opNext = this.nextOpPlayer(this.opPlayer().getId());
         var standard = this.pot.getStandard();
-        if ((this.playerNum - this.leaveOrFoldNum() == 1)
-                || (leftNum == 1 && standard == this.pot.chipsThisCircle(opNext.getId()))
-                || leftNum == 0) {
-            move = Texas.SHOWDOWN;
-        } else if (opNext != null && opNext.getId() == this.pot.getStandardId()) {
-            if (Circle.RIVER.equals(this.pot.circle()) || leftNum <= 1) {
-                move = Texas.SHOWDOWN;
+        if ((this.remainingNum() == 1)
+                // 只能下opNext，并且 opNext 已经到达了 standard
+                || (waitActionNum == 1 && standard == this.pot.chipsThisCircle(opNext.getId()))
+                // 没有可押注玩家
+                || waitActionNum == 0) {
+            state = Texas.STATE_SHOWDOWN;
+        } else if (opNext.getId() == this.pot.getStandardId()) {
+            /********************************************/
+            /**  进入这里，说明下一个操作人轮到了最高押注位  **/
+            /********************************************/
+            if (Circle.RIVER.equals(this.pot.circle())) {
+                // 已经是最后一圈，摊牌
+                state = Texas.STATE_SHOWDOWN;
             } else if (this.isPreflopOnceAction(standard, opNext)) {
+                // 在PREFLOP 多一次押注权限
                 var player = this.nextOpPlayer(opNext.getId());
                 this.pot.setStandardInfo(player.getId());
+                state = Texas.STATE_NEXT_OP;
             } else {
-                move = Texas.CIRCLE_END;
+                // 这一圈结束
+                state = Texas.STATE_CIRCLE_END;
             }
+        } else {
+            // 下一个操作位进行押注
+            state = Texas.STATE_NEXT_OP;
         }
 
-        if (Texas.NEXT_OP.equals(move)) {
+        if (Texas.STATE_NEXT_OP.equals(state)) {
             this.nextOp();
-        } else if (Texas.CIRCLE_END.equals(move)) {
+        } else if (Texas.STATE_CIRCLE_END.equals(state)) {
             this.circleEnd();
             this.circleStart();
         } else {
             this.showdown();
         }
-        return move;
+        return state;
     }
 
     private void circleStart() throws Exception {
@@ -342,6 +354,37 @@ public class Texas {
         // 从庄家下一位开始
         Player op = this.nextOpPlayer(this.dealer().getId());
         ring = this.ring.move(v -> v == op);
+    }
+
+    /**
+     * 玩家离开
+     */
+    String leave(Integer id) throws Exception {
+        var player = this.getPlayerById(id);
+        if (player == null) {
+            throw new IllegalArgumentException(id + " 不存在");
+        }
+        if (player.isLeave()) {
+            return null;
+        }
+
+        player.leave();
+
+        if (this.isOver) {
+            return null;
+        }
+
+        // 如果是正在押注玩家直接弃牌
+        if (this.opPlayer().equals(player)) {
+            return this.action(Action.fold());
+        }
+
+        // 只剩下一个人，结束
+        // TODO 不应该在这里判断，应该放到turn中，只有turn才行判断和决定状态转移
+        if (this.remainingNum() == 1) {
+            return this.transit();
+        }
+        return null;
     }
 
     /**
@@ -581,14 +624,12 @@ public class Texas {
      * 找到紧挨 id 的下一个没有allin 和 fold 的座位
      */
     private Player nextOpPlayer(int id) {
-        if (this.playerNum == this.pot.allinAndFoldNum()) {
+        if (this.waitActionNum() == 0) {
             return null;
         }
 
-        var r = this.ring;
-        while (r.getPrev().value.getId() != id) {
-            r = r.getNext();
-        }
+        var r = this.ring.move(v -> v.getId() == id).getNext();
+
         var standardId = this.pot.getStandardId();
         while ((this.pot.isFold(r.value) || this.pot.isAllin(r.value))
                 && (standardId == null || r.value.getId() != standardId)) {
@@ -608,41 +649,24 @@ public class Texas {
         this.ring = this.ring.move(v -> !this.pot.isAllin(v) && !this.pot.isFold(v));
     }
 
-    private int leaveOrFoldNum() {
-        return (int) this.ring.toList()
+    /**
+     * 剩余玩家数量
+     * 即 还没有离开牌局或弃牌的玩家数量
+     */
+    private int remainingNum() {
+        var leaveOrFoldNum = (int) this.ring.toList()
                 .stream()
                 .filter(v -> v.isLeave() || this.pot.isFold(v.getId()))
                 .count();
+        return this.playerNum - leaveOrFoldNum;
     }
 
     /**
-     * 玩家离开
+     * 等待押注的玩家数量
+     * 即 没有fold 或 allin 的玩家，有可能在接下来进行押注的玩家
      */
-    String leave(Integer id) throws Exception {
-        var player = this.getPlayerById(id);
-        if (player == null) {
-            throw new IllegalArgumentException(id + " 不存在");
-        }
-        if (player.isLeave()) {
-            return null;
-        }
-
-        player.leave();
-
-        if (this.isOver) {
-            return null;
-        }
-
-        // 如果是正在押注玩家直接弃牌
-        if (this.opPlayer().equals(player)) {
-            return this.action(Action.fold());
-        }
-
-        if (this.playerNum - this.leaveOrFoldNum() == 1) {
-            this.showdown();
-            return Texas.SHOWDOWN;
-        }
-        return null;
+    private int waitActionNum() {
+        return this.playerNum - this.pot.allinAndFoldNum();
     }
 
     Player opPlayer() {
@@ -682,7 +706,7 @@ public class Texas {
     }
 
     boolean isCompareShowdown() {
-        return this.isOver && this.playerNum - this.leaveOrFoldNum() > 1;
+        return this.isOver && this.remainingNum() > 1;
     }
 
     int sumPot() {
