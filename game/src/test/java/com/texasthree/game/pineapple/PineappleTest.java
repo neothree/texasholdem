@@ -608,4 +608,195 @@ class PineappleTest extends AllCard {
         state = game.action(0, act);
         assertEquals(Pineapple.STATE_SHOWDOWN, state);
     }
+
+    @Test
+    public void testGetMemo() throws Exception {
+        var game = this.builder(3)
+                .concurrent()
+                .dealer(0)
+                .build();
+
+        game.start();
+
+        assertEquals(47, game.getMemo(0).size());
+        assertEquals(47, game.getMemo(1).size());
+        assertEquals(47, game.getMemo(2).size());
+
+        // 玩家1操作位，玩家0押注，玩家1，2看不到
+        assertEquals(1, game.opPlayer());
+        var state = game.action(0, makeRowCards(null, 2, diamond6, diamond7, diamond8, diamond9, diamond10));
+        assertNull(state);
+        assertEquals(47, game.getMemo(0).size());
+        assertEquals(47, game.getMemo(1).size());
+        assertEquals(47, game.getMemo(2).size());
+
+        // 玩家1操作位，玩家1押注，玩家0，2看到
+        assertEquals(1, game.opPlayer());
+        state = game.action(1, makeRowCards(null, 2, heartA, heart2, clubA, spadesA, spades2));
+        assertEquals(Pineapple.STATE_NEXT_OP, state);
+        assertEquals(42, game.getMemo(0).size());
+        assertEquals(47, game.getMemo(1).size());
+        assertEquals(42, game.getMemo(2).size());
+
+        // 玩家2押注，玩家1, 0看到，
+        assertEquals(2, game.opPlayer());
+        state = game.action(2, makeRowCards(null, 1, heart3, club2, club3, club4, club5));
+        assertEquals(Pineapple.STATE_CONTINUE, state);
+        assertEquals(37, game.getMemo(0).size());
+        assertEquals(42, game.getMemo(1).size());
+        assertEquals(42, game.getMemo(2).size());
+
+        // continue
+        state = game.doContinue();
+        assertEquals(Pineapple.STATE_CIRCLE_END, state);
+        assertEquals(34, game.getMemo(0).size());
+        assertEquals(34, game.getMemo(1).size());
+        assertEquals(34, game.getMemo(2).size());
+
+        // 第2圈
+        // 玩家1权限, 玩家0押注，玩家1, 2看不到
+        assertEquals(1, game.opPlayer());
+        state = game.action(0, makeRowCards(null, 1, diamondA, diamond2));
+        assertNull(state);
+        assertEquals(34, game.getMemo(0).size());
+        assertEquals(34, game.getMemo(1).size());
+        assertEquals(34, game.getMemo(2).size());
+
+        // 玩家1权限 玩家1押注，玩家0, 2看到
+        assertEquals(1, game.opPlayer());
+        state = game.action(1, makeRowCards(null, 1, spades3, spades4));
+        assertEquals(Pineapple.STATE_NEXT_OP, state);
+        assertEquals(32, game.getMemo(0).size());
+        assertEquals(34, game.getMemo(1).size());
+        assertEquals(32, game.getMemo(2).size());
+
+        // 玩家2权限 玩家2押注，玩家1, 0看到，
+        assertEquals(2, game.opPlayer());
+        state = game.action(2, makeRowCards(null, 2, spades10, heartJ));
+        assertEquals(Pineapple.STATE_CONTINUE, state);
+        assertEquals(30, game.getMemo(0).size());
+        assertEquals(32, game.getMemo(1).size());
+        assertEquals(32, game.getMemo(2).size());
+
+        // Continue
+        state = game.doContinue();
+        assertEquals(Pineapple.STATE_CIRCLE_END, state);
+        assertEquals(27, game.getMemo(0).size());
+        assertEquals(27, game.getMemo(1).size());
+        assertEquals(27, game.getMemo(2).size());
+
+        // 第3圈
+        // 玩家1权限 玩家0押注，玩家1, 2看不到
+        assertEquals(1, game.opPlayer());
+        state = game.action(0, makeRowCards(null, 1, diamond3, diamond4));
+        assertNull(state);
+        assertEquals(27, game.getMemo(0).size());
+        assertEquals(27, game.getMemo(1).size());
+        assertEquals(27, game.getMemo(2).size());
+
+        // 玩家1权限, 玩家2押注，玩家1, 0看不到
+        assertEquals(1, game.opPlayer());
+        state = game.action(2, makeRowCards(null, 2, spades9, heartK));
+        assertNull(state);
+        assertEquals(27, game.getMemo(0).size());
+        assertEquals(27, game.getMemo(1).size());
+        assertEquals(27, game.getMemo(2).size());
+
+        // 玩家1权限, 玩家1押注，玩家0, 2看到
+        assertEquals(1, game.opPlayer());
+        state = game.action(1, makeRowCards(null, 1, spades6, spades7));
+        assertEquals(Pineapple.STATE_CONTINUE, state);
+        assertEquals(25, game.getMemo(0).size());
+        assertEquals(27, game.getMemo(1).size());
+        assertEquals(25, game.getMemo(2).size());
+
+        // Continue
+        state = game.doContinue();
+        assertEquals(Pineapple.STATE_CONTINUE, state);
+        assertEquals(23, game.getMemo(0).size());
+        assertEquals(25, game.getMemo(1).size());
+        assertEquals(25, game.getMemo(2).size());
+
+        state = game.doContinue();
+        assertEquals(Pineapple.STATE_CIRCLE_END, state);
+        assertEquals(20, game.getMemo(0).size());
+        assertEquals(20, game.getMemo(1).size());
+        assertEquals(20, game.getMemo(2).size());
+
+
+        game = this.builder(2)
+                .concurrent()
+                .dealer(0)
+                .build();
+
+        game.start();
+
+        assertEquals(47, game.getMemo(0).size());
+        assertEquals(47, game.getMemo(1).size());
+
+        // 玩家1操作位，玩家0押注，玩家1
+        assertEquals(1, game.opPlayer());
+        state = game.action(0, makeRowCards(null, 2, diamond6, diamond7, diamond8, diamond9, diamond10));
+        assertNull(state);
+        assertEquals(47, game.getMemo(0).size());
+        assertEquals(47, game.getMemo(1).size());
+
+        // 玩家1操作位，玩家1押注，玩家0看到
+        assertEquals(1, game.opPlayer());
+        state = game.action(1, makeRowCards(null, 2, heartA, heart2, clubA, spadesA, spades2));
+        assertEquals(Pineapple.STATE_CONTINUE, state);
+        assertEquals(42, game.getMemo(0).size());
+        assertEquals(47, game.getMemo(1).size());
+
+        // Continue
+        state = game.doContinue();
+        assertEquals(Pineapple.STATE_CIRCLE_END, state);
+        assertEquals(39, game.getMemo(0).size());
+        assertEquals(39, game.getMemo(1).size());
+
+        // -- 第2圈
+        // 玩家1权限, 玩家0押注，玩家1看不到
+        assertEquals(1, game.opPlayer());
+        state = game.action(0, makeRowCards(null, 1, diamondA, diamond2));
+        assertNull(state);
+        assertEquals(39, game.getMemo(0).size());
+        assertEquals(39, game.getMemo(1).size());
+        //
+        // 玩家1权限, 玩家1押注，玩家0)看到
+        assertEquals(1, game.opPlayer());
+        state = game.action(1, makeRowCards(null, 1, spades3, spades4));
+        assertEquals(Pineapple.STATE_CONTINUE, state);
+    }
+
+    @Test
+    public void testAction() throws Exception {
+
+    }
+
+    Pineapple.Builder builder(int num) {
+        var ret = Pineapple.builder()
+                .playerNum(num)
+                .playerCards(0,
+                        diamond6, diamond7, diamond8, diamond9, diamond10,
+                        diamondA, diamond2, club7,
+                        diamond3, diamond4, club9,
+                        diamond5, heart10, diamondJ,
+                        clubJ, spadesJ, diamondK)
+                .playerCards(1,
+                        heartA, heart2, clubA, spadesA, spades2,
+                        spades3, spades4, spades5,
+                        spades6, spades7, heart4,
+                        heart5, heart8, heart9,
+                        spadesK, spadesQ, heart6);
+        if (num == 3) {
+
+            ret.playerCards(2,
+                    heart3, club2, club3, club4, club5,
+                    spades10, heartJ, heartQ,
+                    spades9, spades8, heartK,
+                    heart7, diamondQ, club6,
+                    club8, club10, clubQ);
+        }
+        return ret;
+    }
 }

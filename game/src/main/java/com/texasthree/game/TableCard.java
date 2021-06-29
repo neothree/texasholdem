@@ -42,7 +42,10 @@ public class TableCard {
             var mapper = new ObjectMapper();
             var cards = mapper.readTree(sb.toString());
             for (var v : cards) {
-                all.add(new Card(v.get("name").asText(), v.get("point").asInt(), v.get("suit").asInt()));
+                var card = new Card(v.get("name").asText(), v.get("point").asInt(), v.get("suit").asInt());
+                if (card.suit <= 4) {
+                    all.add(card);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -51,9 +54,7 @@ public class TableCard {
     }
 
     public List<Card> shuffle() {
-        List<Card> pair = new ArrayList<Card>();
-        pair.addAll(all);
-
+        var pair = new ArrayList<>(all);
         for (int i = 0; i < 3; i++) {
             Collections.shuffle(pair);
         }
@@ -61,12 +62,11 @@ public class TableCard {
     }
 
     public Card getCardById(int id) {
-        for (Card v : all) {
-            if (v.getId() == id) {
-                return v;
-            }
-        }
-        return null;
+        return this.all.stream().filter(v -> v.getId() == id).findFirst().orElseThrow();
+    }
+
+    public List<Card> getAll() {
+        return new ArrayList<>(all);
     }
 
 }

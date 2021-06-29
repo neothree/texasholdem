@@ -352,4 +352,28 @@ public class Pineapple {
     Set<Integer> getFantasy() {
         return this.fantasy;
     }
+
+    /**
+     * 备忘录
+     * <p>
+     * 已经看到的牌
+     */
+    List<Card> getMemo(Integer id) {
+        var see = new ArrayList<Card>();
+        for (var plate : this.ring.toList()) {
+            if (plate.getId().equals(id)) {
+                see.addAll(plate.getFolds());
+                see.addAll(plate.getWaits());
+                see.addAll(plate.getLayout().stream().map(v -> v.card).collect(Collectors.toList()));
+            } else {
+                see.addAll(plate.getLayout().stream()
+                        .filter(v -> !v.concurrent)
+                        .map(v -> v.card)
+                        .collect(Collectors.toList()));
+            }
+        }
+
+        var all = TableCard.getInstance().getAll();
+        return Card.removeList(all, see);
+    }
 }

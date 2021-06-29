@@ -1,5 +1,9 @@
 package com.texasthree.game.texas;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class Card implements Comparable<Card> {
     /**
      * 黑桃
@@ -76,5 +80,11 @@ public class Card implements Comparable<Card> {
     @Override
     public int hashCode() {
         return point * 10 + suit;
+    }
+
+
+    public static List<Card> removeList(List<Card> src, List<Card> others) {
+        var set = new HashSet<>(others);
+        return src.stream().filter(v -> !set.contains(v)).collect(Collectors.toList());
     }
 }
