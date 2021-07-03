@@ -52,11 +52,11 @@ public class Plate {
     /**
      * 摆牌
      */
-    void put(List<RowCard> rows, boolean con, boolean all, int chooseNum) {
+    void put(List<RowCard> rows, boolean before, boolean all, int chooseNum) {
         check(rows, all, chooseNum);
 
         this.layout.addAll(rows.stream()
-                .map(v -> new RowCard(v.card, v.row, con))
+                .map(v -> new RowCard(v.card, v.row, before))
                 .collect(Collectors.toList()));
         this.layout.sort((a, b) -> a.card.compareToWithSuit(b.card));
 
@@ -96,8 +96,8 @@ public class Plate {
         }
     }
 
-    void doContinue() {
-        this.layout.forEach(v -> v.concurrent = false);
+    void open() {
+        this.layout.forEach(v -> v.beforehand = false);
     }
 
     List<Card> getRowCards(int row) {
@@ -112,7 +112,7 @@ public class Plate {
     }
 
     int notConcurrentNum() {
-        return (int) layout.stream().filter(v -> !v.concurrent).count();
+        return (int) layout.stream().filter(v -> !v.beforehand).count();
     }
 
     public Integer getId() {

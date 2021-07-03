@@ -24,7 +24,7 @@ public class Pineapple {
 
     public static final String STATE_SHOWDOWN = "STATE_SHOWDOWN";
 
-    public static final String STATE_CONTINUE = "STATE_CONTINUE";
+    public static final String STATE_OPEN = "STATE_OPEN";
 
     public static class Builder {
         private int playerNum = 2;
@@ -49,8 +49,8 @@ public class Pineapple {
             return this;
         }
 
-        public Builder concurrent() {
-            regulations.put(Regulation.Concurrent, 1);
+        public Builder beforehand() {
+            regulations.put(Regulation.Beforehand, 1);
             return this;
         }
 
@@ -122,7 +122,7 @@ public class Pineapple {
 
     private Set<Integer> fantasy;
 
-    private Set<Integer> continue1 = new HashSet<>();
+    private Set<Integer> beforehand = new HashSet<>();
 
     private Pineapple(Ring<Plate> ring,
                       Map<Regulation, Integer> regulations,
@@ -145,14 +145,14 @@ public class Pineapple {
         this.circle++;
 
         // 同时发牌
-        if (this.concurrent()) {
+        if (this.beforehand()) {
             var num = this.giveCardNum();
             this.ring.toList().stream()
                     .filter(v -> !fantasy.contains(v.getId()))
                     .forEach(v -> v.deal(num));
         }
         this.ring = this.ring.move(v -> v.getId().equals(dealer));
-        return this.transit(null);
+        return this.transit();
     }
 
     void circleEnd() {
@@ -162,25 +162,35 @@ public class Pineapple {
         if (this.isOver
                 || rows == null
                 || this.getPlayerById(id) == null
-                || (!id.equals(this.opPlayer()) && !this.concurrent())) {
+                || (!id.equals(this.opPlayer()) && !this.beforehand())) {
             throw new IllegalArgumentException();
         }
 
         // 记录
-        var con = !this.opPlayer().equals(id);
+        var before = !this.opPlayer().equals(id);
         var plate = this.getPlateById(id);
-        plate.put(rows, con, this.fantasy.contains(id), this.chooseCardNum());
+        plate.put(rows, before, this.fantasy.contains(id), this.chooseCardNum());
 
-        return this.transit(id);
-    }
-
-    private String transit(Integer id) {
         // 提前摆牌记录
-        if (id != null && !id.equals(this.opPlayer())) {
-            this.continue1.add(id);
+        if (before) {
+            this.beforehand.add(id);
             return null;
         }
 
+        return this.transit();
+    }
+
+    String action() {
+        var id = this.opPlayer();
+        if (!this.beforehand.contains(id)) {
+            throw new IllegalStateException();
+        }
+        this.getPlateById(id).open();
+        this.beforehand.remove(id);
+        return this.transit();
+    }
+
+    private String transit() {
         String state = null;
         var leftNum = this.playerNum() - this.finishTurnNum();
         // 如果剩余人数到了范特西，那肯定就是一圈结束(leftNum == 0)或者是范特西摆牌
@@ -204,8 +214,8 @@ public class Pineapple {
         }
 
         // 触发提前摆牌
-        if (this.continue1.contains(this.opPlayer())) {
-            state = STATE_CONTINUE;
+        if (this.beforehand.contains(this.opPlayer())) {
+            state = STATE_OPEN;
         }
         return state;
     }
@@ -220,7 +230,7 @@ public class Pineapple {
             }
 
             // 发牌
-            if (!this.concurrent()) {
+            if (!this.beforehand()) {
                 var plate = this.getPlateById(this.opPlayer());
                 plate.deal(this.giveCardNum());
             }
@@ -229,16 +239,6 @@ public class Pineapple {
 
         this.ring = ring.move(v -> this.fantasy.contains(v.getId()));
         this.ring.value.deal(FANTASY_CARD_NUM);
-    }
-
-    String doContinue() {
-        var id = this.opPlayer();
-        if (!this.continue1.contains(id)) {
-            throw new IllegalStateException();
-        }
-        this.getPlateById(id).doContinue();
-        this.continue1.remove(id);
-        return this.transit(id);
     }
 
     void showdown() {
@@ -301,8 +301,8 @@ public class Pineapple {
                 .count();
     }
 
-    boolean concurrent() {
-        return this.regulations.containsKey(Regulation.Concurrent);
+    boolean beforehand() {
+        return this.regulations.containsKey(Regulation.Beforehand);
     }
 
     List<Card> getRowCards(int id, int channel) {
@@ -367,7 +367,7 @@ public class Pineapple {
                 see.addAll(plate.getLayout().stream().map(v -> v.card).collect(Collectors.toList()));
             } else {
                 see.addAll(plate.getLayout().stream()
-                        .filter(v -> !v.concurrent)
+                        .filter(v -> !v.beforehand)
                         .map(v -> v.card)
                         .collect(Collectors.toList()));
             }

@@ -89,11 +89,11 @@ class PineappleTest extends AllCard {
     }
 
     @Test
-    public void testConcurrent() throws Exception {
+    public void testOpen() throws Exception {
         var game = Pineapple.builder()
                 .playerNum(3)
                 .dealer(0)
-                .concurrent()
+                .beforehand()
                 .playerCards(0,
                         diamond6, diamond7, diamond8, diamond9, diamond10,
                         diamondA, diamond2, club7,
@@ -137,15 +137,15 @@ class PineappleTest extends AllCard {
         equalsCards(game.getWaits(1), heartA, heart2, clubA, spadesA, spades2);
         equalsCards(game.getWaits(2));
         state = game.action(1, makeRowCards(RowCard.ROW_TAIL, heartA, heart2, clubA, spadesA, spades2));
-        assertEquals(Pineapple.STATE_CONTINUE, state);
+        assertEquals(Pineapple.STATE_OPEN, state);
 
-        // STATE_CONTINUE
+        // STATE_OPEN
         equalsCards(game.getWaits(0));
         equalsCards(game.getWaits(1));
         equalsCards(game.getWaits(2));
-        state = game.doContinue();
-        assertEquals(Pineapple.STATE_CONTINUE, state);
-        state = game.doContinue();
+        state = game.action();
+        assertEquals(Pineapple.STATE_OPEN, state);
+        state = game.action();
         assertEquals(Pineapple.STATE_CIRCLE_END, state);
 
         equalsCards(game.getWaits(0), diamondA, diamond2, club7);
@@ -615,7 +615,7 @@ class PineappleTest extends AllCard {
     @Test
     public void testGetMemo() throws Exception {
         var game = this.builder(3)
-                .concurrent()
+                .beforehand()
                 .dealer(0)
                 .build();
 
@@ -644,13 +644,13 @@ class PineappleTest extends AllCard {
         // 玩家2押注，玩家1, 0看到，
         assertEquals(2, game.opPlayer());
         state = game.action(2, makeRowCards(RowCard.ROW_MIDDLE, heart3, club2, club3, club4, club5));
-        assertEquals(Pineapple.STATE_CONTINUE, state);
+        assertEquals(Pineapple.STATE_OPEN, state);
         assertEquals(37, game.getMemo(0).size());
         assertEquals(42, game.getMemo(1).size());
         assertEquals(42, game.getMemo(2).size());
 
         // continue
-        state = game.doContinue();
+        state = game.action();
         assertEquals(Pineapple.STATE_CIRCLE_END, state);
         assertEquals(34, game.getMemo(0).size());
         assertEquals(34, game.getMemo(1).size());
@@ -676,13 +676,13 @@ class PineappleTest extends AllCard {
         // 玩家2权限 玩家2押注，玩家1, 0看到，
         assertEquals(2, game.opPlayer());
         state = game.action(2, makeRowCards(RowCard.ROW_TAIL, spades10, heartJ));
-        assertEquals(Pineapple.STATE_CONTINUE, state);
+        assertEquals(Pineapple.STATE_OPEN, state);
         assertEquals(30, game.getMemo(0).size());
         assertEquals(32, game.getMemo(1).size());
         assertEquals(32, game.getMemo(2).size());
 
         // Continue
-        state = game.doContinue();
+        state = game.action();
         assertEquals(Pineapple.STATE_CIRCLE_END, state);
         assertEquals(27, game.getMemo(0).size());
         assertEquals(27, game.getMemo(1).size());
@@ -708,19 +708,19 @@ class PineappleTest extends AllCard {
         // 玩家1权限, 玩家1押注，玩家0, 2看到
         assertEquals(1, game.opPlayer());
         state = game.action(1, makeRowCards(RowCard.ROW_MIDDLE, spades6, spades7));
-        assertEquals(Pineapple.STATE_CONTINUE, state);
+        assertEquals(Pineapple.STATE_OPEN, state);
         assertEquals(25, game.getMemo(0).size());
         assertEquals(27, game.getMemo(1).size());
         assertEquals(25, game.getMemo(2).size());
 
         // Continue
-        state = game.doContinue();
-        assertEquals(Pineapple.STATE_CONTINUE, state);
+        state = game.action();
+        assertEquals(Pineapple.STATE_OPEN, state);
         assertEquals(23, game.getMemo(0).size());
         assertEquals(25, game.getMemo(1).size());
         assertEquals(25, game.getMemo(2).size());
 
-        state = game.doContinue();
+        state = game.action();
         assertEquals(Pineapple.STATE_CIRCLE_END, state);
         assertEquals(20, game.getMemo(0).size());
         assertEquals(20, game.getMemo(1).size());
@@ -728,7 +728,7 @@ class PineappleTest extends AllCard {
 
 
         game = this.builder(2)
-                .concurrent()
+                .beforehand()
                 .dealer(0)
                 .build();
 
@@ -747,12 +747,12 @@ class PineappleTest extends AllCard {
         // 玩家1操作位，玩家1押注，玩家0看到
         assertEquals(1, game.opPlayer());
         state = game.action(1, makeRowCards(RowCard.ROW_TAIL, heartA, heart2, clubA, spadesA, spades2));
-        assertEquals(Pineapple.STATE_CONTINUE, state);
+        assertEquals(Pineapple.STATE_OPEN, state);
         assertEquals(42, game.getMemo(0).size());
         assertEquals(47, game.getMemo(1).size());
 
         // Continue
-        state = game.doContinue();
+        state = game.action();
         assertEquals(Pineapple.STATE_CIRCLE_END, state);
         assertEquals(39, game.getMemo(0).size());
         assertEquals(39, game.getMemo(1).size());
@@ -768,7 +768,7 @@ class PineappleTest extends AllCard {
         // 玩家1权限, 玩家1押注，玩家0)看到
         assertEquals(1, game.opPlayer());
         state = game.action(1, makeRowCards(RowCard.ROW_MIDDLE, spades3, spades4));
-        assertEquals(Pineapple.STATE_CONTINUE, state);
+        assertEquals(Pineapple.STATE_OPEN, state);
     }
 
     @Test

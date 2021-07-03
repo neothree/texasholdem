@@ -28,11 +28,11 @@ public class RowCard {
 
     public int row;
     /**
-     * 同时发牌
+     * 预先发牌
      */
-    public boolean concurrent;
+    public boolean beforehand;
 
-    RowCard(Card card, int row, boolean concurrent) {
+    RowCard(Card card, int row, boolean beforehand) {
         if (row != ROW_HEAD && row != ROW_MIDDLE && row != ROW_TAIL) {
             throw new IllegalArgumentException();
         }
@@ -41,7 +41,7 @@ public class RowCard {
         }
         this.card = card;
         this.row = row;
-        this.concurrent = concurrent;
+        this.beforehand = beforehand;
     }
 
 
@@ -51,7 +51,7 @@ public class RowCard {
                 .append("[")
                 .append("card=").append(card)
                 .append("row=").append(row)
-                .append("concurrent=").append(concurrent)
+                .append("beforehand=").append(beforehand)
                 .toString();
     }
 

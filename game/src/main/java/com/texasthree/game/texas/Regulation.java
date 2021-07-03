@@ -7,9 +7,9 @@ package com.texasthree.game.texas;
  */
 public enum Regulation {
     /**
-     * 同时发牌
+     * 提前发牌
      */
-    Concurrent,
+    Beforehand,
     /**
      * 小盲
      */
