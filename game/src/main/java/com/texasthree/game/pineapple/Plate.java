@@ -3,17 +3,19 @@ package com.texasthree.game.pineapple;
 import com.texasthree.game.texas.Card;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * 摆盘
+ * 操作盘
  *
  * @author: neo
  * @create: 2021-06-20 08:43
  */
 public class Plate {
+
     private Integer id;
     /**
      * 已经摆好的牌
@@ -41,7 +43,9 @@ public class Plate {
      * 发牌
      */
     void deal(int num) {
-        this.waits = this.sort(this.left.subList(0, num));
+        var w = this.left.subList(0, num);
+        w.sort((a, b) -> a.compareToWithSuit(b));
+        this.waits = w;
         this.left = this.left.subList(num, this.left.size());
     }
 
@@ -51,10 +55,10 @@ public class Plate {
     void put(List<RowCard> rows, boolean con, boolean all, int chooseNum) {
         check(rows, all, chooseNum);
 
-        for (var v : rows) {
-            this.layout.add(new RowCard(v.card, v.row, con));
-        }
-        this.sortLane(this.layout);
+        this.layout.addAll(rows.stream()
+                .map(v -> new RowCard(v.card, v.row, con))
+                .collect(Collectors.toList()));
+        this.layout.sort((a, b) -> a.card.compareToWithSuit(b.card));
 
         // 弃牌
         var set = rows.stream().map(v -> v.card).collect(Collectors.toSet());
@@ -67,36 +71,26 @@ public class Plate {
 
     private void check(List<RowCard> rows, boolean all, int chooseNum) {
         // 查看牌是否超过channel数量
-        int num0 = 0, num1 = 0, num2 = 0;
         var waitsSet = new HashSet<>(waits);
-        for (var v : rows) {
-            if (v == null || !waitsSet.contains(v.card)) {
-                throw new IllegalArgumentException("摆牌错误 card=" + v);
-            }
-            switch (v.row) {
-                case 0:
-                    num0++;
-                    break;
-                case 1:
-                    num1++;
-                    break;
-                case 2:
-                    num2++;
-                    break;
-                default:
-                    throw new IllegalArgumentException();
-            }
+        if (rows.stream().anyMatch(v -> v == null || !waitsSet.contains(v.card))) {
+            throw new IllegalArgumentException("摆牌错误");
         }
+        var rowNumMap = new HashMap<Integer, Integer>();
+        rows.forEach(v -> rowNumMap.put(v.row, rowNumMap.getOrDefault(v.row, 0) + 1));
+
+        int numHead = rowNumMap.getOrDefault(RowCard.ROW_HEAD, 0), numMiddle = rowNumMap.getOrDefault(RowCard.ROW_MIDDLE, 0), numTail = rowNumMap.getOrDefault(RowCard.ROW_TAIL, 0);
         if (all) {
             // 范特西摆牌
-            if (num0 != 3 || num1 != 5 || num2 != 5) {
+            if (numHead != RowCard.SIZE_HEAD
+                    || numMiddle != RowCard.SIZE_MIDDLE
+                    || numTail != RowCard.SIZE_TAIL) {
                 throw new IllegalArgumentException();
             }
         } else {
             if (rows.size() != chooseNum
-                    || this.getRowCards(0).size() + num0 > 3
-                    || this.getRowCards(1).size() + num1 > 5
-                    || this.getRowCards(2).size() + num2 > 5) {
+                    || this.getRowCards(RowCard.ROW_HEAD).size() + numHead > RowCard.SIZE_HEAD
+                    || this.getRowCards(RowCard.ROW_MIDDLE).size() + numMiddle > RowCard.SIZE_MIDDLE
+                    || this.getRowCards(RowCard.ROW_TAIL).size() + numTail > RowCard.SIZE_TAIL) {
                 throw new IllegalArgumentException();
             }
         }
@@ -111,16 +105,6 @@ public class Plate {
                 .filter(v -> v.row == row)
                 .map(v -> v.card)
                 .collect(Collectors.toList());
-    }
-
-    private List<Card> sort(List<Card> cards) {
-        cards.sort((a, b) -> a.compareToWithSuit(b));
-        return cards;
-    }
-
-    private List<RowCard> sortLane(List<RowCard> cards) {
-        cards.sort((a, b) -> a.card.compareToWithSuit(b.card));
-        return cards;
     }
 
     boolean isStart() {

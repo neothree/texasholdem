@@ -29,10 +29,6 @@ public class Hand implements Comparable<Hand> {
      * 关键牌
      */
     private List<Card> keys;
-    /**
-     * 桌面的底牌
-     */
-    private List<Card> bottom;
 
     public Hand(List<Card> hold) {
         this.hold = hold;
@@ -44,9 +40,8 @@ public class Hand implements Comparable<Hand> {
     }
 
     void fresh(List<Card> bottom) {
-        this.bottom = bottom;
         var list = new ArrayList<>(this.hold);
-        list.addAll(this.bottom);
+        list.addAll(bottom);
         var hand = typeOf(list);
         this.type = hand.type;
         this.best = hand.best;
