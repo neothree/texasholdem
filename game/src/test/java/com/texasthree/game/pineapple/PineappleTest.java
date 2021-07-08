@@ -772,8 +772,21 @@ class PineappleTest extends AllCard {
     }
 
     @Test
-    public void testAction() throws Exception {
+    public void testMakeResult() throws Exception {
+        var game = this.builder(2)
+                .beforehand()
+                .dealer(1)
+                .build();
 
+        game.start();
+
+        var state = game.action(0, makeRowCards(RowCard.ROW_TAIL, diamond6, diamond7, diamond8, diamond9, diamond10));
+        assertEquals(Pineapple.STATE_NEXT_OP, state);
+
+        state = game.action(0, makeRowCards(RowCard.ROW_TAIL, heartA, heart2, clubA, spadesA, spades2));
+        assertEquals(Pineapple.STATE_CIRCLE_END, state);
+
+        var result = game.makeResult();
     }
 
     Pineapple.Builder builder(int num) {

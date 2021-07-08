@@ -46,6 +46,10 @@ public enum Regulation {
      * 自动埋牌
      */
     CoverCard,
+    /**
+     * 倍数
+     */
+    Level,
     ;
 
 

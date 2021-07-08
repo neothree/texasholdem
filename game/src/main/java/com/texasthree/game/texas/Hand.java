@@ -1,5 +1,6 @@
 package com.texasthree.game.texas;
 
+import com.texasthree.game.pineapple.RowCard;
 import lombok.Getter;
 
 import java.util.*;
@@ -13,8 +14,10 @@ import java.util.stream.Collectors;
  */
 @Getter
 public class Hand implements Comparable<Hand> {
+
+
     /**
-     * 手里的两张牌
+     * 基本牌
      */
     private List<Card> hold;
     /**
@@ -39,7 +42,7 @@ public class Hand implements Comparable<Hand> {
         this.type = type;
     }
 
-    void fresh(List<Card> bottom) {
+    public void fresh(List<Card> bottom) {
         var list = new ArrayList<>(this.hold);
         list.addAll(bottom);
         var hand = typeOf(list);
@@ -581,6 +584,74 @@ public class Hand implements Comparable<Hand> {
         }
     }
 
+    private static Map<CardType, Integer> middle;
+    private static Map<CardType, Integer> tail;
+
+    static {
+        // 中道分值
+        middle = new HashMap<>();
+        middle.put(CardType.ThreeOfKind, 2);
+        middle.put(CardType.Straight, 4);
+        middle.put(CardType.Flush, 8);
+        middle.put(CardType.FullHouse, 12);
+        middle.put(CardType.FourOfKind, 20);
+        middle.put(CardType.StraightFlush, 30);
+        middle.put(CardType.RoyalFlush, 50);
+
+        // 尾道分值
+        tail = new HashMap<>();
+        tail.put(CardType.Straight, 2);
+        tail.put(CardType.Flush, 4);
+        tail.put(CardType.FullHouse, 6);
+        tail.put(CardType.FourOfKind, 10);
+        tail.put(CardType.StraightFlush, 15);
+        tail.put(CardType.RoyalFlush, 25);
+    }
+
+    /**
+     * 大菠萝 - 计算分数
+     */
+    public int makePoint(int row) {
+        if (row == RowCard.ROW_HEAD) {
+            if (this.getType().equals(CardType.OnePair)) {
+                var max = Profile.of(hold).pointCountMap.get(2).get(0).get(0);
+                if (max.point > 5) {
+                    return max.point - 5;
+                }
+            } else if (this.getType().equals(CardType.ThreeOfKind)) {
+                return this.hold.stream().max(Comparator.comparing(v -> v.point)).orElseThrow().point + 8;
+            } else {
+                return 0;
+            }
+        } else if (row == RowCard.ROW_MIDDLE) {
+            return middle.getOrDefault(this.type, 0);
+        }
+        return tail.getOrDefault(this.type, 0);
+    }
+
+    /**
+     * 判断【大菠萝】牌型是否进入范特西
+     */
+    public static boolean isFantasy(Hand head, Hand middle, Hand tail, boolean fantasy) {
+        // 下局继续范特西模式
+        // 1.头道三条
+        // 2.尾道四条或者更大
+        if (fantasy) {
+            return head.getType() == CardType.ThreeOfKind
+                    || tail.getType().getWeight() >= CardType.FourOfKind.getWeight();
+        } else {
+            // 首次范特西
+            // 未爆牌玩家头道是QQ或更大牌型，下局将进入范特西模式，直接拿到14-17张牌，选13张摆牌。
+            if (head.getType() == CardType.ThreeOfKind) {
+                return true;
+            } else if (head.getType() == CardType.OnePair) {
+                var profile = Profile.of(head.getHold());
+                return profile.pointCountMap.get(2).get(0).get(0).point >= 12;
+            }
+        }
+        return false;
+    }
+
     private static void sort(List<Card> list, boolean asc) {
         if (asc) {
             // 升序
@@ -622,6 +693,10 @@ public class Hand implements Comparable<Hand> {
 
         public Profile(List<Card> list) {
             this(list, 2);
+        }
+
+        public static Profile of(List<Card> list) {
+            return new Profile(list, 2);
         }
 
         private Map<Integer, List<Card>> toPointMap(List<Card> list) {

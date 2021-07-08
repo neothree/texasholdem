@@ -1,6 +1,7 @@
 package com.texasthree.game.pineapple;
 
 import com.texasthree.game.TableCard;
+import com.texasthree.game.Utils;
 import com.texasthree.game.texas.*;
 
 import java.util.*;
@@ -245,12 +246,154 @@ public class Pineapple {
         this.isOver = true;
     }
 
-    void makeResult() {
+    Result makeResult() {
+        if (this.isOver) {
+            throw new IllegalStateException();
+        }
 
+        var explode = new HashSet<Integer>();
+        var playerList = new HashMap<Integer, ResultPlayer>();
+        for (var v : this.ring.toList()) {
+            var rowList = new ArrayList<RowResult>();
+            for (var row = RowCard.ROW_HEAD; row <= RowCard.ROW_TAIL; row++) {
+                var hand = new Hand(this.getRowCards(v.getId(), row));
+                hand.fresh(Collections.emptyList());
+                var rr = new RowResult();
+                rr.id = v.getId();
+                rr.hand = hand;
+                rr.row = row;
+                rowList.add(rr);
+            }
+
+            var pr = new ResultPlayer();
+            pr.id = v.getId();
+            pr.honors = new ArrayList<>();
+            pr.rowResultList = rowList;
+            pr.folds = this.getPlateById(v.getId()).getFolds();
+
+            var head = rowList.stream().filter(r -> r.row == RowCard.ROW_HEAD).findFirst().orElseThrow();
+            var middle = rowList.stream().filter(r -> r.row == RowCard.ROW_MIDDLE).findFirst().orElseThrow();
+            var tail = rowList.stream().filter(r -> r.row == RowCard.ROW_TAIL).findFirst().orElseThrow();
+            if (this.isExplode(head, middle, tail)) {
+                pr.honors.add(0);
+                explode.add(v.getId());
+            } else if (Hand.isFantasy(head.hand, middle.hand, tail.hand, this.fantasy.contains(v.getId()))) {
+                pr.honors.add(1);
+            }
+            playerList.put(v.getId(), pr);
+        }
+
+        var level = this.regulations.getOrDefault(Regulation.Level, 1);
+        var pairs = Utils.zip(this.ring.toList().stream().map(v -> v.getId()).collect(Collectors.toList()), 2);
+        for (var v : pairs) {
+            ResultPlayer f = playerList.get(v.get(0)), s = playerList.get(v.get(1));
+            int win = 0, lose = 0;
+            for (var row = RowCard.ROW_HEAD; row <= RowCard.ROW_TAIL; row++) {
+                var frow = f.rowResultList.get(row);
+                var srow = s.rowResultList.get(row);
+                var profit = 0;
+                if (!explode.contains(frow.id) && explode.contains(srow.id)) {
+                    profit = 1 + frow.getPoint();
+                } else if (explode.contains(frow.id) && !explode.contains(srow.id)) {
+                    profit = -1 - srow.getPoint();
+                } else if (!explode.contains(frow.id) && !explode.contains(srow.id)) {
+                    var com = frow.hand.compareTo(srow.hand);
+                    if (com >= 1) {
+                        profit = 1 + frow.getPoint();
+                    } else if (com <= -1) {
+                        profit = -1 - srow.getPoint();
+                    }
+                }
+                if (profit > 0) {
+                    win++;
+                } else if (profit < 0) {
+                    lose++;
+                }
+
+                // 倍数
+                profit = profit * level;
+
+                frow.compare.put(s.id, profit);
+                frow.profit += profit;
+                f.profit += profit;
+
+                srow.compare.put(f.id, -profit);
+                srow.profit -= profit;
+                s.profit -= profit;
+            }
+
+            // 三道全输与三道全赢
+            if (win == 3 || lose == 3) {
+                var three = (win == 3 ? 3 : -3) * level;
+                f.profit += three;
+                s.profit -= three;
+            }
+        }
+        var result = new Result();
+        result.playerList = playerList;
+        return result;
     }
 
-    void balanceProfit() {
+    boolean isExplode(RowResult head, RowResult middle, RowResult tail) {
+        if (head.hand.compareTo(middle.hand) > 0) {
+            return true;
+        }
+        return middle.hand.compareTo(tail.hand) > 0;
+    }
 
+    /**
+     * 分配利润，防止玩家筹码扣成负数
+     */
+    Map<Integer, Integer> balanceProfit(Map<Integer, ResultPlayer> playerMap) {
+        var out = false;
+        var loseSum = 0;
+        var winPlayerNum = 0;
+        var profitMap = new HashMap<Integer, Integer>();
+        for (var entry : playerMap.entrySet()) {
+            var chips = this.getChipsById(entry.getKey());
+            var v = entry.getValue();
+            var give = 0;
+            if (v.profit + chips < 0) {
+                out = true;
+                give = -chips;
+            } else {
+                give = v.profit;
+            }
+            profitMap.put(entry.getKey(), give);
+            if (give < 0) {
+                loseSum -= give;
+            } else {
+                winPlayerNum++;
+            }
+        }
+
+        if (!out) {
+            return null;
+        }
+
+        if (winPlayerNum == 1) {
+            // 一个赢家，全给
+            for (var v : profitMap.entrySet()) {
+                if (v.getValue() > 0) {
+                    profitMap.put(v.getKey(), loseSum);
+                }
+            }
+        } else {
+            // 两个赢家，按比例分
+            Integer give = null;
+            for (var v : profitMap.keySet()) {
+                var profit = profitMap.get(v);
+                if (profit > 0) {
+                    if (give == null) {
+                        give = (int) Math.floor(profit / loseSum);
+                        profitMap.put(v, give);
+                    } else {
+                        profitMap.put(v, loseSum - give);
+                    }
+                }
+            }
+        }
+        return profitMap;
     }
 
     boolean fantasyEnable() {
@@ -328,6 +471,10 @@ public class Pineapple {
 
     Integer getPlayerById(Integer id) {
         return this.getPlateById(id).getId();
+    }
+
+    Integer getChipsById(Integer id) {
+        return 0;
     }
 
     Plate getPlateById(Integer id) {
