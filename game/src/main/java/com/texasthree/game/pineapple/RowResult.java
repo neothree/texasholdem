@@ -15,6 +15,9 @@ public class RowResult {
     public int profit;
     public Hand hand;
 
+    /**
+     * 每个plate比牌的结果
+     */
     public Map<Integer, Integer> compare = new HashMap<>();
 
     public int getPoint() {

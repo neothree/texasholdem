@@ -34,9 +34,12 @@ public class Plate {
      */
     private List<Card> left;
 
-    Plate(Integer id, List<Card> left) {
+    private Integer chips;
+
+    Plate(Integer id, Integer chips, List<Card> left) {
         this.id = id;
         this.left = left;
+        this.chips = chips;
     }
 
     /**
@@ -133,5 +136,9 @@ public class Plate {
 
     public List<Card> getWaits() {
         return waits;
+    }
+
+    public Integer getChips() {
+        return chips;
     }
 }

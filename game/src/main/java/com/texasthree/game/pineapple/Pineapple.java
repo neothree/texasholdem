@@ -15,19 +15,8 @@ import java.util.stream.Collectors;
  */
 public class Pineapple {
 
-    public static final int FANTASY_CARD_NUM = 14;
-
-    public static final int SUM_CARD_NUM = 17;
-
-    public static final String STATE_NEXT_OP = "STATE_NEXT_OP";
-
-    public static final String STATE_CIRCLE_END = "STATE_CIRCLE_END";
-
-    public static final String STATE_SHOWDOWN = "STATE_SHOWDOWN";
-
-    public static final String STATE_OPEN = "STATE_OPEN";
-
     public static class Builder {
+
         private int playerNum = 2;
 
         private Ring<Plate> ring;
@@ -82,7 +71,7 @@ public class Pineapple {
                         left = all.subList(0, SUM_CARD_NUM);
                         all = all.subList(SUM_CARD_NUM, all.size());
                     }
-                    ring.value = new Plate(i, left);
+                    ring.value = new Plate(i, 100, left);
                     ring = ring.getNext();
                 }
             }
@@ -106,10 +95,40 @@ public class Pineapple {
         return new Builder();
     }
 
+    /**
+     * 范特西发牌数
+     */
+    public static final int FANTASY_CARD_NUM = 14;
+    /**
+     * 总共分配的牌数
+     */
+    public static final int SUM_CARD_NUM = 17;
+    /**
+     * 下一个操作位
+     */
+    public static final String STATE_NEXT_OP = "STATE_NEXT_OP";
+    /**
+     * 一圈结束
+     */
+    public static final String STATE_CIRCLE_END = "STATE_CIRCLE_END";
+    /**
+     * 摊牌
+     */
+    public static final String STATE_SHOWDOWN = "STATE_SHOWDOWN";
+    /**
+     * 开牌
+     */
+    public static final String STATE_OPEN = "STATE_OPEN";
+
+
+    /**
+     * 是否结束
+     */
     private boolean isOver;
-
+    /**
+     * 第几圈
+     */
     private int circle;
-
     /**
      * 规则
      */
@@ -118,9 +137,13 @@ public class Pineapple {
      * 玩家的位置
      */
     private Ring<Plate> ring;
-
+    /**
+     * 庄家
+     */
     private Integer dealer;
-
+    /**
+     * 范特西位
+     */
     private Set<Integer> fantasy;
 
     private Set<Integer> beforehand = new HashSet<>();
@@ -162,7 +185,7 @@ public class Pineapple {
     String action(Integer id, List<RowCard> rows) {
         if (this.isOver
                 || rows == null
-                || this.getPlayerById(id) == null
+                || this.getPlateById(id) == null
                 || (!id.equals(this.opPlayer()) && !this.beforehand())) {
             throw new IllegalArgumentException();
         }
@@ -247,7 +270,7 @@ public class Pineapple {
     }
 
     Result makeResult() {
-        if (this.isOver) {
+        if (!this.isOver) {
             throw new IllegalStateException();
         }
 
@@ -267,7 +290,7 @@ public class Pineapple {
 
             var pr = new ResultPlayer();
             pr.id = v.getId();
-            pr.honors = new ArrayList<>();
+            pr.honors = new HashSet<>();
             pr.rowResultList = rowList;
             pr.folds = this.getPlateById(v.getId()).getFolds();
 
@@ -275,10 +298,10 @@ public class Pineapple {
             var middle = rowList.stream().filter(r -> r.row == RowCard.ROW_MIDDLE).findFirst().orElseThrow();
             var tail = rowList.stream().filter(r -> r.row == RowCard.ROW_TAIL).findFirst().orElseThrow();
             if (this.isExplode(head, middle, tail)) {
-                pr.honors.add(0);
+                pr.honors.add(ResultPlayer.HONOR_EXPLODE);
                 explode.add(v.getId());
             } else if (Hand.isFantasy(head.hand, middle.hand, tail.hand, this.fantasy.contains(v.getId()))) {
-                pr.honors.add(1);
+                pr.honors.add(ResultPlayer.HONOR_FANTASY);
             }
             playerList.put(v.getId(), pr);
         }
@@ -350,7 +373,7 @@ public class Pineapple {
         var winPlayerNum = 0;
         var profitMap = new HashMap<Integer, Integer>();
         for (var entry : playerMap.entrySet()) {
-            var chips = this.getChipsById(entry.getKey());
+            var chips = this.getPlateById(entry.getKey()).getChips();
             var v = entry.getValue();
             var give = 0;
             if (v.profit + chips < 0) {
@@ -448,11 +471,12 @@ public class Pineapple {
         return this.regulations.containsKey(Regulation.Beforehand);
     }
 
-    List<Card> getRowCards(int id, int channel) {
-        if (this.getPlayerById(id) == null) {
+    List<Card> getRowCards(int id, int row) {
+        var plate = this.getPlateById(id);
+        if (plate == null) {
             throw new IllegalArgumentException();
         }
-        return this.getPlateById(id).getRowCards(channel);
+        return plate.getRowCards(row);
     }
 
     int chooseCardNum() {
@@ -467,14 +491,6 @@ public class Pineapple {
             return FANTASY_CARD_NUM;
         }
         return chooseCardNum();
-    }
-
-    Integer getPlayerById(Integer id) {
-        return this.getPlateById(id).getId();
-    }
-
-    Integer getChipsById(Integer id) {
-        return 0;
     }
 
     Plate getPlateById(Integer id) {

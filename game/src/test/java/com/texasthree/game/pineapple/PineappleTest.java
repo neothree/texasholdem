@@ -780,13 +780,44 @@ class PineappleTest extends AllCard {
 
         game.start();
 
-        var state = game.action(0, makeRowCards(RowCard.ROW_TAIL, diamond6, diamond7, diamond8, diamond9, diamond10));
-        assertEquals(Pineapple.STATE_NEXT_OP, state);
+        game.action(0, makeRowCards(RowCard.ROW_TAIL, diamond6, diamond7, diamond8, diamond9, diamond10));
+        game.action(1, makeRowCards(RowCard.ROW_MIDDLE, heartA, heart2, clubA, spadesA, spades2));
 
-        state = game.action(0, makeRowCards(RowCard.ROW_TAIL, heartA, heart2, clubA, spadesA, spades2));
-        assertEquals(Pineapple.STATE_CIRCLE_END, state);
+        game.action(0, makeRowCards(RowCard.ROW_MIDDLE, diamondA, diamond2));
+        game.action(1, makeRowCards(RowCard.ROW_TAIL, spades3, spades4));
+
+        game.action(0, makeRowCards(RowCard.ROW_MIDDLE, diamond3, diamond4));
+        game.action(1, makeRowCards(RowCard.ROW_TAIL, spades6, spades7));
+
+        var acts = makeRowCards(RowCard.ROW_HEAD, diamondJ);
+        game.action(0, makeRowCards(acts, RowCard.ROW_MIDDLE, diamond5));
+        acts = makeRowCards(RowCard.ROW_HEAD, heart8);
+        game.action(1, makeRowCards(acts, RowCard.ROW_TAIL, heart5));
+
+        game.action(0, makeRowCards(RowCard.ROW_HEAD, clubJ, spadesJ));
+        var state = game.action(1, makeRowCards(RowCard.ROW_HEAD, spadesQ, spadesK));
+        assertEquals(Pineapple.STATE_SHOWDOWN, state);
 
         var result = game.makeResult();
+        assertResult(result.playerList.get(0), new String[]{ResultPlayer.HONOR_FANTASY}, 70, new Integer[]{20, 31, 16}, 1, new Integer[]{20, 31, 16});
+        assertResult(result.playerList.get(1), new String[]{ResultPlayer.HONOR_EXPLODE}, -70, new Integer[]{-20, -31, -16}, 0, new Integer[]{-20, -31, -16});
+    }
+
+    private void assertResult(ResultPlayer resultPlayer, String[] honors, Integer profit, Integer[] rowProfit, Integer compareId, Integer[] compareProfit) {
+        assertEquals(honors.length, resultPlayer.honors.size());
+        for (var v : honors) {
+            assertTrue(resultPlayer.honors.contains(v));
+        }
+
+        assertEquals(profit, resultPlayer.profit);
+        var rowResultList = resultPlayer.rowResultList;
+        assertEquals(rowProfit[RowCard.ROW_HEAD], rowResultList.get(RowCard.ROW_HEAD).profit);
+        assertEquals(rowProfit[RowCard.ROW_MIDDLE], rowResultList.get(RowCard.ROW_MIDDLE).profit);
+        assertEquals(rowProfit[RowCard.ROW_TAIL], rowResultList.get(RowCard.ROW_TAIL).profit);
+
+        assertEquals(compareProfit[RowCard.ROW_HEAD], rowResultList.get(RowCard.ROW_HEAD).compare.get(compareId));
+        assertEquals(compareProfit[RowCard.ROW_MIDDLE], rowResultList.get(RowCard.ROW_MIDDLE).compare.get(compareId));
+        assertEquals(compareProfit[RowCard.ROW_TAIL], rowResultList.get(RowCard.ROW_TAIL).compare.get(compareId));
     }
 
     Pineapple.Builder builder(int num) {
