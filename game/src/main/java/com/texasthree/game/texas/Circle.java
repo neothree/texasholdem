@@ -1,7 +1,5 @@
 package com.texasthree.game.texas;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.*;
 
 public class Circle {
@@ -92,16 +90,14 @@ public class Circle {
         }
     }
 
-    void action(Player player, Action act, int smallBlind, boolean check) throws Exception {
+    void action(Player player, Action act, int smallBlind, boolean check) {
         // 解析
         act = this.parseAction(player, act);
         if (check) {
             var auth = this.auth(player, smallBlind, act.sumPot);
             if (!auth.containsKey(act.op) ||
                     (Optype.Raise.equals(act.op) && act.chipsBet < auth.get(act.op))) {
-                var str = "auth = " + new ObjectMapper().writeValueAsString(auth) + "\n";
-                str = str + "action = " + act;
-                throw new IllegalArgumentException("押注错误 " + str);
+                throw new IllegalArgumentException("押注权限错误");
             }
         }
 
@@ -135,7 +131,7 @@ public class Circle {
     /**
      * 将action中的数据补充完整
      */
-    private Action parseAction(Player player, Action action) throws Exception {
+    private Action parseAction(Player player, Action action) {
         if (action.op == null) {
             throw new IllegalArgumentException();
         }

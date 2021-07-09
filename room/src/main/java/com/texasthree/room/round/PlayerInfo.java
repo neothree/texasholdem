@@ -1,4 +1,4 @@
-package com.texasthree.room.game;
+package com.texasthree.room.round;
 
 import com.texasthree.room.User;
 

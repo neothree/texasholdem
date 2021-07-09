@@ -43,11 +43,11 @@ public class Texas {
      */
     private Ring<Player> ring;
 
-    static Texas.Builder builder() {
+    public static Texas.Builder builder() {
         return new Texas.Builder();
     }
 
-    static Texas.Builder builder(int playerNum) {
+    public static Texas.Builder builder(int playerNum) {
         var builder = new Texas.Builder();
         builder.playerNum = playerNum;
         return builder;
@@ -135,7 +135,7 @@ public class Texas {
             return board;
         }
 
-        Texas build() {
+        public Texas build() {
             if (ring == null) {
                 if (players == null) {
                     players = new ArrayList<>(playerNum);
@@ -212,7 +212,7 @@ public class Texas {
     /**
      * 开始
      */
-    String start() throws Exception {
+    public String start() {
         this.pot = new Pot(playerNum, this.smallBlind(), this.ante());
 
         // 一圈开始
@@ -261,7 +261,7 @@ public class Texas {
     /**
      * 强制盲注
      */
-    private String actionStraddle() throws Exception {
+    private String actionStraddle() {
         var act = Action.straddleBlind(this.straddleBlind());
         return this.action(act);
     }
@@ -269,11 +269,11 @@ public class Texas {
     /**
      * 庄家前注
      */
-    private void actionDealerAnte() throws Exception {
+    private void actionDealerAnte() {
         this.pot.actionDealerAnte(this.dealer(), this.ante());
     }
 
-    public String action(Action action) throws Exception {
+    public String action(Action action) {
         if (this.isOver) {
             return null;
         }
@@ -295,7 +295,7 @@ public class Texas {
     /**
      * 状态转移
      */
-    private String transit() throws Exception {
+    private String transit() {
         String state;
         var waitActionNum = this.waitActionNum();
         var opNext = this.nextOpPlayer(this.opPlayer().getId());
@@ -338,7 +338,7 @@ public class Texas {
         return state;
     }
 
-    private void circleStart() throws Exception {
+    private void circleStart() {
         this.pot.circleStart();
 
         this.freshHand();

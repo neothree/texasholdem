@@ -1,11 +1,12 @@
-package com.texasthree.room.game;
+package com.texasthree.room.round;
 
 import com.texasthree.room.Cmd;
 import com.texasthree.room.User;
 import org.junit.jupiter.api.Test;
 
-class TexasGameTest {
+import static org.junit.jupiter.api.Assertions.*;
 
+class TexasRoundTest {
     @Test
     void start() throws Exception {
         User[] users = new User[3];
@@ -17,7 +18,7 @@ class TexasGameTest {
             User u = new User(data);
             users[i] = u;
         }
-        TexasGame game = new TexasGame(users, null);
+        TexasRound game = new TexasRound(users, null);
         game.start();
     }
 }

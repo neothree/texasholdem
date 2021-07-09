@@ -143,9 +143,9 @@ class PineappleTest extends AllCard {
         equalsCards(game.getWaits(0));
         equalsCards(game.getWaits(1));
         equalsCards(game.getWaits(2));
-        state = game.action();
+        state = game.open();
         assertEquals(Pineapple.STATE_OPEN, state);
-        state = game.action();
+        state = game.open();
         assertEquals(Pineapple.STATE_CIRCLE_END, state);
 
         equalsCards(game.getWaits(0), diamondA, diamond2, club7);
@@ -650,7 +650,7 @@ class PineappleTest extends AllCard {
         assertEquals(42, game.getMemo(2).size());
 
         // continue
-        state = game.action();
+        state = game.open();
         assertEquals(Pineapple.STATE_CIRCLE_END, state);
         assertEquals(34, game.getMemo(0).size());
         assertEquals(34, game.getMemo(1).size());
@@ -682,7 +682,7 @@ class PineappleTest extends AllCard {
         assertEquals(32, game.getMemo(2).size());
 
         // Continue
-        state = game.action();
+        state = game.open();
         assertEquals(Pineapple.STATE_CIRCLE_END, state);
         assertEquals(27, game.getMemo(0).size());
         assertEquals(27, game.getMemo(1).size());
@@ -714,13 +714,13 @@ class PineappleTest extends AllCard {
         assertEquals(25, game.getMemo(2).size());
 
         // Continue
-        state = game.action();
+        state = game.open();
         assertEquals(Pineapple.STATE_OPEN, state);
         assertEquals(23, game.getMemo(0).size());
         assertEquals(25, game.getMemo(1).size());
         assertEquals(25, game.getMemo(2).size());
 
-        state = game.action();
+        state = game.open();
         assertEquals(Pineapple.STATE_CIRCLE_END, state);
         assertEquals(20, game.getMemo(0).size());
         assertEquals(20, game.getMemo(1).size());
@@ -752,7 +752,7 @@ class PineappleTest extends AllCard {
         assertEquals(47, game.getMemo(1).size());
 
         // Continue
-        state = game.action();
+        state = game.open();
         assertEquals(Pineapple.STATE_CIRCLE_END, state);
         assertEquals(39, game.getMemo(0).size());
         assertEquals(39, game.getMemo(1).size());

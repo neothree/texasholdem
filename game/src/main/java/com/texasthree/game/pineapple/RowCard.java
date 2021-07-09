@@ -30,7 +30,7 @@ public class RowCard {
     /**
      * 预先发牌
      */
-    public boolean beforehand;
+    boolean beforehand;
 
     RowCard(Card card, int row, boolean beforehand) {
         if (row != ROW_HEAD && row != ROW_MIDDLE && row != ROW_TAIL) {

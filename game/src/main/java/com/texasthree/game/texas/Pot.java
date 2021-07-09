@@ -59,7 +59,7 @@ class Pot {
         }
     }
 
-    void actionDealerAnte(Player dealer, int ante) throws Exception {
+    void actionDealerAnte(Player dealer, int ante) {
         if (dealer.getChips() <= 0) {
             return;
         }
@@ -69,7 +69,7 @@ class Pot {
         this.action(dealer, action, false);
     }
 
-    void action(Player player, Action act, boolean check) throws Exception {
+    void action(Player player, Action act, boolean check) {
         act.sumPot = this.sumPot();
         this.going.action(player, act, this.smallBind, check);
 

@@ -58,7 +58,7 @@ public class Pineapple {
         }
 
 
-        Pineapple build() {
+        public Pineapple build() {
             var all = TableCard.getInstance().shuffle();
             if (ring == null) {
                 ring = Ring.create(playerNum);
@@ -91,7 +91,7 @@ public class Pineapple {
         }
     }
 
-    static Builder builder() {
+    public static Builder builder() {
         return new Builder();
     }
 
@@ -161,7 +161,7 @@ public class Pineapple {
         }
     }
 
-    void start() {
+    public void start() {
         this.circleStart();
     }
 
@@ -182,7 +182,7 @@ public class Pineapple {
     void circleEnd() {
     }
 
-    String action(Integer id, List<RowCard> rows) {
+    public String action(Integer id, List<RowCard> rows) {
         if (this.isOver
                 || rows == null
                 || this.getPlateById(id) == null
@@ -204,7 +204,7 @@ public class Pineapple {
         return this.transit();
     }
 
-    String action() {
+    String open() {
         var id = this.opPlayer();
         if (!this.beforehand.contains(id)) {
             throw new IllegalStateException();

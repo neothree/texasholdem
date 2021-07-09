@@ -1,7 +1,7 @@
 package com.texasthree.room;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.texasthree.room.game.TexasGame;
+import com.texasthree.room.round.Round;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,7 +12,7 @@ public class Desk {
 
     public User[] seats = new User[8];
 
-    private TexasGame game;
+    private Round round;
 
     private Map<String, User> audience = new HashMap<>();
 
@@ -47,12 +47,12 @@ public class Desk {
     }
 
     public void start() {
-        this.game = new TexasGame(this.seats, (Object msg) -> this.send(msg));
+        this.round = Round.texas(this.seats, (Object msg) -> this.send(msg));
         try {
-            this.game.start();
+            this.round.start();
         } catch (Exception e) {
             e.printStackTrace();
-            this.game = null;
+            this.round = null;
         }
     }
 

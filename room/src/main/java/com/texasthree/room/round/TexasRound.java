@@ -1,4 +1,4 @@
-package com.texasthree.room.game;
+package com.texasthree.room.round;
 
 import com.texasthree.room.Cmd;
 import com.texasthree.room.ScheduledEvent;
@@ -15,12 +15,13 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
+ * 德扑游戏
+ *
  * @author : neo
  * create at:  2020-06-29  15:26
- * @description: 德扑游戏
  */
 @Slf4j
-public class TexasGame {
+class TexasRound implements Round {
     public static int TIMEOUT_ACTION = 15000;
     public static int TIMEOUT_MOVE_FOLD = 800;
     public static int TIMEOUT_MOVE_ACTION = 500;
@@ -30,7 +31,7 @@ public class TexasGame {
      */
     private int dealer = 0;
 
-    private Texas texas;
+    private Texas game;
 
     private GameState state;
 
@@ -51,40 +52,37 @@ public class TexasGame {
 
     private User[] users;
 
-    public TexasGame(User[] users, Consumer send) {
+    TexasRound(User[] users, Consumer send) {
         this.users = users;
         this.send = send;
     }
 
-
-    public void start() throws Exception {
+    @Override
+    public void start() {
         // 位置图谱
-        var players = new ArrayList<User>();
-        var pos = new HashMap<String, Integer>();
+        var players = new ArrayList<Player>();
         for (int i = 0; i < this.users.length; i++) {
             var v = this.users[i];
             if (v != null) {
-                players.add(v);
-                pos.put(v.getId(), i);
+                players.add(new Player(i, v.getChips()));
             }
         }
-        // 玩法
-        Map<Regulation, Integer> laws = new HashMap<>();
-        laws.put(Regulation.SmallBlind, 1);
-        laws.put(Regulation.Dealer, 0);
-        if (players.size() == 2) {
-            laws.put(Regulation.SB, 0);
-            laws.put(Regulation.BB, 1);
-        } else {
-            laws.put(Regulation.SB, 1);
-            laws.put(Regulation.BB, 2);
-        }
 
-        texas = null;
+        this.game = Texas.builder()
+                .smallBlind(1)
+                .players(players)
+                .regulation(Regulation.Dealer, 0)
+                .regulation(Regulation.SmallBlind, 1)
+                .build();
+        this.game.start();
 
         this.printStart();
 
-        this.opEvent = new ScheduledEvent(() -> this.move(state.move), 2000);
+        try {
+            this.opEvent = new ScheduledEvent(() -> this.move(state.move), 2000);
+        } catch (Exception e) {
+            throw new IllegalStateException();
+        }
 
         this.send(new Cmd.StartGame());
 
@@ -98,9 +96,10 @@ public class TexasGame {
      * @return void
      * create at 2020-06-30 11:12
      */
+    @Override
     public void action(Action action) {
 
-        Cmd.BetAction send = new Cmd.BetAction();
+        var send = new Cmd.BetAction();
         send.sumPot = 0;
         send.action = this.getAction(action.id + "");
         this.send(send);
@@ -109,8 +108,8 @@ public class TexasGame {
         this.opPlayer = null;
 
         try {
-            this.texas.action(action);
-//            state = texas.state();
+            this.game.action(action);
+//            state = game.state();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -123,10 +122,6 @@ public class TexasGame {
             this.opEvent = new ScheduledEvent(() -> this.move(state.move), TIMEOUT_MOVE_ACTION);
         }
 
-    }
-
-    public void settle() {
-//        this.texas.settle();
     }
 
     /**
@@ -229,7 +224,7 @@ public class TexasGame {
 
         this.updateHand();
 
-        int time = this.texas.circle().equals(Circle.FLOP) ? 2300 : 1300;
+        int time = this.game.circle().equals(Circle.FLOP) ? 2300 : 1300;
         this.opEvent = new ScheduledEvent(() -> this.moveNextOp(), time);
     }
 
@@ -312,6 +307,7 @@ public class TexasGame {
 
     }
 
+    @Override
     public void loop() {
         if (opEvent != null) {
             this.opEvent.check();
