@@ -3,6 +3,12 @@ package com.texasthree.room;
 import java.util.List;
 
 public class Cmd {
+
+    public static class Command {
+        public String name;
+        public String data;
+    }
+
     public static class UserData {
         public String id;
         public String name;
@@ -15,10 +21,6 @@ public class Cmd {
         public String creator;
     }
 
-    public static class Command {
-        public String name;
-        public String data;
-    }
 
     public static class SetName {
         public String name;

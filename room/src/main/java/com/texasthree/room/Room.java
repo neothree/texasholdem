@@ -12,6 +12,10 @@ public class Room {
 
     private static Map<String, Room> roomMap = new HashMap<>();
 
+    public static Room getRoom(String id) {
+        return roomMap.get(id);
+    }
+
     private Cmd.RoomData data;
 
     private Desk desk;
@@ -38,21 +42,18 @@ public class Room {
         this.desk.removeUser(user);
     }
 
-    public void sitdown(User user, int position) {
-        this.desk.sitdown(user, position);
+    public void sitDown(User user, int position) {
+        this.desk.sitDown(user, position);
     }
 
-    public void situp(int position) {
-        this.desk.situp(position);
+    public void sitUp(int position) {
+        this.desk.sitUp(position);
     }
 
     public void start() {
         this.desk.start();
     }
 
-    public static Room getRoom(String id) {
-        return roomMap.get(id);
-    }
 
     public String getName() {
         return this.data.name;

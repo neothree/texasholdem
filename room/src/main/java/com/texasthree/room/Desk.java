@@ -27,20 +27,17 @@ public class Desk {
         audience.remove(user.getId());
     }
 
-    public void sitdown(User user, int position) {
-        if (position >= seats.length || position < 0) {
-            return;
-        }
-        if (seats[position] != null) {
-            return;
+    public void sitDown(User user, int position) {
+        if (position >= seats.length || seats[position] != null) {
+            throw new IllegalArgumentException();
         }
 
         seats[position] = user;
         this.audience.remove(user.getId());
     }
 
-    public void situp(int position) {
-        User user = seats[position];
+    public void sitUp(int position) {
+        var user = seats[position];
         if (user == null) {
             return;
         }
