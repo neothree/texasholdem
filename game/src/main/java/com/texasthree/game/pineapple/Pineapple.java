@@ -1,6 +1,6 @@
 package com.texasthree.game.pineapple;
 
-import com.texasthree.game.TableCard;
+import com.texasthree.game.Deck;
 import com.texasthree.game.Utils;
 import com.texasthree.game.texas.*;
 
@@ -59,7 +59,7 @@ public class Pineapple {
 
 
         public Pineapple build() {
-            var all = TableCard.getInstance().shuffle();
+            var all = Deck.getInstance().shuffle();
             if (ring == null) {
                 ring = Ring.create(playerNum);
                 for (var i = 0; i < playerNum; i++) {
@@ -536,7 +536,11 @@ public class Pineapple {
             }
         }
 
-        var all = TableCard.getInstance().getAll();
+        var all = Deck.getInstance().getAll();
         return Card.removeList(all, see);
+    }
+
+    public boolean isOver() {
+        return this.isOver;
     }
 }

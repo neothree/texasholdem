@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
- * TableCard Tester.
+ * Deck Tester.
  *
  * @author <Authors name>
  * @version 1.0
@@ -24,7 +24,7 @@ public class TableCardTest {
      */
     @Test
     public void testGetInstance() throws Exception {
-        List<Card> pair = TableCard.getInstance().shuffle();
+        List<Card> pair = Deck.getInstance().shuffle();
         Set<Integer> set = new HashSet<>();
         pair.forEach(v -> set.add(v.getId()));
         assertEquals(54, set.size());

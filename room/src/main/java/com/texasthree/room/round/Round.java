@@ -37,6 +37,8 @@ public interface Round {
      */
     void action(Action action);
 
+    boolean finished();
+
     /**
      * 事件循环
      */

@@ -23,7 +23,7 @@ class Pot {
 
     private List<Divide> divides;
 
-    private Player giveback;
+    private Player refundPlayer;
 
     Pot(int playerNum, int smallBind, int ante) {
         this.smallBind = smallBind;
@@ -36,13 +36,12 @@ class Pot {
             return;
         }
         for (var player : ring.toList()) {
-            if (player.getChips() >= ante) {
-                this.anteBet.put(player.getId(), ante);
-            } else {
-                this.anteBet.put(player.getId(), player.getChips());
+            var give = Math.min(player.getChips(), ante);
+            this.anteBet.put(player.getId(), give);
+            player.changeChips(-give);
+            if (player.getChips() == 0) {
                 this.allin.add(player.getId());
             }
-            player.changeChips(-this.anteBet.get(player.getId()));
         }
 
         // 分池
@@ -63,7 +62,7 @@ class Pot {
         if (dealer.getChips() <= 0) {
             return;
         }
-        var chipsBet = dealer.getChips() >= ante ? ante : dealer.getChips();
+        var chipsBet = Math.min(dealer.getChips(), ante);
         dealer.changeChips(-chipsBet);
         var action = new Action(dealer.getId(), Optype.DealerAnte, chipsBet, chipsBet, 0, 0);
         this.action(dealer, action, false);
@@ -114,7 +113,7 @@ class Pot {
             var id = last.getMembers().keySet().stream().findFirst().orElseThrow();
             var player = texas.getPlayerById(id);
             if (!player.isLeave() && com) {
-                this.givebackLastSinglePlayerPot();
+                this.refundLastSinglePlayerPot();
             }
         }
 
@@ -131,11 +130,11 @@ class Pot {
     /**
      * 返回最后的单人单池筹码
      */
-    private void givebackLastSinglePlayerPot() {
+    private void refundLastSinglePlayerPot() {
         var putin = this.divides.get(divides.size() - 1).getPutin();
         if (putin.size() == 1) {
             var entry = putin.entrySet().stream().findFirst().get();
-            this.giveback = new Player(entry.getKey(), entry.getValue());
+            this.refundPlayer = new Player(entry.getKey(), entry.getValue());
             this.divides.remove(divides.size() - 1);
         }
     }
@@ -295,8 +294,8 @@ class Pot {
         return this.going.getStandardId();
     }
 
-    Player giveback() {
-        return this.giveback;
+    Player refundPlayer() {
+        return this.refundPlayer;
     }
 
     Integer lastBetOrRaise() {

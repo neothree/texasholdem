@@ -22,10 +22,10 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 class TexasRound implements Round {
-    public static int TIMEOUT_ACTION = 15000;
-    public static int TIMEOUT_MOVE_FOLD = 800;
-    public static int TIMEOUT_MOVE_ACTION = 500;
-    public static int TIMEOUT_MOVE_CIRCLE = 2000;
+    final static int TIMEOUT_ACTION = 15000;
+    final static int TIMEOUT_MOVE_FOLD = 800;
+    final static int TIMEOUT_MOVE_ACTION = 500;
+    final static int TIMEOUT_MOVE_CIRCLE = 2000;
     /*
      * 庄家位
      */
@@ -99,7 +99,7 @@ class TexasRound implements Round {
     @Override
     public void action(Action action) {
 
-        var send = new Cmd.BetAction();
+        var send = new Cmd.PlayerAction();
         send.sumPot = 0;
         send.action = this.getAction(action.id + "");
         this.send(send);
@@ -121,7 +121,11 @@ class TexasRound implements Round {
         } else {
             this.opEvent = new ScheduledEvent(() -> this.move(state.move), TIMEOUT_MOVE_ACTION);
         }
+    }
 
+    @Override
+    public boolean finished() {
+        return this.isOver;
     }
 
     /**
@@ -143,11 +147,11 @@ class TexasRound implements Round {
      * create at 2020-06-30 10:26
      */
     private void updateHand() {
-        for (PlayerInfo v : this.playerMap.values()) {
+        for (var v : this.playerMap.values()) {
             if (!this.isLeave(v.user.getId())) {
                 continue;
             }
-            Cmd.HandUpdate update = new Cmd.HandUpdate();
+            var update = new Cmd.HandUpdate();
             update.hands = new ArrayList<>();
             update.hands.add(this.getHand(v.user.getId()));
             v.user.send(update);

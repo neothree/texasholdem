@@ -1,6 +1,6 @@
 package com.texasthree.game.texas;
 
-import com.texasthree.game.TableCard;
+import com.texasthree.game.Deck;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -183,7 +183,7 @@ public class Texas {
         }
 
         private void deal() {
-            var leftCard = TableCard.getInstance().shuffle();
+            var leftCard = Deck.getInstance().shuffle();
             if (board == null || board.size() != 5) {
                 board = leftCard.subList(0, 5);
                 leftCard = leftCard.subList(5, leftCard.size());
@@ -412,9 +412,9 @@ public class Texas {
         }
 
         // 单池返回的钱
-        var potback = this.pot.giveback();
-        if (potback != null) {
-            result.playersMap.get(potback.getId()).potback = potback.getChips();
+        var refundPlayer = this.pot.refundPlayer();
+        if (refundPlayer != null) {
+            result.playersMap.get(refundPlayer.getId()).refund = refundPlayer.getChips();
         }
 
         // 最后从池里的输赢
@@ -458,7 +458,7 @@ public class Texas {
             var index = potId;
             if (!members.isEmpty()) {
                 // 有玩家比牌, 正常计算输赢
-                var winner = winner(members);
+                var winner = winners(members);
                 if (potId == 0) {
                     mainPotWinner = winner;
                 }
@@ -507,7 +507,7 @@ public class Texas {
         return ret;
     }
 
-    private Set<Integer> winner(Collection<Player> players) {
+    private Set<Integer> winners(Collection<Player> players) {
         var winner = new HashSet<Integer>();
         Player win = null;
         for (var v : players) {

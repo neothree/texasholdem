@@ -3,7 +3,7 @@ package com.texasthree.game.texas;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.texasthree.game.AllCard;
-import com.texasthree.game.TableCard;
+import com.texasthree.game.Deck;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -491,7 +491,7 @@ public class TexasTest extends AllCard {
         assertEquals(20, result.playersMap.get(1).getProfit());
         assertEquals(-30, result.playersMap.get(2).getProfit());
         assertEquals(10, result.playersMap.get(3).getProfit());
-        assertEquals(10, result.playersMap.get(3).potback);
+        assertEquals(10, result.playersMap.get(3).refund);
 
         // 10 B
         // 10 20 C
@@ -514,7 +514,7 @@ public class TexasTest extends AllCard {
         assertEquals(40, result.playersMap.get(1).getProfit());
         assertEquals(-10, result.playersMap.get(2).getProfit());
         assertEquals(-30, result.playersMap.get(3).getProfit());
-        assertEquals(10, result.playersMap.get(1).potback);
+        assertEquals(10, result.playersMap.get(1).refund);
     }
 
     private static class SimpleTexas {
@@ -576,9 +576,9 @@ public class TexasTest extends AllCard {
         for (var i = 2; i <= players.size(); i++) {
             var p = players.get(i - 1);
             var id = i * 10 + 4;
-            var c1 = TableCard.getInstance().getCardById(id);
+            var c1 = Deck.getInstance().getCardById(id);
             assertNotNull(c1);
-            var c2 = TableCard.getInstance().getCardById(id - 1);
+            var c2 = Deck.getInstance().getCardById(id - 1);
             assertNotNull(c2);
             p.setHand(new Hand(Arrays.asList(c1, c2)));
         }

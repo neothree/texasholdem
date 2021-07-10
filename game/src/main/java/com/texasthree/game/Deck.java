@@ -12,12 +12,12 @@ import java.util.Collections;
 import java.util.List;
 
 
-public class TableCard {
-    private static TableCard instance;
+public class Deck {
+    private static Deck instance;
 
-    public static TableCard getInstance() {
+    public static Deck getInstance() {
         if (instance == null) {
-            instance = new TableCard();
+            instance = new Deck();
         }
         return instance;
     }
@@ -25,7 +25,7 @@ public class TableCard {
     private List<Card> all;
 
 
-    private TableCard() {
+    private Deck() {
         var fileName = this.getClass().getClassLoader().getResource("table_card.json").getPath();
         try {
             var fileReader = new FileReader(fileName);

@@ -25,7 +25,7 @@ public class ResultPlayer {
      */
     List<Card> cardList;
 
-    int potback;
+    int refund;
 
     Map<Integer, Integer> pot;
 
@@ -39,6 +39,6 @@ public class ResultPlayer {
     }
 
     int getProfit() {
-        return this.getWin() - betSum + potback;
+        return this.getWin() - betSum + refund;
     }
 }

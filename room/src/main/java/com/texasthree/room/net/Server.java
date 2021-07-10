@@ -1,11 +1,8 @@
 package com.texasthree.room.net;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.EventBus;
-import io.vertx.core.http.ServerWebSocket;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -45,44 +42,35 @@ public class Server {
 
         final var chatUrlPattern = Pattern.compile("/chat/(\\w+)");
 
-        vertx.createHttpServer().webSocketHandler(new Handler<ServerWebSocket>() {
-            @Override
-            public void handle(final ServerWebSocket ws) {
-                final var m = chatUrlPattern.matcher(ws.path());
-                if (!m.matches()) {
-                    ws.reject();
-                    return;
-                }
-
-                final var chatRoom = m.group(1);
-                final var uid = ws.textHandlerID();
-                log.info("registering new connection with id: " + uid + " for chat-room: " + chatRoom);
-                vertx.sharedData().getLocalMap("chat.room." + chatRoom).put(uid, uid);
-
-                ws.closeHandler(new Handler<Void>() {
-                    @Override
-                    public void handle(final Void event) {
-                        log.info("un-registering connection with id: " + uid + " from chat-room: " + chatRoom);
-                        vertx.sharedData().getLocalMap("chat.room." + chatRoom).remove(uid);
-                    }
-                });
-
-                ws.handler(new Handler<Buffer>() {
-                    @Override
-                    public void handle(final Buffer buffer) {
-                        var m = new ObjectMapper();
-                        try {
-                            var receive = buffer.toString();
-                            log.info("收到消息 {}", receive);
-                            var rootNode = m.readTree(receive);
-                            var message = new Message(uid, rootNode.get("name").asText(), rootNode.get("data").asText());
-                            dispatcher.dispatch(message);
-                        } catch (IOException e) {
-                            ws.reject();
-                        }
-                    }
-                });
+        vertx.createHttpServer().webSocketHandler(ws -> {
+            final var m = chatUrlPattern.matcher(ws.path());
+            if (!m.matches()) {
+                ws.reject();
+                return;
             }
+
+            final var chatRoom = m.group(1);
+            final var uid = ws.textHandlerID();
+            log.info("registering new connection with id: " + uid + " for chat-room: " + chatRoom);
+            vertx.sharedData().getLocalMap("chat.room." + chatRoom).put(uid, uid);
+
+            ws.closeHandler(event -> {
+                log.info("un-registering connection with id: " + uid + " from chat-room: " + chatRoom);
+                vertx.sharedData().getLocalMap("chat.room." + chatRoom).remove(uid);
+
+            });
+
+            ws.handler(buffer -> {
+                try {
+                    var receive = buffer.toString();
+                    log.info("收到消息 {}", receive);
+                    var rootNode = new ObjectMapper().readTree(receive);
+                    var message = new Message(uid, rootNode.get("name").asText(), rootNode.get("data").asText());
+                    dispatcher.dispatch(message);
+                } catch (IOException e) {
+                    ws.reject();
+                }
+            });
         }).listen(port);
         log.info("websocket server 启动");
     }

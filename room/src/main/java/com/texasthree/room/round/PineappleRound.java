@@ -17,12 +17,16 @@ class PineappleRound implements Round {
     public void start() {
         this.game = Pineapple.builder().build();
         this.game.start();
-
     }
 
     @Override
     public void action(Action action) {
         this.game.action(null, null);
+    }
+
+    @Override
+    public boolean finished() {
+        return this.game.isOver();
     }
 
     @Override
