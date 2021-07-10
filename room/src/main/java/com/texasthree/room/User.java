@@ -1,13 +1,14 @@
 package com.texasthree.room;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.texasthree.room.net.Server;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class User {
 
-    static ObjectMapper mapper = new ObjectMapper();
+    public static Server server;
 
     private static Map<String, User> userMap = new HashMap<>();
 
@@ -24,13 +25,22 @@ public class User {
         userMap.put(data.id, this);
     }
 
+    /**
+     * 进入房间
+     */
     public void enter(Room room) {
         room.addUser(this);
         this.room = room;
     }
 
-    public void leave(Room room) {
-        room.removeUser(this);
+    /**
+     * 离开房间
+     */
+    public void leave() {
+        if (this.room == null) {
+            return;
+        }
+        this.room.removeUser(this);
         this.room = null;
     }
 
@@ -51,7 +61,16 @@ public class User {
         return this.data.name + ":" + this.data.id;
     }
 
-    public void send(Object msg) {
+    public void send(Object obj) {
+        send(obj, this.getId());
+    }
 
+    public static void send(Object obj, String uid) {
+        server.send(obj, uid);
+
+    }
+
+    public static void send(Object obj, Set<String> uids) {
+        server.send(obj, uids);
     }
 }

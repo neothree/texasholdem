@@ -21,32 +21,29 @@ public class Cmd {
         public String creator;
     }
 
-
-    public static class SetName {
-        public String name;
-    }
-
-
     public static class CreateRoom {
         public RoomData data;
     }
 
     public static class EnterRoom {
-        public String id;
+        public String roomId;
 
     }
 
     public static class LeaveRoom {
-        public String id;
 
     }
 
-    public static class Sitdown {
+    public static class SitDown {
         public int position;
     }
 
-    public static class Situp {
+    public static class SitUp {
         public int position;
+    }
+
+    public static class EnableRound {
+
     }
 
     public static class StartGame {
@@ -73,7 +70,7 @@ public class Cmd {
 
     }
 
-    public static class BetAction {
+    public static class PlayerAction {
         public Action action;
         public int sumPot;
     }
@@ -101,5 +98,8 @@ public class Cmd {
 
     public static class Heartbeat {
         public long timestamp;
+    }
+
+    public static class Dismiss {
     }
 }

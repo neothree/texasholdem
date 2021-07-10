@@ -35,6 +35,10 @@ public class MessageDispatcher {
         for (var m : cmds) {
             var params = m.getParameterTypes();
             var name = params[0].getSimpleName().toLowerCase();
+            if (messageClass.containsKey(name)) {
+                throw new IllegalStateException("消息重复注册 " + params[0].getSimpleName());
+            }
+
             messageClass.put(name, params[0]);
             messageConsumers.put(name, (data, user) -> {
                 try {

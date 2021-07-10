@@ -4,10 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.http.ServerWebSocket;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -17,12 +19,19 @@ import java.util.regex.Pattern;
 @Slf4j
 public class Server {
 
+    private Vertx vertx;
+
+    private EventBus eventBus;
+
     private int port = 8090;
 
     private MessageDispatcher dispatcher;
 
     public void start() {
         log.info("开始启动服务器");
+        this.vertx = Vertx.vertx();
+        this.eventBus = vertx.eventBus();
+
         this.startWebsocket();
 
         this.dispatcher = new MessageDispatcher();
@@ -33,10 +42,8 @@ public class Server {
 
 
     private void startWebsocket() {
-        var vertx = Vertx.vertx();
 
         final var chatUrlPattern = Pattern.compile("/chat/(\\w+)");
-        final var eventBus = vertx.eventBus();
 
         vertx.createHttpServer().webSocketHandler(new Handler<ServerWebSocket>() {
             @Override
@@ -78,5 +85,27 @@ public class Server {
             }
         }).listen(port);
         log.info("websocket server 启动");
+    }
+
+    public void send(Object obj, String uid) {
+        try {
+            var str = new ObjectMapper().writeValueAsString(obj);
+            var message = new Message(null, obj.getClass().getSimpleName(), str);
+            eventBus.send(uid, message);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void send(Object obj, Set<String> uids) {
+        try {
+            var str = new ObjectMapper().writeValueAsString(obj);
+            var message = new Message(null, obj.getClass().getSimpleName(), str);
+            for (var uid : uids) {
+                eventBus.send(uid, message);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

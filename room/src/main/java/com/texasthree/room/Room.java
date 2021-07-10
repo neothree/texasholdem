@@ -46,17 +46,28 @@ public class Room {
         this.desk.sitDown(user, position);
     }
 
-    public void sitUp(int position) {
-        this.desk.sitUp(position);
+    public void sitUp(User user) {
+        this.desk.sitUp(user);
+    }
+
+    public void dismiss(User user) {
+
+    }
+
+    public void enableRound(User user) {
+
     }
 
     public void start() {
         this.desk.start();
     }
 
-
     public String getName() {
         return this.data.name;
+    }
+
+    private void loop() {
+        this.desk.loop();
     }
 
     @Override
@@ -64,7 +75,4 @@ public class Room {
         return this.getName();
     }
 
-    private void loop() {
-        this.desk.loop();
-    }
 }

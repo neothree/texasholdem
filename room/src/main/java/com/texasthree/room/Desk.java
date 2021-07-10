@@ -1,14 +1,11 @@
 package com.texasthree.room;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.texasthree.room.round.Round;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class Desk {
-
-    static ObjectMapper mapper = new ObjectMapper();
 
     public User[] seats = new User[8];
 
@@ -19,14 +16,23 @@ public class Desk {
     public Desk() {
     }
 
+    /**
+     * 添加玩家
+     */
     public void addUser(User user) {
         audience.put(user.getId(), user);
     }
 
+    /**
+     * 移除玩家
+     */
     public void removeUser(User user) {
         audience.remove(user.getId());
     }
 
+    /**
+     * 玩家坐下
+     */
     public void sitDown(User user, int position) {
         if (position >= seats.length || seats[position] != null) {
             throw new IllegalArgumentException();
@@ -36,14 +42,17 @@ public class Desk {
         this.audience.remove(user.getId());
     }
 
-    public void sitUp(int position) {
-        var user = seats[position];
-        if (user == null) {
-            return;
+    /**
+     * 玩家站起
+     */
+    public void sitUp(User user) {
+        for (var i = 0; i < seats.length; i++) {
+            var v = seats[i];
+            if (v != null && v.getId().equals(user.getId())) {
+                this.audience.put(user.getId(), user);
+                seats[i] = null;
+            }
         }
-
-        this.audience.put(user.getId(), user);
-        seats[position] = null;
     }
 
     public void start() {
@@ -61,15 +70,13 @@ public class Desk {
     }
 
     public void send(Object msg) {
-        try {
-            Cmd.Command cmd = new Cmd.Command();
-            cmd.name = msg.getClass().getSimpleName();
-            cmd.data = mapper.writeValueAsString(msg);
-            String send = mapper.writeValueAsString(cmd);
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        var set = this.audience.keySet();
+        for (var v : seats) {
+            if (v != null) {
+                set.add(v.getId());
+            }
         }
+        User.send(msg, set);
     }
 
     public User[] getUsers() {
