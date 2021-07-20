@@ -1,6 +1,6 @@
 package com.texasthree.room;
 
-import com.texasthree.room.net.Server;
+import com.texasthree.core.Server;
 
 import java.util.HashMap;
 import java.util.Map;

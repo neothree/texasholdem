@@ -1,12 +1,15 @@
-package com.texasthree.room.net;
+package com.texasthree.core;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.texasthree.core.net.Message;
+import com.texasthree.core.net.MessageDispatcher;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.EventBus;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 /**
@@ -24,7 +27,7 @@ public class Server {
 
     private MessageDispatcher dispatcher;
 
-    public void start() {
+    public void start(String path, Function<String, Object> find) {
         log.info("开始启动服务器");
         this.vertx = Vertx.vertx();
         this.eventBus = vertx.eventBus();
@@ -32,7 +35,7 @@ public class Server {
         this.startWebsocket();
 
         this.dispatcher = new MessageDispatcher();
-        this.dispatcher.init();
+        this.dispatcher.init(path, find);
 
         log.info("服务器启动成功");
     }

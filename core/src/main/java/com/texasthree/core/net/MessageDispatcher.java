@@ -1,7 +1,6 @@
-package com.texasthree.room.net;
+package com.texasthree.core.net;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.texasthree.room.User;
 import lombok.extern.slf4j.Slf4j;
 import org.reflections.Reflections;
 
@@ -9,6 +8,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -24,8 +24,11 @@ public class MessageDispatcher {
 
     private Map<String, Class> messageClass = new HashMap<>();
 
-    public void init() {
-        var f = new Reflections("com.texasthree.room");
+    private Function<String, Object> func;
+
+    public void init(String path, Function<String, Object> func) {
+        this.func = func;
+        var f = new Reflections(path);
         var set = f.getTypesAnnotatedWith(Controller.class);
         var cmds = set.stream()
                 .map(Class::getMethods)
@@ -51,6 +54,7 @@ public class MessageDispatcher {
         log.info("注册消息注册数量 {}", messageClass.size());
     }
 
+    @SuppressWarnings("unchecked")
     public void dispatch(Message message) {
         var consumer = this.messageConsumers.get(message.name);
         if (consumer == null) {
@@ -58,13 +62,13 @@ public class MessageDispatcher {
             throw new IllegalArgumentException();
         }
 
-        var user = User.getUser(message.uid);
-        if (user == null) {
+        var who = this.func.apply(message.uid);
+        if (who == null) {
             throw new IllegalStateException("没有找到玩家 uid=" + message.uid);
         }
         try {
             var cmd = new ObjectMapper().readValue(message.name, messageClass.get(message.name));
-            consumer.accept(cmd, user);
+            consumer.accept(cmd, who);
         } catch (Exception e) {
             e.printStackTrace();
         }

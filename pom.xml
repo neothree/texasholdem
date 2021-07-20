@@ -11,6 +11,7 @@
     <modules>
         <module>room</module>
         <module>game</module>
+        <module>core</module>
     </modules>
 
     <!--版本维护-->

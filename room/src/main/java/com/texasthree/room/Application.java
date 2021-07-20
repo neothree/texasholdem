@@ -1,7 +1,6 @@
-package com.texasthree;
+package com.texasthree.room;
 
-import com.texasthree.room.User;
-import com.texasthree.room.net.Server;
+import com.texasthree.core.Server;
 import org.apache.log4j.BasicConfigurator;
 
 
@@ -11,7 +10,7 @@ public class Application {
         BasicConfigurator.configure();
 
         var server = new Server();
-        server.start();
+        server.start("com.texasthree.room.controller", uid -> User.getUser(uid));
 
         // TODO 移除
         User.server = server;

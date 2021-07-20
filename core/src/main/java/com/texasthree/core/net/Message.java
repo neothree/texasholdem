@@ -1,4 +1,4 @@
-package com.texasthree.room.net;
+package com.texasthree.core.net;
 
 /**
  * @author: neo

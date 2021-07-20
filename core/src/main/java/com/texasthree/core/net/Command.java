@@ -1,4 +1,4 @@
-package com.texasthree.room.net;
+package com.texasthree.core.net;
 
 import java.lang.annotation.*;
 

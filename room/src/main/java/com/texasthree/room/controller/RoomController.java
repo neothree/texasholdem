@@ -1,10 +1,10 @@
 package com.texasthree.room.controller;
 
+import com.texasthree.core.net.Command;
+import com.texasthree.core.net.Controller;
 import com.texasthree.room.Cmd;
 import com.texasthree.room.Room;
 import com.texasthree.room.User;
-import com.texasthree.room.net.Command;
-import com.texasthree.room.net.Controller;
 
 /**
  * @author: neo
