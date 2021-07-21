@@ -26,8 +26,9 @@ public class MessageDispatcher {
 
     private Function<String, Object> func;
 
-    public void init(String path, Function<String, Object> func) {
+    public void register(String path, Function<String, Object> func) {
         this.func = func;
+
         var f = new Reflections(path);
         var set = f.getTypesAnnotatedWith(Controller.class);
         var cmds = set.stream()
@@ -42,6 +43,7 @@ public class MessageDispatcher {
                 throw new IllegalStateException("消息重复注册 " + params[0].getSimpleName());
             }
 
+            log.debug("注册消息 {}", name);
             messageClass.put(name, params[0]);
             messageConsumers.put(name, (data, user) -> {
                 try {
@@ -56,7 +58,7 @@ public class MessageDispatcher {
 
     @SuppressWarnings("unchecked")
     public void dispatch(Message message) {
-        var consumer = this.messageConsumers.get(message.name);
+        var consumer = this.messageConsumers.get(message.name.toLowerCase());
         if (consumer == null) {
             log.error("未知消息 {}", message.name);
             throw new IllegalArgumentException();
