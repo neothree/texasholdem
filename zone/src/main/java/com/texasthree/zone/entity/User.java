@@ -1,6 +1,6 @@
 package com.texasthree.zone.entity;
 
-import com.texasthree.core.Server;
+import com.texasthree.zone.net.Server;
 import com.texasthree.zone.controller.Cmd;
 
 import java.util.HashMap;

@@ -1,7 +1,7 @@
 package com.texasthree.zone.controller;
 
-import com.texasthree.core.net.Command;
-import com.texasthree.core.net.Controller;
+import com.texasthree.zone.net.Command;
+import com.texasthree.zone.net.Controller;
 import com.texasthree.zone.entity.Room;
 import com.texasthree.zone.entity.User;
 

@@ -1,8 +1,8 @@
-package com.texasthree.core;
+package com.texasthree.zone.net;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.texasthree.core.net.Message;
-import com.texasthree.core.net.MessageDispatcher;
+import com.texasthree.zone.net.Message;
+import com.texasthree.zone.net.MessageDispatcher;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.ServerWebSocket;
 import lombok.extern.slf4j.Slf4j;

@@ -1,4 +1,4 @@
-package com.texasthree.core.net;
+package com.texasthree.zone.net;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;

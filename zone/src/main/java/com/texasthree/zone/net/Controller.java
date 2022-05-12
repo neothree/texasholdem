@@ -1,15 +1,15 @@
-package com.texasthree.core.net;
+package com.texasthree.zone.net;
 
 import java.lang.annotation.*;
 
 /**
- * 网络消息
+ * 消息
  *
  * @author: neo
  * @create: 2021-07-09 15:05
  */
-@Target({ElementType.METHOD})
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface Command {
+public @interface Controller {
 }
