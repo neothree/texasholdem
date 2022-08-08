@@ -10,7 +10,6 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>game</module>
-        <module>core</module>
         <module>zone</module>
     </modules>
 
@@ -29,7 +28,6 @@
         <java.version>11</java.version>
         <junit-jupiter.version>5.4.0</junit-jupiter.version>
         <jackson.version>2.12.3</jackson.version>
-        <lombok.version>1.18.20</lombok.version>
         <vertx-web.version>4.3.0</vertx-web.version>
     </properties>
 
@@ -45,13 +43,6 @@
             <artifactId>junit-jupiter-engine</artifactId>
             <version>${junit-jupiter.version}</version>
             <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>

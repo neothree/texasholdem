@@ -1,7 +1,6 @@
 package com.texasthree.game.texas;
 
 import com.texasthree.game.pineapple.RowCard;
-import lombok.Getter;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -12,7 +11,6 @@ import java.util.stream.Collectors;
 /**
  * 手牌
  */
-@Getter
 public class Hand implements Comparable<Hand> {
 
 
@@ -732,5 +730,21 @@ public class Hand implements Comparable<Hand> {
             }
             return ret;
         }
+    }
+
+    public List<Card> getHold() {
+        return hold;
+    }
+
+    public CardType getType() {
+        return type;
+    }
+
+    public List<Card> getBest() {
+        return best;
+    }
+
+    public List<Card> getKeys() {
+        return keys;
     }
 }

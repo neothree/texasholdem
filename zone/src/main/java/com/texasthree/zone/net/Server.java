@@ -5,7 +5,8 @@ import com.texasthree.zone.net.Message;
 import com.texasthree.zone.net.MessageDispatcher;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.ServerWebSocket;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -18,8 +19,9 @@ import java.util.regex.Pattern;
  * @author: neo
  * @create: 2021-07-09 15:13
  */
-@Slf4j
 public class Server {
+
+    private static Logger log = LoggerFactory.getLogger(Server.class);
 
     private Vertx vertx;
 

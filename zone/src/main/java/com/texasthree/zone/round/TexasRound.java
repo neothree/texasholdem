@@ -5,7 +5,8 @@ import com.texasthree.zone.entity.ScheduledEvent;
 import com.texasthree.zone.entity.User;
 import com.texasthree.game.GameState;
 import com.texasthree.game.texas.*;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,8 +21,10 @@ import java.util.stream.Collectors;
  * @author : neo
  * create at:  2020-06-29  15:26
  */
-@Slf4j
 class TexasRound implements Round {
+
+    private static Logger log = LoggerFactory.getLogger(TexasRound.class);
+
     final static int TIMEOUT_ACTION = 15000;
     final static int TIMEOUT_MOVE_FOLD = 800;
     final static int TIMEOUT_MOVE_ACTION = 500;

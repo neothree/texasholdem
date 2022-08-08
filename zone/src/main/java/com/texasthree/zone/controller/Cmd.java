@@ -27,7 +27,6 @@ public class Cmd {
 
     public static class EnterRoom {
         public String roomId;
-
     }
 
     public static class LeaveRoom {
@@ -101,5 +100,13 @@ public class Cmd {
     }
 
     public static class Dismiss {
+    }
+
+    public static class Warning {
+        public String message;
+
+        public Warning(String message) {
+            this.message = message;
+        }
     }
 }

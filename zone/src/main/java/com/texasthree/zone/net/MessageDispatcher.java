@@ -1,8 +1,9 @@
 package com.texasthree.zone.net;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
 import org.reflections.Reflections;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -17,8 +18,9 @@ import java.util.stream.Collectors;
  * @author: neo
  * @create: 2021-07-09 16:21
  */
-@Slf4j
 public class MessageDispatcher {
+
+    private static Logger log = LoggerFactory.getLogger(MessageDispatcher.class);
 
     private Map<String, BiConsumer> messageConsumers = new HashMap<>();
 
