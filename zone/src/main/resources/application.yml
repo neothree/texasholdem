@@ -1,0 +1,10 @@
+server:
+  port: 8090
+  servlet:
+    session:
+      timeout: 30M
+spring:
+  profiles:
+    active: dev # 默认启动开发环境
+  application:
+    name: zone
