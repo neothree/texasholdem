@@ -1,9 +1,12 @@
 package com.texasthree.zone.net;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.texasthree.zone.packet.Packet;
+import com.texasthree.zone.packet.PacketHandler;
+import com.texasthree.zone.utility.JSONUtils;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -18,9 +21,10 @@ import java.util.stream.Collectors;
  * @author: neo
  * @create: 2021-07-09 16:21
  */
-public class MessageDispatcher {
+@Service
+public class PacketDispatcher implements PacketHandler {
 
-    private static Logger log = LoggerFactory.getLogger(MessageDispatcher.class);
+    private static Logger log = LoggerFactory.getLogger(PacketDispatcher.class);
 
     private Map<String, BiConsumer> messageConsumers = new HashMap<>();
 
@@ -63,18 +67,24 @@ public class MessageDispatcher {
         var consumer = this.messageConsumers.get(message.name.toLowerCase());
         if (consumer == null) {
             log.error("未知消息 {}", message.name);
-            throw new IllegalArgumentException();
+            return;
         }
 
         var who = this.func.apply(message.uid);
         if (who == null) {
-            throw new IllegalStateException("没有找到玩家 uid=" + message.uid);
+            log.error("没有找到玩家 uid={}" + message.uid);
+            return;
         }
         try {
-            var cmd = new ObjectMapper().readValue(message.name, messageClass.get(message.name));
+            var cmd = JSONUtils.readValue(message.name, messageClass.get(message.name));
             consumer.accept(cmd, who);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("消息派发异常 message={} user={} reason={}", message.name, who, e.getMessage());
         }
+    }
+
+    @Override
+    public void handle(Packet packet) {
+        log.info("收到packet消息 {}", packet);
     }
 }

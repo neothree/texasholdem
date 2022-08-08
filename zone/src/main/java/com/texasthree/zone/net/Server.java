@@ -1,8 +1,5 @@
 package com.texasthree.zone.net;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.texasthree.zone.net.Message;
-import com.texasthree.zone.net.MessageDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +10,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
-import java.util.function.Function;
 
 /**
  * @author: neo
@@ -30,13 +26,13 @@ public class Server {
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
-    private MessageDispatcher dispatcher;
+    private PacketDispatcher dispatcher;
 
 
     public void start() {
         log.info("开始启动服务器");
 
-//        this.dispatcher = new MessageDispatcher();
+        this.dispatcher = new PacketDispatcher();
 //        this.dispatcher.register(path, find);
 
         log.info("服务器启动成功");
