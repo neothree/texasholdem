@@ -1,5 +1,6 @@
 package com.texasthree.zone.net;
 
+import com.texasthree.zone.entity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,18 +40,17 @@ public class Server {
     private final PacketDispatcher dispatcher;
 
     @Autowired
-    public Server(SimpMessagingTemplate messagingTemplate,
-                  PacketDispatcher dispatcher) {
+    public Server(SimpMessagingTemplate messagingTemplate) {
         this.messagingTemplate = messagingTemplate;
-        this.dispatcher = dispatcher;
+        this.dispatcher = new PacketDispatcher(User::getUser);
     }
 
     public void start() {
-//        dispatcher.register("com.texasthree.zone.controller");
+        dispatcher.register("com.texasthree.zone.controller");
     }
 
     @EventListener
-    public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
+    public void onWebSocketDisconnect(SessionDisconnectEvent event) {
 //        var headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
 //        String username = (String) headerAccessor.getSessionAttributes().get("username");
         log.info("Webscoket seesion断开连接 {}", event.getSessionId());

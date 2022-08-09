@@ -5,12 +5,13 @@ import com.texasthree.zone.utility.JSONUtils;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -19,14 +20,19 @@ import java.util.stream.Collectors;
  * @author: neo
  * @create: 2021-07-09 16:21
  */
-@Service
 public class PacketDispatcher {
 
     private static Logger log = LoggerFactory.getLogger(PacketDispatcher.class);
 
-    private Map<String, BiConsumer> messageConsumers = new HashMap<>();
+    private Map<String, BiConsumer<Object, User>> messageConsumers = new HashMap<>();
 
-    private Map<String, Class> messageClass = new HashMap<>();
+    private Map<String, Class<?>> messageClass = new HashMap<>();
+
+    private Function<String, User> userSource;
+
+    public PacketDispatcher(Function<String, User> userSource) {
+        this.userSource = userSource;
+    }
 
     public void register(String path) {
         var f = new Reflections(path);
@@ -38,45 +44,47 @@ public class PacketDispatcher {
                 .collect(Collectors.toList());
         for (var m : cmds) {
             var params = m.getParameterTypes();
-            var name = params[0].getSimpleName().toLowerCase();
+            var name = params[0].getSimpleName();
             if (messageClass.containsKey(name)) {
                 throw new IllegalStateException("消息重复注册 " + params[0].getSimpleName());
             }
 
-            log.debug("注册消息 {}", name);
+            log.info("注册消息 {}", name);
             messageClass.put(name, params[0]);
             messageConsumers.put(name, (data, user) -> {
                 try {
-                    m.invoke(data, user);
+                    m.invoke(null, data, user);
                 } catch (Exception e) {
-                    log.error("消息效用异常 {}", name);
+                    log.error("消息调用异常 {} {}", name, m);
                 }
             });
         }
         log.info("注册消息注册数量 {}", messageClass.size());
     }
 
-    @SuppressWarnings("unchecked")
     public void dispatch(Packet packet) {
         var uid = packet.parse();
-        var user = User.getUser(uid);
+        var user = userSource.apply(uid);
         if (user == null) {
             log.error("没有找到玩家 uid={}" + uid);
             return;
         }
+        this.dispatch(packet.getName(), packet.getPayload(), user);
+    }
 
-        var name = packet.getName();
-        var consumer = this.messageConsumers.get(name.toLowerCase());
+    public void dispatch(String name, String payload, User user) {
+        Objects.requireNonNull(name);
+        var consumer = this.messageConsumers.get(name);
         if (consumer == null) {
-            log.error("未知消息 {}", name);
+            log.error("消息派发失败，未知的消息名称 {}", name);
             return;
         }
 
         try {
-            var data = JSONUtils.readValue(name, messageClass.get(name));
+            var data = JSONUtils.readValue(payload, messageClass.get(name));
             consumer.accept(data, user);
         } catch (Exception e) {
-            log.error("消息派发异常 message={} user={} reason={}", name, user, e.getMessage());
+            log.error("消息派发异常 message={} reason={}", name, e.getMessage());
         }
     }
 }

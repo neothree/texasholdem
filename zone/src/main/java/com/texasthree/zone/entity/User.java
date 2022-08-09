@@ -21,6 +21,8 @@ public class User {
 
     private Room room;
 
+    public User() {}
+
     public User(Cmd.UserData data) {
         this.data = data;
         userMap.put(data.id, this);
