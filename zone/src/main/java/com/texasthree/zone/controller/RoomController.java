@@ -16,7 +16,7 @@ public class RoomController {
      * 进入房间
      */
     @Command
-    public void command(Cmd.EnterRoom data, User user) {
+    public static void command(Cmd.EnterRoom data, User user) {
         var room = checkRoom(data.roomId, user);
         if (room == null) {
             return;
@@ -28,7 +28,7 @@ public class RoomController {
      * 离开房间
      */
     @Command
-    public void command(Cmd.LeaveRoom data, User user) {
+    public static void command(Cmd.LeaveRoom data, User user) {
         user.leave();
     }
 
@@ -36,7 +36,7 @@ public class RoomController {
      * 坐下
      */
     @Command
-    public void command(Cmd.SitDown data, User user) {
+    public static void command(Cmd.SitDown data, User user) {
         var room = user.getRoom();
         if (room == null) {
             user.send(new Cmd.Warning("房间不存在"));
@@ -49,7 +49,7 @@ public class RoomController {
      * 站起
      */
     @Command
-    public void command(Cmd.SitUp data, User user) {
+    public static void command(Cmd.SitUp data, User user) {
         var room = user.getRoom();
         if (room == null) {
             throw new IllegalArgumentException("房间不存在");
@@ -61,7 +61,7 @@ public class RoomController {
      * 解散房间
      */
     @Command
-    public void command(Cmd.Dismiss data, User user) {
+    public static void command(Cmd.Dismiss data, User user) {
         var room = user.getRoom();
         if (room == null) {
             throw new IllegalArgumentException("房间不存在");
@@ -73,7 +73,7 @@ public class RoomController {
      * 启动房间牌局
      */
     @Command
-    public void command(Cmd.EnableRound data, User user) {
+    public static void command(Cmd.EnableRound data, User user) {
         var room = user.getRoom();
         if (room == null) {
             throw new IllegalArgumentException("房间不存在");
@@ -85,11 +85,11 @@ public class RoomController {
      * 玩家执行牌局操作
      */
     @Command
-    public void command(Cmd.PlayerAction data, User user) {
+    public static void command(Cmd.PlayerAction data, User user) {
 
     }
 
-    private Room checkRoom(String roomId, User user) {
+    private static Room checkRoom(String roomId, User user) {
         var room = Room.getRoom(roomId);
         if (room == null) {
             user.send(new Cmd.Warning("房间不存在"));

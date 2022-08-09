@@ -6,6 +6,7 @@ import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,7 +41,7 @@ public class PacketDispatcher {
         var cmds = set.stream()
                 .map(Class::getMethods)
                 .flatMap(Arrays::stream)
-                .filter(v -> v.isAnnotationPresent(Command.class))
+                .filter(v -> v.isAnnotationPresent(Command.class) && Modifier.isStatic(v.getModifiers()))
                 .collect(Collectors.toList());
         for (var m : cmds) {
             var params = m.getParameterTypes();
@@ -49,7 +50,6 @@ public class PacketDispatcher {
                 throw new IllegalStateException("消息重复注册 " + params[0].getSimpleName());
             }
 
-            log.info("注册消息 {}", name);
             messageClass.put(name, params[0]);
             messageConsumers.put(name, (data, user) -> {
                 try {
