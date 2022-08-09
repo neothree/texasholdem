@@ -22,7 +22,7 @@ public class Cmd {
     }
 
     public static class CreateRoom {
-        public RoomData data;
+        public String name;
     }
 
     public static class EnterRoom {

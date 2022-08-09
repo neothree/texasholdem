@@ -1,5 +1,6 @@
 package com.texasthree.zone.controller;
 
+import com.texasthree.zone.entity.RoomConfig;
 import com.texasthree.zone.net.Command;
 import com.texasthree.zone.net.Controller;
 import com.texasthree.zone.entity.Room;
@@ -11,6 +12,13 @@ import com.texasthree.zone.entity.User;
  */
 @Controller
 public class RoomController {
+
+    @Command
+    public static void command(Cmd.CreateRoom data, User user) {
+        var config = new RoomConfig();
+        var room = new Room(config, user);
+    }
+
 
     /**
      * 进入房间
@@ -66,7 +74,7 @@ public class RoomController {
         if (room == null) {
             throw new IllegalArgumentException("房间不存在");
         }
-        room.dismiss(user);
+        room.dismiss();
     }
 
     /**
@@ -78,7 +86,7 @@ public class RoomController {
         if (room == null) {
             throw new IllegalArgumentException("房间不存在");
         }
-        room.enableRound(user);
+        room.enableRound();
     }
 
     /**

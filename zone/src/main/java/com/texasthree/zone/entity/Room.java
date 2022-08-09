@@ -1,7 +1,7 @@
 package com.texasthree.zone.entity;
 
 
-import com.texasthree.zone.controller.Cmd;
+import com.texasthree.zone.utility.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,9 +18,13 @@ public class Room {
         return roomMap.get(id);
     }
 
-    private Cmd.RoomData data;
+    private RoomConfig config;
 
     private Desk desk;
+
+    private User creator;
+
+    private boolean isStart;
 
     /**
      * 定时器
@@ -28,10 +32,12 @@ public class Room {
     private ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
 
 
-    public Room(Cmd.RoomData data) {
-        this.data = data;
+    public Room(RoomConfig data, User user) {
+        data.setId(StringUtils.get32UUID());
+        this.config = data;
         this.desk = new Desk();
-        roomMap.put(data.id, this);
+        this.creator = user;
+        roomMap.put(data.getId(), this);
 
         service.scheduleAtFixedRate(() -> loop(), 1000L, 200L, TimeUnit.MILLISECONDS);
     }
@@ -52,12 +58,12 @@ public class Room {
         this.desk.sitUp(user);
     }
 
-    public void dismiss(User user) {
-
+    public void dismiss() {
+        roomMap.remove(this.config.getId());
     }
 
-    public void enableRound(User user) {
-
+    public void enableRound() {
+        this.isStart = true;
     }
 
     public void start() {
@@ -65,7 +71,7 @@ public class Room {
     }
 
     public String getName() {
-        return this.data.name;
+        return this.config.getName();
     }
 
     private void loop() {
