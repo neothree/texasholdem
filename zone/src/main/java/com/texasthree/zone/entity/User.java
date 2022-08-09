@@ -67,11 +67,9 @@ public class User {
     }
 
     public static void send(Object obj, String uid) {
-        server.send(uid, obj);
 
     }
 
     public static void send(Object obj, Set<String> uids) {
-        server.send(uids, obj);
     }
 }

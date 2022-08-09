@@ -1,13 +1,21 @@
 package com.texasthree.zone.net;
 
+import com.texasthree.zone.packet.Packet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import java.util.Set;
 
@@ -17,35 +25,68 @@ import java.util.Set;
  */
 @EnableAsync
 @Service
+@RestController
+@RequestMapping
 public class Server {
 
     private static Logger log = LoggerFactory.getLogger(Server.class);
 
     private static final String PING_DESTINATION = "/ping";
 
+    private static final String USER_DESTINATION = "/user";
+
+    private final SimpMessagingTemplate messagingTemplate;
+
+    private final PacketDispatcher dispatcher;
+
     @Autowired
-    private SimpMessagingTemplate messagingTemplate;
-
-    private PacketDispatcher dispatcher;
-
+    public Server(SimpMessagingTemplate messagingTemplate,
+                  PacketDispatcher dispatcher) {
+        this.messagingTemplate = messagingTemplate;
+        this.dispatcher = dispatcher;
+    }
 
     public void start() {
-        log.info("开始启动服务器");
-
-        this.dispatcher = new PacketDispatcher();
-//        this.dispatcher.register(path, find);
-
-        log.info("服务器启动成功");
+        // 注册消息
     }
 
-    public void send(String uid, Object obj) {
-
+    @EventListener
+    public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
+//        var headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
+//        String username = (String) headerAccessor.getSessionAttributes().get("username");
+        log.info("Webscoket seesion断开连接 {}", event.getSessionId());
     }
 
-    public void send(Set<String> uids, Object obj) {
-
+    /**
+     * 接收到玩家的 websocket packet 消息
+     */
+    @MessageMapping("/user")
+    public void recv(SimpMessageHeaderAccessor headerAccessor,
+                     @Payload Packet packet) throws Exception {
+        this.dispatcher.dispatch(packet);
     }
 
+    public void send(Set<String> uids, Packet packet) {
+        for (var uid : uids) {
+            this.send(uid, packet.toString());
+        }
+    }
+
+    public void send(String uid, Packet packet) {
+        this.send(uid, packet.toString());
+    }
+
+    /**
+     * 发送消息给玩家
+     */
+    public void send(String uid, String msg) {
+        var destination = USER_DESTINATION + "/" + uid;
+        this.messagingTemplate.convertAndSend(destination, msg);
+    }
+
+    /**
+     * 给所有的ws链接定时发送心跳消息
+     */
     @Async
     @Scheduled(fixedRate = 1000)
     public void ping() {

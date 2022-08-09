@@ -3,6 +3,7 @@ package com.texasthree.zone.net;
 import com.texasthree.zone.packet.Packet;
 import com.texasthree.zone.packet.PacketHandler;
 import com.texasthree.zone.utility.JSONUtils;
+import com.texasthree.zone.utility.StringUtils;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
  * @create: 2021-07-09 16:21
  */
 @Service
-public class PacketDispatcher implements PacketHandler {
+public class PacketDispatcher {
 
     private static Logger log = LoggerFactory.getLogger(PacketDispatcher.class);
 
@@ -63,28 +64,25 @@ public class PacketDispatcher implements PacketHandler {
     }
 
     @SuppressWarnings("unchecked")
-    public void dispatch(Message message) {
-        var consumer = this.messageConsumers.get(message.name.toLowerCase());
+    public void dispatch(Packet packet) {
+        var uid = packet.parse();
+        var name = packet.getName();
+        var consumer = this.messageConsumers.get(name.toLowerCase());
         if (consumer == null) {
-            log.error("未知消息 {}", message.name);
+            log.error("未知消息 {}", name);
             return;
         }
 
-        var who = this.func.apply(message.uid);
+        var who = this.func.apply(uid);
         if (who == null) {
-            log.error("没有找到玩家 uid={}" + message.uid);
+            log.error("没有找到玩家 uid={}" + uid);
             return;
         }
         try {
-            var cmd = JSONUtils.readValue(message.name, messageClass.get(message.name));
+            var cmd = JSONUtils.readValue(name, messageClass.get(name));
             consumer.accept(cmd, who);
         } catch (Exception e) {
-            log.error("消息派发异常 message={} user={} reason={}", message.name, who, e.getMessage());
+            log.error("消息派发异常 message={} user={} reason={}", name, who, e.getMessage());
         }
-    }
-
-    @Override
-    public void handle(Packet packet) {
-        log.info("收到packet消息 {}", packet);
     }
 }
