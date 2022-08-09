@@ -1,6 +1,5 @@
 package com.texasthree.zone.net;
 
-import com.texasthree.zone.packet.Packet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +46,7 @@ public class Server {
     }
 
     public void start() {
-        // 注册消息
+//        dispatcher.register("com.texasthree.zone.controller");
     }
 
     @EventListener

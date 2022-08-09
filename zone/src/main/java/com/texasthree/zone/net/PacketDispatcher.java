@@ -1,9 +1,7 @@
 package com.texasthree.zone.net;
 
-import com.texasthree.zone.packet.Packet;
-import com.texasthree.zone.packet.PacketHandler;
+import com.texasthree.zone.entity.User;
 import com.texasthree.zone.utility.JSONUtils;
-import com.texasthree.zone.utility.StringUtils;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +11,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -31,11 +28,7 @@ public class PacketDispatcher {
 
     private Map<String, Class> messageClass = new HashMap<>();
 
-    private Function<String, Object> func;
-
-    public void register(String path, Function<String, Object> func) {
-        this.func = func;
-
+    public void register(String path) {
         var f = new Reflections(path);
         var set = f.getTypesAnnotatedWith(Controller.class);
         var cmds = set.stream()
@@ -56,7 +49,7 @@ public class PacketDispatcher {
                 try {
                     m.invoke(data, user);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.error("消息效用异常 {}", name);
                 }
             });
         }
@@ -66,6 +59,12 @@ public class PacketDispatcher {
     @SuppressWarnings("unchecked")
     public void dispatch(Packet packet) {
         var uid = packet.parse();
+        var user = User.getUser(uid);
+        if (user == null) {
+            log.error("没有找到玩家 uid={}" + uid);
+            return;
+        }
+
         var name = packet.getName();
         var consumer = this.messageConsumers.get(name.toLowerCase());
         if (consumer == null) {
@@ -73,16 +72,11 @@ public class PacketDispatcher {
             return;
         }
 
-        var who = this.func.apply(uid);
-        if (who == null) {
-            log.error("没有找到玩家 uid={}" + uid);
-            return;
-        }
         try {
-            var cmd = JSONUtils.readValue(name, messageClass.get(name));
-            consumer.accept(cmd, who);
+            var data = JSONUtils.readValue(name, messageClass.get(name));
+            consumer.accept(data, user);
         } catch (Exception e) {
-            log.error("消息派发异常 message={} user={} reason={}", name, who, e.getMessage());
+            log.error("消息派发异常 message={} user={} reason={}", name, user, e.getMessage());
         }
     }
 }

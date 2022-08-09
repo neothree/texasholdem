@@ -1,4 +1,4 @@
-package com.texasthree.zone.packet;
+package com.texasthree.zone.net;
 
 /**
  * @author: neo

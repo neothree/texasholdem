@@ -1,4 +1,4 @@
-package com.texasthree.zone.packet;
+package com.texasthree.zone.net;
 
 import com.texasthree.zone.utility.JwtUtils;
 import com.texasthree.zone.utility.StringUtils;
