@@ -56,7 +56,7 @@ public class Desk {
     }
 
     public void start() {
-        this.round = Round.texas(this.seats, (Object msg) -> this.send(msg));
+        this.round = Round.texas(this.seats);
         try {
             this.round.start();
         } catch (Exception e) {

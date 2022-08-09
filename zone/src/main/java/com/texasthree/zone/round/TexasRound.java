@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -41,8 +42,6 @@ class TexasRound implements Round {
      */
     private ScheduledEvent opEvent;
 
-    private RoundEventHandler eventHandler;
-
     private PlayerInfo opPlayer;
 
     private boolean isOver;
@@ -53,9 +52,11 @@ class TexasRound implements Round {
 
     private User[] users;
 
+    private Consumer<RoundEvent> eventConsumer;
 
-    TexasRound(User[] users) {
+    TexasRound(User[] users, Consumer<RoundEvent> eventConsumer) {
         this.users = users;
+        this.eventConsumer = eventConsumer;
     }
 
     @Override
@@ -85,7 +86,7 @@ class TexasRound implements Round {
             throw new IllegalStateException();
         }
 
-        this.eventHandler.trigger(RoundEvent.START_GAME);
+        this.eventConsumer.accept(RoundEvent.START_GAME);
 
 
         this.dealCard();
@@ -100,7 +101,7 @@ class TexasRound implements Round {
      */
     @Override
     public void action(Action action) {
-        this.eventHandler.trigger(RoundEvent.ACTION);
+        this.eventConsumer.accept(RoundEvent.ACTION);
 
         this.opEvent = null;
         this.opPlayer = null;
@@ -130,7 +131,7 @@ class TexasRound implements Round {
      * 发牌
      */
     private void dealCard() {
-        this.eventHandler.trigger(RoundEvent.DEAL_CARD);
+        this.eventConsumer.accept(RoundEvent.DEAL_CARD);
         this.updateHand();
     }
 
@@ -139,7 +140,7 @@ class TexasRound implements Round {
      * create at 2020-06-30 10:26
      */
     private void updateHand() {
-        this.eventHandler.trigger(RoundEvent.UPDATE_HAND);
+        this.eventConsumer.accept(RoundEvent.UPDATE_HAND);
     }
 
     private boolean isLeave(String id) {
@@ -170,7 +171,7 @@ class TexasRound implements Round {
     private void moveNextOp() {
         this.opPlayer = new PlayerInfo();
         this.opEvent = new ScheduledEvent(() -> this.onOpTimeout(), this.actDuration);
-        this.eventHandler.trigger(RoundEvent.NEW_OPERATOR);
+        this.eventConsumer.accept(RoundEvent.NEW_OPERATOR);
         log.info("轮到下一位进行押注 opId={} position={}", this.opPlayer.user.getId(), this.opPlayer.position);
     }
 
@@ -182,7 +183,7 @@ class TexasRound implements Round {
      */
     private void moveCircleEnd() {
         this.printCircle();
-        this.eventHandler.trigger(RoundEvent.CIRCLE_END);
+        this.eventConsumer.accept(RoundEvent.CIRCLE_END);
 
         this.updateHand();
 
@@ -200,7 +201,7 @@ class TexasRound implements Round {
         this.opEvent = null;
         this.opPlayer = null;
         this.isOver = true;
-        this.eventHandler.trigger(RoundEvent.SHOWDOWN);
+        this.eventConsumer.accept(RoundEvent.SHOWDOWN);
     }
 
     /**

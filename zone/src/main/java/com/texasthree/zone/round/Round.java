@@ -3,8 +3,6 @@ package com.texasthree.zone.round;
 import com.texasthree.game.texas.Action;
 import com.texasthree.zone.entity.User;
 
-import java.util.function.Consumer;
-
 /**
  * 一局牌局
  *
@@ -16,8 +14,9 @@ public interface Round {
     /**
      * 创建德州扑克
      */
-    static Round texas(User[] users, Consumer send) {
-        return new TexasRound(users, send);
+    static Round texas(User[] users) {
+        var con = new RoundEventHandler();
+        return new TexasRound(users, con::trigger);
     }
 
     /**
