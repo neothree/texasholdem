@@ -1,10 +1,9 @@
 package com.texasthree.zone.round;
 
-import com.texasthree.zone.controller.Cmd;
-import com.texasthree.zone.entity.ScheduledEvent;
-import com.texasthree.zone.entity.User;
 import com.texasthree.game.GameState;
 import com.texasthree.game.texas.*;
+import com.texasthree.zone.entity.ScheduledEvent;
+import com.texasthree.zone.entity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +11,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -43,21 +41,21 @@ class TexasRound implements Round {
      */
     private ScheduledEvent opEvent;
 
+    private RoundEventHandler eventHandler;
+
     private PlayerInfo opPlayer;
 
     private boolean isOver;
 
     private Map<String, PlayerInfo> playerMap = new HashMap<>();
 
-    private int actDuarion = 15000;
-
-    private Consumer<Object> send;
+    private int actDuration = 15000;
 
     private User[] users;
 
-    TexasRound(User[] users, Consumer send) {
+
+    TexasRound(User[] users) {
         this.users = users;
-        this.send = send;
     }
 
     @Override
@@ -87,7 +85,8 @@ class TexasRound implements Round {
             throw new IllegalStateException();
         }
 
-        this.send(new Cmd.StartGame());
+        this.eventHandler.trigger(RoundEvent.START_GAME);
+
 
         this.dealCard();
     }
@@ -101,11 +100,7 @@ class TexasRound implements Round {
      */
     @Override
     public void action(Action action) {
-
-        var send = new Cmd.PlayerAction();
-        send.sumPot = 0;
-        send.action = this.getAction(action.id + "");
-        this.send(send);
+        this.eventHandler.trigger(RoundEvent.ACTION);
 
         this.opEvent = null;
         this.opPlayer = null;
@@ -135,13 +130,7 @@ class TexasRound implements Round {
      * 发牌
      */
     private void dealCard() {
-        Cmd.DealCard info = new Cmd.DealCard();
-        info.positions = new ArrayList<>();
-        for (PlayerInfo v : this.playerMap.values()) {
-            info.positions.add(v.position);
-        }
-        this.send(info);
-
+        this.eventHandler.trigger(RoundEvent.DEAL_CARD);
         this.updateHand();
     }
 
@@ -150,48 +139,17 @@ class TexasRound implements Round {
      * create at 2020-06-30 10:26
      */
     private void updateHand() {
-        for (var v : this.playerMap.values()) {
-            if (!this.isLeave(v.user.getId())) {
-                continue;
-            }
-            var update = new Cmd.HandUpdate();
-            update.hands = new ArrayList<>();
-            update.hands.add(this.getHand(v.user.getId()));
-            v.user.send(update);
-        }
+        this.eventHandler.trigger(RoundEvent.UPDATE_HAND);
     }
 
     private boolean isLeave(String id) {
         return this.state.players.stream().anyMatch(v -> v.isLeave() && playerMap.get(id).position == v.getId());
     }
 
-    private Cmd.Hand getHand(String id) {
-        if (!this.playerMap.containsKey(id)) {
-            return null;
-        }
-        int position = this.playerMap.get(id).position;
-        Player player = this.state.players.stream().filter(v -> v.getId() == position).findFirst().orElse(null);
-        Cmd.Hand info = new Cmd.Hand();
-        info.best = cardList(player.getHand().getBest());
-        info.cards = cardList(player.getHand().getHold());
-        info.key = cardList(player.getHand().getKeys());
-        info.type = player.getHand().getType().name();
-        info.position = position;
-        return info;
-    }
-
     private List<Integer> cardList(List<Card> list) {
         return list.stream().map(v -> v.getId()).collect(Collectors.toList());
     }
 
-    private Cmd.Action getAction(String id) {
-        int position = this.playerMap.get(id).position;
-        Action act = this.state.actions.stream().filter(v -> v.id == position).findFirst().orElse(null);
-        Cmd.Action action = new Cmd.Action();
-        action.op = act.op.name();
-        action.chipsBet = act.chipsBet;
-        return action;
-    }
 
     private void move(String move) {
         if (Texas.STATE_NEXT_OP.equals(move)) {
@@ -210,11 +168,9 @@ class TexasRound implements Round {
      * create at 2020-06-30 18:07
      */
     private void moveNextOp() {
-        // TODO
         this.opPlayer = new PlayerInfo();
-
-        this.opEvent = new ScheduledEvent(() -> this.onOpTimeout(), this.actDuarion);
-        this.send(this.opInfo());
+        this.opEvent = new ScheduledEvent(() -> this.onOpTimeout(), this.actDuration);
+        this.eventHandler.trigger(RoundEvent.NEW_OPERATOR);
         log.info("轮到下一位进行押注 opId={} position={}", this.opPlayer.user.getId(), this.opPlayer.position);
     }
 
@@ -226,8 +182,7 @@ class TexasRound implements Round {
      */
     private void moveCircleEnd() {
         this.printCircle();
-
-        this.send(this.boardInfo());
+        this.eventHandler.trigger(RoundEvent.CIRCLE_END);
 
         this.updateHand();
 
@@ -245,11 +200,7 @@ class TexasRound implements Round {
         this.opEvent = null;
         this.opPlayer = null;
         this.isOver = true;
-
-        Cmd.RoundResult result = this.roundResult();
-        this.send(result);
-
-        printResult(result);
+        this.eventHandler.trigger(RoundEvent.SHOWDOWN);
     }
 
     /**
@@ -264,46 +215,10 @@ class TexasRound implements Round {
         }
 
         log.info("压住超时: {}", this.opPlayer.toString());
-        Optype op = state.ops.stream().anyMatch(v -> Optype.Check.equals(v.op)) ? Optype.Check : Optype.Fold;
-        Action action = Action.of(op);
+        var op = state.ops.stream().anyMatch(v -> Optype.Check.equals(v.op)) ? Optype.Check : Optype.Fold;
+        var action = Action.of(op);
         action.id = this.opPlayer.position;
         this.action(action);
-    }
-
-    private Cmd.NewOperator opInfo() {
-        Cmd.NewOperator info = new Cmd.NewOperator();
-        info.leftSec = this.opEvent.getNextMsec() - System.currentTimeMillis();
-        info.ops = state.ops.stream().map(v -> {
-            Cmd.Action act = new Cmd.Action();
-            act.op = v.op.name();
-            act.chipsBet = v.chipsBet;
-            return act;
-        }).collect(Collectors.toList());
-        info.position = this.opPlayer.position;
-        info.raiseLine = state.raiseLine;
-        return info;
-    }
-
-    private Cmd.CircleEnd boardInfo() {
-        Cmd.CircleEnd info = new Cmd.CircleEnd();
-        info.board = this.state.board;
-        info.devide = this.state.divides;
-        return info;
-    }
-
-    private Cmd.RoundResult roundResult() {
-        return null;
-    }
-
-    private void printResult(Cmd.RoundResult result) {
-
-    }
-
-
-    private void send(Object data) {
-        if (this.send != null) {
-            this.send.accept(data);
-        }
     }
 
     private void printStart() {

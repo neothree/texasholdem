@@ -64,6 +64,7 @@ public class Room {
 
     public void enableRound() {
         this.isStart = true;
+        this.desk.start();
     }
 
     public void start() {
