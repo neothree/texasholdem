@@ -2,7 +2,7 @@ package com.texasthree.zone.controller;
 
 import com.texasthree.zone.entity.RoomConfig;
 import com.texasthree.zone.net.Command;
-import com.texasthree.zone.net.Controller;
+import com.texasthree.zone.net.CommandController;
 import com.texasthree.zone.entity.Room;
 import com.texasthree.zone.entity.User;
 
@@ -10,7 +10,7 @@ import com.texasthree.zone.entity.User;
  * @author: neo
  * @create: 2021-06-18 10:27
  */
-@Controller
+@CommandController
 public class RoomController {
 
     @Command

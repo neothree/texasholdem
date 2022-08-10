@@ -2,13 +2,13 @@ package com.texasthree.zone.net.some;
 
 import com.texasthree.zone.entity.User;
 import com.texasthree.zone.net.Command;
-import com.texasthree.zone.net.Controller;
+import com.texasthree.zone.net.CommandController;
 
 /**
  * @author: neo
  * @create: 2022-08-09 12:04
  */
-@Controller
+@CommandController
 public class SomeController {
 
     @Command

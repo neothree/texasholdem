@@ -37,7 +37,7 @@ public class PacketDispatcher {
 
     public void register(String path) {
         var f = new Reflections(path);
-        var set = f.getTypesAnnotatedWith(Controller.class);
+        var set = f.getTypesAnnotatedWith(CommandController.class);
         var cmds = set.stream()
                 .map(Class::getMethods)
                 .flatMap(Arrays::stream)
