@@ -1,7 +1,7 @@
 package com.texasthree.zone.entity;
 
-import com.texasthree.zone.net.Server;
-import com.texasthree.zone.controller.Cmd;
+import com.texasthree.zone.net.Packet;
+import com.texasthree.zone.utility.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,23 +9,29 @@ import java.util.Set;
 
 public class User {
 
-    public static Server server;
-
     private static Map<String, User> userMap = new HashMap<>();
 
     public static User getUser(String id) {
         return userMap.get(id);
     }
 
-    private Cmd.UserData data;
+
+    private String id;
+
+    private String name;
+
+    private int chips;
 
     private Room room;
 
-    public User() {}
+    private String token;
 
-    public User(Cmd.UserData data) {
-        this.data = data;
-        userMap.put(data.id, this);
+
+    public User() {
+        this.id = StringUtils.get32UUID();
+        this.name = StringUtils.getChineseName();
+        this.token = Packet.encode(this.id);
+        userMap.put(id, this);
     }
 
     /**
@@ -51,17 +57,27 @@ public class User {
         return this.room;
     }
 
-    public String getId() {
-        return this.data.id;
-    }
-
-    public int getChips() {
-        return this.data.chips;
-    }
 
     @Override
     public String toString() {
-        return this.data.name + ":" + this.data.id;
+        return this.name + ":" + this.id;
+    }
+
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getChips() {
+        return chips;
+    }
+
+    public void setChips(int chips) {
+        this.chips = chips;
     }
 
     public void send(Object obj) {
@@ -73,5 +89,21 @@ public class User {
     }
 
     public static void send(Object obj, Set<String> uids) {
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }
