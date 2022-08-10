@@ -11,15 +11,15 @@ class Pot {
 
     private final int payerNum;
 
-    private Set<Integer> allin = new HashSet<>();
+    private Set<String> allin = new HashSet<>();
 
-    private Set<Integer> fold = new HashSet<>();
+    private Set<String> fold = new HashSet<>();
 
     private List<Circle> circles = new ArrayList<>();
 
     private Circle going;
 
-    private Map<Integer, Integer> anteBet = new HashMap<>();
+    private Map<String, Integer> anteBet = new HashMap<>();
 
     private List<Divide> divides;
 
@@ -188,8 +188,8 @@ class Pot {
     /**
      * 押注统计信息
      */
-    Map<Integer, Statistic> makeBetStatistic(Set<Integer> winners) {
-        var ret = new HashMap<Integer, Statistic>();
+    Map<String, Statistic> makeBetStatistic(Set<String> winners) {
+        var ret = new HashMap<String, Statistic>();
         var preflop = this.circles.stream()
                 .filter(v -> v.getCircle().equals(Circle.PREFLOP))
                 .findFirst()
@@ -219,8 +219,8 @@ class Pot {
         return ret;
     }
 
-    Map<Integer, Integer> playerBetChips() {
-        var ret = new HashMap<Integer, Integer>();
+    Map<String, Integer> playerBetChips() {
+        var ret = new HashMap<String, Integer>();
         var list = circles.stream().map(Circle::playerBetChips).collect(Collectors.toList());
         list.add(anteBet);
         for (var circle : list) {
@@ -235,7 +235,7 @@ class Pot {
     /**
      * 这一圈的押注数
      */
-    int chipsThisCircle(int id) {
+    int chipsThisCircle(String id) {
         return this.going.chipsThisCircle(id);
     }
 
@@ -251,7 +251,7 @@ class Pot {
         return this.payerNum - this.fold.size();
     }
 
-    boolean isFold(int i) {
+    boolean isFold(String i) {
         return fold.contains(i);
     }
 
@@ -259,7 +259,7 @@ class Pot {
         return fold.contains(player.getId());
     }
 
-    private boolean isAllin(int i) {
+    private boolean isAllin(String i) {
         return allin.contains(i);
     }
 
@@ -290,7 +290,7 @@ class Pot {
         return this.going.getStandard();
     }
 
-    Integer getStandardId() {
+    String getStandardId() {
         return this.going.getStandardId();
     }
 
@@ -298,11 +298,11 @@ class Pot {
         return this.refundPlayer;
     }
 
-    Integer lastBetOrRaise() {
+    String lastBetOrRaise() {
         return this.going.lastBetOrRaise();
     }
 
-    void setStandardInfo(int id) {
+    void setStandardInfo(String id) {
         var action = this.going.getAction(id);
         var chips = action != null ? action.chipsBet : 0;
         this.going.setStandardInfo(new Action(id, null, chips, 0, 0, 0));

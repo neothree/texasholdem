@@ -2,7 +2,7 @@ package com.texasthree.game.texas;
 
 public class Player {
 
-    private int id;
+    private String id;
 
     private int chips;
 
@@ -10,12 +10,12 @@ public class Player {
 
     private Hand hand;
 
-    public Player(int id, int chips) {
+    public Player(String id, int chips) {
         this.id = id;
         this.chips = chips;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
@@ -59,7 +59,7 @@ public class Player {
 
     @Override
     public boolean equals(Object other) {
-        return (other instanceof Player) && ((Player) other).getId() == this.id;
+        return (other instanceof Player) && ((Player) other).getId().equals(this.getId());
     }
 
     @Override

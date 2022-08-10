@@ -5,7 +5,7 @@ import com.texasthree.zone.entity.User;
 import org.junit.jupiter.api.Test;
 
 class TexasRoundTest {
-    
+
     @Test
     void start() throws Exception {
         User[] users = new User[3];

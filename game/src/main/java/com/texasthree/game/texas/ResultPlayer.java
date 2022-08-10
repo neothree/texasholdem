@@ -9,7 +9,7 @@ import java.util.Map;
  * @create: 2021-06-14 10:50
  */
 public class ResultPlayer {
-    Integer id;
+    String id;
     /**
      * 总押注
      */
@@ -40,11 +40,11 @@ public class ResultPlayer {
         return this.getWin() - betSum + refund;
     }
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 

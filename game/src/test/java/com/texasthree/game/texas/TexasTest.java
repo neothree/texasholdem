@@ -129,7 +129,7 @@ public class TexasTest extends AllCard {
 
         // 复现
         texas = Texas.builder()
-                .players(new Player(1, 100), new Player(2, 200), new Player(3, 200))
+                .players(new Player("1", 100), new Player("2", 200), new Player("3", 200))
                 .build();
         assertEquals(Texas.STATE_NEXT_OP, texas.start());
         equalsAction(1, makeAct(Optype.Allin), Texas.STATE_NEXT_OP, texas);
@@ -169,10 +169,10 @@ public class TexasTest extends AllCard {
         //////////////////////////////////////////////////////////////////
         Ring<Player> ring = Ring.create(5);
         for (int i = 1; i <= 4; i++) {
-            ring.setValue(new Player(i, 100));
+            ring.setValue(new Player(i + "", 100));
             ring = ring.getNext();
         }
-        ring.setValue(new Player(5, 50));
+        ring.setValue(new Player(5 + "", 50));
         texas = Texas.builder()
                 .ring(ring)
                 .build();
@@ -203,11 +203,11 @@ public class TexasTest extends AllCard {
         equalsAction(2, makeAct(Optype.Check), Texas.STATE_CIRCLE_END, texas);
 
         assertEquals(Circle.FLOP, texas.circle());
-        assertEquals(2, texas.opPlayer().getId());
+        assertEquals("2", texas.opPlayer().getId());
 
         ////////////////////////////////////////////////////////////////////////
         //  短牌：在“两倍前注”下, 开局后，所有玩家都call，最后应该到庄家还有一次option
-        var regulations = new HashMap<Regulation, Integer>();
+        var regulations = new HashMap<Regulation, Object>();
         regulations.put(Regulation.DoubleAnte, 1);
         texas = Texas.builder()
                 .smallBlind(0)
@@ -237,8 +237,8 @@ public class TexasTest extends AllCard {
         assertEquals(Texas.STATE_NEXT_OP, texas.start());
 //        assert(game:OpPlayer() == config.playerList[1])
 //        assert(config.playerList[4]:Chips() == 196)
-        assertEquals(texas.opPlayer().getId(), 1);
-        assertEquals(texas.getPlayerById(4).getChips(), 96);
+        assertEquals("1", texas.opPlayer().getId());
+        assertEquals(96, texas.getPlayerById("4").getChips());
 
         // TODO
 //        local config = {
@@ -265,7 +265,7 @@ public class TexasTest extends AllCard {
         var texas = Texas.builder()
                 .build();
         texas.start();
-        var state = texas.leave(1);
+        var state = texas.leave("1");
         assertEquals(Texas.STATE_SHOWDOWN, state);
         assertTrue(texas.isOver());
 
@@ -273,7 +273,7 @@ public class TexasTest extends AllCard {
         texas = Texas.builder()
                 .build();
         texas.start();
-        state = texas.leave(2);
+        state = texas.leave("2");
         assertEquals(Texas.STATE_SHOWDOWN, state);
         assertTrue(texas.isOver());
 
@@ -281,17 +281,17 @@ public class TexasTest extends AllCard {
         texas = Texas.builder(3)
                 .build();
         texas.start();
-        texas.leave(1);
-        assertEquals(2, texas.opPlayer().getId());
+        texas.leave("1");
+        assertEquals("2", texas.opPlayer().getId());
         assertFalse(texas.isOver());
-        texas.leave(2);
+        texas.leave("2");
         assertTrue(texas.isOver());
 
         // 离开玩家自动弃牌
         texas = Texas.builder(4)
                 .build();
         texas.start();
-        texas.leave(1);
+        texas.leave("1");
         texas.action(Action.fold());
         assertEquals(2, texas.opPlayer().getId());
 
@@ -301,7 +301,7 @@ public class TexasTest extends AllCard {
         texas.action(Action.call());
         texas.action(Action.call());
         texas.action(Action.call());
-        texas.leave(2);
+        texas.leave("2");
         texas.action(Action.check());
         assertEquals(Circle.FLOP, texas.circle());
         assertEquals(3, texas.opPlayer().getId());
@@ -309,7 +309,7 @@ public class TexasTest extends AllCard {
         //////////////////////////////
         texas = Texas.builder(3).build();
         texas.start();
-        texas.leave(3);
+        texas.leave("3");
         texas.action(Action.fold());
         assertTrue(texas.isOver());
     }
@@ -367,8 +367,8 @@ public class TexasTest extends AllCard {
         texas.action(Action.allin());
         texas.action(Action.allin());
         texas.action(Action.allin());
-        texas.leave(1);
-        texas.leave(2);
+        texas.leave("1");
+        texas.leave("2");
         texas.action(Action.allin());
         assertTrue(texas.isOver());
         result = texas.makeResult();
@@ -381,8 +381,8 @@ public class TexasTest extends AllCard {
         texas = SimpleTexas.builder(3).build();
         texas.start();
 
-        texas.leave(2);
-        texas.leave(3);
+        texas.leave("2");
+        texas.leave("3");
         assertTrue(texas.isOver());
         result = texas.makeResult();
         assertEquals(3, result.playersMap.get(1).pot.get(0));
@@ -557,7 +557,7 @@ public class TexasTest extends AllCard {
     private List<Player> createPlayersByChips(int... initChips) {
         var ret = new ArrayList<Player>();
         for (var i = 0; i < initChips.length; i++) {
-            var player = new Player(i + 1, initChips[i]);
+            var player = new Player(i + 1 +"", initChips[i]);
             ret.add(player);
         }
         return giveHand(ret);
@@ -566,7 +566,7 @@ public class TexasTest extends AllCard {
     private List<Player> createPlayers(int num, int init) {
         var list = new ArrayList<Player>();
         for (var i = 1; i <= num; i++) {
-            list.add(new Player(i, init));
+            list.add(new Player(i+"", init));
         }
         return giveHand(list);
     }
@@ -650,7 +650,7 @@ public class TexasTest extends AllCard {
 
         // 最小加注线等于最大加注则只能allin, 没有加注
         texas = Texas.builder()
-                .players(new Player(1, 10), new Player(2, 100))
+                .players(new Player("1", 10), new Player("2", 100))
                 .build();
         texas.start();
         texas.action(Action.of(Optype.Call));
@@ -662,10 +662,10 @@ public class TexasTest extends AllCard {
 
         // 只有弃牌操作复现
         texas = Texas.builder()
-                .players(new Player(1, 100)
-                        , new Player(2, 110)
-                        , new Player(3, 110)
-                        , new Player(4, 100))
+                .players(new Player("1", 100)
+                        , new Player("2", 110)
+                        , new Player("3", 110)
+                        , new Player("4", 100))
                 .build();
         texas.start();
         texas.action(Action.raise(70));
@@ -678,9 +678,9 @@ public class TexasTest extends AllCard {
         // 对allin不足的人call后不能再allin
         // 需求先不要
         texas = Texas.builder()
-                .players(new Player(1, 40)
-                        , new Player(2, 60)
-                        , new Player(3, 80))
+                .players(new Player("1", 40)
+                        , new Player("2", 60)
+                        , new Player("3", 80))
                 .build();
         texas.start();
         texas.action(Action.of(Optype.Call));
@@ -692,8 +692,8 @@ public class TexasTest extends AllCard {
 
         // AllinOrFold
         texas = Texas.builder()
-                .players(new Player(1, 200)
-                        , new Player(2, 10000))
+                .players(new Player("1", 200)
+                        , new Player("2", 10000))
                 .smallBlind(100)
                 .regulation(Regulation.AllinOrFold, 1)
                 .build();
@@ -745,7 +745,7 @@ public class TexasTest extends AllCard {
         texas = Texas.builder()
                 .smallBlind(1)
                 .ante(20)
-                .players(new Player(1, 10), new Player(1, 50))
+                .players(new Player("1", 10), new Player("1", 50))
                 .build();
         texas.start();
         assertTrue(texas.isOver());
@@ -760,16 +760,16 @@ public class TexasTest extends AllCard {
     @Test
     public void testStart() throws Exception {
         Ring<Player> ring = Ring.create(2);
-        ring.setValue(new Player(1, 500));
-        ring.getNext().setValue(new Player(2, 50));
+        ring.setValue(new Player("1", 500));
+        ring.getNext().setValue(new Player("2", 50));
         var texas = Texas.builder()
                 .ring(ring)
                 .smallBlind(50)
                 .build();
         var state = texas.start();
-        assertEquals(1, texas.dealer().getId());
-        assertEquals(1, texas.sbPlayer().getId());
-        assertEquals(2, texas.bbPlayer().getId());
+        assertEquals("1", texas.dealer().getId());
+        assertEquals("1", texas.sbPlayer().getId());
+        assertEquals("2", texas.bbPlayer().getId());
         assertEquals(50, texas.smallBlind());
         assertEquals(Texas.STATE_SHOWDOWN, state);
     }
@@ -801,7 +801,7 @@ public class TexasTest extends AllCard {
 
         texas = Texas.builder()
                 .board(club9, club10, spadesA, heartK, club8)
-                .players(new Player(1, 100), new Player(2, 200), new Player(3, 300))
+                .players(new Player("1", 100), new Player("2", 200), new Player("3", 300))
                 .build();
         texas.start();
         texas.action(Action.allin());
@@ -846,7 +846,7 @@ public class TexasTest extends AllCard {
         ////////////////////////////////////
         // 大盲直接allin结束
         texas = Texas.builder()
-                .players(new Player(1, 600), new Player(2, 200))
+                .players(new Player("1", 600), new Player("2", 200))
                 .smallBlind(200)
                 .build();
         texas.start();
@@ -854,7 +854,7 @@ public class TexasTest extends AllCard {
 
         // 大盲直接allin不结束
         texas = Texas.builder()
-                .players(new Player(1, 600), new Player(2, 300))
+                .players(new Player("1", 600), new Player("2", 300))
                 .smallBlind(200)
                 .build();
         texas.start();
@@ -862,7 +862,7 @@ public class TexasTest extends AllCard {
 
         // 小盲直接allin结束
         texas = Texas.builder()
-                .players(new Player(1, 200), new Player(2, 600))
+                .players(new Player("1", 200), new Player("2", 600))
                 .smallBlind(200)
                 .build();
         texas.start();
@@ -870,7 +870,7 @@ public class TexasTest extends AllCard {
 
         // 大小盲同时allin结束
         texas = Texas.builder()
-                .players(new Player(1, 200), new Player(2, 300))
+                .players(new Player("1", 200), new Player("2", 300))
                 .smallBlind(200)
                 .build();
         texas.start();
@@ -879,7 +879,7 @@ public class TexasTest extends AllCard {
         // 通过Raise将所有的筹码加上, 实际是allin
         // 最低最低加注筹码刚好等于剩余筹码，只能allin
         texas = Texas.builder()
-                .players(new Player(1, 750), new Player(2, 2000))
+                .players(new Player("1", 750), new Player("2", 2000))
                 .smallBlind(20)
                 .build();
         texas.start();

@@ -12,9 +12,9 @@ import java.util.Map;
 public class Divide {
     private int chips;
 
-    private Map<Integer, Integer> members = new HashMap<>();
+    private Map<String, Integer> members = new HashMap<>();
 
-    private Map<Integer, Integer> putin = new HashMap<>();
+    private Map<String, Integer> putin = new HashMap<>();
 
     public int getChips() {
         return chips;
@@ -24,19 +24,19 @@ public class Divide {
         this.chips = chips;
     }
 
-    public Map<Integer, Integer> getMembers() {
+    public Map<String, Integer> getMembers() {
         return members;
     }
 
-    public void setMembers(Map<Integer, Integer> members) {
+    public void setMembers(Map<String, Integer> members) {
         this.members = members;
     }
 
-    public Map<Integer, Integer> getPutin() {
+    public Map<String, Integer> getPutin() {
         return putin;
     }
 
-    public void setPutin(Map<Integer, Integer> putin) {
+    public void setPutin(Map<String, Integer> putin) {
         this.putin = putin;
     }
 }

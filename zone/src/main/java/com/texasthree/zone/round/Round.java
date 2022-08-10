@@ -35,7 +35,7 @@ public interface Round {
 
     boolean finished();
 
-    boolean isLeave(int id);
+    boolean isLeave(String id);
 
     Collection<Player> getPlayers();
 

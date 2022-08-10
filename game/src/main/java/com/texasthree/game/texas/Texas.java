@@ -37,7 +37,7 @@ public class Texas {
     /**
      * 规则
      */
-    private Map<Regulation, Integer> regulations;
+    private Map<Regulation, Object> regulations;
     /**
      * 玩家的位置
      */
@@ -61,7 +61,7 @@ public class Texas {
         private boolean straddle;
         private Ring<Player> ring;
         private List<Card> board;
-        private Map<Regulation, Integer> regulations;
+        private Map<Regulation, Object> regulations;
         private List<Player> players;
 
         public Builder() {
@@ -98,7 +98,7 @@ public class Texas {
             return this;
         }
 
-        public Builder regulations(Map<Regulation, Integer> regulations) {
+        public Builder regulations(Map<Regulation, Object> regulations) {
             this.regulations = regulations;
             return this;
         }
@@ -140,7 +140,7 @@ public class Texas {
                 if (players == null) {
                     players = new ArrayList<>(playerNum);
                     for (int i = 1; i <= playerNum; i++) {
-                        players.add(new Player(i, initChips));
+                        players.add(new Player(i + "", initChips));
                     }
                 }
                 ring = Ring.create(players.size());
@@ -170,7 +170,7 @@ public class Texas {
                 regulations.put(Regulation.Straddle, 0);
             }
 
-            this.ring = this.ring.move(v -> v.getId() == regulations.get(Regulation.Dealer));
+            this.ring = this.ring.move(v -> v.getId().equals(regulations.get(Regulation.Dealer)));
 
             if (ring.size() == 2) {
                 regulations.put(Regulation.SB, this.ring.value.getId());
@@ -202,7 +202,7 @@ public class Texas {
     }
 
 
-    private Texas(Map<Regulation, Integer> regulations, Ring<Player> ring, List<Card> leftCard) {
+    private Texas(Map<Regulation, Object> regulations, Ring<Player> ring, List<Card> leftCard) {
         this.regulations = regulations;
         this.ring = ring;
         this.board = leftCard;
@@ -359,7 +359,7 @@ public class Texas {
     /**
      * 玩家离开
      */
-    String leave(Integer id) throws Exception {
+    String leave(String id) throws Exception {
         var player = this.getPlayerById(id);
         if (player == null) {
             throw new IllegalArgumentException(id + " 不存在");
@@ -427,11 +427,11 @@ public class Texas {
         return result;
     }
 
-    private Map<Integer, Map<Integer, Integer>> divideMoney() {
+    private Map<String, Map<Integer, Integer>> divideMoney() {
         this.freshHand();
 
         var divide = this.pot.divides();
-        var ret = new HashMap<Integer, Map<Integer, Integer>>();
+        var ret = new HashMap<String, Map<Integer, Integer>>();
         var inGameNum = this.ring.toList().stream().filter(Player::inGame).count();
         // 只剩下一个玩家没有离开,不用经过比牌,全部给他
         if (inGameNum == 1) {
@@ -445,7 +445,7 @@ public class Texas {
         }
 
         // 有多个玩家,主池肯定有玩家比牌
-        Set<Integer> mainPotWinner = null;
+        Set<String> mainPotWinner = null;
         for (var potId = 0; potId < divide.size(); potId++) {
             var pot = divide.get(potId);
             var members = pot.getMembers()
@@ -481,9 +481,9 @@ public class Texas {
         return ret;
     }
 
-    private Map<Integer, Integer> singlePotWinChips(Set<Integer> winner, int sum) {
+    private Map<String, Integer> singlePotWinChips(Set<String> winner, int sum) {
         // 如果只有一个赢家则全给他
-        var ret = new HashMap<Integer, Integer>();
+        var ret = new HashMap<String, Integer>();
         if (winner.size() == 1) {
             ret.put(winner.stream().findFirst().get(), sum);
             return ret;
@@ -507,8 +507,8 @@ public class Texas {
         return ret;
     }
 
-    private Set<Integer> winners(Collection<Player> players) {
-        var winner = new HashSet<Integer>();
+    private Set<String> winners(Collection<Player> players) {
+        var winner = new HashSet<String>();
         Player win = null;
         for (var v : players) {
             if (winner.isEmpty()) {
@@ -623,12 +623,12 @@ public class Texas {
     /**
      * 找到紧挨 id 的下一个没有allin 和 fold 的座位
      */
-    private Player nextOpPlayer(int id) {
+    private Player nextOpPlayer(String id) {
         if (this.waitActionNum() == 0) {
             return null;
         }
 
-        var r = this.ring.move(v -> v.getId() == id).getNext();
+        var r = this.ring.move(v -> v.getId().equals(id)).getNext();
 
         var standardId = this.pot.getStandardId();
         while ((this.pot.isFold(r.value) || this.pot.isAllin(r.value))
@@ -714,11 +714,11 @@ public class Texas {
     }
 
     int smallBlind() {
-        return this.regulations.getOrDefault(Regulation.SmallBlind, 0);
+        return (int)this.regulations.getOrDefault(Regulation.SmallBlind, 0);
     }
 
     int ante() {
-        return this.regulations.getOrDefault(Regulation.Ante, 0);
+        return (int)this.regulations.getOrDefault(Regulation.Ante, 0);
     }
 
     int anteSum() {
@@ -746,8 +746,8 @@ public class Texas {
     }
 
 
-    Player getPlayerById(Integer id) {
-        return this.getPlayer(v -> v.getId() == id);
+    Player getPlayerById(String id) {
+        return this.getPlayer(v -> v.getId().equals(id));
     }
 
     public String circle() {

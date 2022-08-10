@@ -63,7 +63,7 @@ class TexasRound implements Round {
         for (int i = 0; i < this.users.length; i++) {
             var v = this.users[i];
             if (v != null) {
-                players.add(new Player(i, v.getChips()));
+                players.add(new Player(i + "", v.getChips()));
             }
         }
 
@@ -125,7 +125,7 @@ class TexasRound implements Round {
     }
 
     @Override
-    public boolean isLeave(int id) {
+    public boolean isLeave(String id) {
         return false;
     }
 
@@ -150,8 +150,8 @@ class TexasRound implements Round {
         this.eventConsumer.accept(RoundEvent.UPDATE_HAND);
     }
 
-    private boolean isLeave(String id) {
-        return this.state.players.stream().anyMatch(v -> v.isLeave() && playerMap.get(id).position == v.getId());
+    private boolean inGame(String id) {
+        return this.state.players.stream().anyMatch(v -> v.getId().equals(id) && !v.isLeave());
     }
 
     private List<Integer> cardList(List<Card> list) {
@@ -225,7 +225,7 @@ class TexasRound implements Round {
         log.info("压住超时: {}", this.opPlayer.toString());
         var op = state.ops.stream().anyMatch(v -> Optype.Check.equals(v.op)) ? Optype.Check : Optype.Fold;
         var action = Action.of(op);
-        action.id = this.opPlayer.position;
+        action.id = this.opPlayer.user.getId();
         this.action(action);
     }
 

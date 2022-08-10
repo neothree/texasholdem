@@ -57,7 +57,7 @@ public class Cmd {
     }
 
     public static class DealCard {
-        public List<Integer> positions;
+        public List<String> positions;
     }
 
     public static class Action {
