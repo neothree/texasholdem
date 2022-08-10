@@ -82,4 +82,8 @@ public class Desk {
     public User[] getUsers() {
         return this.seats;
     }
+
+    public Round getRound() {
+        return this.round;
+    }
 }

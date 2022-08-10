@@ -1,7 +1,10 @@
 package com.texasthree.zone.round;
 
 import com.texasthree.game.texas.Action;
+import com.texasthree.game.texas.Player;
 import com.texasthree.zone.entity.User;
+
+import java.util.Collection;
 
 /**
  * 一局牌局
@@ -15,16 +18,10 @@ public interface Round {
      * 创建德州扑克
      */
     static Round texas(User[] users) {
-        var con = new RoundEventHandler();
+        var con = new TexasEventHandler();
         return new TexasRound(users, con::trigger);
     }
 
-    /**
-     * 创建大菠萝
-     */
-    static Round pineapple() {
-        return new PineappleRound();
-    }
 
     /**
      * 开始
@@ -38,8 +35,20 @@ public interface Round {
 
     boolean finished();
 
+    boolean isLeave(int id);
+
+    Collection<Player> getPlayers();
+
     /**
      * 事件循环
      */
     void loop();
+
+    void send(Object obj);
+
+    void send(String uid, Object obj);
+
+    void send(int uid, Object obj);
+
+    Player opPlayer();
 }

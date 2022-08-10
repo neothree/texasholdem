@@ -1,26 +1,41 @@
 package com.texasthree.zone.round;
 
+import com.texasthree.game.texas.Player;
 import com.texasthree.zone.controller.Cmd;
+import com.texasthree.zone.entity.Desk;
+
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 /**
  * @author: neo
  * @create: 2022-08-09 16:50
  */
-public class RoundEventHandler {
+public class TexasEventHandler {
+
+    private Desk desk;
+
+    private Round round;
 
     public void trigger(RoundEvent event) {
         switch (event) {
             case START_GAME:
+                this.onStartGame();
                 break;
             case DEAL_CARD:
+                this.onDealCard();
                 break;
             case UPDATE_HAND:
+                this.onUpdateHand();
                 break;
             case NEW_OPERATOR:
+                this.onNewOperator();
                 break;
             case CIRCLE_END:
+                this.onCircleEnd();
                 break;
             case SHOWDOWN:
+                this.onShowdown();
                 break;
             default:
                 throw new IllegalArgumentException(event.name());
@@ -28,47 +43,49 @@ public class RoundEventHandler {
     }
 
     private void onStartGame() {
-        this.send(new Cmd.StartGame());
+        this.desk.send(new Cmd.StartGame());
     }
 
     private void onDealCard() {
         var info = new Cmd.DealCard();
-//        info.positions = new ArrayList<>();
-//        for (var v : this.playerMap.values()) {
-//            info.positions.add(v.position);
-//        }
-        this.send(info);
+        var round = this.desk.getRound();
+        this.desk.getRound().finished();
+        info.positions = round.getPlayers().stream().map(Player::getId).collect(Collectors.toList());
+        this.desk.send(info);
     }
 
     private void onUpdateHand() {
-//        for (var v : this.playerMap.values()) {
-//            if (!this.isLeave(v.user.getId())) {
-//                continue;
-//            }
-//            var update = new Cmd.HandUpdate();
-//            update.hands = new ArrayList<>();
-//            update.hands.add(this.getHand(v.user.getId()));
-//            v.user.send(update);
-//        }
+        var round = this.desk.getRound();
+        for (var v : round.getPlayers()) {
+            if (!round.isLeave(v.getId())) {
+                continue;
+            }
+            var update = new Cmd.HandUpdate();
+            update.hands = new ArrayList<>();
+            update.hands.add(this.getHand(v.getId() + ""));
+            round.send(v.getId(), update);
+        }
     }
 
     private void onAction() {
+        var round = this.desk.getRound();
         var send = new Cmd.PlayerAction();
-//        send.sumPot = 0;
-//        send.action = this.getAction(action.id + "");
-        this.send(send);
+        send.sumPot = 0;
+        send.action = this.getAction(round.opPlayer().getId() + "");
+        this.desk.send(send);
     }
 
     private void onCircleEnd() {
         var info = new Cmd.CircleEnd();
-//        info.board = this.state.board;
-//        info.devide = this.state.divides;
+        info.board = new ArrayList<>();
+        info.devide = new ArrayList<>();
+        this.desk.send(info);
     }
 
     private void onShowdown() {
     }
 
-    private Cmd.NewOperator onNewOperator() {
+    private void onNewOperator() {
         var info = new Cmd.NewOperator();
 //        info.leftSec = this.opEvent.getNextMsec() - System.currentTimeMillis();
 //        info.ops = state.ops.stream().map(v -> {
@@ -79,7 +96,7 @@ public class RoundEventHandler {
 //        }).collect(Collectors.toList());
 //        info.position = this.opPlayer.position;
 //        info.raiseLine = state.raiseLine;
-        return info;
+        this.desk.send(info);
     }
 
     private Cmd.Action getAction(String id) {
@@ -106,11 +123,5 @@ public class RoundEventHandler {
 //        info.position = position;
 //        return info;
         return null;
-    }
-
-
-
-    private void send(Object object) {
-
     }
 }

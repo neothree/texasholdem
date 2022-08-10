@@ -7,10 +7,7 @@ import com.texasthree.zone.entity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -127,6 +124,16 @@ class TexasRound implements Round {
         return this.isOver;
     }
 
+    @Override
+    public boolean isLeave(int id) {
+        return false;
+    }
+
+    @Override
+    public Collection<Player> getPlayers() {
+        return null;
+    }
+
     /**
      * 发牌
      */
@@ -235,5 +242,25 @@ class TexasRound implements Round {
         if (opEvent != null) {
             this.opEvent.check();
         }
+    }
+
+    @Override
+    public void send(Object obj) {
+
+    }
+
+    @Override
+    public void send(String uid, Object obj) {
+
+    }
+
+    @Override
+    public void send(int uid, Object obj) {
+
+    }
+
+    @Override
+    public Player opPlayer() {
+        return null;
     }
 }

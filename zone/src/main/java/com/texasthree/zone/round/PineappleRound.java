@@ -9,27 +9,23 @@ import com.texasthree.game.texas.Action;
  * @author: neo
  * @create: 2021-07-09 18:11
  */
-class PineappleRound implements Round {
+class PineappleRound {
 
     private Pineapple game;
 
-    @Override
     public void start() {
         this.game = Pineapple.builder().build();
         this.game.start();
     }
 
-    @Override
     public void action(Action action) {
         this.game.action(null, null);
     }
 
-    @Override
     public boolean finished() {
         return this.game.isOver();
     }
 
-    @Override
     public void loop() {
     }
 }
