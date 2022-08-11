@@ -46,7 +46,13 @@ public class Cmd {
     }
 
     public static class StartGame {
-
+        public int sbSeatId;
+        public int bbSeatId;
+        public int dealer;
+        public int smallBlind;
+        public int ante;
+        public int sumPot;
+        public List<Integer> players;
     }
 
     public static class NewOperator {

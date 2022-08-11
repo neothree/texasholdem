@@ -84,8 +84,6 @@ class TexasRound implements Round {
         }
 
         this.eventConsumer.accept(RoundEvent.START_GAME);
-
-
         this.dealCard();
     }
 
@@ -144,14 +142,13 @@ class TexasRound implements Round {
 
     /**
      * 更新手牌
-     * create at 2020-06-30 10:26
      */
     private void updateHand() {
         this.eventConsumer.accept(RoundEvent.UPDATE_HAND);
     }
 
     private boolean isLeave(String id) {
-        return this.state.players.stream().anyMatch(v -> v.isLeave() && playerMap.get(id).position == v.getId());
+        return this.state.players.stream().anyMatch(v -> v.isLeave() && playerMap.get(id).seatId == v.getId());
     }
 
     private List<Integer> cardList(List<Card> list) {
@@ -179,7 +176,7 @@ class TexasRound implements Round {
         this.opPlayer = new PlayerInfo();
         this.opEvent = new ScheduledEvent(() -> this.onOpTimeout(), this.actDuration);
         this.eventConsumer.accept(RoundEvent.NEW_OPERATOR);
-        log.info("轮到下一位进行押注 opId={} position={}", this.opPlayer.user.getId(), this.opPlayer.position);
+        log.info("轮到下一位进行押注 opId={} seatId={}", this.opPlayer.user.getId(), this.opPlayer.seatId);
     }
 
     /**
@@ -225,8 +222,40 @@ class TexasRound implements Round {
         log.info("压住超时: {}", this.opPlayer.toString());
         var op = state.ops.stream().anyMatch(v -> Optype.Check.equals(v.op)) ? Optype.Check : Optype.Fold;
         var action = Action.of(op);
-        action.id = this.opPlayer.position;
+        action.id = this.opPlayer.seatId;
         this.action(action);
+    }
+
+    @Override
+    public Player opPlayer() {
+        return null;
+    }
+
+    public int sumPot() {
+        return this.game.sumPot();
+    }
+
+    public int ante() {
+        return this.game.ante();
+    }
+
+    public int smallBlind() {
+        return this.game.smallBlind();
+    }
+
+    public int sbSeatId() {
+        var player = this.game.sbPlayer();
+        return 0;
+    }
+
+    public int bbSeatId() {
+        var player = this.game.bbPlayer();
+        return 0;
+    }
+
+    public int dealer() {
+        var player = this.game.dealer();
+        return 0;
     }
 
     private void printStart() {
@@ -257,10 +286,5 @@ class TexasRound implements Round {
     @Override
     public void send(int uid, Object obj) {
 
-    }
-
-    @Override
-    public Player opPlayer() {
-        return null;
     }
 }

@@ -9,12 +9,12 @@ import com.texasthree.zone.entity.User;
  * create at:  2020-06-30  10:23
  */
 public class PlayerInfo {
-    public int position;
+    public int seatId;
 
     public User user;
 
     @Override
     public String toString() {
-        return this.user.toString() + ":" + position;
+        return this.user.toString() + ":" + seatId;
     }
 }

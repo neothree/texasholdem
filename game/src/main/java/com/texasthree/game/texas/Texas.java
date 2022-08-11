@@ -709,33 +709,33 @@ public class Texas {
         return this.isOver && this.remainingNum() > 1;
     }
 
-    int sumPot() {
+    public int sumPot() {
         return this.pot.sumPot();
     }
 
-    int smallBlind() {
+    public int smallBlind() {
         return this.regulations.getOrDefault(Regulation.SmallBlind, 0);
     }
 
-    int ante() {
+    public int ante() {
         return this.regulations.getOrDefault(Regulation.Ante, 0);
     }
 
-    int anteSum() {
+    public int anteSum() {
         return this.pot.anteSum();
     }
 
-    Player dealer() {
+    public Player dealer() {
         var id = this.regulations.get(Regulation.Dealer);
         return this.getPlayer(v -> v.getId() == id);
     }
 
-    Player sbPlayer() {
+    public Player sbPlayer() {
         var id = this.regulations.get(Regulation.SB);
         return this.getPlayer(v -> v.getId() == id);
     }
 
-    Player bbPlayer() {
+    public Player bbPlayer() {
         var id = this.regulations.get(Regulation.BB);
         return this.getPlayer(v -> v.getId() == id);
     }
@@ -746,7 +746,7 @@ public class Texas {
     }
 
 
-    Player getPlayerById(Integer id) {
+    public Player getPlayerById(Integer id) {
         return this.getPlayer(v -> v.getId() == id);
     }
 

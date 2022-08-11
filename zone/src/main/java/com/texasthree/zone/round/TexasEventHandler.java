@@ -15,7 +15,7 @@ public class TexasEventHandler {
 
     private Desk desk;
 
-    private Round round;
+    private TexasRound round;
 
     public void trigger(RoundEvent event) {
         switch (event) {
@@ -43,13 +43,22 @@ public class TexasEventHandler {
     }
 
     private void onStartGame() {
-        this.desk.send(new Cmd.StartGame());
+        var info = new Cmd.StartGame();
+        info.ante = round.ante();
+        info.sbSeatId = round.sbSeatId();
+        info.bbSeatId = round.bbSeatId();
+        info.dealer = round.dealer();
+        info.smallBlind = round.smallBlind();
+        info.sumPot = round.sumPot();
+        info.players = round.getPlayers().stream()
+                .map(Player::getId)
+                .collect(Collectors.toList());
+        this.desk.send(info);
     }
 
     private void onDealCard() {
         var info = new Cmd.DealCard();
         var round = this.desk.getRound();
-        this.desk.getRound().finished();
         info.positions = round.getPlayers().stream().map(Player::getId).collect(Collectors.toList());
         this.desk.send(info);
     }
@@ -94,14 +103,14 @@ public class TexasEventHandler {
 //            act.chipsBet = v.chipsBet;
 //            return act;
 //        }).collect(Collectors.toList());
-//        info.position = this.opPlayer.position;
+//        info.seatId = this.opPlayer.seatId;
 //        info.raiseLine = state.raiseLine;
         this.desk.send(info);
     }
 
     private Cmd.Action getAction(String id) {
-//        int position = this.playerMap.get(id).position;
-//        var act = this.state.actions.stream().filter(v -> v.id == position).findFirst().orElse(null);
+//        int seatId = this.playerMap.get(id).seatId;
+//        var act = this.state.actions.stream().filter(v -> v.id == seatId).findFirst().orElse(null);
 //        var action = new Cmd.Action();
 //        action.op = act.op.name();
 //        action.chipsBet = act.chipsBet;
@@ -113,14 +122,14 @@ public class TexasEventHandler {
 //        if (!this.playerMap.containsKey(id)) {
 //            return null;
 //        }
-//        int position = this.playerMap.get(id).position;
-//        var player = this.state.players.stream().filter(v -> v.getId() == position).findFirst().orElse(null);
+//        int seatId = this.playerMap.get(id).seatId;
+//        var player = this.state.players.stream().filter(v -> v.getId() == seatId).findFirst().orElse(null);
 //        var info = new Cmd.Hand();
 //        info.best = cardList(player.getHand().getBest());
 //        info.cards = cardList(player.getHand().getHold());
 //        info.key = cardList(player.getHand().getKeys());
 //        info.type = player.getHand().getType().name();
-//        info.position = position;
+//        info.seatId = seatId;
 //        return info;
         return null;
     }
