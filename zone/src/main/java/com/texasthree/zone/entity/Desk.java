@@ -5,6 +5,7 @@ import com.texasthree.zone.round.TexasRound;
 import com.texasthree.zone.round.UserPlayer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,16 +17,11 @@ public class Desk {
 
     private Map<String, User> audience = new HashMap<>();
 
-    /**
-     * 添加玩家
-     */
+
     public void addUser(User user) {
         audience.put(user.getId(), user);
     }
 
-    /**
-     * 移除玩家
-     */
     public void removeUser(User user) {
         audience.remove(user.getId());
     }
@@ -33,13 +29,14 @@ public class Desk {
     /**
      * 玩家坐下
      */
-    public void sitDown(User user, int position) {
-        if (position >= seats.length || seats[position] != null) {
+    public void sitDown(User user, int seatId) {
+        if (seatId >= seats.length || seats[seatId] != null) {
             throw new IllegalArgumentException();
         }
 
-        seats[position] = user;
+        seats[seatId] = user;
         this.audience.remove(user.getId());
+        this.tryStart();
     }
 
     /**
@@ -55,7 +52,21 @@ public class Desk {
         }
     }
 
-    public void start() {
+    private void tryStart() {
+
+        // 已经有牌局
+        if (round != null) {
+            return;
+        }
+
+        // 座位的人数
+        if (playerNum() < 2) {
+            return;
+        }
+        this.start();
+    }
+
+    private void start() {
         var users = new ArrayList<UserPlayer>();
         for (var i = 0; i < this.seats.length; i++) {
             var user = this.seats[i];
@@ -88,7 +99,9 @@ public class Desk {
         User.send(msg, set);
     }
 
-    public User[] getUsers() {
-        return this.seats;
+    public int playerNum() {
+        return (int) Arrays.stream(this.seats)
+                .filter(v -> v != null)
+                .count();
     }
 }
