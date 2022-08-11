@@ -2,9 +2,9 @@ package com.texasthree.zone.round;
 
 import com.texasthree.game.texas.Action;
 import com.texasthree.game.texas.Player;
-import com.texasthree.zone.entity.User;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * 一局牌局
@@ -17,7 +17,7 @@ public interface Round {
     /**
      * 创建德州扑克
      */
-    static Round texas(User[] users) {
+    static Round texas(List<Integer> users) {
         var con = new TexasEventHandler();
         return new TexasRound(users, con::trigger);
     }

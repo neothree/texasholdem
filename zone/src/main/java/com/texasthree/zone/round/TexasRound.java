@@ -3,7 +3,6 @@ package com.texasthree.zone.round;
 import com.texasthree.game.GameState;
 import com.texasthree.game.texas.*;
 import com.texasthree.zone.entity.ScheduledEvent;
-import com.texasthree.zone.entity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,11 +46,11 @@ class TexasRound implements Round {
 
     private int actDuration = 15000;
 
-    private User[] users;
+    private List<Integer> users;
 
     private Consumer<RoundEvent> eventConsumer;
 
-    TexasRound(User[] users, Consumer<RoundEvent> eventConsumer) {
+    TexasRound(List<Integer>  users, Consumer<RoundEvent> eventConsumer) {
         this.users = users;
         this.eventConsumer = eventConsumer;
     }
@@ -60,11 +59,9 @@ class TexasRound implements Round {
     public void start() {
         // 位置图谱
         var players = new ArrayList<Player>();
-        for (int i = 0; i < this.users.length; i++) {
-            var v = this.users[i];
-            if (v != null) {
-                players.add(new Player(i, v.getChips()));
-            }
+
+        for (int i = 0; i < this.users.size(); i++) {
+            players.add(new Player(i, users.get(i)));
         }
 
         this.game = Texas.builder()

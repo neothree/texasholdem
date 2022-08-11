@@ -27,6 +27,6 @@ public class TableCardTest {
         List<Card> pair = Deck.getInstance().shuffle();
         Set<Integer> set = new HashSet<>();
         pair.forEach(v -> set.add(v.getId()));
-        assertEquals(54, set.size());
+        assertEquals(52, set.size());
     }
 }

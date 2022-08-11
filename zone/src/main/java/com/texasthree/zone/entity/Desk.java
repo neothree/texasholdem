@@ -2,8 +2,10 @@ package com.texasthree.zone.entity;
 
 import com.texasthree.zone.round.Round;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Desk {
 
@@ -56,7 +58,11 @@ public class Desk {
     }
 
     public void start() {
-        this.round = Round.texas(this.seats);
+        var users = Arrays.stream(this.seats)
+                .filter(v -> v != null)
+                .map(User::getChips)
+                .collect(Collectors.toList());
+        this.round = Round.texas(users);
         try {
             this.round.start();
         } catch (Exception e) {
