@@ -20,20 +20,22 @@ public class Room {
         return roomMap.values();
     }
 
-    private RoomConfig config;
+    public static Room one() {
+        if (roomMap.isEmpty()) {
+            var room = new Room();
+            roomMap.put(room.id, room);
+        }
+        return roomMap.values().stream().findFirst().get();
+    }
 
     private Desk desk;
 
-    private User creator;
+    private String id;
 
-    private boolean isStart;
-
-    public Room(RoomConfig data, User user) {
-        data.setId(StringUtils.get32UUID());
-        this.config = data;
+    public Room() {
+        this.id = StringUtils.get32UUID();
         this.desk = new Desk();
-        this.creator = user;
-        roomMap.put(data.getId(), this);
+        roomMap.put(id, this);
     }
 
     public void addUser(User user) {
@@ -52,30 +54,16 @@ public class Room {
         this.desk.sitUp(user);
     }
 
-    public void dismiss() {
-        roomMap.remove(this.config.getId());
-    }
-
-    public void enableRound() {
-        this.isStart = true;
-        this.desk.start();
-    }
-
-    public void start() {
-        this.desk.start();
-    }
-
-    public String getName() {
-        return this.config.getName();
-    }
-
     public void loop() {
         this.desk.loop();
     }
 
     @Override
     public String toString() {
-        return this.getName();
+        return this.id;
     }
 
+    public String getId() {
+        return id;
+    }
 }

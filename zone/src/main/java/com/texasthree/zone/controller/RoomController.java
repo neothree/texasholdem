@@ -1,10 +1,9 @@
 package com.texasthree.zone.controller;
 
-import com.texasthree.zone.entity.RoomConfig;
-import com.texasthree.zone.net.Command;
-import com.texasthree.zone.net.CommandController;
 import com.texasthree.zone.entity.Room;
 import com.texasthree.zone.entity.User;
+import com.texasthree.zone.net.Command;
+import com.texasthree.zone.net.CommandController;
 
 /**
  * @author: neo
@@ -13,23 +12,12 @@ import com.texasthree.zone.entity.User;
 @CommandController
 public class RoomController {
 
-    @Command
-    public static void command(Cmd.CreateRoom data, User user) {
-        var config = new RoomConfig();
-        var room = new Room(config, user);
-    }
-
-
     /**
      * 进入房间
      */
     @Command
     public static void command(Cmd.EnterRoom data, User user) {
-        var room = checkRoom(data.roomId, user);
-        if (room == null) {
-            return;
-        }
-        user.enter(room);
+        user.enter(Room.one());
     }
 
     /**

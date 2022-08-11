@@ -19,6 +19,7 @@ public class Zone {
 
     public void start() {
         log.info("zone 开启启动");
+        Room.one();
     }
 
     @Async
