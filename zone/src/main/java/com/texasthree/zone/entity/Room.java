@@ -3,11 +3,9 @@ package com.texasthree.zone.entity;
 
 import com.texasthree.zone.utility.StringUtils;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 
 public class Room {
@@ -18,6 +16,10 @@ public class Room {
         return roomMap.get(id);
     }
 
+    public static Collection<Room> all() {
+        return roomMap.values();
+    }
+
     private RoomConfig config;
 
     private Desk desk;
@@ -26,20 +28,12 @@ public class Room {
 
     private boolean isStart;
 
-    /**
-     * 定时器
-     */
-    private ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
-
-
     public Room(RoomConfig data, User user) {
         data.setId(StringUtils.get32UUID());
         this.config = data;
         this.desk = new Desk();
         this.creator = user;
         roomMap.put(data.getId(), this);
-
-        service.scheduleAtFixedRate(() -> loop(), 1000L, 200L, TimeUnit.MILLISECONDS);
     }
 
     public void addUser(User user) {
@@ -75,7 +69,7 @@ public class Room {
         return this.config.getName();
     }
 
-    private void loop() {
+    public void loop() {
         this.desk.loop();
     }
 

@@ -1,6 +1,5 @@
 package com.texasthree.zone;
 
-import com.texasthree.zone.net.LifeCircle;
 import org.apache.log4j.BasicConfigurator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
