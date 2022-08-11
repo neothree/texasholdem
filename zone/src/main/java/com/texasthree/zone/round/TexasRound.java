@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
  * @author : neo
  * create at:  2020-06-29  15:26
  */
-class TexasRound implements Round {
+public class TexasRound {
 
     private static Logger log = LoggerFactory.getLogger(TexasRound.class);
 
@@ -50,12 +50,12 @@ class TexasRound implements Round {
 
     private Consumer<RoundEvent> eventConsumer;
 
-    TexasRound(List<UserPlayer> users, Consumer<RoundEvent> eventConsumer) {
+    public TexasRound(List<UserPlayer> users, Consumer<RoundEvent> eventConsumer) {
         this.users = users;
         this.eventConsumer = eventConsumer;
     }
 
-    @Override
+
     public void start() {
         // 位置图谱
         var players = new ArrayList<Player>();
@@ -84,7 +84,7 @@ class TexasRound implements Round {
      * @return void
      * create at 2020-06-30 11:12
      */
-    @Override
+
     public void action(Action action) {
         this.eventConsumer.accept(RoundEvent.ACTION);
 
@@ -107,12 +107,11 @@ class TexasRound implements Round {
         }
     }
 
-    @Override
     public boolean finished() {
         return this.isOver;
     }
 
-    @Override
+
     public Collection<UserPlayer> getPlayers() {
         return null;
     }
@@ -136,7 +135,7 @@ class TexasRound implements Round {
         this.eventConsumer.accept(RoundEvent.UPDATE_HAND);
     }
 
-    @Override
+
     public boolean isLeave(String id) {
         return this.state.players.stream().anyMatch(v -> v.isLeave() && playerMap.get(id).seatId == v.getId());
     }
@@ -144,7 +143,6 @@ class TexasRound implements Round {
     private List<Integer> cardList(List<Card> list) {
         return list.stream().map(v -> v.getId()).collect(Collectors.toList());
     }
-
 
     private void move(String move) {
         if (Texas.STATE_NEXT_OP.equals(move)) {
@@ -220,12 +218,12 @@ class TexasRound implements Round {
         return null;
     }
 
-    @Override
+
     public UserPlayer opPlayer() {
         return null;
     }
 
-    @Override
+
     public Action getPlayerAction(String id) {
         return null;
     }
@@ -274,24 +272,20 @@ class TexasRound implements Round {
 
     }
 
-    @Override
     public void loop() {
         if (opEvent != null) {
             this.opEvent.check();
         }
     }
 
-    @Override
     public void send(Object obj) {
 
     }
 
-    @Override
     public void send(String uid, Object obj) {
 
     }
 
-    @Override
     public void send(int uid, Object obj) {
 
     }

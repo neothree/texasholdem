@@ -1,6 +1,7 @@
 package com.texasthree.zone.entity;
 
-import com.texasthree.zone.round.Round;
+import com.texasthree.zone.round.TexasEventHandler;
+import com.texasthree.zone.round.TexasRound;
 import com.texasthree.zone.round.UserPlayer;
 
 import java.util.ArrayList;
@@ -11,7 +12,7 @@ public class Desk {
 
     private User[] seats = new User[8];
 
-    private Round round;
+    private TexasRound round;
 
     private Map<String, User> audience = new HashMap<>();
 
@@ -63,7 +64,8 @@ public class Desk {
                 users.add(up);
             }
         }
-        this.round = Round.texas(users);
+        var con = new TexasEventHandler();
+        this.round = new TexasRound(users, con::trigger);
         try {
             this.round.start();
         } catch (Exception e) {
@@ -88,9 +90,5 @@ public class Desk {
 
     public User[] getUsers() {
         return this.seats;
-    }
-
-    public Round getRound() {
-        return this.round;
     }
 }
