@@ -12,9 +12,9 @@ import java.util.stream.Collectors;
  * @create: 2021-06-14 10:46
  */
 public class Result {
-    public Map<String, ResultPlayer> playersMap = new HashMap<>();
+    public Map<Integer, ResultPlayer> playersMap = new HashMap<>();
 
-    public Set<String> getWinners() {
+    public Set<Integer> getWinners() {
         return this.playersMap.values()
                 .stream()
                 .filter(v -> v.getWin() > 0)

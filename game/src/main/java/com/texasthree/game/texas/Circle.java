@@ -35,15 +35,15 @@ public class Circle {
 
     private List<Action> actions = new ArrayList<>();
 
-    private String lastBetOrRaise;
+    private Integer lastBetOrRaise;
 
-    private String legalRaiseId;
+    private Integer legalRaiseId;
 
     private Action standardAct;
 
     private int amplitude;
 
-    private Set<String> flopRaise = new HashSet<>();
+    private Set<Integer> flopRaise = new HashSet<>();
 
     Circle(String circle, int potChips, int playerNum) {
         this.circle = circle;
@@ -155,7 +155,7 @@ public class Circle {
 
     }
 
-    int chipsThisCircle(String id) {
+    int chipsThisCircle(int id) {
         var action = this.getAction(id);
         return action != null ? action.chipsBet : 0;
     }
@@ -274,10 +274,10 @@ public class Circle {
         return ret;
     }
 
-    Action getAction(String id) {
+    Action getAction(int id) {
         for (var i = this.actions.size() - 1; i >= 0; i--) {
             var action = this.actions.get(i);
-            if (action.id.equals(id)) {
+            if (action.id == id) {
                 return action;
             }
         }
@@ -287,15 +287,15 @@ public class Circle {
     /**
      * 所有人的押注数
      */
-    Map<String, Integer> playerBetChips() {
-        var ret = new HashMap<String, Integer>();
+    Map<Integer, Integer> playerBetChips() {
+        var ret = new HashMap<Integer, Integer>();
         var actions = new ArrayList<>(this.actions);
         Collections.reverse(actions);
         actions.forEach(v -> ret.putIfAbsent(v.id, v.chipsBet));
         return ret;
     }
 
-    boolean isFlopRaise(String id) {
+    boolean isFlopRaise(Integer id) {
         return this.flopRaise.contains(id);
     }
 
@@ -315,7 +315,7 @@ public class Circle {
         return this.getStandard() + this.amplitude;
     }
 
-    String lastBetOrRaise() {
+    Integer lastBetOrRaise() {
         return lastBetOrRaise;
     }
 
@@ -323,7 +323,7 @@ public class Circle {
         return this.standardAct != null ? standardAct.chipsBet : 0;
     }
 
-    String getStandardId() {
+    Integer getStandardId() {
         return this.standardAct != null ? standardAct.id : null;
     }
 

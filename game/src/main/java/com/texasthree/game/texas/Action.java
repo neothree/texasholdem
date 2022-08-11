@@ -2,7 +2,7 @@ package com.texasthree.game.texas;
 
 public class Action {
 
-    public String id;
+    public int id;
 
     public Optype op;
 
@@ -27,7 +27,7 @@ public class Action {
      */
     public boolean straddle;
 
-    public Action(String id, Optype op, int chipsBet, int chipsAdd, int chipsLeft, int sumPot) {
+    public Action(int id, Optype op, int chipsBet, int chipsAdd, int chipsLeft, int sumPot) {
         this.id = id;
         this.op = op;
         this.chipsBet = chipsBet;
@@ -54,15 +54,15 @@ public class Action {
     }
 
     public static Action raise(int chipsAdd) {
-        return new Action(null, Optype.Raise, 0, chipsAdd, 0, 0);
+        return new Action(-1, Optype.Raise, 0, chipsAdd, 0, 0);
     }
 
     public static Action of(Optype op) {
-        return new Action(null, op, 0, 0, 0, 0);
+        return new Action(-1, op, 0, 0, 0, 0);
     }
 
     public static Action straddleBlind(int chipsAdd) {
-        var act = new Action(null, Optype.Raise, 0, chipsAdd, 0, 0);
+        var act = new Action(-1, Optype.Raise, 0, chipsAdd, 0, 0);
         act.straddle = true;
         return act;
     }
