@@ -17,7 +17,7 @@ public interface Round {
     /**
      * 创建德州扑克
      */
-    static Round texas(List<Integer> users) {
+    static Round texas(List<UserPayer> users) {
         var con = new TexasEventHandler();
         return new TexasRound(users, con::trigger);
     }

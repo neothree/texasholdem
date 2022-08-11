@@ -1,7 +1,9 @@
 package com.texasthree.zone.entity;
 
 import com.texasthree.zone.round.Round;
+import com.texasthree.zone.round.UserPayer;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -58,10 +60,16 @@ public class Desk {
     }
 
     public void start() {
-        var users = Arrays.stream(this.seats)
-                .filter(v -> v != null)
-                .map(User::getChips)
-                .collect(Collectors.toList());
+        var users = new ArrayList<UserPayer>();
+        for (var i = 0; i < this.seats.length; i++) {
+            var user = this.seats[i];
+            if (user != null) {
+                var up = new UserPayer();
+                up.seatId = i;
+                up.user = user;
+                users.add(up);
+            }
+        }
         this.round = Round.texas(users);
         try {
             this.round.start();

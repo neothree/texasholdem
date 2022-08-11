@@ -38,19 +38,19 @@ class TexasRound implements Round {
      */
     private ScheduledEvent opEvent;
 
-    private PlayerInfo opPlayer;
+    private UserPayer opPlayer;
 
     private boolean isOver;
 
-    private Map<String, PlayerInfo> playerMap = new HashMap<>();
+    private Map<String, UserPayer> playerMap = new HashMap<>();
 
     private int actDuration = 15000;
 
-    private List<Integer> users;
+    private List<UserPayer> users;
 
     private Consumer<RoundEvent> eventConsumer;
 
-    TexasRound(List<Integer>  users, Consumer<RoundEvent> eventConsumer) {
+    TexasRound(List<UserPayer>  users, Consumer<RoundEvent> eventConsumer) {
         this.users = users;
         this.eventConsumer = eventConsumer;
     }
@@ -61,7 +61,7 @@ class TexasRound implements Round {
         var players = new ArrayList<Player>();
 
         for (int i = 0; i < this.users.size(); i++) {
-            players.add(new Player(i, users.get(i)));
+            players.add(new Player(i, users.get(i).user.getChips()));
         }
 
         this.game = Texas.builder()
@@ -170,7 +170,7 @@ class TexasRound implements Round {
      * create at 2020-06-30 18:07
      */
     private void moveNextOp() {
-        this.opPlayer = new PlayerInfo();
+        this.opPlayer = new UserPayer();
         this.opEvent = new ScheduledEvent(() -> this.onOpTimeout(), this.actDuration);
         this.eventConsumer.accept(RoundEvent.NEW_OPERATOR);
         log.info("轮到下一位进行押注 opId={} seatId={}", this.opPlayer.user.getId(), this.opPlayer.seatId);

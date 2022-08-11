@@ -8,7 +8,8 @@ import com.texasthree.zone.entity.User;
  * @author : guoqing
  * create at:  2020-06-30  10:23
  */
-public class PlayerInfo {
+public class UserPayer {
+
     public int seatId;
 
     public User user;
