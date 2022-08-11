@@ -1,5 +1,6 @@
 package com.texasthree.zone.round;
 
+import com.texasthree.game.texas.Card;
 import com.texasthree.zone.controller.Cmd;
 import com.texasthree.zone.entity.Desk;
 
@@ -23,6 +24,9 @@ public class TexasEventHandler {
                 break;
             case DEAL_CARD:
                 this.onDealCard();
+                break;
+            case ACTION:
+                this.onAction();
                 break;
             case UPDATE_HAND:
                 this.onUpdateHand();
@@ -57,29 +61,34 @@ public class TexasEventHandler {
 
     private void onDealCard() {
         var info = new Cmd.DealCard();
-        var round = this.desk.getRound();
         info.seatIds = round.getPlayers().stream().map(v -> v.seatId).collect(Collectors.toList());
         this.desk.send(info);
     }
 
     private void onUpdateHand() {
-        var round = this.desk.getRound();
         for (var v : round.getPlayers()) {
             if (!round.isLeave(v.getId())) {
                 continue;
             }
+            var hand = round.getPlayerHand(v.getId());
             var update = new Cmd.HandUpdate();
-            update.hands = new ArrayList<>();
-            update.hands.add(this.getHand(v.getId() + ""));
+            update.cards = hand.getHold().stream().map(Card::getId).collect(Collectors.toList());
+            update.best = hand.getBest().stream().map(Card::getId).collect(Collectors.toList());
+            update.key = hand.getKeys().stream().map(Card::getId).collect(Collectors.toList());
+            update.type = hand.getType().name();
             round.send(v.getId(), update);
         }
     }
 
     private void onAction() {
-        var round = this.desk.getRound();
+        var id = "11";
+        var action = round.getPlayerAction(id);
         var send = new Cmd.PlayerAction();
-        send.sumPot = 0;
-        send.action = this.getAction(round.opPlayer().getId() + "");
+        send.op = action.op.name();
+        send.chipsAdd = action.chipsAdd;
+        send.chipsBet = action.chipsBet;
+        send.chipsLeft = action.chipsLeft;
+        send.sumPot = round.sumPot();
         this.desk.send(send);
     }
 
@@ -95,41 +104,16 @@ public class TexasEventHandler {
 
     private void onNewOperator() {
         var info = new Cmd.NewOperator();
-//        info.leftSec = this.opEvent.getNextMsec() - System.currentTimeMillis();
-//        info.ops = state.ops.stream().map(v -> {
-//            var act = new Cmd.Action();
-//            act.op = v.op.name();
-//            act.chipsBet = v.chipsBet;
-//            return act;
-//        }).collect(Collectors.toList());
-//        info.seatId = this.opPlayer.seatId;
-//        info.raiseLine = state.raiseLine;
+        info.leftSec = this.round.opLeftSec();
+        info.seatId = this.round.getOpPlayer().seatId;
+        info.ops = this.round.authority()
+                .entrySet().stream()
+                .map(v -> {
+                    var act = new Cmd.Action();
+                    act.op = v.getKey().name();
+                    act.chipsBet = v.getValue();
+                    return act;
+                }).collect(Collectors.toList());
         this.desk.send(info);
-    }
-
-    private Cmd.Action getAction(String id) {
-//        int seatId = this.playerMap.get(id).seatId;
-//        var act = this.state.actions.stream().filter(v -> v.id == seatId).findFirst().orElse(null);
-//        var action = new Cmd.Action();
-//        action.op = act.op.name();
-//        action.chipsBet = act.chipsBet;
-//        return action;
-        return null;
-    }
-
-    private Cmd.Hand getHand(String id) {
-//        if (!this.playerMap.containsKey(id)) {
-//            return null;
-//        }
-//        int seatId = this.playerMap.get(id).seatId;
-//        var player = this.state.players.stream().filter(v -> v.getId() == seatId).findFirst().orElse(null);
-//        var info = new Cmd.Hand();
-//        info.best = cardList(player.getHand().getBest());
-//        info.cards = cardList(player.getHand().getHold());
-//        info.key = cardList(player.getHand().getKeys());
-//        info.type = player.getHand().getType().name();
-//        info.seatId = seatId;
-//        return info;
-        return null;
     }
 }

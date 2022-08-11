@@ -50,7 +50,7 @@ class TexasRound implements Round {
 
     private Consumer<RoundEvent> eventConsumer;
 
-    TexasRound(List<UserPlayer>  users, Consumer<RoundEvent> eventConsumer) {
+    TexasRound(List<UserPlayer> users, Consumer<RoundEvent> eventConsumer) {
         this.users = users;
         this.eventConsumer = eventConsumer;
     }
@@ -59,7 +59,6 @@ class TexasRound implements Round {
     public void start() {
         // 位置图谱
         var players = new ArrayList<Player>();
-
         for (int i = 0; i < this.users.size(); i++) {
             players.add(new Player(i, users.get(i).user.getChips()));
         }
@@ -71,15 +70,9 @@ class TexasRound implements Round {
                 .regulation(Regulation.SmallBlind, 1)
                 .build();
         this.game.start();
-
         this.printStart();
 
-        try {
-            this.opEvent = new ScheduledEvent(() -> this.move(state.move), 2000);
-        } catch (Exception e) {
-            throw new IllegalStateException();
-        }
-
+        this.opEvent = new ScheduledEvent(() -> this.move(state.move), 2000);
         this.eventConsumer.accept(RoundEvent.START_GAME);
         this.dealCard();
     }
@@ -121,6 +114,10 @@ class TexasRound implements Round {
 
     @Override
     public Collection<UserPlayer> getPlayers() {
+        return null;
+    }
+
+    public UserPlayer getOpPlayer() {
         return null;
     }
 
@@ -219,8 +216,17 @@ class TexasRound implements Round {
         this.action(action);
     }
 
+    public Hand getPlayerHand(String id) {
+        return null;
+    }
+
     @Override
     public UserPlayer opPlayer() {
+        return null;
+    }
+
+    @Override
+    public Action getPlayerAction(String id) {
         return null;
     }
 
@@ -249,6 +255,15 @@ class TexasRound implements Round {
     public int dealer() {
         var player = this.game.dealer();
         return 0;
+    }
+
+    public Map<Optype, Integer> authority() {
+        return this.game.authority();
+    }
+
+    public int opLeftSec() {
+        return 15;
+
     }
 
     private void printStart() {

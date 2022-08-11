@@ -21,7 +21,6 @@ public interface Round {
         return new TexasRound(users, con::trigger);
     }
 
-
     /**
      * 开始
      */
@@ -38,6 +37,10 @@ public interface Round {
 
     Collection<UserPlayer> getPlayers();
 
+    UserPlayer opPlayer();
+
+    Action getPlayerAction(String id);
+
     /**
      * 事件循环
      */
@@ -49,5 +52,4 @@ public interface Round {
 
     void send(int uid, Object obj);
 
-    UserPlayer opPlayer();
 }

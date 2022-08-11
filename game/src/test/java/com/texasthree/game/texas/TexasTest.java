@@ -627,7 +627,7 @@ public class TexasTest extends AllCard {
         ////////////////////////////////////////////////////////////////////////////////
         texas = Texas.builder().build();
         texas.start();
-        var auth = texas.auth();
+        var auth = texas.authority();
         assertEquals(7, auth.size());
         assertEquals(0, auth.get(Optype.Fold));
         assertEquals(1, auth.get(Optype.Call));
@@ -638,7 +638,7 @@ public class TexasTest extends AllCard {
         assertEquals(9, auth.get(Optype.BBlind4));
 
         texas.action(Action.raise(8));
-        auth = texas.auth();
+        auth = texas.authority();
         assertEquals(7, auth.size());
         assertEquals(0, auth.get(Optype.Fold));
         assertEquals(7, auth.get(Optype.Call));
@@ -656,7 +656,7 @@ public class TexasTest extends AllCard {
         texas.action(Action.of(Optype.Call));
         texas.action(Action.of(Optype.Check));
         texas.action(Action.raise(4));
-        auth = texas.auth();
+        auth = texas.authority();
         assertTrue(auth.containsKey(Optype.Allin));
         assertFalse(auth.containsKey(Optype.Raise));
 
@@ -709,7 +709,7 @@ public class TexasTest extends AllCard {
             player.changeChips(chipsLeft - player.getChips());
         }
 
-        var auth = texas.auth();
+        var auth = texas.authority();
         if (false) {
             var mp = new ObjectMapper();
             System.out.println(mp.writeValueAsString(auth));

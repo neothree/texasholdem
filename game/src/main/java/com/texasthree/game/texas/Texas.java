@@ -761,7 +761,7 @@ public class Texas {
     /**
      * 获取押注操作权限
      */
-    Map<Optype, Integer> auth() {
+    public Map<Optype, Integer> authority() {
         var auth = this.pot.auth(this.opPlayer());
         if (this.regulations.containsKey(Regulation.AllinOrFold)) {
             // TODO 押注权限检测在pot中，这个玩法会有漏洞

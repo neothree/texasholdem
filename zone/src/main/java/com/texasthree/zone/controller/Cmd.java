@@ -76,12 +76,20 @@ public class Cmd {
     }
 
     public static class PlayerAction {
-        public Action action;
+        public int seatId;
+        public String op;
+        public int chipsAdd;
+        public int chipsBet;
+        public int chipsLeft;
         public int sumPot;
     }
 
     public static class HandUpdate {
-        public List<Hand> hands;
+        public int seatId;
+        public List<Integer> cards;
+        public String type;
+        public List<Integer> best;
+        public List<Integer> key;
     }
 
     public static class Hand {
