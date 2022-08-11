@@ -1,7 +1,6 @@
 package com.texasthree.zone.round;
 
 import com.texasthree.game.texas.Action;
-import com.texasthree.game.texas.Player;
 
 import java.util.Collection;
 import java.util.List;
@@ -17,7 +16,7 @@ public interface Round {
     /**
      * 创建德州扑克
      */
-    static Round texas(List<UserPayer> users) {
+    static Round texas(List<UserPlayer> users) {
         var con = new TexasEventHandler();
         return new TexasRound(users, con::trigger);
     }
@@ -35,9 +34,9 @@ public interface Round {
 
     boolean finished();
 
-    boolean isLeave(int id);
+    boolean isLeave(String id);
 
-    Collection<Player> getPlayers();
+    Collection<UserPlayer> getPlayers();
 
     /**
      * 事件循环
@@ -50,5 +49,5 @@ public interface Round {
 
     void send(int uid, Object obj);
 
-    Player opPlayer();
+    UserPlayer opPlayer();
 }

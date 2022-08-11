@@ -1,6 +1,5 @@
 package com.texasthree.zone.round;
 
-import com.texasthree.game.texas.Player;
 import com.texasthree.zone.controller.Cmd;
 import com.texasthree.zone.entity.Desk;
 
@@ -51,7 +50,7 @@ public class TexasEventHandler {
         info.smallBlind = round.smallBlind();
         info.sumPot = round.sumPot();
         info.players = round.getPlayers().stream()
-                .map(Player::getId)
+                .map(v -> v.seatId)
                 .collect(Collectors.toList());
         this.desk.send(info);
     }
@@ -59,7 +58,7 @@ public class TexasEventHandler {
     private void onDealCard() {
         var info = new Cmd.DealCard();
         var round = this.desk.getRound();
-        info.positions = round.getPlayers().stream().map(Player::getId).collect(Collectors.toList());
+        info.seatIds = round.getPlayers().stream().map(v -> v.seatId).collect(Collectors.toList());
         this.desk.send(info);
     }
 

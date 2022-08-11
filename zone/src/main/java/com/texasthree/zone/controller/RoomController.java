@@ -50,7 +50,7 @@ public class RoomController {
             user.send(new Cmd.Warning("房间不存在"));
             return;
         }
-        room.sitDown(user, data.position);
+        room.sitDown(user, data.seatId);
     }
 
     /**

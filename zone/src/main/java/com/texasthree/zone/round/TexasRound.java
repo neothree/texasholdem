@@ -38,19 +38,19 @@ class TexasRound implements Round {
      */
     private ScheduledEvent opEvent;
 
-    private UserPayer opPlayer;
+    private UserPlayer opPlayer;
 
     private boolean isOver;
 
-    private Map<String, UserPayer> playerMap = new HashMap<>();
+    private Map<String, UserPlayer> playerMap = new HashMap<>();
 
     private int actDuration = 15000;
 
-    private List<UserPayer> users;
+    private List<UserPlayer> users;
 
     private Consumer<RoundEvent> eventConsumer;
 
-    TexasRound(List<UserPayer>  users, Consumer<RoundEvent> eventConsumer) {
+    TexasRound(List<UserPlayer>  users, Consumer<RoundEvent> eventConsumer) {
         this.users = users;
         this.eventConsumer = eventConsumer;
     }
@@ -120,12 +120,7 @@ class TexasRound implements Round {
     }
 
     @Override
-    public boolean isLeave(int id) {
-        return false;
-    }
-
-    @Override
-    public Collection<Player> getPlayers() {
+    public Collection<UserPlayer> getPlayers() {
         return null;
     }
 
@@ -144,7 +139,8 @@ class TexasRound implements Round {
         this.eventConsumer.accept(RoundEvent.UPDATE_HAND);
     }
 
-    private boolean isLeave(String id) {
+    @Override
+    public boolean isLeave(String id) {
         return this.state.players.stream().anyMatch(v -> v.isLeave() && playerMap.get(id).seatId == v.getId());
     }
 
@@ -170,7 +166,7 @@ class TexasRound implements Round {
      * create at 2020-06-30 18:07
      */
     private void moveNextOp() {
-        this.opPlayer = new UserPayer();
+        this.opPlayer = new UserPlayer(1, null);
         this.opEvent = new ScheduledEvent(() -> this.onOpTimeout(), this.actDuration);
         this.eventConsumer.accept(RoundEvent.NEW_OPERATOR);
         log.info("轮到下一位进行押注 opId={} seatId={}", this.opPlayer.user.getId(), this.opPlayer.seatId);
@@ -224,7 +220,7 @@ class TexasRound implements Round {
     }
 
     @Override
-    public Player opPlayer() {
+    public UserPlayer opPlayer() {
         return null;
     }
 

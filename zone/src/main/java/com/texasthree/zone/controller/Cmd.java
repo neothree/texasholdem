@@ -34,11 +34,11 @@ public class Cmd {
     }
 
     public static class SitDown {
-        public int position;
+        public int seatId;
     }
 
     public static class SitUp {
-        public int position;
+        public int seatId;
     }
 
     public static class EnableRound {
@@ -56,18 +56,18 @@ public class Cmd {
     }
 
     public static class NewOperator {
-        public int position;
+        public int seatId;
         public int raiseLine;
         public long leftSec;
         public List<Action> ops;
     }
 
     public static class DealCard {
-        public List<Integer> positions;
+        public List<Integer> seatIds;
     }
 
     public static class Action {
-        public int position;
+        public int seatId;
         public String op;
         public int chipsAdd;
         public int chipsBet;
@@ -85,7 +85,7 @@ public class Cmd {
     }
 
     public static class Hand {
-        public int position;
+        public int seatId;
         public List<Integer> cards;
         public String type;
         public List<Integer> best;

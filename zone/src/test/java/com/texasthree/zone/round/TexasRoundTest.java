@@ -9,13 +9,11 @@ class TexasRoundTest {
     
     @Test
     void start() throws Exception {
-        var users = new ArrayList<UserPayer>();
+        var users = new ArrayList<UserPlayer>();
         for (int i = 0; i < 3; i++) {
-            var up = new UserPayer();
-            up.seatId = i;
-            up.user = new User();
-            up.user.setChips(100);
-            users.add(up);
+            var user = new User();
+            user.setChips(100);
+            users.add(new UserPlayer(1, user));
         }
         var game = new TexasRound(users, v -> {});
         game.start();

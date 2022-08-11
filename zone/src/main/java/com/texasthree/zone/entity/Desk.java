@@ -1,24 +1,19 @@
 package com.texasthree.zone.entity;
 
 import com.texasthree.zone.round.Round;
-import com.texasthree.zone.round.UserPayer;
+import com.texasthree.zone.round.UserPlayer;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class Desk {
 
-    public User[] seats = new User[8];
+    private User[] seats = new User[8];
 
     private Round round;
 
     private Map<String, User> audience = new HashMap<>();
-
-    public Desk() {
-    }
 
     /**
      * 添加玩家
@@ -60,13 +55,11 @@ public class Desk {
     }
 
     public void start() {
-        var users = new ArrayList<UserPayer>();
+        var users = new ArrayList<UserPlayer>();
         for (var i = 0; i < this.seats.length; i++) {
             var user = this.seats[i];
             if (user != null) {
-                var up = new UserPayer();
-                up.seatId = i;
-                up.user = user;
+                var up = new UserPlayer(i, user);
                 users.add(up);
             }
         }
