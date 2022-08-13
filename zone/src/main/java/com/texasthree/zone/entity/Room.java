@@ -2,6 +2,8 @@ package com.texasthree.zone.entity;
 
 
 import com.texasthree.zone.utility.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -9,6 +11,8 @@ import java.util.Map;
 
 
 public class Room {
+
+    private static Logger log = LoggerFactory.getLogger(Room.class);
 
     private static Map<String, Room> roomMap = new HashMap<>();
 
@@ -33,9 +37,10 @@ public class Room {
     private String id;
 
     public Room() {
-        this.id = StringUtils.get32UUID();
+        this.id = StringUtils.get10UUID();
         this.desk = new Desk();
         roomMap.put(id, this);
+        log.info("创建房间 {}", id);
     }
 
     public void addUser(User user) {

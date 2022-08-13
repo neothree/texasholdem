@@ -1,27 +1,20 @@
 package com.texasthree.zone.controller;
 
+import com.texasthree.zone.entity.Room;
 import com.texasthree.zone.entity.User;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
-
-/**
- * 账户登录
- *
- * @author: neo
- * @create: 2022-08-10 10:00
- */
 @RestController
-public class LoginController {
+public class HttpController {
 
     private Map<String, User> users = new HashMap<>();
 
-    @RequestMapping(value = "/login", method = POST)
+    @PostMapping(value = "/login")
     public String login(@RequestParam String username,
                         @RequestParam String password) {
         if (!users.containsKey(username)) {
@@ -29,5 +22,24 @@ public class LoginController {
         }
         var user = users.get(username);
         return user.getToken();
+    }
+
+    /**
+     * 进入房间
+     */
+    @PostMapping(value = "/login")
+    public void enterRoom(@RequestParam String roomId) {
+        var room = Room.getRoom(roomId);
+        if (room == null) {
+            return;
+        }
+
+        var me = this.getMe();
+        me.leave();
+        me.enter(room);
+    }
+
+    private User getMe() {
+        return null;
     }
 }

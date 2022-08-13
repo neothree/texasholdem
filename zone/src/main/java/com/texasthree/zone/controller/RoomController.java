@@ -12,13 +12,6 @@ import com.texasthree.zone.net.CommandController;
 @CommandController
 public class RoomController {
 
-    /**
-     * 进入房间
-     */
-    @Command
-    public static void command(Cmd.EnterRoom data, User user) {
-        user.enter(Room.one());
-    }
 
     /**
      * 离开房间

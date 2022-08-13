@@ -2,25 +2,25 @@ package com.texasthree.zone.entity;
 
 /**
  * 定时事件
- *
- * @author : guoqing
- * create at:  2020-06-29  17:52
- * @description:
  */
 public class ScheduledEvent {
 
     private Runnable command;
 
-    private int delay;
+    private long nextMsec;
 
-    private int nextMsec;
+    private boolean done;
 
     public ScheduledEvent(Runnable command, int delay) {
         this.command = command;
-        this.delay = delay;
+        this.nextMsec = System.currentTimeMillis() + delay;
     }
 
     public void check() {
+        if (!done && System.currentTimeMillis() >= nextMsec) {
+            this.done = true;
+            this.command.run();
+        }
 
     }
 
