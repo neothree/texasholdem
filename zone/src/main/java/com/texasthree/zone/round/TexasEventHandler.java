@@ -15,27 +15,29 @@ public class TexasEventHandler {
 
     private Desk desk;
 
-    private TexasRound round;
+    public TexasEventHandler(Desk desk) {
+        this.desk = desk;
+    }
 
-    public void trigger(RoundEvent event) {
+    public void trigger(TexasRound round, RoundEvent event) {
         switch (event) {
             case START_GAME:
-                this.onStartGame();
+                this.onStartGame(round);
                 break;
             case DEAL_CARD:
-                this.onDealCard();
+                this.onDealCard(round);
                 break;
             case ACTION:
-                this.onAction();
+                this.onAction(round);
                 break;
             case UPDATE_HAND:
-                this.onUpdateHand();
+                this.onUpdateHand(round);
                 break;
             case NEW_OPERATOR:
-                this.onNewOperator();
+                this.onNewOperator(round);
                 break;
             case CIRCLE_END:
-                this.onCircleEnd();
+                this.onCircleEnd(round);
                 break;
             case SHOWDOWN:
                 this.onShowdown();
@@ -45,7 +47,7 @@ public class TexasEventHandler {
         }
     }
 
-    private void onStartGame() {
+    private void onStartGame(TexasRound round) {
         var info = new Cmd.StartGame();
         info.ante = round.ante();
         info.sbSeatId = round.sbSeatId();
@@ -59,13 +61,13 @@ public class TexasEventHandler {
         this.desk.send(info);
     }
 
-    private void onDealCard() {
+    private void onDealCard(TexasRound round) {
         var info = new Cmd.DealCard();
         info.seatIds = round.getPlayers().stream().map(v -> v.seatId).collect(Collectors.toList());
         this.desk.send(info);
     }
 
-    private void onUpdateHand() {
+    private void onUpdateHand(TexasRound round) {
         for (var v : round.getPlayers()) {
             if (!round.isLeave(v.getId())) {
                 continue;
@@ -76,11 +78,11 @@ public class TexasEventHandler {
             update.best = hand.getBest().stream().map(Card::getId).collect(Collectors.toList());
             update.key = hand.getKeys().stream().map(Card::getId).collect(Collectors.toList());
             update.type = hand.getType().name();
-            round.send(v.getId(), update);
+            desk.send(v.getId(), update);
         }
     }
 
-    private void onAction() {
+    private void onAction(TexasRound round) {
         var id = "11";
         var action = round.getPlayerAction(id);
         var send = new Cmd.PlayerAction();
@@ -92,7 +94,7 @@ public class TexasEventHandler {
         this.desk.send(send);
     }
 
-    private void onCircleEnd() {
+    private void onCircleEnd(TexasRound round) {
         var info = new Cmd.CircleEnd();
         info.board = new ArrayList<>();
         info.devide = new ArrayList<>();
@@ -102,11 +104,11 @@ public class TexasEventHandler {
     private void onShowdown() {
     }
 
-    private void onNewOperator() {
+    private void onNewOperator(TexasRound round) {
         var info = new Cmd.NewOperator();
-        info.leftSec = this.round.opLeftSec();
-        info.seatId = this.round.getOpPlayer().seatId;
-        info.ops = this.round.authority()
+        info.leftSec = round.opLeftSec();
+        info.seatId = round.getOpPlayer().seatId;
+        info.ops = round.authority()
                 .entrySet().stream()
                 .map(v -> {
                     var act = new Cmd.Action();

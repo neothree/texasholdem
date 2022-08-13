@@ -52,6 +52,9 @@ public class Desk {
         }
     }
 
+    /**
+     * 尝试开局
+     */
     private void tryStart() {
 
         // 已经有牌局
@@ -66,6 +69,9 @@ public class Desk {
         this.start();
     }
 
+    /**
+     * 牌局开始
+     */
     private void start() {
         var users = new ArrayList<UserPlayer>();
         for (var i = 0; i < this.seats.length; i++) {
@@ -75,8 +81,8 @@ public class Desk {
                 users.add(up);
             }
         }
-        var con = new TexasEventHandler();
-        this.round = new TexasRound(users, con::trigger);
+        var con = new TexasEventHandler(this);
+        this.round = new TexasRound(users, con);
         try {
             this.round.start();
         } catch (Exception e) {
@@ -86,7 +92,13 @@ public class Desk {
     }
 
     public void loop() {
-        this.loop();
+        if (round != null) {
+            round.loop();
+        }
+    }
+
+    public void send(String uid, Object msg) {
+
     }
 
     public void send(Object msg) {

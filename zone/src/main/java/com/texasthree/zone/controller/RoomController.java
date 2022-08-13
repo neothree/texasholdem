@@ -53,29 +53,6 @@ public class RoomController {
         room.sitUp(user);
     }
 
-    /**
-     * 解散房间
-     */
-    @Command
-    public static void command(Cmd.Dismiss data, User user) {
-        var room = user.getRoom();
-        if (room == null) {
-            throw new IllegalArgumentException("房间不存在");
-        }
-        room.dismiss();
-    }
-
-    /**
-     * 启动房间牌局
-     */
-    @Command
-    public static void command(Cmd.EnableRound data, User user) {
-        var room = user.getRoom();
-        if (room == null) {
-            throw new IllegalArgumentException("房间不存在");
-        }
-        room.enableRound();
-    }
 
     /**
      * 玩家执行牌局操作

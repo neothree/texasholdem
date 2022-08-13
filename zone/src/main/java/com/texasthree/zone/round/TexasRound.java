@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -48,11 +47,11 @@ public class TexasRound {
 
     private List<UserPlayer> users;
 
-    private Consumer<RoundEvent> eventConsumer;
+    private TexasEventHandler eventHandler;
 
-    public TexasRound(List<UserPlayer> users, Consumer<RoundEvent> eventConsumer) {
+    public TexasRound(List<UserPlayer> users, TexasEventHandler eventHandler) {
         this.users = users;
-        this.eventConsumer = eventConsumer;
+        this.eventHandler = eventHandler;
     }
 
 
@@ -73,7 +72,7 @@ public class TexasRound {
         this.printStart();
 
         this.opEvent = new ScheduledEvent(() -> this.move(state.move), 2000);
-        this.eventConsumer.accept(RoundEvent.START_GAME);
+        this.eventHandler.trigger(this, RoundEvent.START_GAME);
         this.dealCard();
     }
 
@@ -86,7 +85,7 @@ public class TexasRound {
      */
 
     public void action(Action action) {
-        this.eventConsumer.accept(RoundEvent.ACTION);
+        this.eventHandler.trigger(this, RoundEvent.ACTION);
 
         this.opEvent = null;
         this.opPlayer = null;
@@ -124,7 +123,7 @@ public class TexasRound {
      * 发牌
      */
     private void dealCard() {
-        this.eventConsumer.accept(RoundEvent.DEAL_CARD);
+        this.eventHandler.trigger(this, RoundEvent.DEAL_CARD);
         this.updateHand();
     }
 
@@ -132,7 +131,7 @@ public class TexasRound {
      * 更新手牌
      */
     private void updateHand() {
-        this.eventConsumer.accept(RoundEvent.UPDATE_HAND);
+        this.eventHandler.trigger(this, RoundEvent.UPDATE_HAND);
     }
 
 
@@ -163,7 +162,7 @@ public class TexasRound {
     private void moveNextOp() {
         this.opPlayer = new UserPlayer(1, null);
         this.opEvent = new ScheduledEvent(() -> this.onOpTimeout(), this.actDuration);
-        this.eventConsumer.accept(RoundEvent.NEW_OPERATOR);
+        this.eventHandler.trigger(this, RoundEvent.NEW_OPERATOR);
         log.info("轮到下一位进行押注 opId={} seatId={}", this.opPlayer.user.getId(), this.opPlayer.seatId);
     }
 
@@ -175,7 +174,7 @@ public class TexasRound {
      */
     private void moveCircleEnd() {
         this.printCircle();
-        this.eventConsumer.accept(RoundEvent.CIRCLE_END);
+        this.eventHandler.trigger(this, RoundEvent.CIRCLE_END);
 
         this.updateHand();
 
@@ -193,7 +192,7 @@ public class TexasRound {
         this.opEvent = null;
         this.opPlayer = null;
         this.isOver = true;
-        this.eventConsumer.accept(RoundEvent.SHOWDOWN);
+        this.eventHandler.trigger(this, RoundEvent.SHOWDOWN);
     }
 
     /**
@@ -276,17 +275,5 @@ public class TexasRound {
         if (opEvent != null) {
             this.opEvent.check();
         }
-    }
-
-    public void send(Object obj) {
-
-    }
-
-    public void send(String uid, Object obj) {
-
-    }
-
-    public void send(int uid, Object obj) {
-
     }
 }

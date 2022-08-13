@@ -1,5 +1,6 @@
 package com.texasthree.zone;
 
+import com.texasthree.zone.entity.Zone;
 import com.texasthree.zone.net.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

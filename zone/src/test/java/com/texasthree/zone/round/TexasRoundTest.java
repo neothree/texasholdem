@@ -15,7 +15,7 @@ class TexasRoundTest {
             user.setChips(100);
             users.add(new UserPlayer(1, user));
         }
-        var game = new TexasRound(users, v -> {});
+        var game = new TexasRound(users, new TexasEventHandler(null));
         game.start();
     }
 
