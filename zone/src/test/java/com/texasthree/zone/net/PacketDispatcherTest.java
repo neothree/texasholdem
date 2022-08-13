@@ -13,7 +13,7 @@ public class PacketDispatcherTest {
 
     @Test
     void start() throws Exception {
-        var user = new SomeUser();
+        var user = new SomeUser("123");
         assertNull(user.say);
         var dispatcher = new PacketDispatcher(v -> user);
         dispatcher.register("com.texasthree.zone.net.some");

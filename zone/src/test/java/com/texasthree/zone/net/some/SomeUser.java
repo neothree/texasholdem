@@ -8,4 +8,8 @@ import com.texasthree.zone.entity.User;
  */
 public class SomeUser extends User {
     public String say;
+
+    public SomeUser(String username) {
+        super(username);
+    }
 }

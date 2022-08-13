@@ -6,21 +6,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @RestController
 public class HttpController {
 
-    private Map<String, User> users = new HashMap<>();
 
     @PostMapping(value = "/login")
     public String login(@RequestParam String username,
                         @RequestParam String password) {
-        if (!users.containsKey(username)) {
-            users.put(username, new User());
+        var user = User.getUserByUsername(username);
+        if (user == null) {
+            user = new User(username);
         }
-        var user = users.get(username);
         return user.getToken();
     }
 

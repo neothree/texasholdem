@@ -10,15 +10,21 @@ import java.util.Set;
 public class User {
 
     private static Map<String, User> userMap = new HashMap<>();
+    private static Map<String, User> usernameMap = new HashMap<>();
 
-    public static User getUser(String id) {
+    public static User getUserById(String id) {
         return userMap.get(id);
     }
 
+    public static User getUserByUsername(String username) {
+        return usernameMap.get(username);
+    }
 
     private String id;
 
     private String name;
+
+    private String username;
 
     private int chips;
 
@@ -27,11 +33,13 @@ public class User {
     private String token;
 
 
-    public User() {
+    public User(String username) {
         this.id = StringUtils.get32UUID();
+        this.username = username;
         this.name = StringUtils.getChineseName();
         this.token = Packet.encode(this.id);
         userMap.put(id, this);
+        usernameMap.put(username, this);
     }
 
     /**
@@ -105,5 +113,13 @@ public class User {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }

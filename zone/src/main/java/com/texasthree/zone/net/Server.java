@@ -42,7 +42,7 @@ public class Server {
     @Autowired
     public Server(SimpMessagingTemplate messagingTemplate) {
         this.messagingTemplate = messagingTemplate;
-        this.dispatcher = new PacketDispatcher(User::getUser);
+        this.dispatcher = new PacketDispatcher(User::getUserById);
     }
 
     public void start() {
