@@ -17,13 +17,15 @@ public class HttpController {
         if (user == null) {
             user = new User(username);
         }
+
+        // 返回token，作为消息身份认证
         return user.getToken();
     }
 
     /**
      * 进入房间
      */
-    @PostMapping(value = "/login")
+    @PostMapping(value = "/room")
     public void enterRoom(@RequestParam String roomId) {
         var room = Room.getRoom(roomId);
         if (room == null) {
