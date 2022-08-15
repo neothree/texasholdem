@@ -5,7 +5,10 @@ import com.texasthree.security.login.entity.Loginer;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
-public interface LoginDao extends JpaRepository<Loginer, Integer> {
-    Loginer findDataByUsername(String username);
+public interface LoginerDao extends JpaRepository<Loginer, Integer> {
+
+    Optional<Loginer> findByUsername(String username);
 }

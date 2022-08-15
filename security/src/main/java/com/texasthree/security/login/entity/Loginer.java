@@ -6,10 +6,7 @@ import com.texasthree.security.login.enums.LoginApp;
 import com.texasthree.security.shiro.LoginerRealm;
 import com.texasthree.utility.utlis.StringUtils;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Version;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 import static com.texasthree.security.shiro.LoginerRealm.getPwd;
@@ -18,7 +15,7 @@ import static com.texasthree.security.shiro.LoginerRealm.getPwd;
  * 登录用户
  */
 @Entity
-@Table(name="loginer_info")
+@Table(name = "loginer_info")
 public class Loginer {
     /**
      * 版本
@@ -29,34 +26,37 @@ public class Loginer {
      * 主键ID
      */
     @Id
-    private int id;
+    @GeneratedValue
+    private Integer id;
 
     /**
      * 登录名
      */
+    @Column(nullable = false, updatable = false)
     private String username;
 
     /**
      * 登录密码
      */
+    @Column(nullable = false)
     private String password;
     /**
      * 状态
      */
+    @Column(nullable = false)
     private String status;
     /**
      * 创建时间
      */
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createTime;
     /**
      * 认证加密的盐
      */
+    @Column(nullable = false)
     private String salt;
 
-    public String getCredentialsSalt() {
-        return username + salt;
-    }
-
+    @Column(nullable = false, updatable = false)
     private String app;
 
     public Loginer() {
@@ -122,7 +122,6 @@ public class Loginer {
     }
 
 
-
     @Override
     public String toString() {
         return new StringBuilder()
@@ -156,11 +155,11 @@ public class Loginer {
         this.version = version;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -194,5 +193,9 @@ public class Loginer {
 
     public void setApp(String app) {
         this.app = app;
+    }
+
+    public String getCredentialsSalt() {
+        return username + salt;
     }
 }

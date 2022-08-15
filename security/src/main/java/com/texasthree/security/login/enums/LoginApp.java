@@ -8,9 +8,7 @@ import java.util.Map;
 
 public enum LoginApp {
 
-    PROVIDER("服务商后台"),
-
-    MERCHANT("商户后台");
+    USER("玩家");
 
     /**
      * 描述

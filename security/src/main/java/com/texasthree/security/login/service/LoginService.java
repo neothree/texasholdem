@@ -2,7 +2,7 @@ package com.texasthree.security.login.service;
 
 
 import com.texasthree.security.SecurityException;
-import com.texasthree.security.login.dao.LoginDao;
+import com.texasthree.security.login.dao.LoginerDao;
 import com.texasthree.security.login.entity.Loginer;
 import com.texasthree.security.login.enums.LoginApp;
 import com.texasthree.utility.restful.RestResponse;
@@ -17,15 +17,15 @@ public class LoginService {
 
     protected final Logger log = LoggerFactory.getLogger(LoginService.class);
 
-    private final LoginDao loginDao;
+    private final LoginerDao loginDao;
 
     public LoginService(
-            LoginDao dao) {
+            LoginerDao dao) {
         this.loginDao = dao;
     }
 
     public Loginer getDataByUsername(String username) {
-        return this.loginDao.findDataByUsername(username);
+        return this.loginDao.findByUsername(username).orElse(null);
     }
 
     @Transactional
