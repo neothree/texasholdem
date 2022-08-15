@@ -1,5 +1,5 @@
 module com.texasholdem.utility {
-    exports com.texasholdem.utility.utlis;
+    exports com.texasthree.utility.utlis;
 
     requires java.xml;
     requires org.slf4j;

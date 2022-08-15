@@ -1,25 +1,27 @@
 package com.texasthree.zone.controller;
 
+import com.texasthree.security.shiro.LoginerRealm;
+import com.texasthree.utility.restful.RestResponse;
 import com.texasthree.zone.entity.Room;
 import com.texasthree.zone.entity.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @RestController
 public class HttpController {
 
+    @Autowired
+    private LoginerRealm<User> loginerRealm;
 
-    @PostMapping(value = "/login")
-    public String login(@RequestParam String username,
-                        @RequestParam String password) {
-        var user = User.getUserByUsername(username);
-        if (user == null) {
-            user = new User(username);
-        }
-
-        // 返回token，作为消息身份认证
-        return user.getToken();
+    @RequestMapping(value = "/login", method = POST)
+    public RestResponse login(@RequestParam String username,
+                              @RequestParam String password) {
+        return loginerRealm.login(username, password);
     }
 
     /**

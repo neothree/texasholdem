@@ -1,5 +1,6 @@
 package com.texasthree.zone.token;
 
+import com.texasthree.zone.entity.User;
 import org.springframework.stereotype.Component;
 
 /**
@@ -8,4 +9,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class UserService {
+    public User getDataByUsername(String username) {
+        return null;
+    }
 }

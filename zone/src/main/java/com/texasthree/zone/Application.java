@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages="com.texasthree")
 public class Application {
 
     public static void main(String[] args) throws Exception {
