@@ -1,6 +1,5 @@
 package com.texasthree.security.login.entity;
 
-
 import com.texasthree.security.SecurityException;
 import com.texasthree.security.login.enums.Active;
 import com.texasthree.security.login.enums.LoginApp;
@@ -11,13 +10,10 @@ import java.time.LocalDateTime;
 
 import static com.texasthree.security.shiro.LoginerRealm.getPwd;
 
-
 /**
  * 登录用户
  */
-public class Loginer extends StringEntity {
-
-
+public class Loginer extends Entity<String> {
     /**
      * 登录名
      */
@@ -42,15 +38,6 @@ public class Loginer extends StringEntity {
     public String getCredentialsSalt() {
         return username + salt;
     }
-
-    /**
-     * 谷歌认证秘钥
-     */
-    private String gAuthKey;
-    /**
-     * 谷歌认证是否绑定
-     */
-    private String gAuthStatus;
 
     private String app;
 
@@ -135,11 +122,6 @@ public class Loginer extends StringEntity {
         this.setStatus(status.name());
     }
 
-    public boolean gAuthEnable() {
-        return Active.ACTIVE.name().equals(this.gAuthStatus);
-    }
-
-
 
     @Override
     public String toString() {
@@ -188,22 +170,6 @@ public class Loginer extends StringEntity {
 
     public void setSalt(String salt) {
         this.salt = salt;
-    }
-
-    public String getGAuthKey() {
-        return gAuthKey;
-    }
-
-    public void setGAuthKey(String gAuthKey) {
-        this.gAuthKey = gAuthKey;
-    }
-
-    public String getGAuthStatus() {
-        return gAuthStatus;
-    }
-
-    public void setGAuthStatus(String gAuthStatus) {
-        this.gAuthStatus = gAuthStatus;
     }
 
     public String getApp() {
