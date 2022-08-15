@@ -3,6 +3,7 @@ server:
   servlet:
     session:
       timeout: 30M
+    context-path: /zone
 spring:
   profiles:
     active: dev # 默认启动开发环境
