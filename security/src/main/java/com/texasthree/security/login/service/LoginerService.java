@@ -13,13 +13,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
-public class LoginService {
+public class LoginerService {
 
-    protected final Logger log = LoggerFactory.getLogger(LoginService.class);
+    protected final Logger log = LoggerFactory.getLogger(LoginerService.class);
 
     private final LoginerDao loginDao;
 
-    public LoginService(
+    public LoginerService(
             LoginerDao dao) {
         this.loginDao = dao;
     }

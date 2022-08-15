@@ -3,7 +3,7 @@ package com.texasthree.security.shiro;
 
 import com.texasthree.security.login.entity.Loginer;
 import com.texasthree.security.login.enums.Active;
-import com.texasthree.security.login.service.LoginService;
+import com.texasthree.security.login.service.LoginerService;
 import com.texasthree.utility.restful.RestResponse;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
@@ -65,17 +65,17 @@ public class LoginerRealm<T> extends AuthorizingRealm implements LoginListener {
         return SECURE_RANDOM_NUMBER_GENERATOR.nextBytes().toHex();
     }
 
-    private final LoginService loginService;
+    private final LoginerService loginerService;
 
     private final MeSource<T> meSource;
 
     @Autowired
     public LoginerRealm(RetryLimitHashedCredentialsMatcher matcher,
-                        LoginService loginService,
+                        LoginerService loginerService,
                         MeSource<T> meSource) {
         this.setCredentialsMatcher(matcher);
         this.setCachingEnabled(false);
-        this.loginService = loginService;
+        this.loginerService = loginerService;
         this.meSource = meSource;
     }
 
@@ -88,7 +88,7 @@ public class LoginerRealm<T> extends AuthorizingRealm implements LoginListener {
         // 交给AuthenticatingRealm使用CredentialsMatcher进行密码匹配，如果觉得人家的不好可以自定义实现
         // 如果没有在 login 注册则不能登录
         // TODO 这个地方可以成为攻击的弱点，会一直请求数据库
-        var loginer = this.loginService.getDataByUsername(username);
+        var loginer = this.loginerService.getDataByUsername(username);
         if (loginer == null) {
             throw new UnknownAccountException();
         }
@@ -158,7 +158,7 @@ public class LoginerRealm<T> extends AuthorizingRealm implements LoginListener {
 
     @Override
     public void onSuccess(String username) {
-        getSession().setAttribute(LOGINER_KEY, loginService.getDataByUsername(username));
+        getSession().setAttribute(LOGINER_KEY, loginerService.getDataByUsername(username));
         getSession().setAttribute(ME_KEY, meSource.getMeByUsername(username));
     }
 

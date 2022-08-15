@@ -1,6 +1,6 @@
 package com.texasthree.zone.controller;
 
-import com.texasthree.security.login.service.LoginService;
+import com.texasthree.security.login.service.LoginerService;
 import com.texasthree.security.shiro.LoginerRealm;
 import com.texasthree.utility.restful.RestResponse;
 import com.texasthree.zone.entity.Room;
@@ -20,16 +20,14 @@ public class HttpController {
     private LoginerRealm<User> loginerRealm;
 
     @Autowired
-    private LoginService loginService;
+    private LoginerService loginerService;
 
     @RequestMapping(value = "/login", method = POST)
     public RestResponse login(@RequestParam String username,
                               @RequestParam String password) {
-        username = "test";
-        password = "test";
-        var loginer = this.loginService.getDataByUsername(username);
+        var loginer = this.loginerService.getDataByUsername(username);
         if (loginer == null) {
-            this.loginService.login(username, password);
+            this.loginerService.login(username, password);
         }
         return loginerRealm.login(username, password);
     }
