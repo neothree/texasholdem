@@ -1,6 +1,5 @@
 package com.texasthree.zone.entity;
 
-import com.texasthree.zone.net.Packet;
 import com.texasthree.zone.utility.StringUtils;
 
 import java.util.HashMap;
@@ -37,7 +36,6 @@ public class User {
         this.id = StringUtils.get32UUID();
         this.username = username;
         this.name = StringUtils.getChineseName();
-        this.token = Packet.encode(this.id);
         userMap.put(id, this);
         usernameMap.put(username, this);
     }

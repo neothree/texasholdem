@@ -1,5 +1,7 @@
 package com.texasthree.zone.net;
 
+import com.texasthree.security.shiro.LoginerRealm;
+import com.texasthree.utility.packet.Packet;
 import com.texasthree.zone.entity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +64,8 @@ public class Server {
     @MessageMapping("/user")
     public void recv(SimpMessageHeaderAccessor headerAccessor,
                      @Payload Packet packet) throws Exception {
-        this.dispatcher.dispatch(packet);
+        var user = (User) headerAccessor.getSessionAttributes().get(LoginerRealm.ME_KEY);
+        this.dispatcher.dispatch(packet, user);
     }
 
     public void send(Set<String> uids, Packet packet) {

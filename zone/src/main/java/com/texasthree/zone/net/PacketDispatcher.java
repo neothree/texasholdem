@@ -1,5 +1,6 @@
 package com.texasthree.zone.net;
 
+import com.texasthree.utility.packet.Packet;
 import com.texasthree.zone.entity.User;
 import com.texasthree.zone.utility.JSONUtils;
 import org.reflections.Reflections;
@@ -62,12 +63,9 @@ public class PacketDispatcher {
         log.info("注册消息注册数量 {}", messageClass.size());
     }
 
-    public void dispatch(Packet packet) {
-        var uid = packet.parse();
-        var user = userSource.apply(uid);
-        if (user == null) {
-            log.error("没有找到玩家 uid={}" + uid);
-            return;
+    public void dispatch(Packet packet, User user) {
+        if (packet == null || user == null) {
+            throw new IllegalArgumentException();
         }
         this.dispatch(packet.getName(), packet.getPayload(), user);
     }
