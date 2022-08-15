@@ -8,6 +8,7 @@ import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 public class CorsConfig {
+
     @Bean
     public CorsFilter corsFilter() {
         //1. 添加 CORS配置信息
@@ -22,14 +23,14 @@ public class CorsConfig {
         config.addAllowedHeader("*");
         //暴露哪些头部信息
         config.addExposedHeader("Content-Type");
-        config.addExposedHeader( "X-Requested-With");
+        config.addExposedHeader("X-Requested-With");
         config.addExposedHeader("accept");
         config.addExposedHeader("Origin");
-        config.addExposedHeader( "Access-Control-Request-Method");
+        config.addExposedHeader("Access-Control-Request-Method");
         config.addExposedHeader("Access-Control-Request-Headers");
         //2. 添加映射路径
         UrlBasedCorsConfigurationSource corsConfigurationSource = new UrlBasedCorsConfigurationSource();
-        corsConfigurationSource.registerCorsConfiguration("/**",config);
+        corsConfigurationSource.registerCorsConfiguration("/**", config);
         //3. 返回新的CorsFilter
         return new CorsFilter(corsConfigurationSource);
     }

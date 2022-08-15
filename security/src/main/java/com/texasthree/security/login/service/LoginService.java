@@ -16,7 +16,7 @@ public class LoginService {
     private final LoginDao loginDao;
 
     public LoginService(
-                            LoginDao dao) {
+            LoginDao dao) {
         this.loginDao = dao;
     }
 

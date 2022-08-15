@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class LifeCircle {
 
+    private static Logger log = LoggerFactory.getLogger(LifeCircle.class);
+
     private Server server;
 
     private Zone zone;
@@ -25,7 +27,6 @@ public class LifeCircle {
         this.zone = zone;
     }
 
-    private static Logger log = LoggerFactory.getLogger(LifeCircle.class);
 
     public void start() {
         server.start();

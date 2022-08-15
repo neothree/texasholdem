@@ -8,3 +8,6 @@ spring:
     active: dev # 默认启动开发环境
   application:
     name: zone
+
+logging:
+  config: classpath:logback.xml

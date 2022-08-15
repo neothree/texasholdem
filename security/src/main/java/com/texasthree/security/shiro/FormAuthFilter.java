@@ -1,4 +1,4 @@
-package com.texasthree.security.shiro.filter;
+package com.texasthree.security.shiro;
 
 import com.texasthree.utility.utlis.JSONUtils;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -44,6 +44,7 @@ public class FormAuthFilter extends FormAuthenticationFilter {
         httpServletResponse.setContentType("application/json");
         return false;
     }
+
     @Override
     protected boolean onLoginSuccess(AuthenticationToken token, Subject subject, ServletRequest request,
                                      ServletResponse response) throws Exception {

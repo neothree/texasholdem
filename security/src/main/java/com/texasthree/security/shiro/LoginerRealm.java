@@ -4,7 +4,6 @@ package com.texasthree.security.shiro;
 import com.texasthree.security.login.entity.Loginer;
 import com.texasthree.security.login.enums.Active;
 import com.texasthree.security.login.service.LoginService;
-import com.texasthree.security.shiro.filter.LoginListener;
 import com.texasthree.utility.restful.RestResponse;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
@@ -121,7 +120,6 @@ public class LoginerRealm<T> extends AuthorizingRealm implements LoginListener {
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
         var auth = (SimpleAuthorizationInfo) getSession().getAttribute(AUTHC);
         if (auth == null) {
-            var loginer = getLoginer();
             auth = new SimpleAuthorizationInfo();
             getSession().setAttribute(AUTHC, auth);
         }

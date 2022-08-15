@@ -1,21 +1,31 @@
-package com.texasthree.zone;
+package com.texasthree;
 
-import org.apache.log4j.BasicConfigurator;
+import com.texasthree.zone.LifeCircle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
 
-@SpringBootApplication(scanBasePackages="com.texasthree")
-public class Application {
+@SpringBootApplication
+public class Application extends SpringBootServletInitializer {
 
-    public static void main(String[] args) throws Exception {
-        BasicConfigurator.configure();
+    @Override
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+        return application.sources(Application.class);
+    }
+
+    public static void main(String[] args) {
+        try {
         SpringApplication.run(Application.class, args);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Autowired

@@ -28,9 +28,7 @@
         <java.version>11</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <slf4j-api.version>1.8.0-beta2</slf4j-api.version>
-        <log4j.version>1.2.17</log4j.version>
-        <slf4j-log4j12.version>1.7.30</slf4j-log4j12.version>
+        <slf4j-api.version>1.7.36</slf4j-api.version>
 
         <commons-lang3.version>3.12.0</commons-lang3.version>
         <commons-io.version>2.6</commons-io.version>
@@ -78,8 +76,9 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-log4j12</artifactId>
-                <version>${slf4j-log4j12.version}</version>
+                <version>${slf4j-api.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>

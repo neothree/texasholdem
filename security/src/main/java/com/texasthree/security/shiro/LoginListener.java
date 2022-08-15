@@ -1,4 +1,4 @@
-package com.texasthree.security.shiro.filter;
+package com.texasthree.security.shiro;
 
 /**
  * @author: neo
