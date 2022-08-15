@@ -21,6 +21,7 @@
         <module>zone</module>
         <module>security</module>
         <module>utility</module>
+        <module>dao</module>
     </modules>
 
     <!--版本维护-->
@@ -51,6 +52,8 @@
         <org.apache.shiro.version>1.9.1</org.apache.shiro.version>
         <httpclient.version>4.5.13</httpclient.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+        <druid.version>1.2.11</druid.version>
+        <h2.version>2.1.210</h2.version>
     </properties>
 
     <dependencyManagement>
@@ -66,7 +69,11 @@
                 <version>${junit-jupiter.version}</version>
                 <scope>test</scope>
             </dependency>
-
+            <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>${h2.version}</version>
+            </dependency>
             <dependency>
                 <groupId>com.google.zxing</groupId>
                 <artifactId>core</artifactId>
@@ -187,6 +194,12 @@
                 <artifactId>commons-lang3</artifactId>
                 <version>${commons-lang3.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid</artifactId>
+                <version>${druid.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 

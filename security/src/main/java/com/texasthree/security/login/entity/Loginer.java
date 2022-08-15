@@ -6,6 +6,10 @@ import com.texasthree.security.login.enums.LoginApp;
 import com.texasthree.security.shiro.LoginerRealm;
 import com.texasthree.utility.utlis.StringUtils;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Version;
 import java.time.LocalDateTime;
 
 import static com.texasthree.security.shiro.LoginerRealm.getPwd;
@@ -13,23 +17,37 @@ import static com.texasthree.security.shiro.LoginerRealm.getPwd;
 /**
  * 登录用户
  */
-public class Loginer extends Entity<String> {
+@Entity
+@Table(name="loginer_info")
+public class Loginer {
+    /**
+     * 版本
+     */
+    @Version
+    private int version = 0;
+    /**
+     * 主键ID
+     */
+    @Id
+    private int id;
+
     /**
      * 登录名
      */
     private String username;
+
     /**
      * 登录密码
      */
     private String password;
     /**
-     * 白名单状态
+     * 状态
      */
-    private String whiteStatus;
+    private String status;
     /**
-     * 白名单
+     * 创建时间
      */
-    private String white;
+    private LocalDateTime createTime;
     /**
      * 认证加密的盐
      */
@@ -40,9 +58,6 @@ public class Loginer extends Entity<String> {
     }
 
     private String app;
-
-    private String email;
-
 
     public Loginer() {
     }
@@ -65,12 +80,10 @@ public class Loginer extends Entity<String> {
         }
 
 
-        this.setId(StringUtils.get16UUID());
         this.setUsername(username);
         this.setApp(app.name());
         this.setStatus(Active.ACTIVE.name());
         this.setCreateTime(LocalDateTime.now());
-        this.setWhiteStatus(Active.UNACTIVE.name());
 
         // 生成加密密码
         this.setSalt(LoginerRealm.getSalt());
@@ -108,19 +121,6 @@ public class Loginer extends Entity<String> {
         this.password = getPwd(newPassword, this.getCredentialsSalt());
     }
 
-    public void changeWhiteStatus(Active status) {
-        if (status == null) {
-            throw new IllegalArgumentException();
-        }
-        this.whiteStatus = status.name();
-    }
-
-    public void changeStatus(Active status) {
-        if (status == null) {
-            throw new IllegalArgumentException();
-        }
-        this.setStatus(status.name());
-    }
 
 
     @Override
@@ -148,20 +148,36 @@ public class Loginer extends Entity<String> {
         this.password = password;
     }
 
-    public String getWhiteStatus() {
-        return whiteStatus;
+    public int getVersion() {
+        return version;
     }
 
-    public void setWhiteStatus(String whiteStatus) {
-        this.whiteStatus = whiteStatus;
+    public void setVersion(int version) {
+        this.version = version;
     }
 
-    public String getWhite() {
-        return white;
+    public int getId() {
+        return id;
     }
 
-    public void setWhite(String white) {
-        this.white = white;
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public LocalDateTime getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(LocalDateTime createTime) {
+        this.createTime = createTime;
     }
 
     public String getSalt() {
@@ -178,13 +194,5 @@ public class Loginer extends Entity<String> {
 
     public void setApp(String app) {
         this.app = app;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 }

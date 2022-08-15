@@ -2,15 +2,10 @@ package com.texasthree.security.login.dao;
 
 
 import com.texasthree.security.login.entity.Loginer;
-import org.springframework.stereotype.Component;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
-@Component
-public class LoginDao {
-
-    List<Loginer> getLoginersByRoleId(String roleId) {
-        return null;
-    }
-
+@Repository
+public interface LoginDao extends JpaRepository<Loginer, Integer> {
+    Loginer findDataByUsername(String username);
 }
