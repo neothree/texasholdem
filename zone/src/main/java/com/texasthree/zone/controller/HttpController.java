@@ -1,20 +1,20 @@
 package com.texasthree.zone.controller;
 
+import com.texasthree.security.login.enums.LoginApp;
 import com.texasthree.security.login.service.LoginerService;
+import com.texasthree.security.shiro.AbstractMeController;
 import com.texasthree.security.shiro.LoginerRealm;
 import com.texasthree.utility.restful.RestResponse;
 import com.texasthree.zone.entity.Room;
 import com.texasthree.zone.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
-
 @RestController
-public class HttpController {
+public class HttpController extends AbstractMeController<User> {
 
     @Autowired
     private LoginerRealm<User> loginerRealm;
@@ -22,14 +22,19 @@ public class HttpController {
     @Autowired
     private LoginerService loginerService;
 
-    @RequestMapping(value = "/login", method = POST)
-    public RestResponse login(@RequestParam String username,
-                              @RequestParam String password) {
+    @PostMapping(value = "/login")
+    public RestResponse login(String username,
+                              String password) throws Exception {
         var loginer = this.loginerService.getDataByUsername(username);
         if (loginer == null) {
-            this.loginerService.login(username, password);
+            this.loginerService.loginer(username, password, LoginApp.USER);
         }
         return loginerRealm.login(username, password);
+    }
+
+    @GetMapping(value = "/rooms")
+    public RestResponse rooms() {
+        return new RestResponse<>();
     }
 
     /**
@@ -45,9 +50,5 @@ public class HttpController {
         var me = this.getMe();
         me.leave();
         me.enter(room);
-    }
-
-    private User getMe() {
-        return null;
     }
 }

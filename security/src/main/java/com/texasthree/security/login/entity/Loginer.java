@@ -80,13 +80,13 @@ public class Loginer {
         }
 
 
-        this.setUsername(username);
-        this.setApp(app.name());
-        this.setStatus(Active.ACTIVE.name());
-        this.setCreateTime(LocalDateTime.now());
+        this.username = username;
+        this.app = app.name();
+        this.status = Active.ACTIVE.name();
+        this.createTime = LocalDateTime.now();
 
         // 生成加密密码
-        this.setSalt(LoginerRealm.getSalt());
+        this.salt = LoginerRealm.getSalt();
         var newPassword = getPwd(password, this.getCredentialsSalt());
         this.setPassword(newPassword);
     }

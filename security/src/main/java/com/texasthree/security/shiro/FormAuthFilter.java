@@ -1,5 +1,6 @@
 package com.texasthree.security.shiro;
 
+import com.texasthree.utility.restful.RestResponse;
 import com.texasthree.utility.utlis.JSONUtils;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.subject.Subject;
@@ -9,7 +10,6 @@ import org.apache.shiro.web.util.WebUtils;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
 
 /**
  * 自定义form表单认证过滤器<br/>
@@ -34,14 +34,14 @@ public class FormAuthFilter extends FormAuthenticationFilter {
         if (request.getAttribute(getFailureKeyAttribute()) != null) {
             return true;
         }
-        var httpServletResponse = (HttpServletResponse) response;
 
-        var result = new HashMap<>();
-        result.put("code", 101);
-        result.put("msg", "未登录");
+        // 未登录
+        var httpServletResponse = (HttpServletResponse) response;
+        var result = new RestResponse<>(1, "not authentication");
         httpServletResponse.getWriter().write(JSONUtils.toString(result));
         httpServletResponse.setCharacterEncoding("UTF-8");
         httpServletResponse.setContentType("application/json");
+        httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         return false;
     }
 

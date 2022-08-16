@@ -5,7 +5,6 @@ import com.texasthree.security.SecurityException;
 import com.texasthree.security.login.dao.LoginerDao;
 import com.texasthree.security.login.entity.Loginer;
 import com.texasthree.security.login.enums.LoginApp;
-import com.texasthree.utility.restful.RestResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -39,11 +38,5 @@ public class LoginerService {
         this.loginDao.save(loginer);
         log.info("注册登录账户 {} {}", username, app);
         return loginer;
-    }
-
-    public RestResponse login(String username, String password) {
-//        var loginer = checkLoginer(username);
-//        loginer.login(password);
-        return RestResponse.SUCCESS;
     }
 }
