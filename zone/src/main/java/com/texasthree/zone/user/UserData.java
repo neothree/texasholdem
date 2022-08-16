@@ -1,5 +1,7 @@
 package com.texasthree.zone.user;
 
+import org.hibernate.annotations.GenericGenerator;
+
 import javax.persistence.*;
 
 /**
@@ -18,8 +20,9 @@ public class UserData {
      * 主键ID
      */
     @Id
-    @GeneratedValue
-    private Integer id;
+    @GeneratedValue(generator = "system-uuid")
+    @GenericGenerator(name = "system-uuid", strategy = "uuid")
+    private String id;
 
     /**
      * 登录账户
@@ -55,11 +58,11 @@ public class UserData {
         this.version = version;
     }
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 

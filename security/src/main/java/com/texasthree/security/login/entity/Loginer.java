@@ -5,6 +5,7 @@ import com.texasthree.security.login.enums.Active;
 import com.texasthree.security.login.enums.LoginApp;
 import com.texasthree.security.shiro.LoginerRealm;
 import com.texasthree.utility.utlis.StringUtils;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -26,8 +27,9 @@ public class Loginer {
      * 主键ID
      */
     @Id
-    @GeneratedValue
-    private Integer id;
+    @GeneratedValue(generator = "system-uuid")
+    @GenericGenerator(name = "system-uuid", strategy = "uuid")
+    private String id;
 
     /**
      * 登录名
@@ -155,11 +157,11 @@ public class Loginer {
         this.version = version;
     }
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 

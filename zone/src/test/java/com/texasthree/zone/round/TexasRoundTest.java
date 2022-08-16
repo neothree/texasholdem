@@ -14,7 +14,7 @@ class TexasRoundTest {
         var users = new ArrayList<UserPlayer>();
         for (int i = 0; i < 3; i++) {
             var data = new UserData(StringUtils.get10UUID(),StringUtils.get10UUID());
-            data.setId(i);
+            data.setId(i + "");
             var user = new User(data);
             user.setChips(100);
             users.add(new UserPlayer(1, user));

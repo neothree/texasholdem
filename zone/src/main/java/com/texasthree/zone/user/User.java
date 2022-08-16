@@ -85,6 +85,6 @@ public class User {
     }
 
     public String getId() {
-        return data.getId().toString();
+        return data.getId();
     }
 }
