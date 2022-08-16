@@ -32,8 +32,7 @@ public class StompConfig implements WebSocketMessageBrokerConfigurer {
         var upgradeStrategy = new TomcatRequestUpgradeStrategy();
         //允许客户端使用socketJs方式访问，访问点为ws，允许跨域
         registry.addEndpoint("/texas")
-                .setAllowedOrigins("*")
-//                .setAllowedOriginPatterns("*")
+                .setAllowedOriginPatterns("*")
                 .setHandshakeHandler(new DefaultHandshakeHandler(upgradeStrategy))
                 .addInterceptors(new HttpSessionHandshakeInterceptor());
     }

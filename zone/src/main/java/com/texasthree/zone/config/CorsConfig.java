@@ -14,8 +14,7 @@ public class CorsConfig {
         //1. 添加 CORS配置信息
         CorsConfiguration config = new CorsConfiguration();
         //放行哪些原始域
-//        config.addAllowedOriginPattern(CorsConfiguration.ALL);
-        config.addAllowedOrigin(CorsConfiguration.ALL);
+        config.addAllowedOriginPattern(CorsConfiguration.ALL);
         //是否发送 Cookie
         config.setAllowCredentials(true);
         //放行哪些请求方式
