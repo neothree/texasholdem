@@ -1,7 +1,6 @@
 package com.texasthree.zone.user;
 
 import com.texasthree.zone.entity.Room;
-import com.texasthree.zone.utility.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,6 +9,7 @@ import java.util.Set;
 public class User {
 
     private static Map<String, User> userMap = new HashMap<>();
+
     private static Map<String, User> usernameMap = new HashMap<>();
 
     public static User getUserById(String id) {
@@ -20,25 +20,15 @@ public class User {
         return usernameMap.get(username);
     }
 
-    private String id;
-
-    private String name;
-
-    private String username;
 
     private int chips;
 
     private Room room;
 
-    private String token;
+    private UserData data;
 
-
-    public User(String username) {
-        this.id = StringUtils.get32UUID();
-        this.username = username;
-        this.name = StringUtils.getChineseName();
-        userMap.put(id, this);
-        usernameMap.put(username, this);
+    public User(UserData data) {
+        this.data = data;
     }
 
     /**
@@ -67,16 +57,12 @@ public class User {
 
     @Override
     public String toString() {
-        return this.name + ":" + this.id;
+        return data.toString();
     }
 
 
     public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+        return data.getName();
     }
 
     public int getChips() {
@@ -98,27 +84,7 @@ public class User {
     public static void send(Object obj, Set<String> uids) {
     }
 
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
     public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
+        return data.getId().toString();
     }
 }

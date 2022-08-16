@@ -19,6 +19,6 @@ public class UserPlayer {
     }
 
     public String getId() {
-        return this.user.getId();
+        return this.user.getId().toString();
     }
 }

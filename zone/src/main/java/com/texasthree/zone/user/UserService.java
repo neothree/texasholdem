@@ -1,5 +1,8 @@
 package com.texasthree.zone.user;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -8,6 +11,24 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class UserService {
+
+    protected final Logger log = LoggerFactory.getLogger(UserService.class);
+
+    private final UserDataDao userDataDao;
+
+    @Autowired
+    public UserService(UserDataDao userDataDao) {
+        this.userDataDao = userDataDao;
+    }
+
+    public User user(String username, String name) {
+        var data = new UserData(username, name);
+        this.userDataDao.save(data);
+        log.info("创建玩家 {} {}", username, username);
+        return new User(data);
+    }
+
+
     public User getDataByUsername(String username) {
         return null;
     }

@@ -1,6 +1,7 @@
 package com.texasthree.zone.net.some;
 
 import com.texasthree.zone.user.User;
+import com.texasthree.zone.user.UserData;
 
 /**
  * @author: neo
@@ -9,7 +10,7 @@ import com.texasthree.zone.user.User;
 public class SomeUser extends User {
     public String say;
 
-    public SomeUser(String username) {
-        super(username);
+    public SomeUser(UserData data) {
+        super(data);
     }
 }
