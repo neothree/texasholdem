@@ -30,6 +30,10 @@ public class UserService {
 
 
     public User getDataByUsername(String username) {
-        return null;
+        var data = this.userDataDao.findByUsername(username).orElse(null);
+        if (data == null) {
+            return null;
+        }
+        return new User(data);
     }
 }

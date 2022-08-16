@@ -1,12 +1,12 @@
 package com.texasthree.zone.controller;
 
-import com.texasthree.security.login.enums.LoginApp;
-import com.texasthree.security.login.service.LoginerService;
 import com.texasthree.security.shiro.AbstractMeController;
 import com.texasthree.security.shiro.LoginerRealm;
 import com.texasthree.utility.restful.RestResponse;
+import com.texasthree.zone.ZoneService;
 import com.texasthree.zone.entity.Room;
 import com.texasthree.zone.user.User;
+import com.texasthree.zone.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,14 +20,16 @@ public class HttpController extends AbstractMeController<User> {
     private LoginerRealm<User> loginerRealm;
 
     @Autowired
-    private LoginerService loginerService;
+    private UserService userService;
+
+    @Autowired
+    private ZoneService zoneService;
 
     @PostMapping(value = "/login")
     public RestResponse login(String username,
                               String password) throws Exception {
-        var loginer = this.loginerService.getDataByUsername(username);
-        if (loginer == null) {
-            this.loginerService.loginer(username, password, LoginApp.USER);
+        if (this.userService.getDataByUsername(username) == null) {
+            this.zoneService.createUser(username, password);
         }
         return loginerRealm.login(username, password);
     }
