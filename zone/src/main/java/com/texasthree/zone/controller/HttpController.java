@@ -6,7 +6,7 @@ import com.texasthree.security.shiro.AbstractMeController;
 import com.texasthree.security.shiro.LoginerRealm;
 import com.texasthree.utility.restful.RestResponse;
 import com.texasthree.zone.entity.Room;
-import com.texasthree.zone.entity.User;
+import com.texasthree.zone.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;

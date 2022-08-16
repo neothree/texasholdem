@@ -1,6 +1,5 @@
-package com.texasthree.zone.token;
+package com.texasthree.zone.user;
 
-import com.texasthree.zone.entity.User;
 import org.springframework.stereotype.Component;
 
 /**

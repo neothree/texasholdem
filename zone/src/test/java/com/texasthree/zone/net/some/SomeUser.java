@@ -1,6 +1,6 @@
 package com.texasthree.zone.net.some;
 
-import com.texasthree.zone.entity.User;
+import com.texasthree.zone.user.User;
 
 /**
  * @author: neo

@@ -3,6 +3,7 @@ package com.texasthree.zone.entity;
 import com.texasthree.zone.round.TexasEventHandler;
 import com.texasthree.zone.round.TexasRound;
 import com.texasthree.zone.round.UserPlayer;
+import com.texasthree.zone.user.User;
 
 import java.util.ArrayList;
 import java.util.Arrays;

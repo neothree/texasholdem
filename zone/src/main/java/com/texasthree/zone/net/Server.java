@@ -2,7 +2,7 @@ package com.texasthree.zone.net;
 
 import com.texasthree.security.shiro.LoginerRealm;
 import com.texasthree.utility.packet.Packet;
-import com.texasthree.zone.entity.User;
+import com.texasthree.zone.user.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

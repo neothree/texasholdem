@@ -1,6 +1,7 @@
 package com.texasthree.zone.entity;
 
 
+import com.texasthree.zone.user.User;
 import com.texasthree.zone.utility.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

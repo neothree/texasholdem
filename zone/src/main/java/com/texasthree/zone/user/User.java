@@ -1,5 +1,6 @@
-package com.texasthree.zone.entity;
+package com.texasthree.zone.user;
 
+import com.texasthree.zone.entity.Room;
 import com.texasthree.zone.utility.StringUtils;
 
 import java.util.HashMap;
