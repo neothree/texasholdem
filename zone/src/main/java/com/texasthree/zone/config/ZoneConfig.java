@@ -2,12 +2,14 @@ package com.texasthree.zone.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+@EnableScheduling
 @Configuration
-public class CorsConfig {
+public class ZoneConfig {
 
     @Bean
     public CorsFilter corsFilter() {
