@@ -1,9 +1,9 @@
 package com.texasthree.dao;
 
 
-import com.alibaba.druid.pool.DruidDataSource;
 import com.texasthree.utility.utlis.Base64;
 import com.texasthree.utility.utlis.RSAUtils;
+import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -42,22 +42,22 @@ public class DruidDataConfig {
     private Integer maxWait = 60000;
 
     @Primary
-    @Bean(name = "dataSource", initMethod = "init", destroyMethod = "clone")
-    public DruidDataSource druidDataSource() throws Exception {
-        var dataSource = new DruidDataSource();
+    @Bean(name = "dataSource")
+    public HikariDataSource druidDataSource() throws Exception {
+        var dataSource = new HikariDataSource();
         dataSource.setDriverClassName("org.h2.Driver");
-        dataSource.setUrl("jdbc:h2:mem:test;IGNORECASE=TRUE;database_to_upper=false;");
+        dataSource.setJdbcUrl("jdbc:h2:mem:test;IGNORECASE=TRUE;database_to_upper=false;");
         dataSource.setUsername(new String(RSAUtils.decryptByPublicKey(Base64.decode(username), PUBLIC_KEY)));
         dataSource.setPassword(new String(RSAUtils.decryptByPublicKey(Base64.decode(password), PUBLIC_KEY)));
 
-        //初始化时建立物理连接的个数，缺省值为0
-        dataSource.setInitialSize(initialSize);
-        //最小连接池数量
-        dataSource.setMinIdle(minIdle);
-        //最大连接池数量，缺省值为8
-        dataSource.setMaxActive(maxActive);
-        //获取连接时最大等待时间，单位毫秒。配置了maxWait之后，缺省启用公平锁，并发效率会有所下降，如果需要可以通过配置useUnfairLock属性为true使用非公平锁
-        dataSource.setMaxWait(maxWait);
+//        //初始化时建立物理连接的个数，缺省值为0
+//        dataSource.setInitialSize(initialSize);
+//        //最小连接池数量
+//        dataSource.setMinIdle(minIdle);
+//        //最大连接池数量，缺省值为8
+//        dataSource.setMaxActive(maxActive);
+//        //获取连接时最大等待时间，单位毫秒。配置了maxWait之后，缺省启用公平锁，并发效率会有所下降，如果需要可以通过配置useUnfairLock属性为true使用非公平锁
+//        dataSource.setMaxWait(maxWait);
         return dataSource;
     }
 
