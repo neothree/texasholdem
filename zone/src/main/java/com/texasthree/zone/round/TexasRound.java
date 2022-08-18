@@ -90,13 +90,7 @@ public class TexasRound {
         this.opEvent = null;
         this.opPlayer = null;
 
-        try {
-            this.game.action(action);
-//            state = game.state();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        this.game.action(action);
         if (Optype.Check.equals(action.op)) {
             this.move(state.move);
         } else if (Optype.Fold.equals(action.op)) {
@@ -260,7 +254,6 @@ public class TexasRound {
 
     public int opLeftSec() {
         return 15;
-
     }
 
     private void printStart() {

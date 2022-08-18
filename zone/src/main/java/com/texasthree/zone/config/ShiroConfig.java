@@ -1,9 +1,9 @@
 package com.texasthree.zone.config;
 
 
+import com.texasthree.security.shiro.FormAuthFilter;
 import com.texasthree.security.shiro.LoginerRealm;
 import com.texasthree.security.shiro.MeSource;
-import com.texasthree.security.shiro.FormAuthFilter;
 import com.texasthree.zone.user.User;
 import com.texasthree.zone.user.UserService;
 import org.apache.commons.collections.map.LinkedMap;
@@ -45,6 +45,7 @@ public class ShiroConfig {
 
         var map = new LinkedHashMap<String, String>();
         map.put("/login", "anon");
+        map.put("/poker", "anon");
         map.put("/**", "authc");
         factoryBean.setFilterChainDefinitionMap(map);
         return factoryBean;

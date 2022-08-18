@@ -27,8 +27,6 @@ class LoginDaoTest {
         var loginer = new Loginer(username, password, app);
         this.loginDao.save(loginer);
 
-        System.out.println(loginer.getId());
-
         var optional = this.loginDao.findByUsername(username);
         assertTrue(optional.isPresent());
         var find = optional.get();

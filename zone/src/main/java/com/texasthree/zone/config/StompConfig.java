@@ -1,10 +1,9 @@
-package com.texasthree.zone.net;
+package com.texasthree.zone.config;
 
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
@@ -18,20 +17,14 @@ import javax.websocket.ContainerProvider;
 
 @Configuration
 @EnableWebSocketMessageBroker
-@EnableScheduling
 public class StompConfig implements WebSocketMessageBrokerConfigurer {
 
-    /**
-     * 添加这个Endpoint，这样在网页中就可以通过websocket连接上服务,
-     * 也就是我们配置websocket的服务地址,并且可以指定是否使用socketjs
-     *
-     * @param registry
-     */
+
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         var upgradeStrategy = new TomcatRequestUpgradeStrategy();
         //允许客户端使用socketJs方式访问，访问点为ws，允许跨域
-        registry.addEndpoint("/texas")
+        registry.addEndpoint("/poker")
                 .setAllowedOriginPatterns("*")
                 .setHandshakeHandler(new DefaultHandshakeHandler(upgradeStrategy))
                 .addInterceptors(new HttpSessionHandshakeInterceptor());

@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+
 @RestController
 public class HttpController extends AbstractMeController<User> {
 
@@ -26,12 +28,21 @@ public class HttpController extends AbstractMeController<User> {
     private ZoneService zoneService;
 
     @PostMapping(value = "/login")
-    public RestResponse login(String username,
-                              String password) throws Exception {
+    public RestResponse<String> login(
+            HttpServletRequest request,
+            @RequestParam("username") String username,
+            @RequestParam("password") String password) throws Exception {
+
+        // 没有的话创建一个
         if (this.userService.getDataByUsername(username) == null) {
             this.zoneService.createUser(username, password);
         }
-        return loginerRealm.login(username, password);
+
+        var res = loginerRealm.login(username, password);
+        if (res.isSuccess()) {
+            res = new RestResponse<>(res.getCode(), res.getMessage(), request.getSession().getId());
+        }
+        return res;
     }
 
     @GetMapping(value = "/rooms")
