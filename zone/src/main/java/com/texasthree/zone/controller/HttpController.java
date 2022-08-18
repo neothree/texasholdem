@@ -28,21 +28,34 @@ public class HttpController extends AbstractMeController<User> {
     private ZoneService zoneService;
 
     @PostMapping(value = "/login")
-    public RestResponse<String> login(
+    public RestResponse<LoginResponse> login(
             HttpServletRequest request,
             @RequestParam("username") String username,
             @RequestParam("password") String password) throws Exception {
 
         // 没有的话创建一个
-        if (this.userService.getDataByUsername(username) == null) {
-            this.zoneService.createUser(username, password);
+        var user = this.userService.getDataByUsername(username);
+        if (user == null) {
+            user = this.zoneService.createUser(username, password);
         }
 
         var res = loginerRealm.login(username, password);
-        if (res.isSuccess()) {
-            res = new RestResponse<>(res.getCode(), res.getMessage(), request.getSession().getId());
+        if (!res.isSuccess()) {
+            return res;
         }
-        return res;
+
+        var ret = new LoginResponse();
+        ret.uid = user.getId();
+        ret.name = user.getName();
+        ret.token = request.getSession().getId();
+        return new RestResponse<>(res.getCode(), res.getMessage(), ret);
+    }
+
+    private static class LoginResponse {
+        public String uid;
+        public String name;
+        public String token;
+
     }
 
     @GetMapping(value = "/rooms")
