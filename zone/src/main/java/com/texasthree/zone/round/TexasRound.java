@@ -1,13 +1,11 @@
 package com.texasthree.zone.round;
 
-import com.texasthree.game.GameState;
 import com.texasthree.game.texas.*;
 import com.texasthree.zone.room.ScheduledEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * 德扑游戏
@@ -29,8 +27,6 @@ public class TexasRound {
     private int dealer = 0;
 
     private Texas game;
-
-    private GameState state;
 
     /**
      * 计时器
@@ -70,10 +66,10 @@ public class TexasRound {
                 .regulation(Regulation.Dealer, 0)
                 .regulation(Regulation.SmallBlind, 1)
                 .build();
-        this.game.start();
+        var move = this.game.start();
         this.printStart();
 
-        this.opEvent = new ScheduledEvent(() -> this.move(state.move), 2000);
+        this.opEvent = new ScheduledEvent(() -> this.move(move), 2000);
         this.eventHandler.trigger(this, RoundEvent.START_GAME);
         this.dealCard();
     }
@@ -91,13 +87,13 @@ public class TexasRound {
         this.opEvent = null;
         this.opPlayer = null;
 
-        this.game.action(action);
+        var move = this.game.action(action);
         if (Optype.Check.equals(action.op)) {
-            this.move(state.move);
+            this.move(move);
         } else if (Optype.Fold.equals(action.op)) {
-            this.opEvent = new ScheduledEvent(() -> this.move(state.move), TIMEOUT_MOVE_FOLD);
+            this.opEvent = new ScheduledEvent(() -> this.move(move), TIMEOUT_MOVE_FOLD);
         } else {
-            this.opEvent = new ScheduledEvent(() -> this.move(state.move), TIMEOUT_MOVE_ACTION);
+            this.opEvent = new ScheduledEvent(() -> this.move(move), TIMEOUT_MOVE_ACTION);
         }
     }
 
@@ -135,10 +131,6 @@ public class TexasRound {
         var player = playerMap.get(id);
         var p = this.game.getPlayerById(player.seatId);
         return p.isLeave();
-    }
-
-    private List<Integer> cardList(List<Card> list) {
-        return list.stream().map(v -> v.getId()).collect(Collectors.toList());
     }
 
     private void move(String move) {
@@ -205,7 +197,8 @@ public class TexasRound {
         }
 
         log.info("压住超时: {}", this.opPlayer.toString());
-        var op = state.ops.stream().anyMatch(v -> Optype.Check.equals(v.op)) ? Optype.Check : Optype.Fold;
+        var au = this.game.authority();
+        var op = au.containsKey(Optype.Check) ? Optype.Check : Optype.Fold;
         var action = Action.of(op);
         action.id = this.opPlayer.seatId;
         this.action(action);
