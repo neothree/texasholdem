@@ -3,7 +3,7 @@ package com.texasthree.zone.controller;
 import com.texasthree.security.shiro.AbstractMeController;
 import com.texasthree.security.shiro.LoginerRealm;
 import com.texasthree.utility.restful.RestResponse;
-import com.texasthree.zone.ZoneService;
+import com.texasthree.zone.Zone;
 import com.texasthree.zone.entity.Room;
 import com.texasthree.zone.user.User;
 import com.texasthree.zone.user.UserService;
@@ -25,7 +25,7 @@ public class HttpController extends AbstractMeController<User> {
     private UserService userService;
 
     @Autowired
-    private ZoneService zoneService;
+    private Zone zone;
 
     @PostMapping(value = "/login")
     public RestResponse<LoginResponse> login(
@@ -36,7 +36,7 @@ public class HttpController extends AbstractMeController<User> {
         // 没有的话创建一个
         var user = this.userService.getDataByUsername(username);
         if (user == null) {
-            user = this.zoneService.createUser(username, password);
+            user = this.zone.createUser(username, password);
         }
 
         var res = loginerRealm.login(username, password);
