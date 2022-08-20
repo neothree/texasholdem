@@ -33,7 +33,7 @@ public class StompConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         //订阅广播 Broker（消息代理）名称
-        registry.enableSimpleBroker("/user", "/ping");
+        registry.enableSimpleBroker("/private", "/ping");
     }
 
     @Override

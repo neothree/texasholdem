@@ -2,6 +2,7 @@ package com.texasthree.zone.net;
 
 import com.texasthree.security.shiro.LoginerRealm;
 import com.texasthree.utility.packet.Packet;
+import com.texasthree.zone.room.Room;
 import com.texasthree.zone.user.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +36,7 @@ public class Server {
 
     private static final String PING_DESTINATION = "/ping";
 
-    private static final String USER_DESTINATION = "/user";
+    private static final String USER_DESTINATION = "/private";
 
     private final SimpMessagingTemplate messagingTemplate;
 
@@ -68,14 +69,16 @@ public class Server {
         this.dispatcher.dispatch(packet, user);
     }
 
-    public void send(Set<String> uids, Packet packet) {
+    public void send(Set<String> uids, Object obj) {
+        var msg = Packet.convertAsString(obj);
         for (var uid : uids) {
-            this.send(uid, packet.toString());
+
+            this.send(uid, msg);
         }
     }
 
-    public void send(String uid, Packet packet) {
-        this.send(uid, packet.toString());
+    public void send(String uid, Object obj) {
+        this.send(uid, Packet.convertAsString(obj));
     }
 
     /**

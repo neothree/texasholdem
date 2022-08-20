@@ -72,4 +72,8 @@ public class Room {
     public String getId() {
         return id;
     }
+
+    public Desk getDesk() {
+        return desk;
+    }
 }

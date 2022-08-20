@@ -2,6 +2,7 @@ package com.texasthree.zone;
 
 import com.texasthree.security.login.enums.LoginApp;
 import com.texasthree.security.login.service.LoginerService;
+import com.texasthree.zone.net.Server;
 import com.texasthree.zone.room.Room;
 import com.texasthree.zone.user.User;
 import com.texasthree.zone.user.UserService;
@@ -27,13 +28,15 @@ public class Zone {
 
     private final LoginerService loginerService;
 
-
+    private final Server server;
 
     @Autowired
     public Zone(UserService userService,
-                LoginerService loginerService) {
+                LoginerService loginerService,
+                Server server) {
         this.userService = userService;
         this.loginerService = loginerService;
+        this.server = server;
     }
 
 
@@ -46,7 +49,9 @@ public class Zone {
 
     public void start() {
         log.info("zone 开启启动");
-        Room.one();
+        var room = Room.one();
+        room.getDesk().setServer(server);
+
     }
 
     @Async

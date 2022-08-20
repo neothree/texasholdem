@@ -1,5 +1,6 @@
 package com.texasthree.zone.room;
 
+import com.texasthree.zone.net.Server;
 import com.texasthree.zone.round.TexasEventHandler;
 import com.texasthree.zone.round.TexasRound;
 import com.texasthree.zone.round.UserPlayer;
@@ -15,6 +16,8 @@ public class Desk {
     private User[] seats = new User[8];
 
     private TexasRound round;
+
+    private Server server;
 
     private Map<String, User> audience = new HashMap<>();
 
@@ -99,7 +102,7 @@ public class Desk {
     }
 
     public void send(String uid, Object msg) {
-
+        this.server.send(uid, msg);
     }
 
     public void send(Object msg) {
@@ -109,12 +112,16 @@ public class Desk {
                 set.add(v.getId());
             }
         }
-        User.send(msg, set);
+        server.send(set, msg);
     }
 
     public int playerNum() {
         return (int) Arrays.stream(this.seats)
                 .filter(v -> v != null)
                 .count();
+    }
+
+    public void setServer(Server server) {
+        this.server = server;
     }
 }

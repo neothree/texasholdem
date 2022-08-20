@@ -1,10 +1,10 @@
 package com.texasthree.zone.user;
 
+import com.texasthree.zone.net.Server;
 import com.texasthree.zone.room.Room;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 public class User {
 
@@ -26,6 +26,8 @@ public class User {
     private Room room;
 
     private UserData data;
+
+    private Server server;
 
     public User(UserData data) {
         this.data = data;
@@ -74,15 +76,10 @@ public class User {
     }
 
     public void send(Object obj) {
-        send(obj, this.getId());
+        this.server.send(getId(), obj);
     }
 
-    public static void send(Object obj, String uid) {
 
-    }
-
-    public static void send(Object obj, Set<String> uids) {
-    }
 
     public String getId() {
         return data.getId();
