@@ -69,7 +69,7 @@ public class TexasEventHandler {
 
     private void onUpdateHand(TexasRound round) {
         for (var v : round.getPlayers()) {
-            if (!round.isLeave(v.getId())) {
+            if (round.isLeave(v.getId())) {
                 continue;
             }
             var hand = round.getPlayerHand(v.getId());

@@ -8,10 +8,7 @@ import com.texasthree.zone.user.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Desk {
 
@@ -42,7 +39,7 @@ public class Desk {
         if (seatId >= seats.length || seats[seatId] != null) {
             throw new IllegalArgumentException();
         }
-        log.info("玩家坐下");
+        log.info("玩家坐下 id={} name={} seatId={}", user.getId(), user.getName(), seatId);
         seats[seatId] = user;
         this.audience.remove(user.getId());
         this.tryStart();
@@ -52,10 +49,10 @@ public class Desk {
      * 玩家站起
      */
     public void sitUp(User user) {
-        log.info("玩家站下");
         for (var i = 0; i < seats.length; i++) {
             var v = seats[i];
             if (v != null && v.getId().equals(user.getId())) {
+                log.info("玩家站起 id={} name={} seatId={}", user.getId(), user.getName(), i);
                 this.audience.put(user.getId(), user);
                 seats[i] = null;
             }
@@ -68,7 +65,7 @@ public class Desk {
     private void tryStart() {
 
         // 已经有牌局
-        if (round != null) {
+        if (running()) {
             return;
         }
 
@@ -130,11 +127,19 @@ public class Desk {
 
     public int playerNum() {
         return (int) Arrays.stream(this.seats)
-                .filter(v -> v != null)
+                .filter(Objects::nonNull)
                 .count();
     }
 
     public void setServer(Server server) {
         this.server = server;
+    }
+
+
+    /**
+     * 牌局是否在进行中
+     */
+    public boolean running() {
+        return round != null;
     }
 }

@@ -52,8 +52,10 @@ public class TexasRound {
     public TexasRound(List<UserPlayer> users, TexasEventHandler eventHandler) {
         this.users = users;
         this.eventHandler = eventHandler;
+        for (var v : users) {
+            playerMap.put(v.getId(), v);
+        }
     }
-
 
     public void start() {
         // 位置图谱
@@ -83,7 +85,6 @@ public class TexasRound {
      * @return void
      * create at 2020-06-30 11:12
      */
-
     public void action(Action action) {
         this.eventHandler.trigger(this, RoundEvent.ACTION);
 
@@ -131,7 +132,9 @@ public class TexasRound {
 
 
     public boolean isLeave(String id) {
-        return this.state.players.stream().anyMatch(v -> v.isLeave() && playerMap.get(id).seatId == v.getId());
+        var player = playerMap.get(id);
+        var p = this.game.getPlayerById(player.seatId);
+        return p.isLeave();
     }
 
     private List<Integer> cardList(List<Card> list) {
@@ -209,7 +212,8 @@ public class TexasRound {
     }
 
     public Hand getPlayerHand(String id) {
-        return null;
+        var player = this.playerMap.get(id);
+        return this.game.getPlayerById(player.seatId).getHand();
     }
 
 
@@ -236,17 +240,17 @@ public class TexasRound {
 
     public int sbSeatId() {
         var player = this.game.sbPlayer();
-        return 0;
+        return player.getId();
     }
 
     public int bbSeatId() {
         var player = this.game.bbPlayer();
-        return 0;
+        return player.getId();
     }
 
     public int dealer() {
         var player = this.game.dealer();
-        return 0;
+        return player.getId();
     }
 
     public Map<Optype, Integer> authority() {
