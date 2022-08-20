@@ -5,6 +5,8 @@ import com.texasthree.zone.round.TexasEventHandler;
 import com.texasthree.zone.round.TexasRound;
 import com.texasthree.zone.round.UserPlayer;
 import com.texasthree.zone.user.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,6 +14,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Desk {
+
+    private static Logger log = LoggerFactory.getLogger(Desk.class);
 
     private User[] seats = new User[8];
 
@@ -27,6 +31,7 @@ public class Desk {
     }
 
     public void removeUser(User user) {
+        log.info("离开房间");
         audience.remove(user.getId());
     }
 
@@ -37,7 +42,7 @@ public class Desk {
         if (seatId >= seats.length || seats[seatId] != null) {
             throw new IllegalArgumentException();
         }
-
+        log.info("玩家坐下");
         seats[seatId] = user;
         this.audience.remove(user.getId());
         this.tryStart();
@@ -47,6 +52,7 @@ public class Desk {
      * 玩家站起
      */
     public void sitUp(User user) {
+        log.info("玩家站下");
         for (var i = 0; i < seats.length; i++) {
             var v = seats[i];
             if (v != null && v.getId().equals(user.getId())) {
@@ -77,6 +83,7 @@ public class Desk {
      * 牌局开始
      */
     private void start() {
+        log.info("开始牌局");
         var users = new ArrayList<UserPlayer>();
         for (var i = 0; i < this.seats.length; i++) {
             var user = this.seats[i];
@@ -102,10 +109,16 @@ public class Desk {
     }
 
     public void send(String uid, Object msg) {
+        if (server == null) {
+            return;
+        }
         this.server.send(uid, msg);
     }
 
     public void send(Object msg) {
+        if (server == null) {
+            return;
+        }
         var set = this.audience.keySet();
         for (var v : seats) {
             if (v != null) {

@@ -27,16 +27,15 @@ public class RoomController extends AbstractMeController<User> {
      */
     @DeleteMapping("/{roomId}")
     public void leave(@PathVariable("roomId") String roomId) {
-        log.info("离开房间");
-        var user = this.getMe();
+        Room.one().removeUser(this.getMe());
     }
 
     /**
      * 坐下
      */
     @PostMapping(value = "/seat/{seatId}")
-    public void sitDown(@PathVariable("seatId") String seatId) {
-
+    public void sitDown(@PathVariable("seatId") int seatId) {
+        Room.one().sitDown(this.getMe(), seatId);
     }
 
     /**

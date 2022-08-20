@@ -106,11 +106,12 @@ public class TexasRound {
 
 
     public Collection<UserPlayer> getPlayers() {
-        return null;
+        return playerMap.values();
     }
 
     public UserPlayer getOpPlayer() {
-        return null;
+
+        return this.opPlayer;
     }
 
     /**

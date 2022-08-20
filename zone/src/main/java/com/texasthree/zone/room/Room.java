@@ -52,8 +52,8 @@ public class Room {
         this.desk.removeUser(user);
     }
 
-    public void sitDown(User user, int position) {
-        this.desk.sitDown(user, position);
+    public void sitDown(User user, int seatId) {
+        this.desk.sitDown(user, seatId);
     }
 
     public void sitUp(User user) {
