@@ -2,7 +2,7 @@ package com.texasthree.zone.round;
 
 import com.texasthree.game.texas.Card;
 import com.texasthree.zone.controller.Cmd;
-import com.texasthree.zone.entity.Desk;
+import com.texasthree.zone.room.Desk;
 
 import java.util.ArrayList;
 import java.util.stream.Collectors;

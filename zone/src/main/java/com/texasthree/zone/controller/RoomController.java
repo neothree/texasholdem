@@ -2,7 +2,7 @@ package com.texasthree.zone.controller;
 
 import com.texasthree.security.shiro.AbstractMeController;
 import com.texasthree.utility.restful.RestResponse;
-import com.texasthree.zone.entity.Room;
+import com.texasthree.zone.room.Room;
 import com.texasthree.zone.user.User;
 import org.springframework.web.bind.annotation.*;
 

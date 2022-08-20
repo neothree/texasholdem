@@ -2,7 +2,7 @@ package com.texasthree.zone.round;
 
 import com.texasthree.game.GameState;
 import com.texasthree.game.texas.*;
-import com.texasthree.zone.entity.ScheduledEvent;
+import com.texasthree.zone.room.ScheduledEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

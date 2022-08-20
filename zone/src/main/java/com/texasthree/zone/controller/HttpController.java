@@ -4,7 +4,7 @@ import com.texasthree.security.shiro.AbstractMeController;
 import com.texasthree.security.shiro.LoginerRealm;
 import com.texasthree.utility.restful.RestResponse;
 import com.texasthree.zone.Zone;
-import com.texasthree.zone.entity.Room;
+import com.texasthree.zone.room.Room;
 import com.texasthree.zone.user.User;
 import com.texasthree.zone.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;

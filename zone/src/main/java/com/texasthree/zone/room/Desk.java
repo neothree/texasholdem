@@ -1,4 +1,4 @@
-package com.texasthree.zone.entity;
+package com.texasthree.zone.room;
 
 import com.texasthree.zone.round.TexasEventHandler;
 import com.texasthree.zone.round.TexasRound;

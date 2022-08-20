@@ -2,7 +2,7 @@ package com.texasthree.zone;
 
 import com.texasthree.security.login.enums.LoginApp;
 import com.texasthree.security.login.service.LoginerService;
-import com.texasthree.zone.entity.Room;
+import com.texasthree.zone.room.Room;
 import com.texasthree.zone.user.User;
 import com.texasthree.zone.user.UserService;
 import com.texasthree.zone.utility.StringUtils;
