@@ -52,6 +52,10 @@ public class Zone {
         var room = Room.one();
         room.getDesk().setServer(server);
 
+        var user = createUser(StringUtils.get10UUID(), StringUtils.get10UUID());
+        room.addUser(user);
+        room.sitDown(user, 1);
+
     }
 
     @Async

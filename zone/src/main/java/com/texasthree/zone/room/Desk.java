@@ -116,7 +116,7 @@ public class Desk {
         if (server == null) {
             return;
         }
-        var set = this.audience.keySet();
+        var set = new HashSet<>(this.audience.keySet());
         for (var v : seats) {
             if (v != null) {
                 set.add(v.getId());

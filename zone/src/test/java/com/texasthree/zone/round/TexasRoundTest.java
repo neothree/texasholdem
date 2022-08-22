@@ -24,8 +24,10 @@ class TexasRoundTest {
         }
         var desk = new Desk();
         var round = new TexasRound(users, new TexasEventHandler(desk));
-        round.start(users.get(0).seatId);
+
+        var dealer = users.get(0).seatId;
+        round.start(dealer);
         assertEquals(3, round.getPlayers().stream().count());
-        assertEquals(users.get(0).seatId, round.dealer());
+        assertEquals(dealer, round.dealer());
     }
 }

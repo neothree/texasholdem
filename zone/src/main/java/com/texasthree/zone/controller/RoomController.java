@@ -17,7 +17,7 @@ public class RoomController extends AbstractMeController<User> {
      */
     @PostMapping(value = "/{roomId}")
     public RestResponse enter(@PathVariable("roomId") String roomId) throws Exception {
-        log.info("进入房间");
+        log.info("进入房间 {}", roomId);
         Room.one().addUser(this.getMe());
         return RestResponse.SUCCESS;
     }

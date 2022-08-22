@@ -217,8 +217,14 @@ public final class StringUtils {
 
     public static String getLastName(Class o) {
         String longName = o.getName();
-        String[] s = longName.split("\\.");
-        return s[s.length - 1];
+        if (longName.contains("$")) {
+            String[] s = longName.split("\\$");
+            return s[s.length - 1];
+        } else {
+
+            String[] s = longName.split("\\.");
+            return s[s.length - 1];
+        }
     }
 
     public static String makeForm(Map<String, Object> data) {
