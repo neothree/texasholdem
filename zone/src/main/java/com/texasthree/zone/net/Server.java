@@ -2,7 +2,6 @@ package com.texasthree.zone.net;
 
 import com.texasthree.security.shiro.LoginerRealm;
 import com.texasthree.utility.packet.Packet;
-import com.texasthree.zone.room.Room;
 import com.texasthree.zone.user.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,8 +70,8 @@ public class Server {
 
     public void send(Set<String> uids, Object obj) {
         var msg = Packet.convertAsString(obj);
+        log.info(msg);
         for (var uid : uids) {
-
             this.send(uid, msg);
         }
     }
@@ -85,6 +84,7 @@ public class Server {
      * 发送消息给玩家
      */
     public void send(String uid, String msg) {
+        log.info("{} {}", uid, msg);
         var destination = USER_DESTINATION + "/" + uid;
         this.messagingTemplate.convertAndSend(destination, msg);
     }

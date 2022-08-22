@@ -49,13 +49,26 @@ public class Zone {
 
     public void start() {
         log.info("zone 开启启动");
-        var room = Room.one();
-        room.getDesk().setServer(server);
+        getRoom();
+    }
 
-        var user = createUser(StringUtils.get10UUID(), StringUtils.get10UUID());
-        room.addUser(user);
-        room.sitDown(user, 1);
+    private Room room;
 
+    public Room newRoom() {
+        room = null;
+        return getRoom();
+    }
+
+    public Room getRoom() {
+        if (room == null) {
+            room = new Room();
+            room.getDesk().setServer(server);
+
+            var user = createUser(StringUtils.get10UUID(), StringUtils.get10UUID());
+            room.addUser(user);
+            room.sitDown(user, 1);
+        }
+        return room;
     }
 
     @Async

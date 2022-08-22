@@ -2,8 +2,10 @@ package com.texasthree.zone.controller;
 
 import com.texasthree.security.shiro.AbstractMeController;
 import com.texasthree.utility.restful.RestResponse;
+import com.texasthree.zone.Zone;
 import com.texasthree.zone.room.Room;
 import com.texasthree.zone.user.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -12,13 +14,16 @@ import org.springframework.web.bind.annotation.*;
 public class RoomController extends AbstractMeController<User> {
 
 
+    @Autowired
+    private Zone zone;
+
     /**
      * 进入房间
      */
     @PostMapping(value = "/{roomId}")
     public RestResponse enter(@PathVariable("roomId") String roomId) throws Exception {
         log.info("进入房间 {}", roomId);
-        Room.one().addUser(this.getMe());
+        zone.newRoom().addUser(this.getMe());
         return RestResponse.SUCCESS;
     }
 
@@ -27,7 +32,7 @@ public class RoomController extends AbstractMeController<User> {
      */
     @DeleteMapping("/{roomId}")
     public void leave(@PathVariable("roomId") String roomId) {
-        Room.one().removeUser(this.getMe());
+        zone.getRoom().removeUser(this.getMe());
     }
 
     /**
@@ -35,7 +40,7 @@ public class RoomController extends AbstractMeController<User> {
      */
     @PostMapping(value = "/seat/{seatId}")
     public void sitDown(@PathVariable("seatId") int seatId) {
-        Room.one().sitDown(this.getMe(), seatId);
+        zone.getRoom().sitDown(this.getMe(), seatId);
     }
 
     /**

@@ -25,14 +25,6 @@ public class Room {
         return roomMap.values();
     }
 
-    public static Room one() {
-        if (roomMap.isEmpty()) {
-            var room = new Room();
-            roomMap.put(room.id, room);
-        }
-        return roomMap.values().stream().findFirst().get();
-    }
-
     private Desk desk;
 
     private String id;
