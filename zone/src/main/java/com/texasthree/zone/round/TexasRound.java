@@ -72,7 +72,7 @@ public class TexasRound {
 
         this.opEvent = new ScheduledEvent(() -> this.move(move), 2000);
         this.eventHandler.trigger(this, RoundEvent.START_GAME);
-        this.dealCard();
+        this.updateHand();
     }
 
     /**
@@ -112,13 +112,6 @@ public class TexasRound {
         return this.opPlayer;
     }
 
-    /**
-     * 发牌
-     */
-    private void dealCard() {
-        this.eventHandler.trigger(this, RoundEvent.DEAL_CARD);
-        this.updateHand();
-    }
 
     /**
      * 更新手牌

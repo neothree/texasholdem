@@ -62,10 +62,6 @@ public class Cmd {
         public List<Action> ops;
     }
 
-    public static class DealCard {
-        public List<Integer> seatIds;
-    }
-
     public static class Action {
         public int seatId;
         public String op;

@@ -5,6 +5,7 @@ import com.texasthree.zone.controller.Cmd;
 import com.texasthree.zone.room.Desk;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -23,9 +24,6 @@ public class TexasEventHandler {
         switch (event) {
             case START_GAME:
                 this.onStartGame(round);
-                break;
-            case DEAL_CARD:
-                this.onDealCard(round);
                 break;
             case ACTION:
                 this.onAction(round);
@@ -61,12 +59,6 @@ public class TexasEventHandler {
         this.desk.send(info);
     }
 
-    private void onDealCard(TexasRound round) {
-        var info = new Cmd.DealCard();
-        info.seatIds = round.getPlayers().stream().map(v -> v.seatId).collect(Collectors.toList());
-        this.desk.send(info);
-    }
-
     private void onUpdateHand(TexasRound round) {
         for (var v : round.getPlayers()) {
             if (round.isLeave(v.getId())) {
@@ -74,13 +66,18 @@ public class TexasEventHandler {
             }
             var hand = round.getPlayerHand(v.getId());
             var update = new Cmd.HandUpdate();
-            update.cards = hand.getHold().stream().map(Card::getId).collect(Collectors.toList());
-            update.best = hand.getBest().stream().map(Card::getId).collect(Collectors.toList());
-            update.key = hand.getKeys().stream().map(Card::getId).collect(Collectors.toList());
+            update.cards = toCardIds(hand.getHold());
+            update.best = toCardIds(hand.getBest());
+            update.key = toCardIds(hand.getKeys());
             update.type = hand.getType().name();
             desk.send(v.getId(), update);
         }
     }
+
+    private List<Integer> toCardIds(List<Card> cards) {
+        return cards.stream().map(Card::getId).collect(Collectors.toList());
+    }
+
 
     private void onAction(TexasRound round) {
         var id = "11";

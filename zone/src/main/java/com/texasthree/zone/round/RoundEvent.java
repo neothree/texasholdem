@@ -8,8 +8,6 @@ public enum RoundEvent {
 
     START_GAME,
 
-    DEAL_CARD,
-
     UPDATE_HAND,
 
     NEW_OPERATOR,
