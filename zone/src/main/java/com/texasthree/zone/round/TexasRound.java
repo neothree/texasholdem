@@ -21,10 +21,7 @@ public class TexasRound {
     final static int TIMEOUT_MOVE_FOLD = 800;
     final static int TIMEOUT_MOVE_ACTION = 500;
     final static int TIMEOUT_MOVE_CIRCLE = 2000;
-    /*
-     * 庄家位
-     */
-    private int dealer = 0;
+
 
     private Texas game;
 
@@ -32,16 +29,20 @@ public class TexasRound {
      * 计时器
      */
     private ScheduledEvent opEvent;
-
+    /**
+     * 正在操作的玩家
+     */
     private UserPlayer opPlayer;
-
+    /**
+     * 是否结束
+     */
     private boolean isOver;
 
     private Map<String, UserPlayer> playerMap = new HashMap<>();
 
-    private int actDuration = 15000;
-
     private List<UserPlayer> users;
+
+    private int actDuration = 15000;
 
     private TexasEventHandler eventHandler;
 
@@ -53,17 +54,17 @@ public class TexasRound {
         }
     }
 
-    public void start() {
+    public void start(int dealer) {
         // 位置图谱
         var players = new ArrayList<Player>();
-        for (int i = 0; i < this.users.size(); i++) {
-            players.add(new Player(i, users.get(i).user.getChips()));
+        for (var v : users) {
+            players.add(new Player(v.seatId, v.user.getChips()));
         }
 
         this.game = Texas.builder()
                 .smallBlind(1)
                 .players(players)
-                .regulation(Regulation.Dealer, 0)
+                .regulation(Regulation.Dealer, dealer)
                 .regulation(Regulation.SmallBlind, 1)
                 .build();
         var move = this.game.start();
@@ -232,18 +233,15 @@ public class TexasRound {
     }
 
     public int sbSeatId() {
-        var player = this.game.sbPlayer();
-        return player.getId();
+        return this.game.sbPlayer().getId();
     }
 
     public int bbSeatId() {
-        var player = this.game.bbPlayer();
-        return player.getId();
+        return this.game.bbPlayer().getId();
     }
 
     public int dealer() {
-        var player = this.game.dealer();
-        return player.getId();
+        return this.game.dealer().getId();
     }
 
     public Map<Optype, Integer> authority() {

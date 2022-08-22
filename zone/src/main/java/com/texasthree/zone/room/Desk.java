@@ -92,7 +92,7 @@ public class Desk {
         var con = new TexasEventHandler(this);
         this.round = new TexasRound(users, con);
         try {
-            this.round.start();
+            this.round.start(users.get(0).seatId);
         } catch (Exception e) {
             e.printStackTrace();
             this.round = null;
