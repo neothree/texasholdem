@@ -3,9 +3,6 @@ package com.texasthree.game;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.texasthree.game.texas.Card;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,16 +23,15 @@ public class Deck {
 
 
     private Deck() {
-        var fileName = this.getClass().getClassLoader().getResource("table_card.json").getPath();
+        var inputStream = this.getClass().getClassLoader().getResourceAsStream("table_card.json");
         try {
-            var fileReader = new FileReader(fileName);
-            var reader = new InputStreamReader(new FileInputStream(new File(fileName)), "utf-8");
+            var reader = new InputStreamReader(inputStream, "utf-8");
             var ch = 0;
             var sb = new StringBuffer();
             while ((ch = reader.read()) != -1) {
                 sb.append((char) ch);
             }
-            fileReader.close();
+            inputStream.close();
             reader.close();
 
             all = new ArrayList<>();
