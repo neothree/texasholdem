@@ -279,13 +279,13 @@ public class Texas {
         }
 
         // 执行下注
-        this.pot.action(this.opPlayer(), action, true);
+        this.pot.action(this.operator(), action, true);
 
         // 轮转
         var move = this.transit();
 
         // 如果下一位玩家离开则自动弃牌
-        if (Texas.STATE_NEXT_OP.equals(move) && this.opPlayer().isLeave()) {
+        if (Texas.STATE_NEXT_OP.equals(move) && this.operator().isLeave()) {
             move = this.action(Action.fold());
         }
 
@@ -298,7 +298,7 @@ public class Texas {
     private String transit() {
         String state;
         var waitActionNum = this.waitActionNum();
-        var opNext = this.nextOpPlayer(this.opPlayer().getId());
+        var opNext = this.nextOpPlayer(this.operator().getId());
         var standard = this.pot.getStandard();
         if ((this.remainingNum() == 1)
                 // 只能下opNext，并且 opNext 已经到达了 standard
@@ -343,7 +343,7 @@ public class Texas {
 
         this.freshHand();
 
-        if (this.opPlayer().isLeave()) {
+        if (this.operator().isLeave()) {
             this.action(Action.fold());
         }
     }
@@ -375,7 +375,7 @@ public class Texas {
         }
 
         // 如果是正在押注玩家直接弃牌
-        if (this.opPlayer().equals(player)) {
+        if (this.operator().equals(player)) {
             return this.action(Action.fold());
         }
 
@@ -669,7 +669,7 @@ public class Texas {
         return this.playerNum - this.pot.allinAndFoldNum();
     }
 
-    public Player opPlayer() {
+    public Player operator() {
         return this.ring.value;
     }
 
@@ -689,7 +689,7 @@ public class Texas {
     /**
      * 牌面
      */
-    List<Card> getCommunityCards() {
+    public List<Card> getCommunityCards() {
         if (this.isOver && this.isCompareShowdown()) {
             return this.communityCards.subList(0, 5);
         }
@@ -766,7 +766,7 @@ public class Texas {
      * 获取押注操作权限
      */
     public Map<Optype, Integer> authority() {
-        var auth = this.pot.auth(this.opPlayer());
+        var auth = this.pot.auth(this.operator());
         if (this.regulations.containsKey(Regulation.AllinOrFold)) {
             // TODO 押注权限检测在pot中，这个玩法会有漏洞
             var m = new HashMap<Optype, Integer>();

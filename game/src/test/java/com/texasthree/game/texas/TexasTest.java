@@ -139,7 +139,7 @@ public class TexasTest extends AllCard {
     }
 
     @Test
-    public void testOpPlayer() throws Exception {
+    public void testOperator() throws Exception {
         var texas = Texas.builder(5).build();
         texas.start();
 
@@ -203,7 +203,7 @@ public class TexasTest extends AllCard {
         equalsAction(2, makeAct(Optype.Check), Texas.STATE_CIRCLE_END, texas);
 
         assertEquals(Circle.FLOP, texas.circle());
-        assertEquals(2, texas.opPlayer().getId());
+        assertEquals(2, texas.operator().getId());
 
         ////////////////////////////////////////////////////////////////////////
         //  短牌：在“两倍前注”下, 开局后，所有玩家都call，最后应该到庄家还有一次option
@@ -237,7 +237,7 @@ public class TexasTest extends AllCard {
         assertEquals(Texas.STATE_NEXT_OP, texas.start());
 //        assert(game:OpPlayer() == config.playerList[1])
 //        assert(config.playerList[4]:Chips() == 196)
-        assertEquals(texas.opPlayer().getId(), 1);
+        assertEquals(texas.operator().getId(), 1);
         assertEquals(texas.getPlayerById(4).getChips(), 96);
 
         // TODO
@@ -282,7 +282,7 @@ public class TexasTest extends AllCard {
                 .build();
         texas.start();
         texas.leave(1);
-        assertEquals(2, texas.opPlayer().getId());
+        assertEquals(2, texas.operator().getId());
         assertFalse(texas.isOver());
         texas.leave(2);
         assertTrue(texas.isOver());
@@ -293,7 +293,7 @@ public class TexasTest extends AllCard {
         texas.start();
         texas.leave(1);
         texas.action(Action.fold());
-        assertEquals(2, texas.opPlayer().getId());
+        assertEquals(2, texas.operator().getId());
 
         //////////////////////////////
         texas = Texas.builder(4).build();
@@ -304,7 +304,7 @@ public class TexasTest extends AllCard {
         texas.leave(2);
         texas.action(Action.check());
         assertEquals(Circle.FLOP, texas.circle());
-        assertEquals(3, texas.opPlayer().getId());
+        assertEquals(3, texas.operator().getId());
 
         //////////////////////////////
         texas = Texas.builder(3).build();
@@ -596,7 +596,7 @@ public class TexasTest extends AllCard {
         equalsAuth(texas, 3, Optype.Fold, Optype.Allin, Optype.Call);
         texas.action(Action.of(Optype.Call));
 
-        var player = texas.opPlayer();
+        var player = texas.operator();
         player.changeChips(10 - player.getChips());
         texas.action(Action.of(Optype.Call));
 
@@ -609,7 +609,7 @@ public class TexasTest extends AllCard {
         equalsAuth(texas, 2, Optype.Fold, Optype.Allin, Optype.Check);
         texas.action(Action.of(Optype.Allin));
 
-        player = texas.opPlayer();
+        player = texas.operator();
         player.changeChips(10 - player.getChips());
         texas.action(Action.of(Optype.Call));
 
@@ -704,7 +704,7 @@ public class TexasTest extends AllCard {
     }
 
     private void equalsAuth(Texas texas, Integer chipsLeft, Optype... ops) throws Exception {
-        var player = texas.opPlayer();
+        var player = texas.operator();
         if (chipsLeft != null) {
             player.changeChips(chipsLeft - player.getChips());
         }
@@ -900,12 +900,12 @@ public class TexasTest extends AllCard {
     }
 
     private void equalsAction(Integer opId, Action act, String state, Texas texas) throws Exception {
-        assertEquals(opId, texas.opPlayer().getId());
+        assertEquals(opId, texas.operator().getId());
         assertEquals(state, texas.action(act));
     }
 
     private void equalsCircle(Integer opId, Action act, String circle, Texas texas) throws Exception {
-        assertEquals(opId.toString(), texas.opPlayer().getId() + "");
+        assertEquals(opId.toString(), texas.operator().getId() + "");
         assertEquals(circle, texas.circle());
         texas.action(act);
     }

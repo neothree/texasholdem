@@ -149,7 +149,6 @@ public class TexasEventHandler {
 
     public static class Operator {
         public int seatId;
-        public int raiseLine;
         public long leftSec;
         public List<Action> ops;
     }

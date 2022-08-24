@@ -142,7 +142,7 @@ public class TexasRound {
      * create at 2020-06-30 18:07
      */
     private void moveNextOp() {
-        this.operator =  this.getPlayerBySeatId(game.opPlayer().getId()) ;
+        this.operator = this.getPlayerBySeatId(game.operator().getId());
         this.opEvent = new ScheduledEvent(() -> this.onOpTimeout(), this.actDuration);
         this.eventHandler.trigger(this, RoundEvent.OPERATOR);
         log.info("轮到下一位进行押注 opId={} seatId={}", this.operator.user.getId(), this.operator.seatId);
@@ -244,7 +244,10 @@ public class TexasRound {
     }
 
     public int opLeftSec() {
-        return 15;
+        if (opEvent == null) {
+            return 0;
+        }
+        return (int) ((System.currentTimeMillis() - opEvent.getNextMsec()) / 1000);
     }
 
     public String circle() {
