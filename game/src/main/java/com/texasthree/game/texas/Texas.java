@@ -669,7 +669,7 @@ public class Texas {
         return this.playerNum - this.pot.allinAndFoldNum();
     }
 
-    Player opPlayer() {
+    public Player opPlayer() {
         return this.ring.value;
     }
 

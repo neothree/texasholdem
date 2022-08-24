@@ -98,8 +98,7 @@ public class TexasEventHandler {
 
 
     private void onAction(TexasRound round) {
-        var id = "11";
-        var action = round.getPlayerAction(id);
+        var action = round.getLastAction();
         var send = new Action();
         send.op = action.op.name();
         send.chipsAdd = action.chipsAdd;
@@ -137,7 +136,7 @@ public class TexasEventHandler {
     private void onOperator(TexasRound round) {
         var info = new Operator();
         info.leftSec = round.opLeftSec();
-        info.seatId = round.getOpPlayer().seatId;
+        info.seatId = round.getOperator().seatId;
         info.ops = round.authority()
                 .entrySet().stream()
                 .map(v -> {

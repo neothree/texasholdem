@@ -22,6 +22,8 @@ public class Desk {
 
     private Map<String, User> audience = new HashMap<>();
 
+    private TexasEventHandler handler = new TexasEventHandler(this);
+
 
     public void addUser(User user) {
         audience.put(user.getId(), user);
@@ -89,8 +91,8 @@ public class Desk {
                 users.add(up);
             }
         }
-        var con = new TexasEventHandler(this);
-        this.round = new TexasRound(users, con);
+
+        this.round = new TexasRound(users, handler);
         try {
             this.round.start(users.get(0).seatId);
         } catch (Exception e) {

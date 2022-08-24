@@ -17,6 +17,7 @@ public class ScheduledEvent {
     }
 
     public void check() {
+
         if (!done && System.currentTimeMillis() >= nextMsec) {
             this.done = true;
             this.command.run();
@@ -26,5 +27,12 @@ public class ScheduledEvent {
 
     public long getNextMsec() {
         return this.nextMsec;
+    }
+
+    public void force() {
+        if (!done) {
+            this.done = true;
+            this.command.run();
+        }
     }
 }

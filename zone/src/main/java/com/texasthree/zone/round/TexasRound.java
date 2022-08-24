@@ -32,7 +32,7 @@ public class TexasRound {
     /**
      * 正在操作的玩家
      */
-    private UserPlayer opPlayer;
+    private UserPlayer operator;
     /**
      * 是否结束
      */
@@ -45,6 +45,8 @@ public class TexasRound {
     private int actDuration = 15000;
 
     private TexasEventHandler eventHandler;
+
+    private Action lastAction;
 
     public TexasRound(List<UserPlayer> users, TexasEventHandler eventHandler) {
         this.users = users;
@@ -83,10 +85,11 @@ public class TexasRound {
      * create at 2020-06-30 11:12
      */
     public void action(Action action) {
+        this.lastAction = action;
         this.eventHandler.trigger(this, RoundEvent.ACTION);
 
         this.opEvent = null;
-        this.opPlayer = null;
+        this.operator = null;
 
         var move = this.game.action(action);
         if (Optype.Check.equals(action.op)) {
@@ -105,11 +108,6 @@ public class TexasRound {
 
     public Collection<UserPlayer> getPlayers() {
         return playerMap.values();
-    }
-
-    public UserPlayer getOpPlayer() {
-
-        return this.opPlayer;
     }
 
 
@@ -144,10 +142,10 @@ public class TexasRound {
      * create at 2020-06-30 18:07
      */
     private void moveNextOp() {
-        this.opPlayer = new UserPlayer(1, null);
+        this.operator =  this.getPlayerBySeatId(game.opPlayer().getId()) ;
         this.opEvent = new ScheduledEvent(() -> this.onOpTimeout(), this.actDuration);
         this.eventHandler.trigger(this, RoundEvent.OPERATOR);
-        log.info("轮到下一位进行押注 opId={} seatId={}", this.opPlayer.user.getId(), this.opPlayer.seatId);
+        log.info("轮到下一位进行押注 opId={} seatId={}", this.operator.user.getId(), this.operator.seatId);
     }
 
     /**
@@ -174,7 +172,7 @@ public class TexasRound {
      */
     private void moveShowdown() {
         this.opEvent = null;
-        this.opPlayer = null;
+        this.operator = null;
         this.isOver = true;
         this.eventHandler.trigger(this, RoundEvent.SHOWDOWN);
     }
@@ -186,26 +184,21 @@ public class TexasRound {
      * create at 2020-06-30 17:30
      */
     private void onOpTimeout() {
-        if (this.opPlayer == null) {
+        if (this.operator == null) {
             return;
         }
 
-        log.info("压住超时: {}", this.opPlayer.toString());
+        log.info("压住超时: {}", this.operator.toString());
         var au = this.game.authority();
         var op = au.containsKey(Optype.Check) ? Optype.Check : Optype.Fold;
         var action = Action.of(op);
-        action.id = this.opPlayer.seatId;
+        action.id = this.operator.seatId;
         this.action(action);
     }
 
     public Hand getPlayerHand(String id) {
         var player = this.playerMap.get(id);
         return this.game.getPlayerById(player.seatId).getHand();
-    }
-
-
-    public UserPlayer opPlayer() {
-        return null;
     }
 
 
@@ -237,12 +230,29 @@ public class TexasRound {
         return this.game.dealer().getId();
     }
 
+    public UserPlayer getOperator() {
+        return this.operator;
+    }
+
+    public Action getLastAction() {
+        return this.lastAction;
+    }
+
+
     public Map<Optype, Integer> authority() {
         return this.game.authority();
     }
 
     public int opLeftSec() {
         return 15;
+    }
+
+    public String circle() {
+        return game.circle();
+    }
+
+    private UserPlayer getPlayerBySeatId(int seatId) {
+        return this.users.stream().filter(v -> v.seatId == seatId).findFirst().get();
     }
 
     private void printStart() {
@@ -256,6 +266,12 @@ public class TexasRound {
     public void loop() {
         if (opEvent != null) {
             this.opEvent.check();
+        }
+    }
+
+    public void force() {
+        if (this.opEvent != null) {
+            this.opEvent.force();
         }
     }
 }
