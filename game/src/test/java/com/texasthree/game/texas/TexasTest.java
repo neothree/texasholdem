@@ -546,7 +546,7 @@ public class TexasTest extends AllCard {
         }
 
         Texas build() {
-            if (this.builder.getBoard() == null) {
+            if (this.builder.getCommunityCards() == null) {
                 this.builder.board(club9, club10, spadesA, heartK, club8);
             }
 
@@ -775,29 +775,29 @@ public class TexasTest extends AllCard {
     }
 
     @Test
-    public void testBoard() throws Exception {
+    public void testCommunityCards() throws Exception {
         var texas = Texas.builder()
                 .board(club9, club10, spadesA, heartK, club8)
                 .build();
         texas.start();
-        assertTrue(texas.board().isEmpty());
+        assertTrue(texas.getCommunityCards().isEmpty());
 
         texas.action(Action.call());
         texas.action(Action.raise(2));
         texas.action(Action.call());
-        equalsBoard(texas, club9, club10, spadesA);
+        equalsCommunityCards(texas, club9, club10, spadesA);
 
         texas.action(Action.check());
         texas.action(Action.check());
-        equalsBoard(texas, club9, club10, spadesA, heartK);
+        equalsCommunityCards(texas, club9, club10, spadesA, heartK);
 
         texas.action(Action.check());
         texas.action(Action.check());
-        equalsBoard(texas, club9, club10, spadesA, heartK, club8);
+        equalsCommunityCards(texas, club9, club10, spadesA, heartK, club8);
 
         texas.action(Action.check());
         texas.action(Action.check());
-        equalsBoard(texas, club9, club10, spadesA, heartK, club8);
+        equalsCommunityCards(texas, club9, club10, spadesA, heartK, club8);
 
         texas = Texas.builder()
                 .board(club9, club10, spadesA, heartK, club8)
@@ -807,7 +807,7 @@ public class TexasTest extends AllCard {
         texas.action(Action.allin());
         texas.action(Action.call());
         texas.action(Action.fold());
-        equalsBoard(texas, club9, club10, spadesA, heartK, club8);
+        equalsCommunityCards(texas, club9, club10, spadesA, heartK, club8);
     }
 
     @Test
@@ -891,8 +891,8 @@ public class TexasTest extends AllCard {
         assertTrue(texas.isOver());
     }
 
-    private void equalsBoard(Texas texas, Card... cards) throws Exception {
-        var board = texas.board();
+    private void equalsCommunityCards(Texas texas, Card... cards) throws Exception {
+        var board = texas.getCommunityCards();
         assertEquals(board.size(), cards.length);
         for (var i = 0; i < cards.length; i++) {
             assertEquals(board.get(i), cards[i]);

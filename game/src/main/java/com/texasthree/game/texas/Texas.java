@@ -33,7 +33,7 @@ public class Texas {
     /**
      * 桌面
      */
-    private List<Card> board;
+    private List<Card> communityCards;
     /**
      * 规则
      */
@@ -131,7 +131,7 @@ public class Texas {
             return this;
         }
 
-        public List<Card> getBoard() {
+        public List<Card> getCommunityCards() {
             return board;
         }
 
@@ -205,7 +205,7 @@ public class Texas {
     private Texas(Map<Regulation, Integer> regulations, Ring<Player> ring, List<Card> leftCard) {
         this.regulations = regulations;
         this.ring = ring;
-        this.board = leftCard;
+        this.communityCards = leftCard;
         this.playerNum = ring.size();
     }
 
@@ -349,7 +349,7 @@ public class Texas {
     }
 
     private void circleEnd() {
-        this.pot.circleEnd(this.board());
+        this.pot.circleEnd(this.getCommunityCards());
 
         // 从庄家下一位开始
         Player op = this.nextOpPlayer(this.dealer().getId());
@@ -394,7 +394,7 @@ public class Texas {
 
         this.isOver = true;
 
-        this.pot.showdown(this.board(), this);
+        this.pot.showdown(this.getCommunityCards(), this);
 
         this.freshHand();
     }
@@ -639,7 +639,7 @@ public class Texas {
     }
 
     private void freshHand() {
-        var board = this.board();
+        var board = this.getCommunityCards();
         for (var v : this.ring.toList()) {
             v.getHand().fresh(board);
         }
@@ -689,17 +689,17 @@ public class Texas {
     /**
      * 牌面
      */
-    List<Card> board() {
+    List<Card> getCommunityCards() {
         if (this.isOver && this.isCompareShowdown()) {
-            return this.board.subList(0, 5);
+            return this.communityCards.subList(0, 5);
         }
         switch (this.pot.circle()) {
             case Circle.FLOP:
-                return this.board.subList(0, 3);
+                return this.communityCards.subList(0, 3);
             case Circle.TURN:
-                return this.board.subList(0, 4);
+                return this.communityCards.subList(0, 4);
             case Circle.RIVER:
-                return this.board.subList(0, 5);
+                return this.communityCards.subList(0, 5);
             default:
                 return Collections.emptyList();
         }
@@ -711,6 +711,10 @@ public class Texas {
 
     public int sumPot() {
         return this.pot.sumPot();
+    }
+
+    public List<Integer> getPots() {
+        return this.pot.divides().stream().map(Divide::getChips).collect(Collectors.toList());
     }
 
     public int smallBlind() {

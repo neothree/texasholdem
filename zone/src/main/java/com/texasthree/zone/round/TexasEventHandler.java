@@ -3,7 +3,6 @@ package com.texasthree.zone.round;
 import com.texasthree.game.texas.Card;
 import com.texasthree.zone.room.Desk;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -119,14 +118,14 @@ public class TexasEventHandler {
 
 
     private static class CircleEnd {
-        public List<Integer> board;
+        public List<Integer> communityCards;
         public List<Integer> pots;
     }
 
     private void onCircleEnd(TexasRound round) {
         var info = new CircleEnd();
-        info.board = new ArrayList<>();
-        info.pots = new ArrayList<>();
+        info.communityCards = toCardIds(round.getCommunityCards());
+        info.pots = round.getPots();
         this.desk.send(info);
     }
 

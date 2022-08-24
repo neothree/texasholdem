@@ -274,4 +274,13 @@ public class TexasRound {
             this.opEvent.force();
         }
     }
+
+    public List<Card> getCommunityCards() {
+        return game.getCommunityCards();
+
+    }
+
+    public List<Integer> getPots() {
+        return game.getPots();
+    }
 }
