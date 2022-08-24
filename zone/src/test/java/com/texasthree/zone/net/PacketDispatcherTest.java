@@ -1,7 +1,6 @@
 package com.texasthree.zone.net;
 
 import com.texasthree.utility.packet.Packet;
-import com.texasthree.zone.controller.Cmd;
 import com.texasthree.zone.net.some.SomeCommand;
 import com.texasthree.zone.net.some.SomeUser;
 import com.texasthree.zone.user.UserData;
@@ -31,9 +30,13 @@ public class PacketDispatcherTest {
 
     @Test
     void testPacket() throws Exception {
-        var packet = new Cmd.CreateRoom();
+        var packet = new PacketDispatcherTest.CreateRoom();
         packet.name = "123";
         var msg = Packet.convertAsString(packet);
         assertEquals("12CreateRoom{\"name\":\"123\"}", msg);
+    }
+
+    private static class CreateRoom {
+        public String name;
     }
 }

@@ -1,7 +1,6 @@
 package com.texasthree.zone.round;
 
 import com.texasthree.game.texas.Card;
-import com.texasthree.zone.controller.Cmd;
 import com.texasthree.zone.room.Desk;
 
 import java.util.ArrayList;
@@ -31,8 +30,8 @@ public class TexasEventHandler {
             case UPDATE_HAND:
                 this.onUpdateHand(round);
                 break;
-            case NEW_OPERATOR:
-                this.onNewOperator(round);
+            case OPERATOR:
+                this.onOperator(round);
                 break;
             case CIRCLE_END:
                 this.onCircleEnd(round);
@@ -46,7 +45,7 @@ public class TexasEventHandler {
     }
 
     private void onStartGame(TexasRound round) {
-        var info = new Cmd.StartGame();
+        var info = new StartGame();
         info.ante = round.ante();
         info.sbSeatId = round.sbSeatId();
         info.bbSeatId = round.bbSeatId();
@@ -59,19 +58,38 @@ public class TexasEventHandler {
         this.desk.send(info);
     }
 
+    private static class StartGame {
+        public int sbSeatId;
+        public int bbSeatId;
+        public int dealer;
+        public int smallBlind;
+        public int ante;
+        public int sumPot;
+        public List<Integer> players;
+    }
+
+
     private void onUpdateHand(TexasRound round) {
         for (var v : round.getPlayers()) {
             if (round.isLeave(v.getId())) {
                 continue;
             }
             var hand = round.getPlayerHand(v.getId());
-            var update = new Cmd.HandUpdate();
+            var update = new HandUpdate();
             update.cards = toCardIds(hand.getHold());
             update.best = toCardIds(hand.getBest());
             update.key = toCardIds(hand.getKeys());
             update.type = hand.getType().name();
             desk.send(v.getId(), update);
         }
+    }
+
+
+    private static class HandUpdate {
+        public List<Integer> cards;
+        public String type;
+        public List<Integer> best;
+        public List<Integer> key;
     }
 
     private List<Integer> toCardIds(List<Card> cards) {
@@ -82,7 +100,7 @@ public class TexasEventHandler {
     private void onAction(TexasRound round) {
         var id = "11";
         var action = round.getPlayerAction(id);
-        var send = new Cmd.PlayerAction();
+        var send = new Action();
         send.op = action.op.name();
         send.chipsAdd = action.chipsAdd;
         send.chipsBet = action.chipsBet;
@@ -91,28 +109,52 @@ public class TexasEventHandler {
         this.desk.send(send);
     }
 
+
+    private static class Action {
+        public String op;
+        public int chipsAdd;
+        public int chipsBet;
+        public int chipsLeft;
+        public int sumPot;
+    }
+
+
+    private static class CircleEnd {
+        public List<Integer> board;
+        public List<Integer> pots;
+    }
+
     private void onCircleEnd(TexasRound round) {
-        var info = new Cmd.CircleEnd();
+        var info = new CircleEnd();
         info.board = new ArrayList<>();
-        info.devide = new ArrayList<>();
+        info.pots = new ArrayList<>();
         this.desk.send(info);
     }
 
     private void onShowdown() {
     }
 
-    private void onNewOperator(TexasRound round) {
-        var info = new Cmd.NewOperator();
+    private void onOperator(TexasRound round) {
+        var info = new Operator();
         info.leftSec = round.opLeftSec();
         info.seatId = round.getOpPlayer().seatId;
         info.ops = round.authority()
                 .entrySet().stream()
                 .map(v -> {
-                    var act = new Cmd.Action();
+                    var act = new Action();
                     act.op = v.getKey().name();
                     act.chipsBet = v.getValue();
                     return act;
                 }).collect(Collectors.toList());
         this.desk.send(info);
     }
+
+    public static class Operator {
+        public int seatId;
+        public int raiseLine;
+        public long leftSec;
+        public List<Action> ops;
+    }
+
+
 }

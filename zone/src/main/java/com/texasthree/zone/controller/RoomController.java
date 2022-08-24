@@ -3,7 +3,6 @@ package com.texasthree.zone.controller;
 import com.texasthree.security.shiro.AbstractMeController;
 import com.texasthree.utility.restful.RestResponse;
 import com.texasthree.zone.Zone;
-import com.texasthree.zone.room.Room;
 import com.texasthree.zone.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -65,11 +64,4 @@ public class RoomController extends AbstractMeController<User> {
         return RestResponse.SUCCESS;
     }
 
-    private static Room checkRoom(String roomId, User user) {
-        var room = Room.getRoom(roomId);
-        if (room == null) {
-            user.send(new Cmd.Warning("房间不存在"));
-        }
-        return room;
-    }
 }

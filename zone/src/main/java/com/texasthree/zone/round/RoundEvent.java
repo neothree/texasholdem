@@ -10,12 +10,11 @@ public enum RoundEvent {
 
     UPDATE_HAND,
 
-    NEW_OPERATOR,
+    OPERATOR,
 
     ACTION,
 
     CIRCLE_END,
 
     SHOWDOWN,
-
 }
