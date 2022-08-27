@@ -11,8 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 class TexasRoundTest {
 
@@ -29,6 +28,8 @@ class TexasRoundTest {
         var desk = new Desk();
         var round = new TexasRound(users, new TexasEventHandler(desk));
 
+
+        // PREFLOP
         var dealer = users.get(0).seatId;
         round.start(dealer);
         assertEquals(3, round.getPlayers().size());
@@ -48,6 +49,49 @@ class TexasRoundTest {
         assertEquals(2, round.getOperator().seatId);
         round.action(Action.of(Optype.Check));
 
+        // FLOP
         assertEquals(Circle.FLOP, round.circle());
+        assertNull(round.getOperator());
+
+        round.force();
+        assertEquals(1, round.getOperator().seatId);
+        round.action(Action.of(Optype.Check));
+
+        assertEquals(2, round.getOperator().seatId);
+        round.action(Action.of(Optype.Check));
+
+        assertEquals(0, round.getOperator().seatId);
+        round.action(Action.of(Optype.Check));
+
+        // TURN
+        assertEquals(Circle.TURN, round.circle());
+        assertNull(round.getOperator());
+
+        round.force();
+        assertEquals(1, round.getOperator().seatId);
+        round.action(Action.of(Optype.Check));
+
+        assertEquals(2, round.getOperator().seatId);
+        round.action(Action.of(Optype.Check));
+
+        assertEquals(0, round.getOperator().seatId);
+        round.action(Action.of(Optype.Check));
+
+        // RIVER
+        assertEquals(Circle.RIVER, round.circle());
+        assertNull(round.getOperator());
+
+        round.force();
+        assertEquals(1, round.getOperator().seatId);
+        round.action(Action.of(Optype.Check));
+
+        assertEquals(2, round.getOperator().seatId);
+        round.action(Action.of(Optype.Check));
+
+        assertEquals(0, round.getOperator().seatId);
+        round.action(Action.of(Optype.Check));
+
+        // SHOWDOWN
+        assertTrue(round.finished());
     }
 }

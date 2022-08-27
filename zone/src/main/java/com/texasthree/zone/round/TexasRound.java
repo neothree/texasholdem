@@ -85,6 +85,11 @@ public class TexasRound {
      * create at 2020-06-30 11:12
      */
     public void action(Action action) {
+        if (operator == null) {
+            log.error("押注异常，没有操作人");
+            return;
+        }
+        log.info("玩家押注 seatId={} op={}", operator.seatId, action.op);
         this.lastAction = action;
         this.eventHandler.trigger(this, RoundEvent.ACTION);
 
@@ -93,6 +98,7 @@ public class TexasRound {
 
         var move = this.game.action(action);
         if (Optype.Check.equals(action.op)) {
+            // Check 没有动画，不需要延时，直接下一个操作
             this.move(move);
         } else if (Optype.Fold.equals(action.op)) {
             this.opEvent = new ScheduledEvent(() -> this.move(move), TIMEOUT_MOVE_FOLD);
@@ -101,29 +107,6 @@ public class TexasRound {
         }
     }
 
-    public boolean finished() {
-        return this.isOver;
-    }
-
-
-    public Collection<UserPlayer> getPlayers() {
-        return playerMap.values();
-    }
-
-
-    /**
-     * 更新手牌
-     */
-    private void updateHand() {
-        this.eventHandler.trigger(this, RoundEvent.UPDATE_HAND);
-    }
-
-
-    public boolean isLeave(String id) {
-        var player = playerMap.get(id);
-        var p = this.game.getPlayerById(player.seatId);
-        return p.isLeave();
-    }
 
     private void move(String move) {
         if (Texas.STATE_NEXT_OP.equals(move)) {
@@ -145,7 +128,7 @@ public class TexasRound {
         this.operator = this.getPlayerBySeatId(game.operator().getId());
         this.opEvent = new ScheduledEvent(() -> this.onOpTimeout(), this.actDuration);
         this.eventHandler.trigger(this, RoundEvent.OPERATOR);
-        log.info("轮到下一位进行押注 opId={} seatId={}", this.operator.user.getId(), this.operator.seatId);
+        log.info("轮到下一位进行押注 uid={} seatId={}", this.operator.user.getId(), this.operator.seatId);
     }
 
     /**
@@ -171,6 +154,7 @@ public class TexasRound {
      * create at 2020-06-30 18:06
      */
     private void moveShowdown() {
+        this.printShowdown();
         this.opEvent = null;
         this.operator = null;
         this.isOver = true;
@@ -185,6 +169,7 @@ public class TexasRound {
      */
     private void onOpTimeout() {
         if (this.operator == null) {
+            log.error("押注倒计时超时，但是检测到没有操作人");
             return;
         }
 
@@ -201,6 +186,29 @@ public class TexasRound {
         return this.game.getPlayerById(player.seatId).getHand();
     }
 
+    public boolean finished() {
+        return this.isOver;
+    }
+
+
+    public Collection<UserPlayer> getPlayers() {
+        return playerMap.values();
+    }
+
+
+    /**
+     * 更新手牌
+     */
+    private void updateHand() {
+        this.eventHandler.trigger(this, RoundEvent.UPDATE_HAND);
+    }
+
+
+    public boolean isLeave(String id) {
+        var player = playerMap.get(id);
+        var p = this.game.getPlayerById(player.seatId);
+        return p.isLeave();
+    }
 
     public Action getPlayerAction(String id) {
         return null;
@@ -259,12 +267,19 @@ public class TexasRound {
     }
 
     private void printStart() {
-
+        log.info("============开始牌局==============");
+        log.info("开始牌局 playerNum={} dealer={} sbSeatId={} bbSeatId={} smallBlind={} ante={} ", getPlayers().size(), dealer(), sbSeatId(), bbSeatId(), smallBlind(), ante());
     }
 
     private void printCircle() {
-
+        log.info("============新一轮===================");
+        log.info("开始新一轮押注 {}", circle());
     }
+
+    private void printShowdown() {
+        log.info("============牌局结束===================");
+    }
+
 
     public void loop() {
         if (opEvent != null) {
