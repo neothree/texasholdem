@@ -16,6 +16,13 @@ public class RoomController extends AbstractMeController<User> {
     @Autowired
     private Zone zone;
 
+    @GetMapping(value = "/{roomId}")
+    public RestResponse getRoomData(@PathVariable("roomId") String roomId) throws Exception {
+        log.info("获取房间数据 {}", roomId);
+        var room = zone.getRoom();
+        return new RestResponse<>(room.data());
+    }
+
     /**
      * 进入房间
      */
@@ -59,7 +66,7 @@ public class RoomController extends AbstractMeController<User> {
     /**
      * 玩家执行牌局操作
      */
-    @PostMapping(value = "/action")
+    @PostMapping(value = "/round/action")
     public RestResponse action(@RequestParam("username") String username) {
         return RestResponse.SUCCESS;
     }

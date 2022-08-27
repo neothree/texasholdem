@@ -2,6 +2,7 @@ package com.texasthree.zone.round;
 
 import com.texasthree.game.texas.Card;
 import com.texasthree.zone.room.Desk;
+import com.texasthree.zone.room.Protocal;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -44,7 +45,7 @@ public class TexasEventHandler {
     }
 
     private void onStartGame(TexasRound round) {
-        var info = new StartGame();
+        var info = new Protocal.StartGame();
         info.ante = round.ante();
         info.sbSeatId = round.sbSeatId();
         info.bbSeatId = round.bbSeatId();
@@ -57,24 +58,13 @@ public class TexasEventHandler {
         this.desk.send(info);
     }
 
-    private static class StartGame {
-        public int sbSeatId;
-        public int bbSeatId;
-        public int dealer;
-        public int smallBlind;
-        public int ante;
-        public int sumPot;
-        public List<Integer> players;
-    }
-
-
     private void onUpdateHand(TexasRound round) {
         for (var v : round.getPlayers()) {
             if (round.isLeave(v.getId())) {
                 continue;
             }
             var hand = round.getPlayerHand(v.getId());
-            var update = new HandUpdate();
+            var update = new Protocal.HandUpdate();
             update.cards = toCardIds(hand.getHold());
             update.best = toCardIds(hand.getBest());
             update.key = toCardIds(hand.getKeys());
@@ -83,22 +73,13 @@ public class TexasEventHandler {
         }
     }
 
-
-    private static class HandUpdate {
-        public List<Integer> cards;
-        public String type;
-        public List<Integer> best;
-        public List<Integer> key;
-    }
-
     private List<Integer> toCardIds(List<Card> cards) {
         return cards.stream().map(Card::getId).collect(Collectors.toList());
     }
 
-
     private void onAction(TexasRound round) {
         var action = round.getLastAction();
-        var send = new Action();
+        var send = new Protocal.Action();
         send.op = action.op.name();
         send.chipsAdd = action.chipsAdd;
         send.chipsBet = action.chipsBet;
@@ -107,51 +88,29 @@ public class TexasEventHandler {
         this.desk.send(send);
     }
 
-
-    private static class Action {
-        public String op;
-        public int chipsAdd;
-        public int chipsBet;
-        public int chipsLeft;
-        public int sumPot;
-    }
-
-
-    private static class CircleEnd {
-        public List<Integer> communityCards;
-        public List<Integer> pots;
-    }
-
     private void onCircleEnd(TexasRound round) {
-        var info = new CircleEnd();
+        var info = new Protocal.CircleEnd();
         info.communityCards = toCardIds(round.getCommunityCards());
         info.pots = round.getPots();
         this.desk.send(info);
     }
 
     private void onShowdown() {
+        desk.onShowdown();
     }
 
     private void onOperator(TexasRound round) {
-        var info = new Operator();
+        var info = new Protocal.Operator();
         info.leftSec = round.opLeftSec();
         info.seatId = round.getOperator().seatId;
         info.ops = round.authority()
                 .entrySet().stream()
                 .map(v -> {
-                    var act = new Action();
+                    var act = new Protocal.Action();
                     act.op = v.getKey().name();
                     act.chipsBet = v.getValue();
                     return act;
                 }).collect(Collectors.toList());
         this.desk.send(info);
     }
-
-    public static class Operator {
-        public int seatId;
-        public long leftSec;
-        public List<Action> ops;
-    }
-
-
 }

@@ -1,5 +1,6 @@
 package com.texasthree.zone.room;
 
+import com.texasthree.game.texas.Card;
 import com.texasthree.zone.net.Server;
 import com.texasthree.zone.round.TexasEventHandler;
 import com.texasthree.zone.round.TexasRound;
@@ -9,21 +10,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Desk {
 
     private static Logger log = LoggerFactory.getLogger(Desk.class);
 
-    private User[] seats = new User[8];
+    private final User[] seats;
+
+    private final Map<String, User> audience = new HashMap<>();
+
+    private final TexasEventHandler handler = new TexasEventHandler(this);
 
     private TexasRound round;
 
     private Server server;
 
-    private Map<String, User> audience = new HashMap<>();
-
-    private TexasEventHandler handler = new TexasEventHandler(this);
-
+    public Desk(int capacity) {
+        seats = new User[capacity];
+    }
 
     public void addUser(User user) {
         audience.put(user.getId(), user);
@@ -143,5 +148,34 @@ public class Desk {
      */
     public boolean running() {
         return round != null;
+    }
+
+    public void onShowdown() {
+        log.info("桌子一局结束");
+    }
+
+    public User[] getSeats() {
+        return Arrays.copyOf(seats, seats.length);
+    }
+
+    public Protocal.RoundData roundData() {
+        if (round == null) {
+            return null;
+        }
+        var info = new Protocal.RoundData();
+        info.dealer = round.dealer();
+        info.sbSeatId = round.sbSeatId();
+        info.bbSeatId = round.bbSeatId();
+        info.sumPot = round.sumPot();
+        info.circle = round.circle();
+        info.pots = round.getPots();
+        info.communityCards = round.getCommunityCards().stream().map(Card::getId).collect(Collectors.toList());
+        info.players =new ArrayList<>();
+        for (var v : round.getPlayers()) {
+            var p = new Protocal.Player();
+            p.seatId = v.seatId;
+            p.uid = v.getId();
+        }
+        return info;
     }
 }

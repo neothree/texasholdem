@@ -11,7 +11,7 @@ class DeskTest {
 
     @Test
     void testSitDown() throws Exception {
-        var desk = new Desk();
+        var desk = new Desk(9);
         assertEquals(0, desk.playerNum());
         var u1 = Tester.createUser();
         desk.sitDown(u1, 0);

@@ -6,6 +6,7 @@ import com.texasthree.zone.utility.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,13 +26,40 @@ public class Room {
         return roomMap.values();
     }
 
+    public Protocal.RoomData data() {
+        var info = new Protocal.RoomData();
+        info.id = id;
+        info.name = "test";
+        info.ante = 1;
+        info.smallBlind = 1;
+        info.button = 1;
+        info.capacity = 9;
+        info.seats = new ArrayList<>();
+        info.round = desk.roundData();
+
+        var seats = desk.getSeats();
+        for (var i = 0; i < capacity;i++) {
+            var v = seats[i];
+            if (v != null) {
+                var p = new Protocal.Player();
+                p.uid = v.getId();
+                p.name = v.getName();
+                p.chips = v.getChips();
+                info.seats.add(p);
+            }
+        }
+        return info;
+    }
+
+    private int capacity = 9;
+
     private Desk desk;
 
     private String id;
 
     public Room() {
         this.id = StringUtils.get10UUID();
-        this.desk = new Desk();
+        this.desk = new Desk(capacity);
         roomMap.put(id, this);
         log.info("创建房间 {}", id);
     }

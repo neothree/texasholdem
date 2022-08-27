@@ -25,7 +25,7 @@ class TexasRoundTest {
             user.setChips(100);
             users.add(new UserPlayer(i, user));
         }
-        var desk = new Desk();
+        var desk = new Desk(9);
         var round = new TexasRound("12311", users, new TexasEventHandler(desk));
 
 
