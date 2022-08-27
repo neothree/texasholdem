@@ -22,6 +22,11 @@ public class TexasRound {
     final static int TIMEOUT_MOVE_ACTION = 500;
     final static int TIMEOUT_MOVE_CIRCLE = 2000;
 
+    private final int id = 1;
+
+    private final String roomId;
+
+    private final String logpre;
 
     private Texas game;
 
@@ -48,7 +53,9 @@ public class TexasRound {
 
     private Action lastAction;
 
-    public TexasRound(List<UserPlayer> users, TexasEventHandler eventHandler) {
+    public TexasRound(String roomId, List<UserPlayer> users, TexasEventHandler eventHandler) {
+        this.logpre = "[" + roomId + " - " + id + "]";
+        this.roomId = roomId;
         this.users = users;
         this.eventHandler = eventHandler;
         for (var v : users) {
@@ -86,10 +93,10 @@ public class TexasRound {
      */
     public void action(Action action) {
         if (operator == null) {
-            log.error("押注异常，没有操作人");
+            log.error("{}押注异常，没有操作人", logpre);
             return;
         }
-        log.info("玩家押注 seatId={} op={}", operator.seatId, action.op);
+        log.info("{}玩家押注 seatId={} op={}", logpre, operator.seatId, action.op);
         this.lastAction = action;
         this.eventHandler.trigger(this, RoundEvent.ACTION);
 
@@ -128,7 +135,7 @@ public class TexasRound {
         this.operator = this.getPlayerBySeatId(game.operator().getId());
         this.opEvent = new ScheduledEvent(() -> this.onOpTimeout(), this.actDuration);
         this.eventHandler.trigger(this, RoundEvent.OPERATOR);
-        log.info("轮到下一位进行押注 uid={} seatId={}", this.operator.user.getId(), this.operator.seatId);
+        log.info("{}轮到下一位进行押注 uid={} seatId={}", logpre, this.operator.user.getId(), this.operator.seatId);
     }
 
     /**
@@ -169,11 +176,11 @@ public class TexasRound {
      */
     private void onOpTimeout() {
         if (this.operator == null) {
-            log.error("押注倒计时超时，但是检测到没有操作人");
+            log.error("{}押注倒计时超时，但是检测到没有操作人", logpre);
             return;
         }
 
-        log.info("压住超时: {}", this.operator.toString());
+        log.info("{}压住超时: {}", logpre, this.operator.toString());
         var au = this.game.authority();
         var op = au.containsKey(Optype.Check) ? Optype.Check : Optype.Fold;
         var action = Action.of(op);
@@ -267,17 +274,17 @@ public class TexasRound {
     }
 
     private void printStart() {
-        log.info("============开始牌局==============");
-        log.info("开始牌局 playerNum={} dealer={} sbSeatId={} bbSeatId={} smallBlind={} ante={} ", getPlayers().size(), dealer(), sbSeatId(), bbSeatId(), smallBlind(), ante());
+        log.info("{} ============开始牌局==============", logpre);
+        log.info("{} 开始牌局 playerNum={} dealer={} sbSeatId={} bbSeatId={} smallBlind={} ante={}", logpre, getPlayers().size(), dealer(), sbSeatId(), bbSeatId(), smallBlind(), ante());
     }
 
     private void printCircle() {
-        log.info("============新一轮===================");
-        log.info("开始新一轮押注 {}", circle());
+        log.info("{}============新一轮===================", logpre);
+        log.info("{}开始新一轮押注 {}", logpre, circle());
     }
 
     private void printShowdown() {
-        log.info("============牌局结束===================");
+        log.info("{}============牌局结束===================", logpre);
     }
 
 
@@ -295,7 +302,6 @@ public class TexasRound {
 
     public List<Card> getCommunityCards() {
         return game.getCommunityCards();
-
     }
 
     public List<Integer> getPots() {

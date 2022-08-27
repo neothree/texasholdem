@@ -26,7 +26,7 @@ class TexasRoundTest {
             users.add(new UserPlayer(i, user));
         }
         var desk = new Desk();
-        var round = new TexasRound(users, new TexasEventHandler(desk));
+        var round = new TexasRound("12311", users, new TexasEventHandler(desk));
 
 
         // PREFLOP

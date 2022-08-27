@@ -92,7 +92,7 @@ public class Desk {
             }
         }
 
-        this.round = new TexasRound(users, handler);
+        this.round = new TexasRound("333111", users, handler);
         try {
             this.round.start(users.get(0).seatId);
         } catch (Exception e) {
