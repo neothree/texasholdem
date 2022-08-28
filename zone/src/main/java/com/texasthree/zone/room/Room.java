@@ -1,6 +1,7 @@
 package com.texasthree.zone.room;
 
 
+import com.texasthree.game.texas.Card;
 import com.texasthree.zone.user.User;
 import com.texasthree.zone.utility.StringUtils;
 import org.slf4j.Logger;
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 public class Room {
@@ -35,7 +37,23 @@ public class Room {
         info.button = 1;
         info.capacity = 9;
         info.seats = new ArrayList<>();
-        info.round = desk.roundData();
+
+        var round = desk.getRound();
+        var rd = new Protocal.RoundData();
+        rd.dealer = round.dealer();
+        rd.sbSeatId = round.sbSeatId();
+        rd.bbSeatId = round.bbSeatId();
+        rd.sumPot = round.sumPot();
+        rd.circle = round.circle();
+        rd.pots = round.getPots();
+        rd.communityCards = round.getCommunityCards().stream().map(Card::getId).collect(Collectors.toList());
+        rd.players =new ArrayList<>();
+        for (var v : round.getPlayers()) {
+            var p = new Protocal.Player();
+            p.seatId = v.seatId;
+            p.uid = v.getId();
+        }
+        info.round = rd;
 
         var seats = desk.getSeats();
         for (var i = 0; i < capacity;i++) {

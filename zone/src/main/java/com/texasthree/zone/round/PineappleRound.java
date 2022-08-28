@@ -1,7 +1,6 @@
 package com.texasthree.zone.round;
 
 import com.texasthree.game.pineapple.Pineapple;
-import com.texasthree.game.texas.Action;
 
 /**
  * 大菠萝
@@ -18,7 +17,7 @@ class PineappleRound {
         this.game.start();
     }
 
-    public void action(Action action) {
+    public void action() {
         this.game.action(null, null);
     }
 

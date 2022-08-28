@@ -61,6 +61,10 @@ public class Action {
         return new Action(-1, op, 0, 0, 0, 0);
     }
 
+    public static Action of(Optype op, int chipsBet) {
+        return new Action(-1, op, chipsBet, 0, 0, 0);
+    }
+
     public static Action straddleBlind(int chipsAdd) {
         var act = new Action(-1, Optype.Raise, 0, chipsAdd, 0, 0);
         act.straddle = true;

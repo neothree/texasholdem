@@ -1,5 +1,7 @@
 package com.texasthree.zone.controller;
 
+import com.texasthree.game.texas.Action;
+import com.texasthree.game.texas.Optype;
 import com.texasthree.security.shiro.AbstractMeController;
 import com.texasthree.utility.restful.RestResponse;
 import com.texasthree.zone.Zone;
@@ -12,12 +14,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/room")
 public class RoomController extends AbstractMeController<User> {
 
-
     @Autowired
     private Zone zone;
 
     @GetMapping(value = "/{roomId}")
-    public RestResponse getRoomData(@PathVariable("roomId") String roomId) throws Exception {
+    public RestResponse room(@PathVariable("roomId") String roomId) throws Exception {
         log.info("获取房间数据 {}", roomId);
         var room = zone.getRoom();
         return new RestResponse<>(room.data());
@@ -62,13 +63,14 @@ public class RoomController extends AbstractMeController<User> {
         room.sitUp(user);
     }
 
-
     /**
-     * 玩家执行牌局操作
+     * 押注
      */
     @PostMapping(value = "/round/action")
-    public RestResponse action(@RequestParam("username") String username) {
-        return RestResponse.SUCCESS;
+    public void action(@RequestParam("op") Optype op,
+                       Integer chipsBet) {
+        var action = Action.of(op, chipsBet);
+        var room = zone.newRoom();
+        room.getDesk().getRound().action(action);
     }
-
 }

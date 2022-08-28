@@ -158,24 +158,8 @@ public class Desk {
         return Arrays.copyOf(seats, seats.length);
     }
 
-    public Protocal.RoundData roundData() {
-        if (round == null) {
-            return null;
-        }
-        var info = new Protocal.RoundData();
-        info.dealer = round.dealer();
-        info.sbSeatId = round.sbSeatId();
-        info.bbSeatId = round.bbSeatId();
-        info.sumPot = round.sumPot();
-        info.circle = round.circle();
-        info.pots = round.getPots();
-        info.communityCards = round.getCommunityCards().stream().map(Card::getId).collect(Collectors.toList());
-        info.players =new ArrayList<>();
-        for (var v : round.getPlayers()) {
-            var p = new Protocal.Player();
-            p.seatId = v.seatId;
-            p.uid = v.getId();
-        }
-        return info;
+    public TexasRound getRound() {
+        return this.round;
     }
+
 }
