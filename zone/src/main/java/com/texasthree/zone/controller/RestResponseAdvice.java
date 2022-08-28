@@ -1,7 +1,7 @@
 package com.texasthree.zone.controller;
 
 import com.texasthree.utility.restful.RestResponse;
-import com.texasthree.zone.utility.JSONUtils;
+import com.texasthree.utility.utlis.JSONUtils;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;

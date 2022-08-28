@@ -1,6 +1,6 @@
 package com.texasthree.zone.user;
 
-import com.texasthree.zone.utility.StringUtils;
+import com.texasthree.utility.utlis.StringUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

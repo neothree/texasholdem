@@ -1,8 +1,8 @@
 package com.texasthree.zone;
 
+import com.texasthree.utility.utlis.StringUtils;
 import com.texasthree.zone.user.User;
 import com.texasthree.zone.user.UserData;
-import com.texasthree.zone.utility.StringUtils;
 
 /**
  * @author: neo

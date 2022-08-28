@@ -1,11 +1,11 @@
 package com.texasthree.zone.net;
 
 import com.texasthree.utility.packet.Packet;
+import com.texasthree.utility.utlis.JSONUtils;
+import com.texasthree.utility.utlis.StringUtils;
 import com.texasthree.zone.net.some.SomeCommand;
 import com.texasthree.zone.net.some.SomeUser;
 import com.texasthree.zone.user.UserData;
-import com.texasthree.zone.utility.JSONUtils;
-import com.texasthree.zone.utility.StringUtils;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
