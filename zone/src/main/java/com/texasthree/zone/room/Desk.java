@@ -1,16 +1,11 @@
 package com.texasthree.zone.room;
 
-import com.texasthree.game.texas.Card;
 import com.texasthree.zone.net.Server;
-import com.texasthree.zone.round.TexasEventHandler;
-import com.texasthree.zone.round.TexasRound;
-import com.texasthree.zone.round.UserPlayer;
 import com.texasthree.zone.user.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Desk {
 

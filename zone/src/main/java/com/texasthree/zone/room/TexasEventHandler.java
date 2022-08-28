@@ -1,8 +1,6 @@
-package com.texasthree.zone.round;
+package com.texasthree.zone.room;
 
 import com.texasthree.game.texas.Card;
-import com.texasthree.zone.room.Desk;
-import com.texasthree.zone.room.Protocal;
 
 import java.util.List;
 import java.util.stream.Collectors;
