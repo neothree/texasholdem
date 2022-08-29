@@ -261,7 +261,7 @@ public class TexasRound {
         if (opEvent == null) {
             return 0;
         }
-        return (int) ((System.currentTimeMillis() - opEvent.getNextMsec()) / 1000);
+        return (int) ((opEvent.getNextMsec() - System.currentTimeMillis() ) / 1000);
     }
 
     public String circle() {

@@ -21,7 +21,7 @@ public class User {
     }
 
 
-    private int chips;
+    private int chips = 1000;
 
     private Room room;
 

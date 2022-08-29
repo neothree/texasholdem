@@ -93,9 +93,9 @@ public class TexasEventHandler {
         var action = round.getLastAction();
         var send = new Protocal.Action();
         send.op = action.op.name();
-        send.chipsAdd = action.chipsAdd;
+        send.seatId = action.id;
         send.chipsBet = action.chipsBet;
-        send.chipsLeft = action.chipsLeft;
+        send.chips = action.chipsLeft;
         send.sumPot = round.sumPot();
         this.desk.send(send);
     }
@@ -115,7 +115,7 @@ public class TexasEventHandler {
         var info = new Protocal.Operator();
         info.leftSec = round.opLeftSec();
         info.seatId = round.getOperator().seatId;
-        info.ops = round.authority()
+        info.actions = round.authority()
                 .entrySet().stream()
                 .map(v -> {
                     var act = new Protocal.Action();

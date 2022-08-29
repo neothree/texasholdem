@@ -35,6 +35,7 @@ class TexasRoundTest {
         assertEquals(dealer, round.dealer());
         assertNull(round.getOperator());
         assertEquals(Circle.PREFLOP, round.circle());
+        assertTrue(round.opLeftSec() > 0);
 
         round.force();
         assertEquals(0, round.getOperator().seatId);

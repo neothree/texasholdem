@@ -47,16 +47,16 @@ public class Protocal {
 
     public static class Action {
         public String op;
-        public int chipsAdd;
-        public int chipsBet;
-        public int chipsLeft;
-        public int sumPot;
+        public int seatId;
+        public Integer chipsBet;
+        public Integer chips;
+        public Integer sumPot;
     }
 
     public static class Operator {
         public int seatId;
         public long leftSec;
-        public List<Action> ops;
+        public List<Action> actions;
     }
 
     public static class Hand {
