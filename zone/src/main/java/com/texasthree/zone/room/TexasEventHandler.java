@@ -42,6 +42,20 @@ public class TexasEventHandler {
         }
     }
 
+    public void onSeat(int seatId) {
+        var info = new Protocal.Seat();
+        info.seatId = seatId;
+        var user = desk.getSeats()[seatId];
+        if (user != null) {
+            var p = new Protocal.Player();
+            p.uid = user.getId();
+            p.name = user.getName();
+            p.chips = user.getChips();
+            info.player = p;
+        }
+        this.desk.send(info);
+    }
+
     private void onStartGame(TexasRound round) {
         var info = new Protocal.StartGame();
         info.ante = round.ante();

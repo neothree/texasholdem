@@ -39,6 +39,11 @@ public class Protocal {
         public int chips;
     }
 
+    public static class Seat {
+        public int seatId;
+        public Player player;
+    }
+
 
     public static class Action {
         public String op;

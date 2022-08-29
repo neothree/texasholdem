@@ -38,25 +38,9 @@ public class Room {
         info.capacity = 9;
         info.seats = new ArrayList<>();
 
-        var round = desk.getRound();
-        var rd = new Protocal.RoundData();
-        rd.dealer = round.dealer();
-        rd.sbSeatId = round.sbSeatId();
-        rd.bbSeatId = round.bbSeatId();
-        rd.sumPot = round.sumPot();
-        rd.circle = round.circle();
-        rd.pots = round.getPots();
-        rd.communityCards = round.getCommunityCards().stream().map(Card::getId).collect(Collectors.toList());
-        rd.players =new ArrayList<>();
-        for (var v : round.getPlayers()) {
-            var p = new Protocal.Player();
-            p.seatId = v.seatId;
-            p.uid = v.getId();
-        }
-        info.round = rd;
-
+        // 座位
         var seats = desk.getSeats();
-        for (var i = 0; i < capacity;i++) {
+        for (var i = 0; i < capacity; i++) {
             var v = seats[i];
             if (v != null) {
                 var p = new Protocal.Player();
@@ -66,6 +50,28 @@ public class Room {
                 info.seats.add(p);
             }
         }
+
+        // 牌局
+        var round = desk.getRound();
+        if (round != null) {
+
+            var rd = new Protocal.RoundData();
+            rd.dealer = round.dealer();
+            rd.sbSeatId = round.sbSeatId();
+            rd.bbSeatId = round.bbSeatId();
+            rd.sumPot = round.sumPot();
+            rd.circle = round.circle();
+            rd.pots = round.getPots();
+            rd.communityCards = round.getCommunityCards().stream().map(Card::getId).collect(Collectors.toList());
+            rd.players = new ArrayList<>();
+            for (var v : round.getPlayers()) {
+                var p = new Protocal.Player();
+                p.seatId = v.seatId;
+                p.uid = v.getId();
+            }
+            info.round = rd;
+        }
+
         return info;
     }
 

@@ -44,6 +44,9 @@ public class Desk {
         log.info("玩家坐下 id={} name={} seatId={}", user.getId(), user.getName(), seatId);
         seats[seatId] = user;
         this.audience.remove(user.getId());
+
+        handler.onSeat(seatId);
+
         this.tryStart();
     }
 
@@ -57,6 +60,7 @@ public class Desk {
                 log.info("玩家站起 id={} name={} seatId={}", user.getId(), user.getName(), i);
                 this.audience.put(user.getId(), user);
                 seats[i] = null;
+                handler.onSeat(i);
             }
         }
     }
