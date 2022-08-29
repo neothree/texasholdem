@@ -59,7 +59,7 @@ public class Protocal {
         public List<Action> ops;
     }
 
-    public static class HandUpdate {
+    public static class Hand {
         public List<Integer> cards;
         public String type;
         public List<Integer> best;
@@ -67,7 +67,7 @@ public class Protocal {
     }
 
 
-    public static class StartGame {
+    public static class Start {
         public int sbSeatId;
         public int bbSeatId;
         public int dealer;

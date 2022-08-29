@@ -21,6 +21,8 @@ public class Desk {
 
     private Server server;
 
+    private ScheduledEvent opEvent;
+
     public Desk(int capacity) {
         seats = new User[capacity];
     }
@@ -79,7 +81,9 @@ public class Desk {
         if (playerNum() < 2) {
             return;
         }
-        this.start();
+
+        // 准备开始
+        this.opEvent = new ScheduledEvent(() -> start(), 2000);
     }
 
     /**
@@ -106,8 +110,14 @@ public class Desk {
     }
 
     public void loop() {
-        if (round != null) {
-            round.loop();
+        if (this.opEvent != null) {
+            var run = this.opEvent.check();
+            if (run) {
+                this.opEvent = null;
+            }
+        }
+        if (this.round != null) {
+            this.round.loop();
         }
     }
 

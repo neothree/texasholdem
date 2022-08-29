@@ -57,7 +57,7 @@ public class TexasEventHandler {
     }
 
     private void onStartGame(TexasRound round) {
-        var info = new Protocal.StartGame();
+        var info = new Protocal.Start();
         info.ante = round.ante();
         info.sbSeatId = round.sbSeatId();
         info.bbSeatId = round.bbSeatId();
@@ -76,7 +76,7 @@ public class TexasEventHandler {
                 continue;
             }
             var hand = round.getPlayerHand(v.getId());
-            var update = new Protocal.HandUpdate();
+            var update = new Protocal.Hand();
             update.cards = toCardIds(hand.getHold());
             update.best = toCardIds(hand.getBest());
             update.key = toCardIds(hand.getKeys());
