@@ -9,6 +9,8 @@ import com.texasthree.zone.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
+
 
 @RestController
 @RequestMapping("/room")
@@ -67,10 +69,15 @@ public class RoomController extends AbstractMeController<User> {
      * 押注
      */
     @PostMapping(value = "/round/action")
-    public void action(@RequestParam("op") Optype op,
+    public void action(@RequestParam("op") String op,
                        Integer chipsBet) {
-        var action = Action.of(op, chipsBet);
-        var room = zone.newRoom();
+        var action = Action.of(getOptype(op), chipsBet);
+        var room = zone.getRoom();
         room.getDesk().getRound().action(action);
     }
+
+    private Optype getOptype(String op) {
+        return Arrays.stream(Optype.values()).filter(v -> v.name().equalsIgnoreCase(op)).findFirst().get();
+    }
+
 }

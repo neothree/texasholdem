@@ -48,7 +48,7 @@ public class Server {
     }
 
     public void start() {
-        dispatcher.register("com.texasthree.zone.controller");
+//        dispatcher.register("com.texasthree.zone.controller");
     }
 
     @EventListener

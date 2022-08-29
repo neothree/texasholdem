@@ -61,12 +61,12 @@ public class Zone {
 
     public Room getRoom() {
         if (room == null) {
-            room = new Room();
+            room = new Room(StringUtils.get10UUID(), 9);
             room.getDesk().setServer(server);
 
             var user = createUser(StringUtils.get10UUID(), StringUtils.get10UUID());
             room.addUser(user);
-            room.sitDown(user, 1);
+            room.sitDown(user, 7);
         }
         return room;
     }

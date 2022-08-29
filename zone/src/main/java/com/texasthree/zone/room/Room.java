@@ -2,7 +2,6 @@ package com.texasthree.zone.room;
 
 
 import com.texasthree.game.texas.Card;
-import com.texasthree.utility.utlis.StringUtils;
 import com.texasthree.zone.user.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,61 +27,15 @@ public class Room {
         return roomMap.values();
     }
 
-    public Protocal.RoomData data() {
-        var info = new Protocal.RoomData();
-        info.id = id;
-        info.name = "test";
-        info.ante = 1;
-        info.smallBlind = 1;
-        info.button = 1;
-        info.capacity = 9;
-        info.seats = new ArrayList<>();
-
-        // 座位
-        var seats = desk.getSeats();
-        for (var i = 0; i < capacity; i++) {
-            var v = seats[i];
-            if (v != null) {
-                var p = new Protocal.Player();
-                p.uid = v.getId();
-                p.name = v.getName();
-                p.chips = v.getChips();
-                info.seats.add(p);
-            }
-        }
-
-        // 牌局
-        var round = desk.getRound();
-        if (round != null) {
-
-            var rd = new Protocal.RoundData();
-            rd.dealer = round.dealer();
-            rd.sbSeatId = round.sbSeatId();
-            rd.bbSeatId = round.bbSeatId();
-            rd.sumPot = round.sumPot();
-            rd.circle = round.circle();
-            rd.pots = round.getPots();
-            rd.communityCards = round.getCommunityCards().stream().map(Card::getId).collect(Collectors.toList());
-            rd.players = new ArrayList<>();
-            for (var v : round.getPlayers()) {
-                var p = new Protocal.Player();
-                p.seatId = v.seatId;
-                p.uid = v.getId();
-            }
-            info.round = rd;
-        }
-
-        return info;
-    }
-
-    private int capacity = 9;
-
     private Desk desk;
 
-    private String id;
+    private final String id;
 
-    public Room() {
-        this.id = StringUtils.get10UUID();
+    private final int capacity;
+
+    public Room(String id, int capacity) {
+        this.id = id;
+        this.capacity = capacity;
         this.desk = new Desk(capacity);
         roomMap.put(id, this);
         log.info("创建房间 {}", id);
@@ -119,5 +72,57 @@ public class Room {
 
     public Desk getDesk() {
         return desk;
+    }
+
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public Protocal.RoomData data() {
+        var info = new Protocal.RoomData();
+        info.id = id;
+        info.name = "test";
+        info.ante = 1;
+        info.smallBlind = 1;
+        info.button = 1;
+        info.capacity = capacity;
+        info.seats = new ArrayList<>();
+
+        // 座位
+        var seats = desk.getSeats();
+        for (var i = 0; i < capacity; i++) {
+            var v = seats[i];
+            if (v != null) {
+                var p = new Protocal.Player();
+                p.uid = v.getId();
+                p.name = v.getName();
+                p.chips = v.getChips();
+                p.seatId = i;
+                info.seats.add(p);
+            }
+        }
+
+        // 牌局
+        var round = desk.getRound();
+        if (round != null) {
+
+            var rd = new Protocal.RoundData();
+            rd.dealer = round.dealer();
+            rd.sbSeatId = round.sbSeatId();
+            rd.bbSeatId = round.bbSeatId();
+            rd.sumPot = round.sumPot();
+            rd.circle = round.circle();
+            rd.pots = round.getPots();
+            rd.communityCards = round.getCommunityCards().stream().map(Card::getId).collect(Collectors.toList());
+            rd.players = new ArrayList<>();
+            for (var v : round.getPlayers()) {
+                var p = new Protocal.Player();
+                p.seatId = v.seatId;
+                p.uid = v.getId();
+            }
+            info.round = rd;
+        }
+
+        return info;
     }
 }

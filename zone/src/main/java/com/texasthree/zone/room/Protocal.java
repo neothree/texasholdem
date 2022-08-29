@@ -11,20 +11,20 @@ public class Protocal {
     public static class RoomData {
         public String id;
         public String name;
-        public int number = 112;
-        public int capacity;
-        public int button;
-        public int smallBlind;
-        public int ante;
+        public Integer number = 112;
+        public Integer capacity;
+        public Integer button;
+        public Integer smallBlind;
+        public Integer ante;
         public List<Player> seats;
         public RoundData round;
     }
 
     public static class RoundData {
-        public int dealer;
-        public int sbSeatId;
-        public int bbSeatId;
-        public int sumPot;
+        public Integer dealer;
+        public Integer sbSeatId;
+        public Integer bbSeatId;
+        public Integer sumPot;
         public String circle;
         public List<Integer> pots;
         public List<Integer> communityCards;
@@ -35,26 +35,26 @@ public class Protocal {
         public String uid;
         public String name;
         public String avator = "";
-        public int seatId;
-        public int chips;
+        public Integer seatId;
+        public Integer chips;
     }
 
     public static class Seat {
-        public int seatId;
+        public Integer seatId;
         public Player player;
     }
 
 
     public static class Action {
         public String op;
-        public int seatId;
+        public Integer seatId;
         public Integer chipsBet;
         public Integer chips;
         public Integer sumPot;
     }
 
     public static class Operator {
-        public int seatId;
+        public Integer seatId;
         public long leftSec;
         public List<Action> actions;
     }
@@ -68,12 +68,12 @@ public class Protocal {
 
 
     public static class Start {
-        public int sbSeatId;
-        public int bbSeatId;
-        public int dealer;
-        public int smallBlind;
-        public int ante;
-        public int sumPot;
+        public Integer sbSeatId;
+        public Integer bbSeatId;
+        public Integer dealer;
+        public Integer smallBlind;
+        public Integer ante;
+        public Integer sumPot;
         public List<Integer> players;
     }
 

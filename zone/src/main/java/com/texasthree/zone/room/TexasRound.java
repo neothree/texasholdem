@@ -23,8 +23,6 @@ public class TexasRound {
 
     private final int id = 1;
 
-    private final String roomId;
-
     private final String logpre;
 
     private Texas game;
@@ -46,15 +44,12 @@ public class TexasRound {
 
     private List<UserPlayer> users;
 
-    private int actDuration = 15000;
-
     private TexasEventHandler eventHandler;
 
     private Action lastAction;
 
     public TexasRound(String roomId, List<UserPlayer> users, TexasEventHandler eventHandler) {
         this.logpre = "[" + roomId + " - " + id + "]";
-        this.roomId = roomId;
         this.users = users;
         this.eventHandler = eventHandler;
         for (var v : users) {
@@ -132,7 +127,7 @@ public class TexasRound {
      */
     private void moveNextOp() {
         this.operator = this.getPlayerBySeatId(game.operator().getId());
-        this.opEvent = new ScheduledEvent(() -> this.onOpTimeout(), this.actDuration);
+        this.opEvent = new ScheduledEvent(() -> this.onOpTimeout(), 15 * 1000);
         this.eventHandler.trigger(this, RoundEvent.OPERATOR);
         log.info("{}轮到下一位进行押注 uid={} seatId={}", logpre, this.operator.user.getId(), this.operator.seatId);
     }
@@ -261,7 +256,7 @@ public class TexasRound {
         if (opEvent == null) {
             return 0;
         }
-        return (int) ((opEvent.getNextMsec() - System.currentTimeMillis() ) / 1000);
+        return (int) ((opEvent.getNextMsec() - System.currentTimeMillis()) / 1000);
     }
 
     public String circle() {
@@ -285,7 +280,6 @@ public class TexasRound {
     private void printShowdown() {
         log.info("{}============牌局结束===================", logpre);
     }
-
 
     public void loop() {
         if (opEvent != null) {
