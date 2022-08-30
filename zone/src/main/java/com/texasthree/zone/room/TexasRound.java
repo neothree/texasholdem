@@ -19,7 +19,7 @@ public class TexasRound {
     final static int TIMEOUT_ACTION = 15000;
     final static int TIMEOUT_MOVE_FOLD = 800;
     final static int TIMEOUT_MOVE_ACTION = 500;
-    final static int TIMEOUT_MOVE_CIRCLE = 2000;
+    final static int TIMEOUT_MOVE_CIRCLE = 2300;
 
     private final int id ;
 
@@ -44,11 +44,11 @@ public class TexasRound {
 
     private List<UserPlayer> users;
 
-    private TexasEventHandler eventHandler;
+    private RoundEventHandler eventHandler;
 
     private Action lastAction;
 
-    public TexasRound(int id, String roomId, List<UserPlayer> users, TexasEventHandler eventHandler) {
+    public TexasRound(int id, String roomId, List<UserPlayer> users, RoundEventHandler eventHandler) {
         this.id = id;
         this.logpre = "[" + roomId + " - " + id + "]";
         this.users = users;
@@ -128,7 +128,7 @@ public class TexasRound {
      */
     private void moveNextOp() {
         this.operator = this.getPlayerBySeatId(game.operator().getId());
-        this.opEvent = new ScheduledEvent(() -> this.onOpTimeout(), 3 * 1000);
+        this.opEvent = new ScheduledEvent(() -> this.onOpTimeout(), TIMEOUT_ACTION);
         this.eventHandler.trigger(this, RoundEvent.OPERATOR);
         log.info("{}轮到下一位进行押注 uid={} seatId={}", logpre, this.operator.user.getId(), this.operator.seatId);
     }
@@ -145,7 +145,7 @@ public class TexasRound {
 
         this.updateHand();
 
-        int time = this.game.circle().equals(Circle.FLOP) ? 2300 : 1300;
+        int time = this.game.circle().equals(Circle.FLOP) ? TIMEOUT_MOVE_CIRCLE : TIMEOUT_MOVE_CIRCLE - 1000;
         this.opEvent = new ScheduledEvent(() -> this.moveNextOp(), time);
     }
 
@@ -202,7 +202,7 @@ public class TexasRound {
      * 更新手牌
      */
     private void updateHand() {
-        this.eventHandler.trigger(this, RoundEvent.UPDATE_HAND);
+        this.eventHandler.trigger(this, RoundEvent.HAND);
     }
 
 

@@ -15,7 +15,7 @@ public class Desk {
 
     private final Map<String, User> audience = new HashMap<>();
 
-    private final TexasEventHandler handler;
+    private final RoundEventHandler handler;
 
     private TexasRound round;
 
@@ -27,7 +27,7 @@ public class Desk {
 
     public Desk(int capacity) {
         seats = new User[capacity];
-        handler = new TexasEventHandler(this::onShowdown, this::send, this::send);
+        handler = new RoundEventHandler(this::onShowdown, this::send, this::send);
 
     }
 

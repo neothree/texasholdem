@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
  * @author: neo
  * @create: 2022-08-09 16:50
  */
-public class TexasEventHandler {
+public class RoundEventHandler {
 
     private final Runnable onShowdown;
 
@@ -20,7 +20,7 @@ public class TexasEventHandler {
 
     private final BiConsumer<String, Object> single;
 
-    public TexasEventHandler(Runnable onShowdown,
+    public RoundEventHandler(Runnable onShowdown,
                              Consumer<Object> broadcast,
                              BiConsumer<String, Object> single) {
         this.onShowdown = onShowdown;
@@ -36,7 +36,7 @@ public class TexasEventHandler {
             case ACTION:
                 this.onAction(round);
                 break;
-            case UPDATE_HAND:
+            case HAND:
                 this.onUpdateHand(round);
                 break;
             case OPERATOR:
