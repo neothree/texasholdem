@@ -2,6 +2,7 @@ package com.texasthree.zone.room;
 
 import com.texasthree.game.texas.Card;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -108,6 +109,23 @@ public class TexasEventHandler {
     }
 
     private void onShowdown() {
+        var round = this.desk.getRound();
+        var result = round.getResult();
+        var info = new Protocal.Showdown();
+        info.winners = new ArrayList<>(result.getWinners());
+        info.hands = new ArrayList<>();
+        for (var v : result.playersMap.values()) {
+            var h = new Protocal.Hand();
+//            h.cards = toCardIds(v.getCardList());
+            h.cards = new ArrayList<>();
+            h.cards.add(21);
+            h.cards.add(121);
+            var sh = new Protocal.ShowdownHand();
+            sh.seatId = v.getId();
+            sh.hand = h;
+            info.hands.add(sh);
+        }
+        this.desk.send(info);
         desk.onShowdown();
     }
 

@@ -127,7 +127,7 @@ public class TexasRound {
      */
     private void moveNextOp() {
         this.operator = this.getPlayerBySeatId(game.operator().getId());
-        this.opEvent = new ScheduledEvent(() -> this.onOpTimeout(), 15 * 1000);
+        this.opEvent = new ScheduledEvent(() -> this.onOpTimeout(), 3 * 1000);
         this.eventHandler.trigger(this, RoundEvent.OPERATOR);
         log.info("{}轮到下一位进行押注 uid={} seatId={}", logpre, this.operator.user.getId(), this.operator.seatId);
     }
@@ -241,6 +241,10 @@ public class TexasRound {
 
     public UserPlayer getOperator() {
         return this.operator;
+    }
+
+    public Result getResult() {
+        return this.game.makeResult();
     }
 
     public Action getLastAction() {

@@ -399,7 +399,7 @@ public class Texas {
         this.freshHand();
     }
 
-    Result makeResult() {
+    public Result makeResult() {
         var result = new Result();
         var open = this.showCardStrategy();
         var allBet = this.pot.playerBetChips();

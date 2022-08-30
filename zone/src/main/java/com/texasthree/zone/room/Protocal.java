@@ -44,7 +44,6 @@ public class Protocal {
         public Player player;
     }
 
-
     public static class Action {
         public String op;
         public Integer seatId;
@@ -66,7 +65,6 @@ public class Protocal {
         public List<Integer> key;
     }
 
-
     public static class Start {
         public Integer sbSeatId;
         public Integer bbSeatId;
@@ -81,4 +79,15 @@ public class Protocal {
         public List<Integer> communityCards;
         public List<Integer> pots;
     }
+
+    public static class Showdown {
+        public List<Integer> winners;
+        public List<ShowdownHand> hands;
+    }
+
+    public static class ShowdownHand {
+        public Integer seatId;
+        public Hand hand;
+    }
+
 }
