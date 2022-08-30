@@ -24,9 +24,10 @@ class TexasRoundTest {
             user.setChips(100);
             users.add(new UserPlayer(i, user));
         }
-        var desk = new Desk(9);
-        var round = new TexasRound("12311", users, new TexasEventHandler(desk));
 
+        var id = 12;
+        var round = new TexasRound(id, "12311", users, new TexasEventHandler(new Desk(9)));
+        assertEquals(id, round.getId());
 
         // PREFLOP
         var dealer = users.get(0).seatId;

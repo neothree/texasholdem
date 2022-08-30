@@ -21,7 +21,7 @@ public class TexasRound {
     final static int TIMEOUT_MOVE_ACTION = 500;
     final static int TIMEOUT_MOVE_CIRCLE = 2000;
 
-    private final int id = 1;
+    private final int id ;
 
     private final String logpre;
 
@@ -48,7 +48,8 @@ public class TexasRound {
 
     private Action lastAction;
 
-    public TexasRound(String roomId, List<UserPlayer> users, TexasEventHandler eventHandler) {
+    public TexasRound(int id, String roomId, List<UserPlayer> users, TexasEventHandler eventHandler) {
+        this.id = id;
         this.logpre = "[" + roomId + " - " + id + "]";
         this.users = users;
         this.eventHandler = eventHandler;
@@ -303,5 +304,9 @@ public class TexasRound {
 
     public List<Integer> getPots() {
         return game.getPots();
+    }
+
+    public int getId() {
+        return id;
     }
 }

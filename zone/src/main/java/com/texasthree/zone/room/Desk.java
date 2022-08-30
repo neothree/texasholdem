@@ -23,6 +23,8 @@ public class Desk {
 
     private ScheduledEvent opEvent;
 
+    private int roundNum;
+
     public Desk(int capacity) {
         seats = new User[capacity];
     }
@@ -71,6 +73,11 @@ public class Desk {
      * 尝试开局
      */
     private void tryStart() {
+        if (roundNum >= 10) {
+            log.info("已经进行了 10 局比赛，不再开启");
+            return;
+        }
+
         // 已经有牌局
         if (running()) {
             return;
@@ -89,6 +96,7 @@ public class Desk {
      * 牌局开始
      */
     private void start() {
+        this.roundNum++;
         log.info("开始牌局");
         var users = new ArrayList<UserPlayer>();
         for (var i = 0; i < this.seats.length; i++) {
@@ -99,11 +107,12 @@ public class Desk {
             }
         }
 
-        this.round = new TexasRound("333111", users, handler);
+        this.round = new TexasRound(roundNum, "333111", users, handler);
         try {
             this.round.start(users.get(0).seatId);
         } catch (Exception e) {
             e.printStackTrace();
+            log.info("启动牌局失败");
             this.round = null;
         }
     }
@@ -177,4 +186,7 @@ public class Desk {
         return this.round;
     }
 
+    public int getRoundNum() {
+        return roundNum;
+    }
 }
