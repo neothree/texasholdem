@@ -55,6 +55,7 @@ public class Zone {
     private Room room;
 
     public Room newRoom() {
+        room.dispose();
         room = null;
         return getRoom();
     }

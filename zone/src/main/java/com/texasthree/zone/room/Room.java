@@ -78,6 +78,11 @@ public class Room {
         return capacity;
     }
 
+    public void dispose() {
+        log.info("房间解散");
+        roomMap.remove(id);
+    }
+
     public Protocal.RoomData data() {
         var info = new Protocal.RoomData();
         info.id = id;

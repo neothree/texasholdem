@@ -23,4 +23,13 @@ class RoomTest {
         assertEquals(1, data.seats.size());
         assertEquals(seatId, data.seats.get(0).seatId);
     }
+
+    @Test
+    void testDispose() throws Exception {
+        var room = new Room(StringUtils.get10UUID(), 8);
+        assertNotNull(Room.getRoom(room.getId()));
+
+        room.dispose();
+        assertNull(Room.getRoom(room.getId()));
+    }
 }
