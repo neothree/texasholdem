@@ -15,7 +15,7 @@ public class Desk {
 
     private final Map<String, User> audience = new HashMap<>();
 
-    private final TexasEventHandler handler = new TexasEventHandler(this);
+    private final TexasEventHandler handler;
 
     private TexasRound round;
 
@@ -27,6 +27,8 @@ public class Desk {
 
     public Desk(int capacity) {
         seats = new User[capacity];
+        handler = new TexasEventHandler(this::onShowdown, this::send, this::send);
+
     }
 
     public void addUser(User user) {
@@ -49,7 +51,7 @@ public class Desk {
         seats[seatId] = user;
         this.audience.remove(user.getId());
 
-        handler.onSeat(seatId);
+        this.onSeat(seatId);
 
         this.tryStart();
     }
@@ -64,10 +66,25 @@ public class Desk {
                 log.info("玩家站起 id={} name={} seatId={}", user.getId(), user.getName(), i);
                 this.audience.put(user.getId(), user);
                 seats[i] = null;
-                handler.onSeat(i);
+                this.onSeat(i);
             }
         }
     }
+
+    private void onSeat(int seatId) {
+        var info = new Protocal.Seat();
+        info.seatId = seatId;
+        var user = this.getSeats()[seatId];
+        if (user != null) {
+            var p = new Protocal.Player();
+            p.uid = user.getId();
+            p.name = user.getName();
+            p.chips = user.getChips();
+            info.player = p;
+        }
+        this.send(info);
+    }
+
 
     /**
      * 尝试开局

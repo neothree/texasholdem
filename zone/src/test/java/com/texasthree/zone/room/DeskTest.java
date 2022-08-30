@@ -62,10 +62,12 @@ class DeskTest {
     @Test
     void testRestart() throws Exception {
         var desk = new Desk(9);
+        assertEquals(0, desk.getRoundNum());
         desk.sitDown(Tester.createUser(), 0);
         desk.sitDown(Tester.createUser(), 1);
         desk.force();
         assertTrue(desk.running());
+        assertEquals(1, desk.getRoundNum());
         desk.force();
 
         desk.onShowdown();
@@ -75,5 +77,6 @@ class DeskTest {
         desk.force();
         desk.force();
         assertTrue(desk.running());
+        assertEquals(2, desk.getRoundNum());
     }
 }

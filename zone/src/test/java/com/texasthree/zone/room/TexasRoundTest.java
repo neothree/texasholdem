@@ -26,7 +26,10 @@ class TexasRoundTest {
         }
 
         var id = 12;
-        var round = new TexasRound(id, "12311", users, new TexasEventHandler(new Desk(9)));
+        var round = new TexasRound(id, "12311", users, new TexasEventHandler(() -> {
+        }, (v) -> {
+        }, (v, s) -> {
+        }));
         assertEquals(id, round.getId());
 
         // PREFLOP
