@@ -71,7 +71,6 @@ public class Desk {
      * 尝试开局
      */
     private void tryStart() {
-
         // 已经有牌局
         if (running()) {
             return;
@@ -109,15 +108,25 @@ public class Desk {
         }
     }
 
+
+    public void onShowdown() {
+        log.info("桌子一局结束");
+        this.round = null;
+        this.opEvent = new ScheduledEvent(() -> tryStart(), 3000);
+    }
+
     public void loop() {
         if (this.opEvent != null) {
-            var run = this.opEvent.check();
-            if (run) {
-                this.opEvent = null;
-            }
+            this.opEvent.check();
         }
         if (this.round != null) {
             this.round.loop();
+        }
+    }
+
+    public void force() {
+        if (this.opEvent != null) {
+            this.opEvent.force();
         }
     }
 
@@ -159,9 +168,6 @@ public class Desk {
         return round != null;
     }
 
-    public void onShowdown() {
-        log.info("桌子一局结束");
-    }
 
     public User[] getSeats() {
         return Arrays.copyOf(seats, seats.length);

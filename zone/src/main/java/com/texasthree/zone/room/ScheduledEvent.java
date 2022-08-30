@@ -16,13 +16,10 @@ public class ScheduledEvent {
         this.nextMsec = System.currentTimeMillis() + delay;
     }
 
-    public boolean check() {
+    public void check() {
         if (!done && System.currentTimeMillis() >= nextMsec) {
-            this.done = true;
-            this.command.run();
-            return true;
+            this.run();
         }
-        return false;
     }
 
     public long getNextMsec() {
@@ -31,8 +28,13 @@ public class ScheduledEvent {
 
     public void force() {
         if (!done) {
-            this.done = true;
-            this.command.run();
+            this.run();
         }
     }
+
+    private void run() {
+        this.done = true;
+        this.command.run();
+    }
+
 }
