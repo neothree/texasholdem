@@ -21,16 +21,13 @@ public class TexasRound {
     final static int TIMEOUT_MOVE_ACTION = 500;
     final static int TIMEOUT_MOVE_CIRCLE = 2300;
 
-    private final int id ;
+    private final int id;
 
     private final String logpre;
 
     private Texas game;
 
-    /**
-     * 计时器
-     */
-    private ScheduledEvent opEvent;
+    private ScheduledEventChecker checker = new ScheduledEventChecker();
     /**
      * 正在操作的玩家
      */
@@ -73,8 +70,7 @@ public class TexasRound {
                 .build();
         var move = this.game.start();
         this.printStart();
-
-        this.opEvent = new ScheduledEvent(() -> this.move(move), 2000);
+        this.checker.once(() -> this.move(move), 2000);
         this.eventHandler.trigger(this, RoundEvent.START_GAME);
         this.updateHand();
     }
@@ -94,7 +90,6 @@ public class TexasRound {
         log.info("{}玩家押注 seatId={} op={}", logpre, operator.seatId, action.op);
         var move = this.game.action(action.op, action.chipsAdd);
         this.lastAction = this.game.getAction(this.operator.seatId);
-        this.opEvent = null;
         this.operator = null;
         this.eventHandler.trigger(this, RoundEvent.ACTION);
 
@@ -102,9 +97,9 @@ public class TexasRound {
             // Check 没有动画，不需要延时，直接下一个操作
             this.move(move);
         } else if (Optype.Fold.equals(action.op)) {
-            this.opEvent = new ScheduledEvent(() -> this.move(move), TIMEOUT_MOVE_FOLD);
+            this.checker.once(() -> this.move(move), TIMEOUT_MOVE_FOLD);
         } else {
-            this.opEvent = new ScheduledEvent(() -> this.move(move), TIMEOUT_MOVE_ACTION);
+            this.checker.once(() -> this.move(move), TIMEOUT_MOVE_ACTION);
         }
     }
 
@@ -127,7 +122,7 @@ public class TexasRound {
      */
     private void moveNextOp() {
         this.operator = this.getPlayerBySeatId(game.operator().getId());
-        this.opEvent = new ScheduledEvent(() -> this.onOpTimeout(), TIMEOUT_ACTION);
+        this.checker.once(this::onOpTimeout, TIMEOUT_ACTION);
         this.eventHandler.trigger(this, RoundEvent.OPERATOR);
         log.info("{}轮到下一位进行押注 uid={} seatId={}", logpre, this.operator.user.getId(), this.operator.seatId);
     }
@@ -145,7 +140,7 @@ public class TexasRound {
         this.updateHand();
 
         int time = this.game.circle().equals(Circle.FLOP) ? TIMEOUT_MOVE_CIRCLE : TIMEOUT_MOVE_CIRCLE - 1000;
-        this.opEvent = new ScheduledEvent(() -> this.moveNextOp(), time);
+        this.checker.once(this::moveNextOp, time);
     }
 
     /**
@@ -156,7 +151,7 @@ public class TexasRound {
      */
     private void moveShowdown() {
         this.printShowdown();
-        this.opEvent = null;
+        this.checker.clear();
         this.operator = null;
         this.isOver = true;
         this.eventHandler.trigger(this, RoundEvent.SHOWDOWN);
@@ -256,13 +251,6 @@ public class TexasRound {
         return this.game.authority();
     }
 
-    public int opLeftSec() {
-        if (opEvent == null) {
-            return 0;
-        }
-        return (int) ((opEvent.getNextMsec() - System.currentTimeMillis()) / 1000);
-    }
-
     public String circle() {
         return game.circle();
     }
@@ -286,15 +274,7 @@ public class TexasRound {
     }
 
     public void loop() {
-        if (opEvent != null) {
-            this.opEvent.check();
-        }
-    }
-
-    public void force() {
-        if (this.opEvent != null) {
-            this.opEvent.force();
-        }
+        this.checker.check();
     }
 
     public List<Card> getCommunityCards() {
@@ -307,5 +287,13 @@ public class TexasRound {
 
     public int getId() {
         return id;
+    }
+
+    public int leftSec() {
+        return this.checker.leftSec();
+    }
+
+    public void force() {
+        this.checker.force();
     }
 }

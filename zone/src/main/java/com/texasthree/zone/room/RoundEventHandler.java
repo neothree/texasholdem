@@ -126,7 +126,7 @@ public class RoundEventHandler {
 
     private void onOperator(TexasRound round) {
         var info = new Protocal.Operator();
-        info.leftSec = round.opLeftSec();
+        info.leftSec = round.leftSec();
         info.seatId = round.getOperator().seatId;
         info.actions = round.authority()
                 .entrySet().stream()

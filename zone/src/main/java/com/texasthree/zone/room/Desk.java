@@ -21,9 +21,9 @@ public class Desk {
 
     private Server server;
 
-    private ScheduledEvent opEvent;
-
     private int roundNum;
+
+    private ScheduledEventChecker checker = new ScheduledEventChecker();
 
     public Desk(int capacity) {
         seats = new User[capacity];
@@ -106,7 +106,7 @@ public class Desk {
         }
 
         // 准备开始
-        this.opEvent = new ScheduledEvent(() -> start(), 2000);
+        this.checker.once(this::start, 2000);
     }
 
     /**
@@ -138,21 +138,13 @@ public class Desk {
     public void onShowdown() {
         log.info("桌子一局结束");
         this.round = null;
-        this.opEvent = new ScheduledEvent(() -> tryStart(), 3000);
+        this.checker.once(this::tryStart, 3000);
     }
 
     public void loop() {
-        if (this.opEvent != null) {
-            this.opEvent.check();
-        }
+        this.checker.check();
         if (this.round != null) {
             this.round.loop();
-        }
-    }
-
-    public void force() {
-        if (this.opEvent != null) {
-            this.opEvent.force();
         }
     }
 
@@ -205,5 +197,9 @@ public class Desk {
 
     public int getRoundNum() {
         return roundNum;
+    }
+
+    public void force() {
+        this.checker.force();
     }
 }
