@@ -262,8 +262,7 @@ public class Texas {
      * 强制盲注
      */
     private String actionStraddle() {
-        var act = Action.straddleBlind(this.straddleBlind());
-        return this.action(act);
+        return this.action(Optype.Raise, this.straddleBlind(), true);
     }
 
     /**
@@ -274,19 +273,27 @@ public class Texas {
     }
 
     public String action(Action action) {
+        return this.action(action.op, action.chipsAdd, action.straddle);
+    }
+
+    public String action(Optype op, int chipsAdd) {
+        return this.action(op, chipsAdd, false);
+    }
+
+    private String action(Optype op, int chipsAdd, boolean straddle) {
         if (this.isOver) {
             return null;
         }
 
         // 执行下注
-        this.pot.action(this.operator(), action, true);
+        this.pot.action(this.operator(), op, chipsAdd, straddle, true);
 
         // 轮转
         var move = this.transit();
 
         // 如果下一位玩家离开则自动弃牌
         if (Texas.STATE_NEXT_OP.equals(move) && this.operator().isLeave()) {
-            move = this.action(Action.fold());
+            move = this.action(Optype.Fold, 0, false);
         }
 
         return move;
@@ -344,7 +351,7 @@ public class Texas {
         this.freshHand();
 
         if (this.operator().isLeave()) {
-            this.action(Action.fold());
+            this.action(Optype.Fold, 0, false);
         }
     }
 
@@ -376,7 +383,7 @@ public class Texas {
 
         // 如果是正在押注玩家直接弃牌
         if (this.operator().equals(player)) {
-            return this.action(Action.fold());
+            return this.action(Optype.Fold, 0, false);
         }
 
         // 只剩下一个人，结束

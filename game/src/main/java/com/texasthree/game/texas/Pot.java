@@ -64,18 +64,16 @@ class Pot {
         }
         var chipsBet = Math.min(dealer.getChips(), ante);
         dealer.changeChips(-chipsBet);
-        var action = new Action(dealer.getId(), Optype.DealerAnte, chipsBet, chipsBet, 0, 0);
-        this.action(dealer, action, false);
+        this.action(dealer, Optype.DealerAnte, chipsBet, false, false);
     }
 
-    void action(Player player, Action act, boolean check) {
-        act.sumPot = this.sumPot();
-        this.going.action(player, act, this.smallBind, check);
+    void action(Player player, Optype op, int chipsAdd, boolean straddle, boolean check) {
+        this.going.action(player, op, chipsAdd, straddle, this.sumPot(), this.smallBind, check);
 
         // 弃牌 和 allin
-        if (Optype.Fold.equals(act.op)) {
+        if (Optype.Fold.equals(op)) {
             this.fold.add(player.getId());
-        } else if (Optype.Allin.equals(act.op)) {
+        } else if (Optype.Allin.equals(op)) {
             this.allin.add(player.getId());
         }
     }

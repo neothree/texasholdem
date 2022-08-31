@@ -98,7 +98,7 @@ public class TexasRound {
         this.opEvent = null;
         this.operator = null;
 
-        var move = this.game.action(action);
+        var move = this.game.action(action.op, action.chipsAdd);
         if (Optype.Check.equals(action.op)) {
             // Check 没有动画，不需要延时，直接下一个操作
             this.move(move);

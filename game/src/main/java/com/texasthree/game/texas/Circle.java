@@ -90,9 +90,11 @@ public class Circle {
         }
     }
 
-    void action(Player player, Action act, int smallBlind, boolean check) {
+    void action(Player player, Optype op, int chipsAdd, boolean straddle, int sumPot, int smallBlind, boolean check) {
         // 解析
-        act = this.parseAction(player, act);
+        var act = this.parseAction(player, op, chipsAdd);
+        act.straddle = straddle;
+        act.sumPot = sumPot;
         if (check) {
             var auth = this.auth(player, smallBlind, act.sumPot);
             if (!auth.containsKey(act.op) ||
@@ -131,28 +133,22 @@ public class Circle {
     /**
      * 将action中的数据补充完整
      */
-    private Action parseAction(Player player, Action action) {
-        if (action.op == null) {
-            throw new IllegalArgumentException();
-        }
+    private Action parseAction(Player player, Optype op, int add) {
         var chipsBetOld = this.chipsThisCircle(player.getId());
         var chipsBet = chipsBetOld;
         var chipsLeft = player.getChips();
-        if (Optype.Raise.equals(action.op) || Optype.DealerAnte.equals(action.op)) {
-            chipsBet = chipsBetOld + action.chipsAdd;
-        } else if (Optype.Allin.equals(action.op)) {
+        if (Optype.Raise.equals(op) || Optype.DealerAnte.equals(op)) {
+            chipsBet = chipsBetOld + add;
+        } else if (Optype.Allin.equals(op)) {
             chipsBet = chipsBetOld + chipsLeft;
-        } else if (Optype.Call.equals(action.op)) {
+        } else if (Optype.Call.equals(op)) {
             chipsBet = this.getStandard();
         }
         var chipsAdd = chipsBet - chipsBetOld;
         if (chipsAdd > player.getChips()) {
-            throw new IllegalArgumentException("action=" + action + "\n" + "player=" + player);
+            throw new IllegalArgumentException("押注余额不足");
         }
-        var ret = new Action(player.getId(), action.op, chipsBet, chipsAdd, chipsLeft, action.sumPot);
-        ret.straddle = action.straddle;
-        return ret;
-
+        return new Action(player.getId(), op, chipsBet, chipsAdd, chipsLeft, 0);
     }
 
     int chipsThisCircle(int id) {
