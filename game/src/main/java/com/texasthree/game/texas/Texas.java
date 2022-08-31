@@ -783,4 +783,8 @@ public class Texas {
         }
         return auth;
     }
+
+    public Action getAction(int id) {
+        return this.pot.getAction(id);
+    }
 }

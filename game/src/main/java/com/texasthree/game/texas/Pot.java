@@ -305,5 +305,17 @@ class Pot {
         var chips = action != null ? action.chipsBet : 0;
         this.going.setStandardInfo(new Action(id, null, chips, 0, 0, 0));
     }
+
+    Action getAction(int id) {
+        var cs = new ArrayList<>(circles);
+        Collections.reverse(cs);
+        for (var v : cs) {
+            var act = v.getAction(id);
+            if (act != null) {
+                return act;
+            }
+        }
+        return null;
+    }
 }
 

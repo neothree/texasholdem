@@ -92,13 +92,12 @@ public class TexasRound {
             return;
         }
         log.info("{}玩家押注 seatId={} op={}", logpre, operator.seatId, action.op);
-        this.lastAction = action;
-        this.eventHandler.trigger(this, RoundEvent.ACTION);
-
+        var move = this.game.action(action.op, action.chipsAdd);
+        this.lastAction = this.game.getAction(this.operator.seatId);
         this.opEvent = null;
         this.operator = null;
+        this.eventHandler.trigger(this, RoundEvent.ACTION);
 
-        var move = this.game.action(action.op, action.chipsAdd);
         if (Optype.Check.equals(action.op)) {
             // Check 没有动画，不需要延时，直接下一个操作
             this.move(move);
