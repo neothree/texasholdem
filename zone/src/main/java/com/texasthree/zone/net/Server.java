@@ -84,7 +84,7 @@ public class Server {
      * 发送消息给玩家
      */
     public void send(String uid, String msg) {
-        log.info("{} {}", uid, msg);
+        log.info("{}", msg);
         var destination = USER_DESTINATION + "/" + uid;
         this.messagingTemplate.convertAndSend(destination, msg);
     }

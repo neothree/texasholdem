@@ -16,7 +16,7 @@ public class TexasRound {
 
     private static Logger log = LoggerFactory.getLogger(TexasRound.class);
 
-    final static int TIMEOUT_ACTION = 15000;
+    final static int TIMEOUT_ACTION = 5000;
     final static int TIMEOUT_MOVE_FOLD = 800;
     final static int TIMEOUT_MOVE_ACTION = 500;
     final static int TIMEOUT_MOVE_CIRCLE = 2300;
