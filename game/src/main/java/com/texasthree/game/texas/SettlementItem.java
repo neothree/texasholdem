@@ -8,7 +8,7 @@ import java.util.Map;
  * @author: neo
  * @create: 2021-06-14 10:50
  */
-public class ResultPlayer {
+public class SettlementItem {
     Integer id;
     /**
      * 总押注

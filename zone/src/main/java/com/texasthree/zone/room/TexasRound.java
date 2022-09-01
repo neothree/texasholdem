@@ -232,8 +232,8 @@ public class TexasRound {
         return this.operator;
     }
 
-    public Result getResult() {
-        return this.game.makeResult();
+    public Settlement settle() {
+        return this.game.settle();
     }
 
     public Action getLastAction() {

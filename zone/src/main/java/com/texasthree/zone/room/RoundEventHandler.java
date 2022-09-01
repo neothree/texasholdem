@@ -105,7 +105,7 @@ public class RoundEventHandler {
     }
 
     private void onShowdown(TexasRound round) {
-        var result = round.getResult();
+        var result = round.settle();
         var info = new Protocal.Showdown();
         info.winners = new ArrayList<>(result.getWinners());
         info.hands = new ArrayList<>();

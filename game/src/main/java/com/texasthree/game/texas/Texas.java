@@ -406,12 +406,12 @@ public class Texas {
         this.freshHand();
     }
 
-    public Result makeResult() {
-        var result = new Result();
+    public Settlement settle() {
+        var result = new Settlement();
         var open = this.showCardStrategy();
         var allBet = this.pot.playerBetChips();
         for (var v : this.ring.toList()) {
-            var info = new ResultPlayer();
+            var info = new SettlementItem();
             info.setId(v.getId());
             info.setBetSum(allBet.getOrDefault(v.getId(), 0));
             info.cardShow = open.contains(v);

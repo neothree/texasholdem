@@ -12,11 +12,11 @@ import java.util.stream.Collectors;
  * @author: neo
  * @create: 2021-06-14 10:46
  */
-public class Result implements Iterable<ResultPlayer> {
+public class Settlement implements Iterable<SettlementItem> {
 
-    private List<ResultPlayer> players = new ArrayList<>();
+    private List<SettlementItem> players = new ArrayList<>();
 
-    public void add(ResultPlayer p) {
+    public void add(SettlementItem p) {
         this.players.add(p);
     }
 
@@ -24,16 +24,16 @@ public class Result implements Iterable<ResultPlayer> {
         return this.players
                 .stream()
                 .filter(v -> v.getWin() > 0)
-                .map(ResultPlayer::getId)
+                .map(SettlementItem::getId)
                 .collect(Collectors.toSet());
     }
 
-    public ResultPlayer getPlayer(int id) {
+    public SettlementItem getPlayer(int id) {
         return this.players.stream().filter(v -> v.id == id).findFirst().get();
     }
 
     @Override
-    public Iterator<ResultPlayer> iterator() {
+    public Iterator<SettlementItem> iterator() {
         return players.iterator();
     }
 
