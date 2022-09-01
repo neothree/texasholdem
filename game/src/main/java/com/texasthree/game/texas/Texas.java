@@ -10,39 +10,6 @@ import java.util.stream.Collectors;
  * 德扑牌局
  */
 public class Texas {
-    /**
-     * 轮到下一个操作位
-     */
-    public static final String STATE_NEXT_OP = "STATE_NEXT_OP";
-
-    public static final String STATE_CIRCLE_END = "STATE_CIRCLE_END";
-
-    public static final String STATE_SHOWDOWN = "STATE_SHOWDOWN";
-    /**
-     * 是否结束
-     */
-    private boolean isOver;
-    /**
-     * 底池
-     */
-    private Pot pot;
-    /**
-     * 玩家人数
-     */
-    private final int playerNum;
-    /**
-     * 桌面
-     */
-    private List<Card> communityCards;
-    /**
-     * 规则
-     */
-    private Map<Regulation, Integer> regulations;
-    /**
-     * 玩家的位置
-     */
-    private Ring<Player> ring;
-
     public static Texas.Builder builder() {
         return new Texas.Builder();
     }
@@ -200,6 +167,39 @@ public class Texas {
             }
         }
     }
+
+    /**
+     * 轮到下一个操作位
+     */
+    public static final String STATE_NEXT_OP = "STATE_NEXT_OP";
+
+    public static final String STATE_CIRCLE_END = "STATE_CIRCLE_END";
+
+    public static final String STATE_SHOWDOWN = "STATE_SHOWDOWN";
+    /**
+     * 是否结束
+     */
+    private boolean isOver;
+    /**
+     * 底池
+     */
+    private Pot pot;
+    /**
+     * 玩家人数
+     */
+    private final int playerNum;
+    /**
+     * 桌面
+     */
+    private List<Card> communityCards;
+    /**
+     * 规则
+     */
+    private Map<Regulation, Integer> regulations;
+    /**
+     * 玩家的位置
+     */
+    private Ring<Player> ring;
 
 
     private Texas(Map<Regulation, Integer> regulations, Ring<Player> ring, List<Card> leftCard) {
@@ -407,132 +407,9 @@ public class Texas {
     }
 
     public Settlement settle() {
-        var result = new Settlement();
-        var open = this.showCardStrategy();
-        var allBet = this.pot.playerBetChips();
-        for (var v : this.ring.toList()) {
-            var info = new SettlementItem();
-            info.setId(v.getId());
-            info.setBetSum(allBet.getOrDefault(v.getId(), 0));
-            info.cardShow = open.contains(v);
-            result.add(info);
-        }
-
-        // 单池返回的钱
-        var refundPlayer = this.pot.refundPlayer();
-        if (refundPlayer != null) {
-            result.getPlayer(refundPlayer.getId()).refund = refundPlayer.getChips();
-        }
-
-        // 最后从池里的输赢
-        var shares = this.share();
-        result.forEach(v -> v.pot = shares.getOrDefault(v.id, new HashMap<>()));
-
-        // 押注统计
-        var stats = this.pot.makeBetStatistic(result.getWinners());
-        result.forEach(v -> v.statistic = stats.getOrDefault(v.id, new Statistic()));
-        return result;
-    }
-
-    private Map<Integer, Map<Integer, Integer>> share() {
         this.freshHand();
-
-        var divide = this.pot.divides();
-        var ret = new HashMap<Integer, Map<Integer, Integer>>();
-        var inGameNum = this.ring.toList().stream().filter(Player::inGame).count();
-        // 只剩下一个玩家没有离开,不用经过比牌,全部给他
-        if (inGameNum == 1) {
-            var give = new HashMap<Integer, Integer>();
-            for (var i = 0; i < divide.size(); i++) {
-                give.put(i, divide.get(0).getChips());
-            }
-            var p = this.getPlayer(Player::inGame);
-            ret.put(p.getId(), give);
-            return ret;
-        }
-
-        // 有多个玩家,主池肯定有玩家比牌
-        Set<Integer> mainPotWinner = null;
-        for (var potId = 0; potId < divide.size(); potId++) {
-            var pot = divide.get(potId);
-            var members = pot.getMembers()
-                    .keySet()
-                    .stream()
-                    .map(key -> this.getPlayerById(key))
-                    .filter(Player::inGame)
-                    .collect(Collectors.toSet());
-
-            var index = potId;
-            if (!members.isEmpty()) {
-                // 有玩家比牌, 正常计算输赢
-                var winner = winners(members);
-                if (potId == 0) {
-                    mainPotWinner = winner;
-                }
-                var singleWin = this.singlePotWinChips(winner, pot.getChips());
-                singleWin.forEach((k, v) -> {
-                    var give = ret.getOrDefault(k, new HashMap<>());
-                    give.put(index, v);
-                    ret.put(k, give);
-                });
-            } else {
-                // 没有人了，主池玩家平分
-                var average = (int) Math.floor(pot.getChips() / mainPotWinner.size());
-                mainPotWinner.forEach(k -> {
-                    var give = ret.getOrDefault(k, new HashMap<>());
-                    give.put(index, average);
-                    ret.put(k, give);
-                });
-            }
-        }
-        return ret;
-    }
-
-    private Map<Integer, Integer> singlePotWinChips(Set<Integer> winner, int sum) {
-        // 如果只有一个赢家则全给他
-        var ret = new HashMap<Integer, Integer>();
-        if (winner.size() == 1) {
-            ret.put(winner.stream().findFirst().get(), sum);
-            return ret;
-        }
-
-        // 个池中的赢家都会分有至少averageChips 个筹码，
-        // 如果有 oneMoreNum 个筹码余下，则从小盲位开始分，靠后的玩家没有
-        var averageChips = (int) Math.floor(sum / winner.size());
-        var oneMoreNum = sum % winner.size();
-        var r = this.ring.move(v -> v.getId() == this.bbPlayer().getId());
-        for (var v : r.toList()) {
-            if (winner.contains(v.getId())) {
-                if (oneMoreNum > 0) {
-                    ret.put(v.getId(), averageChips + 1);
-                    oneMoreNum--;
-                } else {
-                    ret.put(v.getId(), averageChips);
-                }
-            }
-        }
-        return ret;
-    }
-
-    private Set<Integer> winners(Collection<Player> players) {
-        var winner = new HashSet<Integer>();
-        Player win = null;
-        for (var v : players) {
-            if (winner.isEmpty()) {
-                winner.add(v.getId());
-                win = v;
-            } else {
-                var com = v.getHand().compareTo(win.getHand());
-                if (com >= 1) {
-                    win = v;
-                    winner = new HashSet<>();
-                    winner.add(v.getId());
-                } else if (com == 0) {
-                    winner.add(v.getId());
-                }
-            }
-        }
-        return winner;
+        var open = this.showCardStrategy();
+        return this.pot.settle(this.ring, bbPlayer(), open);
     }
 
     /**
@@ -751,7 +628,7 @@ public class Texas {
         return this.getPlayer(v -> v.getId() == id);
     }
 
-    private Player getPlayer(Predicate<Player> filter) {
+    Player getPlayer(Predicate<Player> filter) {
         var r = this.ring.move(filter);
         return r != null ? r.value : null;
     }

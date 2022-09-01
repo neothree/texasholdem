@@ -183,10 +183,146 @@ class Pot {
         return divides;
     }
 
+    Settlement settle(Ring<Player> ring, Player bbPlayer, Set<Player> open) {
+        var result = new Settlement();
+        var allBet = this.playerBetChips();
+        for (var v : ring.toList()) {
+            var info = new SettlementItem();
+            info.setId(v.getId());
+            info.setBetSum(allBet.getOrDefault(v.getId(), 0));
+            info.cardShow = open.contains(v);
+            result.add(info);
+        }
+
+        // 单池返回的钱
+        var refundPlayer = this.refundPlayer();
+        if (refundPlayer != null) {
+            result.getPlayer(refundPlayer.getId()).refund = refundPlayer.getChips();
+        }
+
+        // 最后从池里的输赢
+
+        var shares = this.share(ring, bbPlayer);
+        result.forEach(v -> v.pot = shares.getOrDefault(v.id, new HashMap<>()));
+
+        // 押注统计
+        var stats = this.makeBetStatistic(result.getWinners());
+        result.forEach(v -> v.statistic = stats.getOrDefault(v.id, new Statistic()));
+        return result;
+    }
+
+    /**
+     * 计算奖池的分成
+     */
+    private Map<Integer, Map<Integer, Integer>> share(Ring<Player> ring, Player bbPlayer) {
+        var divide = this.divides();
+        var ret = new HashMap<Integer, Map<Integer, Integer>>();
+        var inGameNum = ring.toList().stream().filter(Player::inGame).count();
+        // 只剩下一个玩家没有离开,不用经过比牌,全部给他
+        if (inGameNum == 1) {
+            var give = new HashMap<Integer, Integer>();
+            for (var i = 0; i < divide.size(); i++) {
+                give.put(i, divide.get(0).getChips());
+            }
+            var p = ring.move(Player::inGame).value;
+            ret.put(p.getId(), give);
+            return ret;
+        }
+
+        // 有多个玩家,主池肯定有玩家比牌
+        Set<Integer> mainPotWinner = null;
+        for (var potId = 0; potId < divide.size(); potId++) {
+            var pot = divide.get(potId);
+            var members = pot.getMembers()
+                    .keySet()
+                    .stream()
+                    .map(v -> ring.move(p -> p.getId() == v).value)
+                    .filter(Player::inGame)
+                    .collect(Collectors.toSet());
+
+            var index = potId;
+            if (!members.isEmpty()) {
+                // 有玩家比牌, 正常计算输赢
+                var winner = winners(members);
+                if (potId == 0) {
+                    mainPotWinner = winner;
+                }
+                var singleWin = shareAmount(ring, winner, bbPlayer, pot.getChips());
+                singleWin.forEach((k, v) -> {
+                    var give = ret.getOrDefault(k, new HashMap<>());
+                    give.put(index, v);
+                    ret.put(k, give);
+                });
+            } else {
+                // 没有人了，主池玩家平分
+                var average = (int) Math.floor(pot.getChips() / mainPotWinner.size());
+                mainPotWinner.forEach(k -> {
+                    var give = ret.getOrDefault(k, new HashMap<>());
+                    give.put(index, average);
+                    ret.put(k, give);
+                });
+            }
+        }
+        return ret;
+    }
+
+
+    /**
+     * 对amount金额的进行分配
+     */
+    private Map<Integer, Integer> shareAmount(Ring<Player> ring, Set<Integer> winner, Player bbPlayer, int amount) {
+        // 如果只有一个赢家则全给他
+        var ret = new HashMap<Integer, Integer>();
+        if (winner.size() == 1) {
+            ret.put(winner.stream().findFirst().get(), amount);
+            return ret;
+        }
+
+        // 个池中的赢家都会分有至少averageChips 个筹码，
+        // 如果有 oneMoreNum 个筹码余下，则从小盲位开始分，靠后的玩家没有
+        var averageChips = (int) Math.floor(amount / winner.size());
+        var oneMoreNum = amount % winner.size();
+        var r = ring.move(v -> v.getId() == bbPlayer.getId());
+        for (var v : r.toList()) {
+            if (winner.contains(v.getId())) {
+                if (oneMoreNum > 0) {
+                    ret.put(v.getId(), averageChips + 1);
+                    oneMoreNum--;
+                } else {
+                    ret.put(v.getId(), averageChips);
+                }
+            }
+        }
+        return ret;
+    }
+
+
+    private Set<Integer> winners(Collection<Player> players) {
+        var winner = new HashSet<Integer>();
+        Player win = null;
+        for (var v : players) {
+            if (winner.isEmpty()) {
+                winner.add(v.getId());
+                win = v;
+            } else {
+                var com = v.getHand().compareTo(win.getHand());
+                if (com >= 1) {
+                    win = v;
+                    winner = new HashSet<>();
+                    winner.add(v.getId());
+                } else if (com == 0) {
+                    winner.add(v.getId());
+                }
+            }
+        }
+        return winner;
+    }
+
+
     /**
      * 押注统计信息
      */
-    Map<Integer, Statistic> makeBetStatistic(Set<Integer> winners) {
+    private Map<Integer, Statistic> makeBetStatistic(Set<Integer> winners) {
         var ret = new HashMap<Integer, Statistic>();
         var preflop = this.circles.stream()
                 .filter(v -> v.getCircle().equals(Circle.PREFLOP))
@@ -217,7 +353,7 @@ class Pot {
         return ret;
     }
 
-    Map<Integer, Integer> playerBetChips() {
+    private Map<Integer, Integer> playerBetChips() {
         var ret = new HashMap<Integer, Integer>();
         var list = circles.stream().map(Circle::playerBetChips).collect(Collectors.toList());
         list.add(anteBet);
