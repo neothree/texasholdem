@@ -14,14 +14,14 @@ import java.util.stream.Collectors;
  */
 public class Settlement implements Iterable<SettlementItem> {
 
-    private List<SettlementItem> players = new ArrayList<>();
+    private List<SettlementItem> items = new ArrayList<>();
 
-    public void add(SettlementItem p) {
-        this.players.add(p);
+    public void add(SettlementItem item) {
+        this.items.add(item);
     }
 
     public Set<Integer> getWinners() {
-        return this.players
+        return this.items
                 .stream()
                 .filter(v -> v.getWin() > 0)
                 .map(SettlementItem::getId)
@@ -29,15 +29,15 @@ public class Settlement implements Iterable<SettlementItem> {
     }
 
     public SettlementItem getPlayer(int id) {
-        return this.players.stream().filter(v -> v.id == id).findFirst().get();
+        return this.items.stream().filter(v -> v.id == id).findFirst().get();
     }
 
     @Override
     public Iterator<SettlementItem> iterator() {
-        return players.iterator();
+        return items.iterator();
     }
 
     public int size() {
-        return this.players.size();
+        return this.items.size();
     }
 }

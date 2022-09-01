@@ -171,8 +171,6 @@ public class TexasRound {
         log.info("{}压住超时: {}", logpre, this.operator.toString());
         var au = this.game.authority();
         var op = au.containsKey(Optype.Check) ? Optype.Check : Optype.Fold;
-        var action = Action.of(op);
-        action.id = this.operator.seatId;
         this.action(op, 0);
     }
 

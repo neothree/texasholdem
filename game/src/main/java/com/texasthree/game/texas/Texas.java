@@ -272,8 +272,8 @@ public class Texas {
         this.pot.actionDealerAnte(this.dealer(), this.ante());
     }
 
-    public String action(Action action) {
-        return this.action(action.op, action.chipsAdd, action.straddle);
+    public String action(Optype op) {
+        return this.action(op, 0, false);
     }
 
     public String action(Optype op, int chipsAdd) {
@@ -366,7 +366,7 @@ public class Texas {
     /**
      * 玩家离开
      */
-    String leave(Integer id) throws Exception {
+    String leave(Integer id) {
         var player = this.getPlayerById(id);
         if (player == null) {
             throw new IllegalArgumentException(id + " 不存在");
@@ -425,8 +425,8 @@ public class Texas {
         }
 
         // 最后从池里的输赢
-        var potWin = this.divideMoney();
-        result.forEach(v -> v.pot = potWin.getOrDefault(v.id, new HashMap<>()));
+        var shares = this.share();
+        result.forEach(v -> v.pot = shares.getOrDefault(v.id, new HashMap<>()));
 
         // 押注统计
         var stats = this.pot.makeBetStatistic(result.getWinners());
@@ -434,7 +434,7 @@ public class Texas {
         return result;
     }
 
-    private Map<Integer, Map<Integer, Integer>> divideMoney() {
+    private Map<Integer, Map<Integer, Integer>> share() {
         this.freshHand();
 
         var divide = this.pot.divides();

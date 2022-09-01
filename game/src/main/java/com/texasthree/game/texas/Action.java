@@ -37,40 +37,6 @@ public class Action {
         this.straddle = false;
     }
 
-    public static Action check() {
-        return Action.of(Optype.Check);
-    }
-
-    public static Action fold() {
-        return Action.of(Optype.Fold);
-    }
-
-    public static Action allin() {
-        return Action.of(Optype.Allin);
-    }
-
-    public static Action call() {
-        return Action.of(Optype.Call);
-    }
-
-    public static Action raise(int chipsAdd) {
-        return new Action(-1, Optype.Raise, 0, chipsAdd, 0, 0);
-    }
-
-    public static Action of(Optype op) {
-        return new Action(-1, op, 0, 0, 0, 0);
-    }
-
-    public static Action of(Optype op, int chipsBet) {
-        return new Action(-1, op, chipsBet, 0, 0, 0);
-    }
-
-    public static Action straddleBlind(int chipsAdd) {
-        var act = new Action(-1, Optype.Raise, 0, chipsAdd, 0, 0);
-        act.straddle = true;
-        return act;
-    }
-
     public boolean isInpot() {
         if (this.straddle) {
             return false;

@@ -45,18 +45,18 @@ public class TexasTest extends AllCard {
         texas.start();
 
         // 1 dealer 2 sb 3 bb
-        equalsCircle(4, makeAct(Optype.Call), Circle.PREFLOP, texas);
-        equalsCircle(5, makeAct(Optype.Call), Circle.PREFLOP, texas);
-        equalsCircle(1, makeAct(Optype.Call), Circle.PREFLOP, texas);
-        equalsCircle(2, makeAct(Optype.Fold), Circle.PREFLOP, texas);
-        equalsCircle(3, makeAct(Optype.Fold), Circle.PREFLOP, texas);
+        equalsCircle(4, Optype.Call, Circle.PREFLOP, texas);
+        equalsCircle(5, Optype.Call, Circle.PREFLOP, texas);
+        equalsCircle(1, Optype.Call, Circle.PREFLOP, texas);
+        equalsCircle(2, Optype.Fold, Circle.PREFLOP, texas);
+        equalsCircle(3, Optype.Fold, Circle.PREFLOP, texas);
 
-        equalsCircle(4, Action.raise(2), Circle.FLOP, texas);
-        equalsCircle(5, makeAct(Optype.Fold), Circle.FLOP, texas);
-        equalsCircle(1, makeAct(Optype.Call), Circle.FLOP, texas);
+        equalsCircle(4, Optype.Raise, 2, Circle.FLOP, texas);
+        equalsCircle(5, Optype.Fold, Circle.FLOP, texas);
+        equalsCircle(1, Optype.Call, Circle.FLOP, texas);
 
-        equalsCircle(4, makeAct(Optype.Check), Circle.TURN, texas);
-        equalsCircle(1, makeAct(Optype.Check), Circle.TURN, texas);
+        equalsCircle(4, Optype.Check, Circle.TURN, texas);
+        equalsCircle(1, Optype.Check, Circle.TURN, texas);
 
         assertEquals(Circle.RIVER, texas.circle());
 
@@ -65,18 +65,18 @@ public class TexasTest extends AllCard {
         texas = Texas.builder(5).build();
         texas.start();
 
-        equalsCircle(4, makeAct(Optype.Call), Circle.PREFLOP, texas);
-        equalsCircle(5, makeAct(Optype.Call), Circle.PREFLOP, texas);
-        equalsCircle(1, makeAct(Optype.Call), Circle.PREFLOP, texas);
-        equalsCircle(2, makeAct(Optype.Call), Circle.PREFLOP, texas);
-        equalsCircle(3, makeAct(Optype.Check), Circle.PREFLOP, texas);
+        equalsCircle(4, Optype.Call, Circle.PREFLOP, texas);
+        equalsCircle(5, Optype.Call, Circle.PREFLOP, texas);
+        equalsCircle(1, Optype.Call, Circle.PREFLOP, texas);
+        equalsCircle(2, Optype.Call, Circle.PREFLOP, texas);
+        equalsCircle(3, Optype.Check, Circle.PREFLOP, texas);
 
 
-        equalsCircle(2, makeAct(Optype.Fold), Circle.FLOP, texas);
-        equalsCircle(3, Action.raise(2), Circle.FLOP, texas);
-        equalsCircle(4, makeAct(Optype.Fold), Circle.FLOP, texas);
-        equalsCircle(5, makeAct(Optype.Fold), Circle.FLOP, texas);
-        equalsCircle(1, makeAct(Optype.Call), Circle.FLOP, texas);
+        equalsCircle(2, Optype.Fold, Circle.FLOP, texas);
+        equalsCircle(3, Optype.Raise, 2, Circle.FLOP, texas);
+        equalsCircle(4, Optype.Fold, Circle.FLOP, texas);
+        equalsCircle(5, Optype.Fold, Circle.FLOP, texas);
+        equalsCircle(1, Optype.Call, Circle.FLOP, texas);
 
         assertEquals(Circle.TURN, texas.circle());
 
@@ -84,12 +84,12 @@ public class TexasTest extends AllCard {
         texas = Texas.builder(5).build();
         texas.start();
 
-        equalsCircle(4, Action.raise(4), Circle.PREFLOP, texas);
-        equalsCircle(5, makeAct(Optype.Allin), Circle.PREFLOP, texas);
-        equalsCircle(1, makeAct(Optype.Allin), Circle.PREFLOP, texas);
-        equalsCircle(2, makeAct(Optype.Fold), Circle.PREFLOP, texas);
-        equalsCircle(3, makeAct(Optype.Allin), Circle.PREFLOP, texas);
-        equalsCircle(4, makeAct(Optype.Allin), Circle.PREFLOP, texas);
+        equalsCircle(4, Optype.Raise, 4, Circle.PREFLOP, texas);
+        equalsCircle(5, Optype.Allin, Circle.PREFLOP, texas);
+        equalsCircle(1, Optype.Allin, Circle.PREFLOP, texas);
+        equalsCircle(2, Optype.Fold, Circle.PREFLOP, texas);
+        equalsCircle(3, Optype.Allin, Circle.PREFLOP, texas);
+        equalsCircle(4, Optype.Allin, Circle.PREFLOP, texas);
         assertTrue(texas.isOver());
     }
 
@@ -99,22 +99,22 @@ public class TexasTest extends AllCard {
                 .initChips(200)
                 .build();
         texas.start();
-        assertEquals(Texas.STATE_NEXT_OP, texas.action(Action.raise(198)));
+        assertEquals(Texas.STATE_NEXT_OP, texas.action(Optype.Raise, 198));
 
         // 第一圈都 call, 大盲多一次押注
         texas = Texas.builder(3).build();
         assertEquals(Texas.STATE_NEXT_OP, texas.start());
-        assertEquals(Texas.STATE_NEXT_OP, texas.action(makeAct(Optype.Call)));
-        assertEquals(Texas.STATE_NEXT_OP, texas.action(makeAct(Optype.Call)));
-        assertEquals(Texas.STATE_CIRCLE_END, texas.action(makeAct(Optype.Check)));
+        assertEquals(Texas.STATE_NEXT_OP, texas.action(Optype.Call));
+        assertEquals(Texas.STATE_NEXT_OP, texas.action(Optype.Call));
+        assertEquals(Texas.STATE_CIRCLE_END, texas.action(Optype.Check));
 
         // 小盲为0
         texas = Texas.builder()
                 .smallBlind(0)
                 .build();
         assertEquals(Texas.STATE_NEXT_OP, texas.start());
-        assertEquals(Texas.STATE_NEXT_OP, texas.action(makeAct(Optype.Check)));
-        assertEquals(Texas.STATE_CIRCLE_END, texas.action(makeAct(Optype.Check)));
+        assertEquals(Texas.STATE_NEXT_OP, texas.action(Optype.Check));
+        assertEquals(Texas.STATE_CIRCLE_END, texas.action(Optype.Check));
 
         // TODO 两倍前注
 //        var reg = new HashMap<Regulation, Integer>();
@@ -124,18 +124,18 @@ public class TexasTest extends AllCard {
 //                .regulations(reg)
 //                .build();
 //        assertEquals(Texas.STATE_NEXT_OP, texas.start());
-//        assertEquals(Texas.STATE_NEXT_OP, texas.action(makeAct(Optype.Call)));
-//        assertEquals(Texas.STATE_CIRCLE_END, texas.action(makeAct(Optype.Check)));
+//        assertEquals(Texas.STATE_NEXT_OP, texas.action(Optype.Call));
+//        assertEquals(Texas.STATE_CIRCLE_END, texas.action(Optype.Check));
 
         // 复现
         texas = Texas.builder()
                 .players(new Player(1, 100), new Player(2, 200), new Player(3, 200))
                 .build();
         assertEquals(Texas.STATE_NEXT_OP, texas.start());
-        equalsAction(1, makeAct(Optype.Allin), Texas.STATE_NEXT_OP, texas);
-        equalsAction(2, makeAct(Optype.Call), Texas.STATE_NEXT_OP, texas);
-        equalsAction(3, makeAct(Optype.Call), Texas.STATE_CIRCLE_END, texas);
-        equalsAction(2, makeAct(Optype.Fold), Texas.STATE_SHOWDOWN, texas);
+        equalsAction(1, Optype.Allin, Texas.STATE_NEXT_OP, texas);
+        equalsAction(2, Optype.Call, Texas.STATE_NEXT_OP, texas);
+        equalsAction(3, Optype.Call, Texas.STATE_CIRCLE_END, texas);
+        equalsAction(2, Optype.Fold, Texas.STATE_SHOWDOWN, texas);
     }
 
     @Test
@@ -144,27 +144,27 @@ public class TexasTest extends AllCard {
         texas.start();
 
         // PREFLOP
-        equalsAction(4, makeAct(Optype.Call), Texas.STATE_NEXT_OP, texas);
-        equalsAction(5, makeAct(Optype.Call), Texas.STATE_NEXT_OP, texas);
-        equalsAction(1, makeAct(Optype.Call), Texas.STATE_NEXT_OP, texas);
-        equalsAction(2, makeAct(Optype.Call), Texas.STATE_NEXT_OP, texas);
+        equalsAction(4, Optype.Call, Texas.STATE_NEXT_OP, texas);
+        equalsAction(5, Optype.Call, Texas.STATE_NEXT_OP, texas);
+        equalsAction(1, Optype.Call, Texas.STATE_NEXT_OP, texas);
+        equalsAction(2, Optype.Call, Texas.STATE_NEXT_OP, texas);
         // 第一圈，大盲这种情况下多一次押注
-        equalsAction(3, makeAct(Optype.Check), Texas.STATE_CIRCLE_END, texas);
+        equalsAction(3, Optype.Check, Texas.STATE_CIRCLE_END, texas);
 
         // FLOP
-        equalsAction(2, makeAct(Optype.Fold), Texas.STATE_NEXT_OP, texas);
-        equalsAction(3, makeAct(Optype.Fold), Texas.STATE_NEXT_OP, texas);
-        equalsAction(4, Action.raise(2), Texas.STATE_NEXT_OP, texas);
-        equalsAction(5, makeAct(Optype.Call), Texas.STATE_NEXT_OP, texas);
-        equalsAction(1, makeAct(Optype.Fold), Texas.STATE_CIRCLE_END, texas);
+        equalsAction(2, Optype.Fold, Texas.STATE_NEXT_OP, texas);
+        equalsAction(3, Optype.Fold, Texas.STATE_NEXT_OP, texas);
+        equalsAction(4, Optype.Raise, 2, Texas.STATE_NEXT_OP, texas);
+        equalsAction(5, Optype.Call, Texas.STATE_NEXT_OP, texas);
+        equalsAction(1, Optype.Fold, Texas.STATE_CIRCLE_END, texas);
 
         // TURN
-        equalsAction(4, Action.raise(2), Texas.STATE_NEXT_OP, texas);
-        equalsAction(5, makeAct(Optype.Call), Texas.STATE_CIRCLE_END, texas);
+        equalsAction(4, Optype.Raise, 2, Texas.STATE_NEXT_OP, texas);
+        equalsAction(5, Optype.Call, Texas.STATE_CIRCLE_END, texas);
 
         // RIVER
-        equalsAction(4, Action.raise(2), Texas.STATE_NEXT_OP, texas);
-        equalsAction(5, makeAct(Optype.Call), Texas.STATE_SHOWDOWN, texas);
+        equalsAction(4, Optype.Raise, 2, Texas.STATE_NEXT_OP, texas);
+        equalsAction(5, Optype.Call, Texas.STATE_SHOWDOWN, texas);
 
         //////////////////////////////////////////////////////////////////
         Ring<Player> ring = Ring.create(5);
@@ -178,29 +178,29 @@ public class TexasTest extends AllCard {
                 .build();
         texas.start();
 
-        equalsAction(4, Action.raise(4), Texas.STATE_NEXT_OP, texas);
-        equalsAction(5, makeAct(Optype.Allin), Texas.STATE_NEXT_OP, texas);
-        equalsAction(1, makeAct(Optype.Call), Texas.STATE_NEXT_OP, texas);
-        equalsAction(2, makeAct(Optype.Fold), Texas.STATE_NEXT_OP, texas);
-        equalsAction(3, makeAct(Optype.Call), Texas.STATE_NEXT_OP, texas);
-        equalsAction(4, makeAct(Optype.Call), Texas.STATE_CIRCLE_END, texas);
+        equalsAction(4, Optype.Raise, 4, Texas.STATE_NEXT_OP, texas);
+        equalsAction(5, Optype.Allin, Texas.STATE_NEXT_OP, texas);
+        equalsAction(1, Optype.Call, Texas.STATE_NEXT_OP, texas);
+        equalsAction(2, Optype.Fold, Texas.STATE_NEXT_OP, texas);
+        equalsAction(3, Optype.Call, Texas.STATE_NEXT_OP, texas);
+        equalsAction(4, Optype.Call, Texas.STATE_CIRCLE_END, texas);
 
-        equalsAction(3, makeAct(Optype.Check), Texas.STATE_NEXT_OP, texas);
-        equalsAction(4, makeAct(Optype.Check), Texas.STATE_NEXT_OP, texas);
-        equalsAction(1, Action.raise(4), Texas.STATE_NEXT_OP, texas);
-        equalsAction(3, makeAct(Optype.Fold), Texas.STATE_NEXT_OP, texas);
-        equalsAction(4, makeAct(Optype.Call), Texas.STATE_CIRCLE_END, texas);
+        equalsAction(3, Optype.Check, Texas.STATE_NEXT_OP, texas);
+        equalsAction(4, Optype.Check, Texas.STATE_NEXT_OP, texas);
+        equalsAction(1, Optype.Raise, 4, Texas.STATE_NEXT_OP, texas);
+        equalsAction(3, Optype.Fold, Texas.STATE_NEXT_OP, texas);
+        equalsAction(4, Optype.Call, Texas.STATE_CIRCLE_END, texas);
 
-        equalsAction(4, Action.raise(5), Texas.STATE_NEXT_OP, texas);
-        equalsAction(1, makeAct(Optype.Call), Texas.STATE_CIRCLE_END, texas);
+        equalsAction(4, Optype.Raise, 5, Texas.STATE_NEXT_OP, texas);
+        equalsAction(1, Optype.Call, Texas.STATE_CIRCLE_END, texas);
 
 
         ////////////////////////////////////////////////////////////////////////
         texas = Texas.builder().build();
         texas.start();
 
-        equalsAction(1, makeAct(Optype.Call), Texas.STATE_NEXT_OP, texas);
-        equalsAction(2, makeAct(Optype.Check), Texas.STATE_CIRCLE_END, texas);
+        equalsAction(1, Optype.Call, Texas.STATE_NEXT_OP, texas);
+        equalsAction(2, Optype.Check, Texas.STATE_CIRCLE_END, texas);
 
         assertEquals(Circle.FLOP, texas.circle());
         assertEquals(2, texas.operator().getId());
@@ -215,8 +215,8 @@ public class TexasTest extends AllCard {
                 .regulations(regulations)
                 .build();
         texas.start();
-        equalsAction(2, makeAct(Optype.Call), Texas.STATE_NEXT_OP, texas);
-        equalsAction(1, makeAct(Optype.Check), Texas.STATE_CIRCLE_END, texas);
+        equalsAction(2, Optype.Call, Texas.STATE_NEXT_OP, texas);
+        equalsAction(1, Optype.Check, Texas.STATE_CIRCLE_END, texas);
 
         ////////////////////////////////////////////////////////////////////////
         //  短牌：在“smallBlind == 0”下, 开局后，所有玩家都check，最后应该到庄家还有一次option
@@ -225,8 +225,8 @@ public class TexasTest extends AllCard {
                 .ante(1)
                 .build();
         texas.start();
-        equalsAction(2, makeAct(Optype.Check), Texas.STATE_NEXT_OP, texas);
-        equalsAction(1, makeAct(Optype.Check), Texas.STATE_CIRCLE_END, texas);
+        equalsAction(2, Optype.Check, Texas.STATE_NEXT_OP, texas);
+        equalsAction(1, Optype.Check, Texas.STATE_CIRCLE_END, texas);
     }
 
     @Test
@@ -292,17 +292,17 @@ public class TexasTest extends AllCard {
                 .build();
         texas.start();
         texas.leave(1);
-        texas.action(Action.fold());
+        texas.action(Optype.Fold);
         assertEquals(2, texas.operator().getId());
 
         //////////////////////////////
         texas = Texas.builder(4).build();
         texas.start();
-        texas.action(Action.call());
-        texas.action(Action.call());
-        texas.action(Action.call());
+        texas.action(Optype.Call);
+        texas.action(Optype.Call);
+        texas.action(Optype.Call);
         texas.leave(2);
-        texas.action(Action.check());
+        texas.action(Optype.Check);
         assertEquals(Circle.FLOP, texas.circle());
         assertEquals(3, texas.operator().getId());
 
@@ -310,7 +310,7 @@ public class TexasTest extends AllCard {
         texas = Texas.builder(3).build();
         texas.start();
         texas.leave(3);
-        texas.action(Action.fold());
+        texas.action(Optype.Fold);
         assertTrue(texas.isOver());
     }
 
@@ -318,10 +318,10 @@ public class TexasTest extends AllCard {
     public void testSettle() throws Exception {
         var texas = Texas.builder(5).build();
         texas.start();
-        texas.action(Action.fold());
-        texas.action(Action.fold());
-        texas.action(Action.fold());
-        texas.action(Action.fold());
+        texas.action(Optype.Fold);
+        texas.action(Optype.Fold);
+        texas.action(Optype.Fold);
+        texas.action(Optype.Fold);
         var result = texas.settle();
         assertEquals(5, result.size());
         assertEquals(3, result.getPlayer(3).pot.values().stream().reduce(Integer::sum).get());
@@ -332,18 +332,18 @@ public class TexasTest extends AllCard {
                 .board(club9, club10, spadesA, heartK, club8)
                 .build();
         texas.start();
-        texas.action(Action.call());
-        texas.action(Action.raise(2));
-        texas.action(Action.call());
+        texas.action(Optype.Call);
+        texas.action(Optype.Raise, 2);
+        texas.action(Optype.Call);
 
-        texas.action(Action.check());
-        texas.action(Action.check());
+        texas.action(Optype.Check);
+        texas.action(Optype.Check);
 
-        texas.action(Action.check());
-        texas.action(Action.check());
+        texas.action(Optype.Check);
+        texas.action(Optype.Check);
 
-        texas.action(Action.check());
-        texas.action(Action.check());
+        texas.action(Optype.Check);
+        texas.action(Optype.Check);
         result = texas.settle();
         assertEquals(2, result.size());
         assertEquals(8, result.getPlayer(1).pot.values().stream().reduce(Integer::sum).get());
@@ -354,8 +354,8 @@ public class TexasTest extends AllCard {
                 .board(club9, club10, spadesA, heartK, club8)
                 .build();
         texas.start();
-        texas.action(Action.allin());
-        texas.action(Action.allin());
+        texas.action(Optype.Allin);
+        texas.action(Optype.Allin);
         result = texas.settle();
         assertEquals(20, result.getPlayer(1).pot.get(0));
 
@@ -364,12 +364,12 @@ public class TexasTest extends AllCard {
                 .players(createPlayersByChips(100, 90, 80, 70))
                 .build();
         texas.start();
-        texas.action(Action.allin());
-        texas.action(Action.allin());
-        texas.action(Action.allin());
+        texas.action(Optype.Allin);
+        texas.action(Optype.Allin);
+        texas.action(Optype.Allin);
         texas.leave(1);
         texas.leave(2);
-        texas.action(Action.allin());
+        texas.action(Optype.Allin);
         assertTrue(texas.isOver());
         result = texas.settle();
         assertEquals(280, result.getPlayer(4).pot.get(0));
@@ -425,8 +425,8 @@ public class TexasTest extends AllCard {
                 .players(createPlayersByChips(10, 20))
                 .build();
         texas.start();
-        texas.action(Action.allin());
-        texas.action(Action.allin());
+        texas.action(Optype.Allin);
+        texas.action(Optype.Allin);
 
         result = texas.settle();
         var info = result.getPlayer(1);
@@ -442,7 +442,7 @@ public class TexasTest extends AllCard {
                 .players(createPlayersByChips(10, 20))
                 .build();
         texas.start();
-        texas.action(Action.fold());
+        texas.action(Optype.Fold);
 
         result = texas.settle();
         info = result.getPlayer(1);
@@ -480,12 +480,12 @@ public class TexasTest extends AllCard {
                 .players(createPlayersByChips(10, 100, 40))
                 .build();
         texas.start();
-        texas.action(Action.allin());
-        texas.action(Action.call());
-        texas.action(Action.call());
-        texas.action(Action.raise(20));
-        texas.action(Action.allin());
-        texas.action(Action.fold());
+        texas.action(Optype.Allin);
+        texas.action(Optype.Call);
+        texas.action(Optype.Call);
+        texas.action(Optype.Raise, 20);
+        texas.action(Optype.Allin);
+        texas.action(Optype.Fold);
 
         result = texas.settle();
         assertEquals(20, result.getPlayer(1).getProfit());
@@ -501,14 +501,14 @@ public class TexasTest extends AllCard {
                 .players(createPlayersByChips(40, 10, 40))
                 .build();
         texas.start();
-        texas.action(Action.call());
-        texas.action(Action.allin());
-        texas.action(Action.call());
-        texas.action(Action.call());
+        texas.action(Optype.Call);
+        texas.action(Optype.Allin);
+        texas.action(Optype.Call);
+        texas.action(Optype.Call);
 
-        texas.action(Action.raise(20));
-        texas.action(Action.allin());
-        texas.action(Action.fold());
+        texas.action(Optype.Raise, 20);
+        texas.action(Optype.Allin);
+        texas.action(Optype.Fold);
 
         result = texas.settle();
         assertEquals(40, result.getPlayer(1).getProfit());
@@ -591,36 +591,36 @@ public class TexasTest extends AllCard {
         texas.start();
 
         equalsAuth(texas, 2, Optype.Fold, Optype.Allin);
-        texas.action(Action.of(Optype.Allin));
+        texas.action(Optype.Allin);
 
         equalsAuth(texas, 3, Optype.Fold, Optype.Allin, Optype.Call);
-        texas.action(Action.of(Optype.Call));
+        texas.action(Optype.Call);
 
         var player = texas.operator();
         player.changeChips(10 - player.getChips());
-        texas.action(Action.of(Optype.Call));
+        texas.action(Optype.Call);
 
         equalsAuth(texas, 1, Optype.Fold, Optype.Allin);
-        texas.action(Action.of(Optype.Allin));
+        texas.action(Optype.Allin);
 
         equalsAuth(texas, 3, Optype.Raise, Optype.Fold, Optype.Allin, Optype.Check);
-        texas.action(Action.of(Optype.Check));
+        texas.action(Optype.Check);
 
         equalsAuth(texas, 2, Optype.Fold, Optype.Allin, Optype.Check);
-        texas.action(Action.of(Optype.Allin));
+        texas.action(Optype.Allin);
 
         player = texas.operator();
         player.changeChips(10 - player.getChips());
-        texas.action(Action.of(Optype.Call));
+        texas.action(Optype.Call);
 
         ////////////////////////////////////////////////////////////////////////////////
         texas = Texas.builder(5).build();
         texas.start();
 
         equalsAuth(texas, 10, Optype.Fold, Optype.Call, Optype.Raise, Optype.Allin, Optype.BBlind2, Optype.BBlind3, Optype.BBlind4);
-        texas.action(Action.raise(10));
+        texas.action(Optype.Raise, 10);
 
-        texas.action(Action.of(Optype.Fold));
+        texas.action(Optype.Fold);
 
         equalsAuth(texas, 40, Optype.Fold, Optype.Call, Optype.Raise, Optype.Allin, Optype.Pot1_1, Optype.Pot1_2, Optype.Pot2_3);
 
@@ -637,7 +637,7 @@ public class TexasTest extends AllCard {
         assertEquals(7, auth.get(Optype.BBlind3));
         assertEquals(9, auth.get(Optype.BBlind4));
 
-        texas.action(Action.raise(8));
+        texas.action(Optype.Raise, 8);
         auth = texas.authority();
         assertEquals(7, auth.size());
         assertEquals(0, auth.get(Optype.Fold));
@@ -653,9 +653,9 @@ public class TexasTest extends AllCard {
                 .players(new Player(1, 10), new Player(2, 100))
                 .build();
         texas.start();
-        texas.action(Action.of(Optype.Call));
-        texas.action(Action.of(Optype.Check));
-        texas.action(Action.raise(4));
+        texas.action(Optype.Call);
+        texas.action(Optype.Check);
+        texas.action(Optype.Raise, 4);
         auth = texas.authority();
         assertTrue(auth.containsKey(Optype.Allin));
         assertFalse(auth.containsKey(Optype.Raise));
@@ -668,11 +668,11 @@ public class TexasTest extends AllCard {
                         , new Player(4, 100))
                 .build();
         texas.start();
-        texas.action(Action.raise(70));
-        texas.action(Action.of(Optype.Allin));
-        texas.action(Action.of(Optype.Call));
-        texas.action(Action.of(Optype.Allin));
-        texas.action(Action.of(Optype.Fold));
+        texas.action(Optype.Raise, 70);
+        texas.action(Optype.Allin);
+        texas.action(Optype.Call);
+        texas.action(Optype.Allin);
+        texas.action(Optype.Fold);
         equalsAuth(texas, null, Optype.Fold, Optype.Allin);
 
         // 对allin不足的人call后不能再allin
@@ -683,10 +683,10 @@ public class TexasTest extends AllCard {
                         , new Player(3, 80))
                 .build();
         texas.start();
-        texas.action(Action.of(Optype.Call));
-        texas.action(Action.of(Optype.Call));
-        texas.action(Action.raise(32));
-        texas.action(Action.of(Optype.Allin));
+        texas.action(Optype.Call);
+        texas.action(Optype.Call);
+        texas.action(Optype.Raise, 32);
+        texas.action(Optype.Allin);
         assertTrue(auth.containsKey(Optype.Call));
 //        equalsAuth(texas, null, Optype.Fold, Optype.Allin);
 
@@ -699,7 +699,7 @@ public class TexasTest extends AllCard {
                 .build();
         texas.start();
         equalsAuth(texas, null, Optype.Fold, Optype.Allin);
-        texas.action(Action.of(Optype.Allin));
+        texas.action(Optype.Allin);
         equalsAuth(texas, null, Optype.Fold, Optype.Allin);
     }
 
@@ -782,21 +782,21 @@ public class TexasTest extends AllCard {
         texas.start();
         assertTrue(texas.getCommunityCards().isEmpty());
 
-        texas.action(Action.call());
-        texas.action(Action.raise(2));
-        texas.action(Action.call());
+        texas.action(Optype.Call);
+        texas.action(Optype.Raise, 2);
+        texas.action(Optype.Call);
         equalsCommunityCards(texas, club9, club10, spadesA);
 
-        texas.action(Action.check());
-        texas.action(Action.check());
+        texas.action(Optype.Check);
+        texas.action(Optype.Check);
         equalsCommunityCards(texas, club9, club10, spadesA, heartK);
 
-        texas.action(Action.check());
-        texas.action(Action.check());
+        texas.action(Optype.Check);
+        texas.action(Optype.Check);
         equalsCommunityCards(texas, club9, club10, spadesA, heartK, club8);
 
-        texas.action(Action.check());
-        texas.action(Action.check());
+        texas.action(Optype.Check);
+        texas.action(Optype.Check);
         equalsCommunityCards(texas, club9, club10, spadesA, heartK, club8);
 
         texas = Texas.builder()
@@ -804,9 +804,9 @@ public class TexasTest extends AllCard {
                 .players(new Player(1, 100), new Player(2, 200), new Player(3, 300))
                 .build();
         texas.start();
-        texas.action(Action.allin());
-        texas.action(Action.call());
-        texas.action(Action.fold());
+        texas.action(Optype.Allin);
+        texas.action(Optype.Call);
+        texas.action(Optype.Fold);
         equalsCommunityCards(texas, club9, club10, spadesA, heartK, club8);
     }
 
@@ -816,9 +816,9 @@ public class TexasTest extends AllCard {
         texas.start();
 
         assertFalse(texas.isOver());
-        texas.action(Action.call());
+        texas.action(Optype.Call);
         assertFalse(texas.isOver());
-        texas.action(Action.fold());
+        texas.action(Optype.Fold);
         assertTrue(texas.isOver());
 
         ////////////////////////////////////
@@ -826,21 +826,21 @@ public class TexasTest extends AllCard {
         texas.start();
         assertFalse(texas.isOver());
 
-        texas.action(Action.call());
-        texas.action(Action.raise(2));
-        texas.action(Action.call());
+        texas.action(Optype.Call);
+        texas.action(Optype.Raise, 2);
+        texas.action(Optype.Call);
         assertFalse(texas.isOver());
 
-        texas.action(Action.check());
-        texas.action(Action.check());
+        texas.action(Optype.Check);
+        texas.action(Optype.Check);
         assertFalse(texas.isOver());
 
-        texas.action(Action.check());
-        texas.action(Action.check());
+        texas.action(Optype.Check);
+        texas.action(Optype.Check);
         assertFalse(texas.isOver());
 
-        texas.action(Action.check());
-        texas.action(Action.check());
+        texas.action(Optype.Check);
+        texas.action(Optype.Check);
         assertTrue(texas.isOver());
 
         ////////////////////////////////////
@@ -885,9 +885,9 @@ public class TexasTest extends AllCard {
         texas.start();
         assertFalse(texas.isOver());
 
-        texas.action(Action.call());
-        texas.action(Action.raise(710));
-        texas.action(Action.allin());
+        texas.action(Optype.Call);
+        texas.action(Optype.Raise, 710);
+        texas.action(Optype.Allin);
         assertTrue(texas.isOver());
     }
 
@@ -899,18 +899,24 @@ public class TexasTest extends AllCard {
         }
     }
 
-    private void equalsAction(Integer opId, Action act, String state, Texas texas) throws Exception {
+    private void equalsAction(Integer opId, Optype op, String state, Texas texas) throws Exception {
         assertEquals(opId, texas.operator().getId());
-        assertEquals(state, texas.action(act));
+        assertEquals(state, texas.action(op));
     }
 
-    private void equalsCircle(Integer opId, Action act, String circle, Texas texas) throws Exception {
+    private void equalsAction(Integer opId, Optype op, int chipsAdd, String state, Texas texas) throws Exception {
+        assertEquals(opId, texas.operator().getId());
+        assertEquals(state, texas.action(op, chipsAdd));
+    }
+
+
+    private void equalsCircle(Integer opId, Optype op, String circle, Texas texas) throws Exception {
+        equalsCircle(opId, op, 0, circle, texas);
+    }
+
+    private void equalsCircle(Integer opId, Optype op, int chipsAdd, String circle, Texas texas) throws Exception {
         assertEquals(opId.toString(), texas.operator().getId() + "");
         assertEquals(circle, texas.circle());
-        texas.action(act);
-    }
-
-    private Action makeAct(Optype optype) {
-        return Action.of(optype);
+        texas.action(op, chipsAdd);
     }
 }
