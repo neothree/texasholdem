@@ -153,7 +153,7 @@ public class TexasRound {
         this.checker.clear();
         this.operator = null;
         this.isOver = true;
-        this.eventHandler.trigger(this, RoundEvent.SHOWDOWN);
+        this.checker.once(() -> this.eventHandler.trigger(this, RoundEvent.SHOWDOWN), 2000);
     }
 
     /**
