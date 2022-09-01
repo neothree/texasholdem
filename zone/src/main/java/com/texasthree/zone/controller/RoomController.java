@@ -1,6 +1,5 @@
 package com.texasthree.zone.controller;
 
-import com.texasthree.game.texas.Action;
 import com.texasthree.game.texas.Optype;
 import com.texasthree.security.shiro.AbstractMeController;
 import com.texasthree.utility.restful.RestResponse;
@@ -70,10 +69,9 @@ public class RoomController extends AbstractMeController<User> {
      */
     @PostMapping(value = "/round/action")
     public void action(@RequestParam("op") String op,
-                       Integer chipsBet) {
-        var action = Action.of(getOptype(op), chipsBet);
+                       int chipsBet) {
         var room = zone.getRoom();
-        room.getDesk().getRound().action(action);
+        room.getDesk().getRound().action(getOptype(op), chipsBet);
     }
 
     private Optype getOptype(String op) {

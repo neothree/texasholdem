@@ -1,6 +1,5 @@
 package com.texasthree.zone.room;
 
-import com.texasthree.game.texas.Action;
 import com.texasthree.game.texas.Circle;
 import com.texasthree.game.texas.Optype;
 import com.texasthree.utility.utlis.StringUtils;
@@ -43,15 +42,15 @@ class TexasRoundTest {
 
         round.force();
         assertEquals(0, round.getOperator().seatId);
-        round.action(Action.of(Optype.Call));
+        round.action(Optype.Call, 0);
 
         round.force();
         assertEquals(1, round.getOperator().seatId);
-        round.action(Action.of(Optype.Call));
+        round.action(Optype.Call, 0);
 
         round.force();
         assertEquals(2, round.getOperator().seatId);
-        round.action(Action.of(Optype.Check));
+        round.action(Optype.Check, 0);
 
         // FLOP
         assertEquals(Circle.FLOP, round.circle());
@@ -59,13 +58,13 @@ class TexasRoundTest {
 
         round.force();
         assertEquals(1, round.getOperator().seatId);
-        round.action(Action.of(Optype.Check));
+        round.action(Optype.Check, 0);
 
         assertEquals(2, round.getOperator().seatId);
-        round.action(Action.of(Optype.Check));
+        round.action(Optype.Check, 0);
 
         assertEquals(0, round.getOperator().seatId);
-        round.action(Action.of(Optype.Check));
+        round.action(Optype.Check, 0);
 
         // TURN
         assertEquals(Circle.TURN, round.circle());
@@ -73,13 +72,13 @@ class TexasRoundTest {
 
         round.force();
         assertEquals(1, round.getOperator().seatId);
-        round.action(Action.of(Optype.Check));
+        round.action(Optype.Check, 0);
 
         assertEquals(2, round.getOperator().seatId);
-        round.action(Action.of(Optype.Check));
+        round.action(Optype.Check, 0);
 
         assertEquals(0, round.getOperator().seatId);
-        round.action(Action.of(Optype.Check));
+        round.action(Optype.Check, 0);
 
         // RIVER
         assertEquals(Circle.RIVER, round.circle());
@@ -87,13 +86,13 @@ class TexasRoundTest {
 
         round.force();
         assertEquals(1, round.getOperator().seatId);
-        round.action(Action.of(Optype.Check));
+        round.action(Optype.Check, 0);
 
         assertEquals(2, round.getOperator().seatId);
-        round.action(Action.of(Optype.Check));
+        round.action(Optype.Check, 0);
 
         assertEquals(0, round.getOperator().seatId);
-        round.action(Action.of(Optype.Check));
+        round.action(Optype.Check, 0);
 
         // SHOWDOWN
         assertTrue(round.finished());

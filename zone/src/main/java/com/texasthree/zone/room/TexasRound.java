@@ -77,26 +77,25 @@ public class TexasRound {
 
     /**
      * 押注
-     *
-     * @param action 押注信息
-     * @return void
-     * create at 2020-06-30 11:12
      */
-    public void action(Action action) {
+    public void action(Optype op, int chipsBet) {
         if (operator == null) {
             log.error("{}押注异常，没有操作人", logpre);
             return;
         }
-        log.info("{}玩家押注 seatId={} op={}", logpre, operator.seatId, action.op);
-        var move = this.game.action(action.op, action.chipsAdd);
+        var bet = this.game.getAction(operator.seatId);
+        var old = bet != null ? bet.chipsBet : 0;
+        var chipsAdd = Optype.Raise.equals(op) ? chipsBet - old : 0;
+        log.info("{}玩家押注 seatId={} op={} chipsAdd={}", logpre, operator.seatId, op, chipsAdd);
+        var move = this.game.action(op, chipsAdd);
         this.lastAction = this.game.getAction(this.operator.seatId);
         this.operator = null;
         this.eventHandler.trigger(this, RoundEvent.ACTION);
 
-        if (Optype.Check.equals(action.op)) {
+        if (Optype.Check.equals(op)) {
             // Check 没有动画，不需要延时，直接下一个操作
             this.move(move);
-        } else if (Optype.Fold.equals(action.op)) {
+        } else if (Optype.Fold.equals(op)) {
             this.checker.once(() -> this.move(move), TIMEOUT_MOVE_FOLD);
         } else {
             this.checker.once(() -> this.move(move), TIMEOUT_MOVE_ACTION);
@@ -174,7 +173,7 @@ public class TexasRound {
         var op = au.containsKey(Optype.Check) ? Optype.Check : Optype.Fold;
         var action = Action.of(op);
         action.id = this.operator.seatId;
-        this.action(action);
+        this.action(op, 0);
     }
 
     public Hand getPlayerHand(String id) {
@@ -204,10 +203,6 @@ public class TexasRound {
         var player = playerMap.get(id);
         var p = this.game.getPlayerById(player.seatId);
         return p.isLeave();
-    }
-
-    public Action getPlayerAction(String id) {
-        return null;
     }
 
     public int sumPot() {
