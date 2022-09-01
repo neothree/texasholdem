@@ -176,9 +176,8 @@ public class TexasRound {
         this.action(op, 0);
     }
 
-    public Hand getPlayerHand(String id) {
-        var player = this.playerMap.get(id);
-        return this.game.getPlayerById(player.seatId).getHand();
+    public Hand getPlayerHand(int seatId) {
+        return this.game.getPlayerById(seatId).getHand();
     }
 
     public boolean finished() {

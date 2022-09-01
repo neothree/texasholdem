@@ -88,6 +88,17 @@ public class Protocal {
     public static class ShowdownHand {
         public Integer seatId;
         public Hand hand;
+        public List<PotProfit> profits;
+    }
+
+    public static class PotProfit {
+        public int potId;
+        public int profit;
+
+        PotProfit(int potId, int profit) {
+            this.potId = potId;
+            this.profit = profit;
+        }
     }
 
 }

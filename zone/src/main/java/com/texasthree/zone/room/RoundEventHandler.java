@@ -72,7 +72,7 @@ public class RoundEventHandler {
             if (round.isLeave(v.getId())) {
                 continue;
             }
-            var hand = round.getPlayerHand(v.getId());
+            var hand = round.getPlayerHand(v.seatId);
             var update = new Protocal.Hand();
             update.cards = toCardIds(hand.getHold());
             update.best = toCardIds(hand.getBest());
@@ -110,14 +110,13 @@ public class RoundEventHandler {
         info.winners = new ArrayList<>(result.getWinners());
         info.hands = new ArrayList<>();
         for (var v : result.playersMap.values()) {
-            var h = new Protocal.Hand();
-//            h.cards = toCardIds(v.getCardList());
-            h.cards = new ArrayList<>();
-            h.cards.add(21);
-            h.cards.add(121);
             var sh = new Protocal.ShowdownHand();
             sh.seatId = v.getId();
-            sh.hand = h;
+            sh.hand = new Protocal.Hand();
+            sh.hand.cards = toCardIds(round.getPlayerHand(v.getId()).getHold());
+            sh.profits = v.getPot().entrySet().stream()
+                    .map(e -> new Protocal.PotProfit(e.getKey(), e.getValue()))
+                    .collect(Collectors.toList());
             info.hands.add(sh);
         }
         this.send(info);
@@ -142,6 +141,7 @@ public class RoundEventHandler {
     private void send(Object msg) {
         this.broadcast.accept(msg);
     }
+
     private void send(String uid, Object msg) {
         this.single.accept(uid, msg);
     }
