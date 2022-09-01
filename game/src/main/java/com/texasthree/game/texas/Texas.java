@@ -415,22 +415,22 @@ public class Texas {
             info.setId(v.getId());
             info.setBetSum(allBet.getOrDefault(v.getId(), 0));
             info.cardShow = open.contains(v);
-            result.playersMap.put(v.getId(), info);
+            result.add(info);
         }
 
         // 单池返回的钱
         var refundPlayer = this.pot.refundPlayer();
         if (refundPlayer != null) {
-            result.playersMap.get(refundPlayer.getId()).refund = refundPlayer.getChips();
+            result.getPlayer(refundPlayer.getId()).refund = refundPlayer.getChips();
         }
 
         // 最后从池里的输赢
         var potWin = this.divideMoney();
-        result.playersMap.forEach((k, v) -> v.pot = potWin.getOrDefault(k, new HashMap<>()));
+        result.forEach(v -> v.pot = potWin.getOrDefault(v.id, new HashMap<>()));
 
         // 押注统计
         var stats = this.pot.makeBetStatistic(result.getWinners());
-        result.playersMap.forEach((k, v) -> v.statistic = stats.getOrDefault(k, new Statistic()));
+        result.forEach(v -> v.statistic = stats.getOrDefault(v.id, new Statistic()));
         return result;
     }
 

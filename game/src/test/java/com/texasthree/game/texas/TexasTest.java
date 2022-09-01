@@ -323,8 +323,8 @@ public class TexasTest extends AllCard {
         texas.action(Action.fold());
         texas.action(Action.fold());
         var result = texas.makeResult();
-        assertEquals(5, result.playersMap.size());
-        assertEquals(3, result.playersMap.get(3).pot.values().stream().reduce(Integer::sum).get());
+        assertEquals(5, result.size());
+        assertEquals(3, result.getPlayer(3).pot.values().stream().reduce(Integer::sum).get());
 
 
         texas = Texas.builder()
@@ -345,8 +345,8 @@ public class TexasTest extends AllCard {
         texas.action(Action.check());
         texas.action(Action.check());
         result = texas.makeResult();
-        assertEquals(2, result.playersMap.size());
-        assertEquals(8, result.playersMap.get(1).pot.values().stream().reduce(Integer::sum).get());
+        assertEquals(2, result.size());
+        assertEquals(8, result.getPlayer(1).pot.values().stream().reduce(Integer::sum).get());
 
         // 所有人都allin的话, 结算看5张底牌
         texas = Texas.builder()
@@ -357,7 +357,7 @@ public class TexasTest extends AllCard {
         texas.action(Action.allin());
         texas.action(Action.allin());
         result = texas.makeResult();
-        assertEquals(20, result.playersMap.get(1).pot.get(0));
+        assertEquals(20, result.getPlayer(1).pot.get(0));
 
         // 有人离开
         texas = SimpleTexas.builder()
@@ -372,10 +372,10 @@ public class TexasTest extends AllCard {
         texas.action(Action.allin());
         assertTrue(texas.isOver());
         result = texas.makeResult();
-        assertEquals(280, result.playersMap.get(4).pot.get(0));
-        assertEquals(30, result.playersMap.get(3).pot.get(1));
-        assertEquals(20, result.playersMap.get(4).pot.get(2));
-        assertEquals(10, result.playersMap.get(4).pot.get(3));
+        assertEquals(280, result.getPlayer(4).pot.get(0));
+        assertEquals(30, result.getPlayer(3).pot.get(1));
+        assertEquals(20, result.getPlayer(4).pot.get(2));
+        assertEquals(10, result.getPlayer(4).pot.get(3));
 
         /////////////
         texas = SimpleTexas.builder(3).build();
@@ -385,7 +385,7 @@ public class TexasTest extends AllCard {
         texas.leave(3);
         assertTrue(texas.isOver());
         result = texas.makeResult();
-        assertEquals(3, result.playersMap.get(1).pot.get(0));
+        assertEquals(3, result.getPlayer(1).pot.get(0));
 
         // TODO ------------- 短牌 --------------------------------
 //        local playerList = {
@@ -429,11 +429,11 @@ public class TexasTest extends AllCard {
         texas.action(Action.allin());
 
         result = texas.makeResult();
-        var info = result.playersMap.get(1);
+        var info = result.getPlayer(1);
         assertEquals(20, info.pot.get(0));
         assertEquals(10, info.getProfit());
         assertFalse(info.pot.containsKey(1));
-        info = result.playersMap.get(2);
+        info = result.getPlayer(2);
         assertFalse(info.pot.containsKey(1));
         assertEquals(-10, info.getProfit());
 
@@ -445,11 +445,11 @@ public class TexasTest extends AllCard {
         texas.action(Action.fold());
 
         result = texas.makeResult();
-        info = result.playersMap.get(1);
+        info = result.getPlayer(1);
         assertFalse(info.pot.containsKey(1));
         assertFalse(info.pot.containsKey(2));
         assertEquals(-1, info.getProfit());
-        info = result.playersMap.get(2);
+        info = result.getPlayer(2);
         assertEquals(3, info.pot.get(0));
         assertFalse(info.pot.containsKey(2));
         assertEquals(1, info.getProfit());
@@ -488,10 +488,10 @@ public class TexasTest extends AllCard {
         texas.action(Action.fold());
 
         result = texas.makeResult();
-        assertEquals(20, result.playersMap.get(1).getProfit());
-        assertEquals(-30, result.playersMap.get(2).getProfit());
-        assertEquals(10, result.playersMap.get(3).getProfit());
-        assertEquals(10, result.playersMap.get(3).refund);
+        assertEquals(20, result.getPlayer(1).getProfit());
+        assertEquals(-30, result.getPlayer(2).getProfit());
+        assertEquals(10, result.getPlayer(3).getProfit());
+        assertEquals(10, result.getPlayer(3).refund);
 
         // 10 B
         // 10 20 C
@@ -511,10 +511,10 @@ public class TexasTest extends AllCard {
         texas.action(Action.fold());
 
         result = texas.makeResult();
-        assertEquals(40, result.playersMap.get(1).getProfit());
-        assertEquals(-10, result.playersMap.get(2).getProfit());
-        assertEquals(-30, result.playersMap.get(3).getProfit());
-        assertEquals(10, result.playersMap.get(1).refund);
+        assertEquals(40, result.getPlayer(1).getProfit());
+        assertEquals(-10, result.getPlayer(2).getProfit());
+        assertEquals(-30, result.getPlayer(3).getProfit());
+        assertEquals(10, result.getPlayer(1).refund);
     }
 
     private static class SimpleTexas {

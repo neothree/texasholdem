@@ -109,7 +109,7 @@ public class RoundEventHandler {
         var info = new Protocal.Showdown();
         info.winners = new ArrayList<>(result.getWinners());
         info.hands = new ArrayList<>();
-        for (var v : result.playersMap.values()) {
+        for (var v : result) {
             var sh = new Protocal.ShowdownHand();
             sh.seatId = v.getId();
             sh.hand = new Protocal.Hand();
