@@ -193,6 +193,7 @@ public class Texas {
      */
     private Ring<Player> ring;
 
+    private Transfer state;
 
     private Texas(Map<Regulation, Integer> regulations, Ring<Player> ring, List<Card> leftCard) {
         this.regulations = regulations;
@@ -264,7 +265,7 @@ public class Texas {
         this.pot.actionDealerAnte(this.dealer(), this.ante());
     }
 
-    public Transfer action(Optype op) {
+    Transfer action(Optype op) {
         return this.action(op, 0, false);
     }
 
@@ -334,6 +335,7 @@ public class Texas {
         } else {
             this.showdown();
         }
+        this.state = state;
         return state;
     }
 
@@ -655,5 +657,9 @@ public class Texas {
 
     public Action getAction(int id) {
         return this.pot.getAction(id);
+    }
+
+    public Transfer getState() {
+        return state;
     }
 }

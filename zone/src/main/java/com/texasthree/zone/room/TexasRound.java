@@ -68,9 +68,9 @@ public class TexasRound {
                 .regulation(Regulation.Dealer, dealer)
                 .regulation(Regulation.SmallBlind, 1)
                 .build();
-        var move = this.game.start();
+        this.game.start();
         this.printStart();
-        this.checker.once(() -> this.move(move), 2000);
+        this.checker.once(() -> this.move(this.game.getState()), 2000);
         this.eventHandler.trigger(this, RoundEvent.START_GAME);
         this.updateHand();
     }
@@ -87,11 +87,12 @@ public class TexasRound {
         var old = bet != null ? bet.chipsBet : 0;
         var chipsAdd = Optype.Raise.equals(op) ? chipsBet - old : 0;
         log.info("{}玩家押注 seatId={} op={} chipsAdd={}", logpre, operator.seatId, op, chipsAdd);
-        var move = this.game.action(op, chipsAdd);
+        this.game.action(op, chipsAdd);
         this.lastAction = this.game.getAction(this.operator.seatId);
         this.operator = null;
         this.eventHandler.trigger(this, RoundEvent.ACTION);
 
+        var move = this.game.getState();
         if (Optype.Check.equals(op)) {
             // Check 没有动画，不需要延时，直接下一个操作
             this.move(move);
