@@ -29,9 +29,8 @@ public class TexasTest extends AllCard {
         var texas = Texas.builder(3)
                 .smallBlind(1)
                 .ante(1)
-                .build();
-        texas.start();
-
+                .build()
+                .start();
         assertEquals(1, texas.dealer().getId());
         assertEquals(2, texas.sbPlayer().getId());
         assertEquals(3, texas.bbPlayer().getId());
@@ -297,80 +296,85 @@ public class TexasTest extends AllCard {
 
         //////////////////////////////
         texas = Texas.builder(4).build();
-        texas.start();
-        texas.action(Optype.Call);
-        texas.action(Optype.Call);
-        texas.action(Optype.Call);
-        texas.leave(2);
-        texas.action(Optype.Check);
+        texas.start()
+                .action(Optype.Call)
+                .action(Optype.Call)
+                .action(Optype.Call)
+                .leave(2)
+                .action(Optype.Check);
         assertEquals(Circle.FLOP, texas.circle());
         assertEquals(3, texas.operator().getId());
 
         //////////////////////////////
         texas = Texas.builder(3).build();
-        texas.start();
-        texas.leave(3);
-        texas.action(Optype.Fold);
+        texas.start()
+                .leave(3)
+                .action(Optype.Fold);
         assertTrue(texas.isOver());
     }
 
     @Test
     public void testSettle() throws Exception {
-        var texas = Texas.builder(5).build();
-        texas.start();
-        texas.action(Optype.Fold);
-        texas.action(Optype.Fold);
-        texas.action(Optype.Fold);
-        texas.action(Optype.Fold);
+        var texas = Texas
+                .builder(5)
+                .build()
+                .start()
+                .action(Optype.Fold)
+                .action(Optype.Fold)
+                .action(Optype.Fold)
+                .action(Optype.Fold);
         var result = texas.settle();
         assertEquals(5, result.size());
         assertEquals(3, result.getPlayer(3).pot.values().stream().reduce(Integer::sum).get());
 
 
-        texas = Texas.builder()
+        result = Texas.builder()
                 .players(createPlayers(2, 100))
-                .board(club9, club10, spadesA, heartK, club8)
-                .build();
-        texas.start();
-        texas.action(Optype.Call);
-        texas.action(Optype.Raise, 2);
-        texas.action(Optype.Call);
+                .communityCards(club9, club10, spadesA, heartK, club8)
+                .build()
+                .start()
+                .action(Optype.Call)
+                .action(Optype.Raise, 2)
+                .action(Optype.Call)
 
-        texas.action(Optype.Check);
-        texas.action(Optype.Check);
+                .action(Optype.Check)
+                .action(Optype.Check)
 
-        texas.action(Optype.Check);
-        texas.action(Optype.Check);
+                .action(Optype.Check)
+                .action(Optype.Check)
 
-        texas.action(Optype.Check);
-        texas.action(Optype.Check);
-        result = texas.settle();
+                .action(Optype.Check)
+                .action(Optype.Check)
+                .settle();
+
         assertEquals(2, result.size());
         assertEquals(8, result.getPlayer(1).pot.values().stream().reduce(Integer::sum).get());
 
         // 所有人都allin的话, 结算看5张底牌
-        texas = Texas.builder()
+        result = Texas.builder()
                 .players(createPlayers(2, 10))
-                .board(club9, club10, spadesA, heartK, club8)
-                .build();
-        texas.start();
-        texas.action(Optype.Allin);
-        texas.action(Optype.Allin);
-        result = texas.settle();
+                .communityCards(club9, club10, spadesA, heartK, club8)
+                .build()
+                .start()
+                .action(Optype.Allin)
+                .action(Optype.Allin)
+                .settle();
         assertEquals(20, result.getPlayer(1).pot.get(0));
 
         // 有人离开
-        texas = SimpleTexas.builder()
+        texas = Texas.builder()
                 .players(createPlayersByChips(100, 90, 80, 70))
-                .build();
-        texas.start();
-        texas.action(Optype.Allin);
-        texas.action(Optype.Allin);
-        texas.action(Optype.Allin);
-        texas.leave(1);
-        texas.leave(2);
-        texas.action(Optype.Allin);
+                .communityCards(club9, club10, spadesA, heartK, club8)
+                .build()
+                .start()
+                .action(Optype.Allin)
+                .action(Optype.Allin)
+                .action(Optype.Allin)
+                .leave(1)
+                .leave(2)
+                .action(Optype.Allin);
         assertTrue(texas.isOver());
+
         result = texas.settle();
         assertEquals(280, result.getPlayer(4).pot.get(0));
         assertEquals(30, result.getPlayer(3).pot.get(1));
@@ -378,11 +382,12 @@ public class TexasTest extends AllCard {
         assertEquals(10, result.getPlayer(4).pot.get(3));
 
         /////////////
-        texas = SimpleTexas.builder(3).build();
-        texas.start();
-
-        texas.leave(2);
-        texas.leave(3);
+        texas = Texas.builder(3)
+                .communityCards(club9, club10, spadesA, heartK, club8)
+                .build()
+                .start()
+                .leave(2)
+                .leave(3);
         assertTrue(texas.isOver());
         result = texas.settle();
         assertEquals(3, result.getPlayer(1).pot.get(0));
@@ -421,14 +426,14 @@ public class TexasTest extends AllCard {
 //        assert(history.playerList[1].pot[1] == 2)
 
         // 结算后最后一个单人单池筹码返回
-        texas = SimpleTexas.builder()
+        result = Texas.builder()
                 .players(createPlayersByChips(10, 20))
-                .build();
-        texas.start();
-        texas.action(Optype.Allin);
-        texas.action(Optype.Allin);
-
-        result = texas.settle();
+                .communityCards(club9, club10, spadesA, heartK, club8)
+                .build()
+                .start()
+                .action(Optype.Allin)
+                .action(Optype.Allin)
+                .settle();
         var info = result.getPlayer(1);
         assertEquals(20, info.pot.get(0));
         assertEquals(10, info.getProfit());
@@ -438,13 +443,13 @@ public class TexasTest extends AllCard {
         assertEquals(-10, info.getProfit());
 
         // 最后只有一个人的话不分池
-        texas = SimpleTexas.builder()
+        result = Texas.builder()
                 .players(createPlayersByChips(10, 20))
-                .build();
-        texas.start();
-        texas.action(Optype.Fold);
-
-        result = texas.settle();
+                .communityCards(club9, club10, spadesA, heartK, club8)
+                .build()
+                .start()
+                .action(Optype.Fold)
+                .settle();
         info = result.getPlayer(1);
         assertFalse(info.pot.containsKey(1));
         assertFalse(info.pot.containsKey(2));
@@ -476,18 +481,18 @@ public class TexasTest extends AllCard {
         // 10 20 B
         // 10 20 10 C
         // B 玩家弃牌，A 玩家赢
-        texas = SimpleTexas.builder()
+        result = Texas.builder()
                 .players(createPlayersByChips(10, 100, 40))
-                .build();
-        texas.start();
-        texas.action(Optype.Allin);
-        texas.action(Optype.Call);
-        texas.action(Optype.Call);
-        texas.action(Optype.Raise, 20);
-        texas.action(Optype.Allin);
-        texas.action(Optype.Fold);
-
-        result = texas.settle();
+                .communityCards(club9, club10, spadesA, heartK, club8)
+                .build()
+                .start()
+                .action(Optype.Allin)
+                .action(Optype.Call)
+                .action(Optype.Call)
+                .action(Optype.Raise, 20)
+                .action(Optype.Allin)
+                .action(Optype.Fold)
+                .settle();
         assertEquals(20, result.getPlayer(1).getProfit());
         assertEquals(-30, result.getPlayer(2).getProfit());
         assertEquals(10, result.getPlayer(3).getProfit());
@@ -497,61 +502,23 @@ public class TexasTest extends AllCard {
         // 10 20 C
         // 10 20 10 A
         // B 玩家弃牌，C 玩家赢
-        texas = SimpleTexas.builder()
+        result = Texas.builder()
                 .players(createPlayersByChips(40, 10, 40))
-                .build();
-        texas.start();
-        texas.action(Optype.Call);
-        texas.action(Optype.Allin);
-        texas.action(Optype.Call);
-        texas.action(Optype.Call);
-
-        texas.action(Optype.Raise, 20);
-        texas.action(Optype.Allin);
-        texas.action(Optype.Fold);
-
-        result = texas.settle();
+                .communityCards(club9, club10, spadesA, heartK, club8)
+                .build()
+                .start()
+                .action(Optype.Call)
+                .action(Optype.Allin)
+                .action(Optype.Call)
+                .action(Optype.Call)
+                .action(Optype.Raise, 20)
+                .action(Optype.Allin)
+                .action(Optype.Fold)
+                .settle();
         assertEquals(40, result.getPlayer(1).getProfit());
         assertEquals(-10, result.getPlayer(2).getProfit());
         assertEquals(-30, result.getPlayer(3).getProfit());
         assertEquals(10, result.getPlayer(1).refund);
-    }
-
-    private static class SimpleTexas {
-        private Texas.Builder builder = Texas.builder();
-
-        private static SimpleTexas builder() {
-            return new SimpleTexas();
-        }
-
-        private static SimpleTexas builder(int num) {
-            var ret = new SimpleTexas();
-            ret.builder.playerNum(num);
-            return ret;
-        }
-
-        SimpleTexas players(Player... players) {
-            this.builder.players(players);
-            return this;
-        }
-
-        SimpleTexas players(List<Player> players) {
-            this.builder.players(players);
-            return this;
-        }
-
-        SimpleTexas board(Card... board) {
-            this.builder.board(board);
-            return this;
-        }
-
-        Texas build() {
-            if (this.builder.getCommunityCards() == null) {
-                this.builder.board(club9, club10, spadesA, heartK, club8);
-            }
-
-            return this.builder.build();
-        }
     }
 
     private List<Player> createPlayersByChips(int... initChips) {
@@ -777,7 +744,7 @@ public class TexasTest extends AllCard {
     @Test
     public void testCommunityCards() throws Exception {
         var texas = Texas.builder()
-                .board(club9, club10, spadesA, heartK, club8)
+                .communityCards(club9, club10, spadesA, heartK, club8)
                 .build();
         texas.start();
         assertTrue(texas.getCommunityCards().isEmpty());
@@ -800,7 +767,7 @@ public class TexasTest extends AllCard {
         equalsCommunityCards(texas, club9, club10, spadesA, heartK, club8);
 
         texas = Texas.builder()
-                .board(club9, club10, spadesA, heartK, club8)
+                .communityCards(club9, club10, spadesA, heartK, club8)
                 .players(new Player(1, 100), new Player(2, 200), new Player(3, 300))
                 .build();
         texas.start();

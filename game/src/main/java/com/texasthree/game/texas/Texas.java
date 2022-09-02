@@ -88,12 +88,12 @@ public class Texas {
             return this;
         }
 
-        public Builder board(List<Card> board) {
+        public Builder communityCards(List<Card> board) {
             this.board = board;
             return this;
         }
 
-        public Builder board(Card... board) {
+        public Builder communityCards(Card... board) {
             this.board = Arrays.asList(board);
             return this;
         }
