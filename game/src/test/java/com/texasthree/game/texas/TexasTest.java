@@ -99,22 +99,22 @@ public class TexasTest extends AllCard {
                 .initChips(200)
                 .build();
         texas.start();
-        assertEquals(Transfer.NEXT_OP, texas.action(Optype.Raise, 198));
+        assertEquals(Transfer.NEXT_OP, texas.action(Optype.Raise, 198).state());
 
         // 第一圈都 call, 大盲多一次押注
         texas = Texas.builder(3).build();
-        assertEquals(Transfer.NEXT_OP, texas.start().getState());
-        assertEquals(Transfer.NEXT_OP, texas.action(Optype.Call));
-        assertEquals(Transfer.NEXT_OP, texas.action(Optype.Call));
-        assertEquals(Transfer.CIRCLE_END, texas.action(Optype.Check));
+        assertEquals(Transfer.NEXT_OP, texas.start().state());
+        assertEquals(Transfer.NEXT_OP, texas.action(Optype.Call).state());
+        assertEquals(Transfer.NEXT_OP, texas.action(Optype.Call).state());
+        assertEquals(Transfer.CIRCLE_END, texas.action(Optype.Check).state());
 
         // 小盲为0
         texas = Texas.builder()
                 .smallBlind(0)
                 .build();
-        assertEquals(Transfer.NEXT_OP, texas.start().getState());
-        assertEquals(Transfer.NEXT_OP, texas.action(Optype.Check));
-        assertEquals(Transfer.CIRCLE_END, texas.action(Optype.Check));
+        assertEquals(Transfer.NEXT_OP, texas.start().state());
+        assertEquals(Transfer.NEXT_OP, texas.action(Optype.Check).state());
+        assertEquals(Transfer.CIRCLE_END, texas.action(Optype.Check).state());
 
         // TODO 两倍前注
 //        var reg = new HashMap<Regulation, Integer>();
@@ -123,7 +123,7 @@ public class TexasTest extends AllCard {
 //                .smallBlind(0)
 //                .regulations(reg)
 //                .build();
-//        assertEquals(Transfer.NEXT_OP, texas.start().getState());
+//        assertEquals(Transfer.NEXT_OP, texas.start().state());
 //        assertEquals(Transfer.NEXT_OP, texas.action(Optype.Call));
 //        assertEquals(Transfer.CIRCLE_END, texas.action(Optype.Check));
 
@@ -131,7 +131,7 @@ public class TexasTest extends AllCard {
         texas = Texas.builder()
                 .players(new Player(1, 100), new Player(2, 200), new Player(3, 200))
                 .build();
-        assertEquals(Transfer.NEXT_OP, texas.start().getState());
+        assertEquals(Transfer.NEXT_OP, texas.start().state());
         equalsAction(1, Optype.Allin, Transfer.NEXT_OP, texas);
         equalsAction(2, Optype.Call, Transfer.NEXT_OP, texas);
         equalsAction(3, Optype.Call, Transfer.CIRCLE_END, texas);
@@ -234,7 +234,7 @@ public class TexasTest extends AllCard {
         var texas = Texas.builder(4)
                 .straddle()
                 .build();
-        assertEquals(Transfer.NEXT_OP, texas.start().getState());
+        assertEquals(Transfer.NEXT_OP, texas.start().state());
 //        assert(game:OpPlayer() == config.playerList[1])
 //        assert(config.playerList[4]:Chips() == 196)
         assertEquals(texas.operator().getId(), 1);
@@ -265,16 +265,16 @@ public class TexasTest extends AllCard {
         var texas = Texas.builder()
                 .build();
         texas.start();
-        var state = texas.leave(1);
-        assertEquals(Transfer.SHOWDOWN, state);
+        texas.leave(1);
+        assertEquals(Transfer.SHOWDOWN, texas.state());
         assertTrue(texas.isOver());
 
         //////////////
         texas = Texas.builder()
                 .build();
         texas.start();
-        state = texas.leave(2);
-        assertEquals(Transfer.SHOWDOWN, state);
+        texas.leave(2);
+        assertEquals(Transfer.SHOWDOWN, texas.state());
         assertTrue(texas.isOver());
 
         //////////////
@@ -771,7 +771,7 @@ public class TexasTest extends AllCard {
         assertEquals(1, texas.sbPlayer().getId());
         assertEquals(2, texas.bbPlayer().getId());
         assertEquals(50, texas.smallBlind());
-        assertEquals(Transfer.SHOWDOWN, texas.getState());
+        assertEquals(Transfer.SHOWDOWN, texas.state());
     }
 
     @Test
@@ -901,12 +901,12 @@ public class TexasTest extends AllCard {
 
     private void equalsAction(Integer opId, Optype op, Transfer state, Texas texas) throws Exception {
         assertEquals(opId, texas.operator().getId());
-        assertEquals(state, texas.action(op));
+        assertEquals(state, texas.action(op).state());
     }
 
     private void equalsAction(Integer opId, Optype op, int chipsAdd, Transfer state, Texas texas) throws Exception {
         assertEquals(opId, texas.operator().getId());
-        assertEquals(state, texas.action(op, chipsAdd));
+        assertEquals(state, texas.action(op, chipsAdd).state());
     }
 
 

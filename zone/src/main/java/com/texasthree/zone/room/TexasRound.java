@@ -70,7 +70,7 @@ public class TexasRound {
                 .build();
         this.game.start();
         this.printStart();
-        this.checker.once(() -> this.move(this.game.getState()), 2000);
+        this.checker.once(() -> this.move(this.game.state()), 2000);
         this.eventHandler.trigger(this, RoundEvent.START_GAME);
         this.updateHand();
     }
@@ -92,7 +92,7 @@ public class TexasRound {
         this.operator = null;
         this.eventHandler.trigger(this, RoundEvent.ACTION);
 
-        var move = this.game.getState();
+        var move = this.game.state();
         if (Optype.Check.equals(op)) {
             // Check 没有动画，不需要延时，直接下一个操作
             this.move(move);

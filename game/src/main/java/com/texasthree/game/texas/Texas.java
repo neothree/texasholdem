@@ -193,7 +193,7 @@ public class Texas {
      */
     private Ring<Player> ring;
 
-    private Transfer state;
+    private Transfer STATE;
 
     private Texas(Map<Regulation, Integer> regulations, Ring<Player> ring, List<Card> leftCard) {
         this.regulations = regulations;
@@ -254,8 +254,8 @@ public class Texas {
     /**
      * 强制盲注
      */
-    private Transfer actionStraddle() {
-        return this.action(Optype.Raise, this.straddleBlind(), true);
+    private void actionStraddle() {
+        this.action(Optype.Raise, this.straddleBlind(), true);
     }
 
     /**
@@ -265,15 +265,17 @@ public class Texas {
         this.pot.actionDealerAnte(this.dealer(), this.ante());
     }
 
-    Transfer action(Optype op) {
-        return this.action(op, 0, false);
+    Texas action(Optype op) {
+        this.action(op, 0, false);
+        return this;
     }
 
-    public Transfer action(Optype op, int chipsAdd) {
-        return this.action(op, chipsAdd, false);
+    public Texas action(Optype op, int chipsAdd) {
+        this.action(op, chipsAdd, false);
+        return this;
     }
 
-    private Transfer action(Optype op, int chipsAdd, boolean straddle) {
+    private Texas action(Optype op, int chipsAdd, boolean straddle) {
         if (this.isOver) {
             return null;
         }
@@ -286,10 +288,10 @@ public class Texas {
 
         // 如果下一位玩家离开则自动弃牌
         if (Transfer.NEXT_OP.equals(move) && this.operator().isLeave()) {
-            move = this.action(Optype.Fold, 0, false);
+            this.action(Optype.Fold, 0, false);
         }
 
-        return move;
+        return this;
     }
 
     /**
@@ -335,7 +337,7 @@ public class Texas {
         } else {
             this.showdown();
         }
-        this.state = state;
+        this.STATE = state;
         return state;
     }
 
@@ -360,32 +362,32 @@ public class Texas {
     /**
      * 玩家离开
      */
-    Transfer leave(Integer id) {
+    Texas leave(Integer id) {
         var player = this.getPlayerById(id);
         if (player == null) {
             throw new IllegalArgumentException(id + " 不存在");
         }
         if (player.isLeave()) {
-            return null;
+            return this;
         }
 
         player.leave();
 
         if (this.isOver) {
-            return null;
+            return this;
         }
 
         // 如果是正在押注玩家直接弃牌
         if (this.operator().equals(player)) {
-            return this.action(Optype.Fold, 0, false);
+            this.action(Optype.Fold, 0, false);
         }
 
         // 只剩下一个人，结束
         // TODO 不应该在这里判断，应该放到turn中，只有turn才行判断和决定状态转移
         if (this.remainingNum() == 1) {
-            return this.transit();
+             this.transit();
         }
-        return null;
+        return this;
     }
 
     /**
@@ -659,7 +661,7 @@ public class Texas {
         return this.pot.getAction(id);
     }
 
-    public Transfer getState() {
-        return state;
+    public Transfer state() {
+        return STATE;
     }
 }
