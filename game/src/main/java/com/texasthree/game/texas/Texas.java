@@ -204,7 +204,7 @@ public class Texas {
     /**
      * 开始
      */
-    public String start() {
+    public Transfer start() {
         this.pot = new Pot(playerNum, this.smallBlind(), this.ante());
 
         // 一圈开始
@@ -253,7 +253,7 @@ public class Texas {
     /**
      * 强制盲注
      */
-    private String actionStraddle() {
+    private Transfer actionStraddle() {
         return this.action(Optype.Raise, this.straddleBlind(), true);
     }
 
@@ -264,15 +264,15 @@ public class Texas {
         this.pot.actionDealerAnte(this.dealer(), this.ante());
     }
 
-    public String action(Optype op) {
+    public Transfer action(Optype op) {
         return this.action(op, 0, false);
     }
 
-    public String action(Optype op, int chipsAdd) {
+    public Transfer action(Optype op, int chipsAdd) {
         return this.action(op, chipsAdd, false);
     }
 
-    private String action(Optype op, int chipsAdd, boolean straddle) {
+    private Transfer action(Optype op, int chipsAdd, boolean straddle) {
         if (this.isOver) {
             return null;
         }
@@ -284,7 +284,7 @@ public class Texas {
         var move = this.transit();
 
         // 如果下一位玩家离开则自动弃牌
-        if (Transfer.NEXT_OP.name().equals(move) && this.operator().isLeave()) {
+        if (Transfer.NEXT_OP.equals(move) && this.operator().isLeave()) {
             move = this.action(Optype.Fold, 0, false);
         }
 
@@ -294,8 +294,8 @@ public class Texas {
     /**
      * 状态转移
      */
-    private String transit() {
-        String state;
+    private Transfer transit() {
+        Transfer state;
         var waitActionNum = this.waitActionNum();
         var opNext = this.nextOpPlayer(this.operator().getId());
         var standard = this.pot.getStandard();
@@ -304,31 +304,31 @@ public class Texas {
                 || (waitActionNum == 1 && standard == this.pot.chipsThisCircle(opNext.getId()))
                 // 没有可押注玩家
                 || waitActionNum == 0) {
-            state = Transfer.SHOWDOWN.name();
+            state = Transfer.SHOWDOWN;
         } else if (opNext.getId() == this.pot.getStandardId()) {
             /********************************************/
             /**  进入这里，说明下一个操作人轮到了最高押注位  **/
             /********************************************/
             if (Circle.RIVER.equals(this.pot.circle())) {
                 // 已经是最后一圈，摊牌
-                state = Transfer.SHOWDOWN.name();
+                state = Transfer.SHOWDOWN;
             } else if (this.isPreflopOnceAction(standard, opNext)) {
                 // 在PREFLOP 多一次押注权限
                 var player = this.nextOpPlayer(opNext.getId());
                 this.pot.setStandardInfo(player.getId());
-                state = Transfer.NEXT_OP.name();
+                state = Transfer.NEXT_OP;
             } else {
                 // 这一圈结束
-                state = Transfer.CIRCLE_END.name();
+                state = Transfer.CIRCLE_END;
             }
         } else {
             // 下一个操作位进行押注
-            state = Transfer.NEXT_OP.name();
+            state = Transfer.NEXT_OP;
         }
 
-        if (Transfer.NEXT_OP.name().equals(state)) {
+        if (Transfer.NEXT_OP.equals(state)) {
             this.nextOp();
-        } else if (Transfer.CIRCLE_END.name().equals(state)) {
+        } else if (Transfer.CIRCLE_END.equals(state)) {
             this.circleEnd();
             this.circleStart();
         } else {
@@ -358,7 +358,7 @@ public class Texas {
     /**
      * 玩家离开
      */
-    String leave(Integer id) {
+    Transfer leave(Integer id) {
         var player = this.getPlayerById(id);
         if (player == null) {
             throw new IllegalArgumentException(id + " 不存在");

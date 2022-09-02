@@ -103,12 +103,12 @@ public class TexasRound {
     }
 
 
-    private void move(String move) {
-        if (Transfer.NEXT_OP.name().equals(move)) {
+    private void move(Transfer move) {
+        if (Transfer.NEXT_OP.equals(move)) {
             this.moveNextOp();
-        } else if (Transfer.CIRCLE_END.name().equals(move)) {
+        } else if (Transfer.CIRCLE_END.equals(move)) {
             this.moveCircleEnd();
-        } else if (Transfer.SHOWDOWN.name().equals(move)) {
+        } else if (Transfer.SHOWDOWN.equals(move)) {
             this.moveShowdown();
         }
     }
