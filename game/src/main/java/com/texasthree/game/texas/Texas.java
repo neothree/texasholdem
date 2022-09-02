@@ -205,7 +205,7 @@ public class Texas {
     /**
      * 开始
      */
-    public Transfer start() {
+    public Texas start() {
         this.pot = new Pot(playerNum, this.smallBlind(), this.ante());
 
         // 一圈开始
@@ -227,13 +227,13 @@ public class Texas {
         }
 
         // 轮转
-        var move = this.transit();
+        this.transit();
 
         // 强制盲注
         if (this.straddleEnable()) {
-            move = this.actionStraddle();
+            this.actionStraddle();
         }
-        return move;
+        return this;
     }
 
     /**

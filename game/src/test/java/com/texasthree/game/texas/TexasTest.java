@@ -103,7 +103,7 @@ public class TexasTest extends AllCard {
 
         // 第一圈都 call, 大盲多一次押注
         texas = Texas.builder(3).build();
-        assertEquals(Transfer.NEXT_OP, texas.start());
+        assertEquals(Transfer.NEXT_OP, texas.start().getState());
         assertEquals(Transfer.NEXT_OP, texas.action(Optype.Call));
         assertEquals(Transfer.NEXT_OP, texas.action(Optype.Call));
         assertEquals(Transfer.CIRCLE_END, texas.action(Optype.Check));
@@ -112,7 +112,7 @@ public class TexasTest extends AllCard {
         texas = Texas.builder()
                 .smallBlind(0)
                 .build();
-        assertEquals(Transfer.NEXT_OP, texas.start());
+        assertEquals(Transfer.NEXT_OP, texas.start().getState());
         assertEquals(Transfer.NEXT_OP, texas.action(Optype.Check));
         assertEquals(Transfer.CIRCLE_END, texas.action(Optype.Check));
 
@@ -123,7 +123,7 @@ public class TexasTest extends AllCard {
 //                .smallBlind(0)
 //                .regulations(reg)
 //                .build();
-//        assertEquals(Transfer.NEXT_OP, texas.start());
+//        assertEquals(Transfer.NEXT_OP, texas.start().getState());
 //        assertEquals(Transfer.NEXT_OP, texas.action(Optype.Call));
 //        assertEquals(Transfer.CIRCLE_END, texas.action(Optype.Check));
 
@@ -131,7 +131,7 @@ public class TexasTest extends AllCard {
         texas = Texas.builder()
                 .players(new Player(1, 100), new Player(2, 200), new Player(3, 200))
                 .build();
-        assertEquals(Transfer.NEXT_OP, texas.start());
+        assertEquals(Transfer.NEXT_OP, texas.start().getState());
         equalsAction(1, Optype.Allin, Transfer.NEXT_OP, texas);
         equalsAction(2, Optype.Call, Transfer.NEXT_OP, texas);
         equalsAction(3, Optype.Call, Transfer.CIRCLE_END, texas);
@@ -234,7 +234,7 @@ public class TexasTest extends AllCard {
         var texas = Texas.builder(4)
                 .straddle()
                 .build();
-        assertEquals(Transfer.NEXT_OP, texas.start());
+        assertEquals(Transfer.NEXT_OP, texas.start().getState());
 //        assert(game:OpPlayer() == config.playerList[1])
 //        assert(config.playerList[4]:Chips() == 196)
         assertEquals(texas.operator().getId(), 1);
@@ -766,12 +766,12 @@ public class TexasTest extends AllCard {
                 .ring(ring)
                 .smallBlind(50)
                 .build();
-        var state = texas.start();
+        texas.start();
         assertEquals(1, texas.dealer().getId());
         assertEquals(1, texas.sbPlayer().getId());
         assertEquals(2, texas.bbPlayer().getId());
         assertEquals(50, texas.smallBlind());
-        assertEquals(Transfer.SHOWDOWN, state);
+        assertEquals(Transfer.SHOWDOWN, texas.getState());
     }
 
     @Test
