@@ -169,14 +169,6 @@ public class Texas {
     }
 
     /**
-     * 轮到下一个操作位
-     */
-    public static final String STATE_NEXT_OP = "STATE_NEXT_OP";
-
-    public static final String STATE_CIRCLE_END = "STATE_CIRCLE_END";
-
-    public static final String STATE_SHOWDOWN = "STATE_SHOWDOWN";
-    /**
      * 是否结束
      */
     private boolean isOver;
@@ -292,7 +284,7 @@ public class Texas {
         var move = this.transit();
 
         // 如果下一位玩家离开则自动弃牌
-        if (Texas.STATE_NEXT_OP.equals(move) && this.operator().isLeave()) {
+        if (Transfer.NEXT_OP.name().equals(move) && this.operator().isLeave()) {
             move = this.action(Optype.Fold, 0, false);
         }
 
@@ -312,31 +304,31 @@ public class Texas {
                 || (waitActionNum == 1 && standard == this.pot.chipsThisCircle(opNext.getId()))
                 // 没有可押注玩家
                 || waitActionNum == 0) {
-            state = Texas.STATE_SHOWDOWN;
+            state = Transfer.SHOWDOWN.name();
         } else if (opNext.getId() == this.pot.getStandardId()) {
             /********************************************/
             /**  进入这里，说明下一个操作人轮到了最高押注位  **/
             /********************************************/
             if (Circle.RIVER.equals(this.pot.circle())) {
                 // 已经是最后一圈，摊牌
-                state = Texas.STATE_SHOWDOWN;
+                state = Transfer.SHOWDOWN.name();
             } else if (this.isPreflopOnceAction(standard, opNext)) {
                 // 在PREFLOP 多一次押注权限
                 var player = this.nextOpPlayer(opNext.getId());
                 this.pot.setStandardInfo(player.getId());
-                state = Texas.STATE_NEXT_OP;
+                state = Transfer.NEXT_OP.name();
             } else {
                 // 这一圈结束
-                state = Texas.STATE_CIRCLE_END;
+                state = Transfer.CIRCLE_END.name();
             }
         } else {
             // 下一个操作位进行押注
-            state = Texas.STATE_NEXT_OP;
+            state = Transfer.NEXT_OP.name();
         }
 
-        if (Texas.STATE_NEXT_OP.equals(state)) {
+        if (Transfer.NEXT_OP.name().equals(state)) {
             this.nextOp();
-        } else if (Texas.STATE_CIRCLE_END.equals(state)) {
+        } else if (Transfer.CIRCLE_END.name().equals(state)) {
             this.circleEnd();
             this.circleStart();
         } else {
