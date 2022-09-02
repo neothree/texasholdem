@@ -211,6 +211,9 @@ public class Texas {
      * 开始
      */
     public Texas start() {
+        if (this.pot != null) {
+            throw new IllegalStateException();
+        }
         this.pot = new Pot(playerNum, this.smallBlind(), this.ante());
 
         // 一圈开始
@@ -282,7 +285,7 @@ public class Texas {
 
     private Texas action(Optype op, int chipsAdd, boolean straddle) {
         if (this.isOver) {
-            return null;
+            throw new IllegalStateException();
         }
 
         // 执行下注

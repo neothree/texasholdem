@@ -1,7 +1,6 @@
 package com.texasthree.game.texas;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.texasthree.game.AllCard;
 import com.texasthree.game.Deck;
 import org.junit.jupiter.api.Test;
@@ -11,6 +10,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.texasthree.game.texas.Optype.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -41,80 +41,75 @@ public class TexasTest extends AllCard {
 
     @Test
     public void testCircle() throws Exception {
-        var texas = Texas.builder(5).build();
-        texas.start();
-
         // 1 dealer 2 sb 3 bb
-        equalsCircle(4, Optype.Call, Circle.PREFLOP, texas);
-        equalsCircle(5, Optype.Call, Circle.PREFLOP, texas);
-        equalsCircle(1, Optype.Call, Circle.PREFLOP, texas);
-        equalsCircle(2, Optype.Fold, Circle.PREFLOP, texas);
-        equalsCircle(3, Optype.Fold, Circle.PREFLOP, texas);
+        AssertTexas.builder(5).build().start()
+                .assertDealer(1)
+                .assertSbPlayer(2)
+                .assertBbPlayer(3)
+                .assertOperatorAndCircle(4, Circle.PREFLOP).action(Call)
+                .assertOperatorAndCircle(5, Circle.PREFLOP).action(Call)
+                .assertOperatorAndCircle(1, Circle.PREFLOP).action(Call)
+                .assertOperatorAndCircle(2, Circle.PREFLOP).action(Fold)
+                .assertOperatorAndCircle(3, Circle.PREFLOP).action(Fold)
 
-        equalsCircle(4, Optype.Raise, 2, Circle.FLOP, texas);
-        equalsCircle(5, Optype.Fold, Circle.FLOP, texas);
-        equalsCircle(1, Optype.Call, Circle.FLOP, texas);
+                .assertOperatorAndCircle(4, Circle.FLOP).action(Raise, 2)
+                .assertOperatorAndCircle(5, Circle.FLOP).action(Fold)
+                .assertOperatorAndCircle(1, Circle.FLOP).action(Call)
 
-        equalsCircle(4, Optype.Check, Circle.TURN, texas);
-        equalsCircle(1, Optype.Check, Circle.TURN, texas);
+                .assertOperatorAndCircle(4, Circle.TURN).action(Check)
+                .assertOperatorAndCircle(1, Circle.TURN).action(Check)
 
-        assertEquals(Circle.RIVER, texas.circle());
-
-
-        ////////////////////////////////////////////////////////////////////////
-        texas = Texas.builder(5).build();
-        texas.start();
-
-        equalsCircle(4, Optype.Call, Circle.PREFLOP, texas);
-        equalsCircle(5, Optype.Call, Circle.PREFLOP, texas);
-        equalsCircle(1, Optype.Call, Circle.PREFLOP, texas);
-        equalsCircle(2, Optype.Call, Circle.PREFLOP, texas);
-        equalsCircle(3, Optype.Check, Circle.PREFLOP, texas);
+                .assertCircle(Circle.RIVER);
 
 
-        equalsCircle(2, Optype.Fold, Circle.FLOP, texas);
-        equalsCircle(3, Optype.Raise, 2, Circle.FLOP, texas);
-        equalsCircle(4, Optype.Fold, Circle.FLOP, texas);
-        equalsCircle(5, Optype.Fold, Circle.FLOP, texas);
-        equalsCircle(1, Optype.Call, Circle.FLOP, texas);
+        AssertTexas.builder(5).build().start()
+                .assertOperatorAndCircle(4, Circle.PREFLOP).action(Call)
+                .assertOperatorAndCircle(5, Circle.PREFLOP).action(Call)
+                .assertOperatorAndCircle(1, Circle.PREFLOP).action(Call)
+                .assertOperatorAndCircle(2, Circle.PREFLOP).action(Call)
+                .assertOperatorAndCircle(3, Circle.PREFLOP).action(Check)
 
-        assertEquals(Circle.TURN, texas.circle());
+                .assertOperatorAndCircle(2, Circle.FLOP).action(Fold)
+                .assertOperatorAndCircle(3, Circle.FLOP).action(Raise, 2)
+                .assertOperatorAndCircle(4, Circle.FLOP).action(Fold)
+                .assertOperatorAndCircle(5, Circle.FLOP).action(Fold)
+                .assertOperatorAndCircle(1, Circle.FLOP).action(Call)
 
-        ////////////////////////////////////////////////////////////////////////
-        texas = Texas.builder(5).build();
-        texas.start();
+                .assertCircle(Circle.TURN);
 
-        equalsCircle(4, Optype.Raise, 4, Circle.PREFLOP, texas);
-        equalsCircle(5, Optype.Allin, Circle.PREFLOP, texas);
-        equalsCircle(1, Optype.Allin, Circle.PREFLOP, texas);
-        equalsCircle(2, Optype.Fold, Circle.PREFLOP, texas);
-        equalsCircle(3, Optype.Allin, Circle.PREFLOP, texas);
-        equalsCircle(4, Optype.Allin, Circle.PREFLOP, texas);
-        assertTrue(texas.isOver());
+
+        AssertTexas.builder(5).build().start()
+                .assertOperatorAndCircle(4, Circle.PREFLOP).action(Raise, 4)
+                .assertOperatorAndCircle(5, Circle.PREFLOP).action(Allin)
+                .assertOperatorAndCircle(1, Circle.PREFLOP).action(Allin)
+                .assertOperatorAndCircle(2, Circle.PREFLOP).action(Fold)
+                .assertOperatorAndCircle(3, Circle.PREFLOP).action(Allin)
+                .assertOperatorAndCircle(4, Circle.PREFLOP).action(Allin)
+                .assertIsOver(true);
     }
 
     @Test
     public void testAction() throws Exception {
-        var texas = Texas.builder(2)
-                .initChips(200)
-                .build();
-        texas.start();
-        assertEquals(Transfer.NEXT_OP, texas.action(Optype.Raise, 198).state());
+        AssertTexas.builder(2).initChips(200)
+                .build()
+                .start().assertState(Transfer.NEXT_OP)
+                .action(Raise, 198).assertState(Transfer.NEXT_OP);
 
         // 第一圈都 call, 大盲多一次押注
-        texas = Texas.builder(3).build();
-        assertEquals(Transfer.NEXT_OP, texas.start().state());
-        assertEquals(Transfer.NEXT_OP, texas.action(Optype.Call).state());
-        assertEquals(Transfer.NEXT_OP, texas.action(Optype.Call).state());
-        assertEquals(Transfer.CIRCLE_END, texas.action(Optype.Check).state());
+        AssertTexas.builder(3)
+                .build()
+                .start().assertState(Transfer.NEXT_OP)
+                .action(Call).assertState(Transfer.NEXT_OP)
+                .action(Call).assertState(Transfer.NEXT_OP)
+                .action(Check).assertState(Transfer.CIRCLE_END);
 
         // 小盲为0
-        texas = Texas.builder()
+        AssertTexas.builder()
                 .smallBlind(0)
-                .build();
-        assertEquals(Transfer.NEXT_OP, texas.start().state());
-        assertEquals(Transfer.NEXT_OP, texas.action(Optype.Check).state());
-        assertEquals(Transfer.CIRCLE_END, texas.action(Optype.Check).state());
+                .build()
+                .start().assertState(Transfer.NEXT_OP)
+                .action(Check).assertState(Transfer.NEXT_OP)
+                .action(Check).assertState(Transfer.CIRCLE_END);
 
         // TODO 两倍前注
 //        var reg = new HashMap<Regulation, Integer>();
@@ -124,109 +119,99 @@ public class TexasTest extends AllCard {
 //                .regulations(reg)
 //                .build();
 //        assertEquals(Transfer.NEXT_OP, texas.start().state());
-//        assertEquals(Transfer.NEXT_OP, texas.action(Optype.Call));
-//        assertEquals(Transfer.CIRCLE_END, texas.action(Optype.Check));
+//        assertEquals(Transfer.NEXT_OP, texas.action(Call));
+//        assertEquals(Transfer.CIRCLE_END, texas.action(Check));
 
         // 复现
-        texas = Texas.builder()
+        AssertTexas.builder()
                 .players(new Player(1, 100), new Player(2, 200), new Player(3, 200))
-                .build();
-        assertEquals(Transfer.NEXT_OP, texas.start().state());
-        equalsAction(1, Optype.Allin, Transfer.NEXT_OP, texas);
-        equalsAction(2, Optype.Call, Transfer.NEXT_OP, texas);
-        equalsAction(3, Optype.Call, Transfer.CIRCLE_END, texas);
-        equalsAction(2, Optype.Fold, Transfer.SHOWDOWN, texas);
+                .build()
+                .start().assertState(Transfer.NEXT_OP)
+                .action(Allin).assertState(Transfer.NEXT_OP)
+                .action(Call).assertState(Transfer.NEXT_OP)
+                .action(Call).assertState(Transfer.CIRCLE_END)
+                .action(Fold).assertState(Transfer.SHOWDOWN);
     }
 
     @Test
     public void testOperator() throws Exception {
-        var texas = Texas.builder(5).build();
-        texas.start();
+        AssertTexas.builder(5).build().start()
+                .assertCircle(Circle.PREFLOP)
+                .assertOperator(4).action(Call).assertState(Transfer.NEXT_OP)
+                .assertOperator(5).action(Call).assertState(Transfer.NEXT_OP)
+                .assertOperator(1).action(Call).assertState(Transfer.NEXT_OP)
+                .assertOperator(2).action(Call).assertState(Transfer.NEXT_OP)
+                // 第一圈，大盲这种情况下多一次押注
+                .assertOperator(3).action(Check).assertState(Transfer.CIRCLE_END)
+                .assertCircle(Circle.FLOP)
+                .assertOperator(2).action(Fold).assertState(Transfer.NEXT_OP)
+                .assertOperator(3).action(Fold).assertState(Transfer.NEXT_OP)
+                .assertOperator(4).action(Raise, 2).assertState(Transfer.NEXT_OP)
+                .assertOperator(5).action(Call).assertState(Transfer.NEXT_OP)
+                .assertOperator(1).action(Fold).assertState(Transfer.CIRCLE_END)
+                .assertCircle(Circle.TURN)
+                .assertOperator(4).action(Raise, 2).assertState(Transfer.NEXT_OP)
+                .assertOperator(5).action(Call).assertState(Transfer.CIRCLE_END)
+                .assertCircle(Circle.RIVER)
+                .assertOperator(4).action(Raise, 2).assertState(Transfer.NEXT_OP)
+                .assertOperator(5).action(Call).assertState(Transfer.SHOWDOWN);
 
-        // PREFLOP
-        equalsAction(4, Optype.Call, Transfer.NEXT_OP, texas);
-        equalsAction(5, Optype.Call, Transfer.NEXT_OP, texas);
-        equalsAction(1, Optype.Call, Transfer.NEXT_OP, texas);
-        equalsAction(2, Optype.Call, Transfer.NEXT_OP, texas);
-        // 第一圈，大盲这种情况下多一次押注
-        equalsAction(3, Optype.Check, Transfer.CIRCLE_END, texas);
 
-        // FLOP
-        equalsAction(2, Optype.Fold, Transfer.NEXT_OP, texas);
-        equalsAction(3, Optype.Fold, Transfer.NEXT_OP, texas);
-        equalsAction(4, Optype.Raise, 2, Transfer.NEXT_OP, texas);
-        equalsAction(5, Optype.Call, Transfer.NEXT_OP, texas);
-        equalsAction(1, Optype.Fold, Transfer.CIRCLE_END, texas);
-
-        // TURN
-        equalsAction(4, Optype.Raise, 2, Transfer.NEXT_OP, texas);
-        equalsAction(5, Optype.Call, Transfer.CIRCLE_END, texas);
-
-        // RIVER
-        equalsAction(4, Optype.Raise, 2, Transfer.NEXT_OP, texas);
-        equalsAction(5, Optype.Call, Transfer.SHOWDOWN, texas);
-
-        //////////////////////////////////////////////////////////////////
         Ring<Player> ring = Ring.create(5);
         for (int i = 1; i <= 4; i++) {
             ring.setValue(new Player(i, 100));
             ring = ring.getNext();
         }
         ring.setValue(new Player(5, 50));
-        texas = Texas.builder()
-                .ring(ring)
-                .build();
-        texas.start();
-
-        equalsAction(4, Optype.Raise, 4, Transfer.NEXT_OP, texas);
-        equalsAction(5, Optype.Allin, Transfer.NEXT_OP, texas);
-        equalsAction(1, Optype.Call, Transfer.NEXT_OP, texas);
-        equalsAction(2, Optype.Fold, Transfer.NEXT_OP, texas);
-        equalsAction(3, Optype.Call, Transfer.NEXT_OP, texas);
-        equalsAction(4, Optype.Call, Transfer.CIRCLE_END, texas);
-
-        equalsAction(3, Optype.Check, Transfer.NEXT_OP, texas);
-        equalsAction(4, Optype.Check, Transfer.NEXT_OP, texas);
-        equalsAction(1, Optype.Raise, 4, Transfer.NEXT_OP, texas);
-        equalsAction(3, Optype.Fold, Transfer.NEXT_OP, texas);
-        equalsAction(4, Optype.Call, Transfer.CIRCLE_END, texas);
-
-        equalsAction(4, Optype.Raise, 5, Transfer.NEXT_OP, texas);
-        equalsAction(1, Optype.Call, Transfer.CIRCLE_END, texas);
+        AssertTexas.builder().ring(ring).build().start()
+                .assertCircle(Circle.PREFLOP)
+                .assertOperator(4).action(Raise, 4).assertState(Transfer.NEXT_OP)
+                .assertOperator(5).action(Allin).assertState(Transfer.NEXT_OP)
+                .assertOperator(1).action(Call).assertState(Transfer.NEXT_OP)
+                .assertOperator(2).action(Fold).assertState(Transfer.NEXT_OP)
+                .assertOperator(3).action(Call).assertState(Transfer.NEXT_OP)
+                .assertOperator(4).action(Call).assertState(Transfer.CIRCLE_END)
+                .assertCircle(Circle.FLOP)
+                .assertOperator(3).action(Check).assertState(Transfer.NEXT_OP)
+                .assertOperator(4).action(Check).assertState(Transfer.NEXT_OP)
+                .assertOperator(1).action(Raise, 4).assertState(Transfer.NEXT_OP)
+                .assertOperator(3).action(Fold).assertState(Transfer.NEXT_OP)
+                .assertOperator(4).action(Call).assertState(Transfer.CIRCLE_END)
+                .assertCircle(Circle.TURN)
+                .assertOperator(4).action(Raise, 5).assertState(Transfer.NEXT_OP)
+                .assertOperator(1).action(Call).assertState(Transfer.CIRCLE_END);
 
 
-        ////////////////////////////////////////////////////////////////////////
-        texas = Texas.builder().build();
-        texas.start();
+        AssertTexas.builder().build().start()
+                .assertCircle(Circle.PREFLOP)
+                .assertOperator(1).action(Call).assertState(Transfer.NEXT_OP)
+                .assertOperator(2).action(Check).assertState(Transfer.CIRCLE_END)
+                .assertCircle(Circle.FLOP)
+                .assertOperator(2);
 
-        equalsAction(1, Optype.Call, Transfer.NEXT_OP, texas);
-        equalsAction(2, Optype.Check, Transfer.CIRCLE_END, texas);
 
-        assertEquals(Circle.FLOP, texas.circle());
-        assertEquals(2, texas.operator().getId());
-
-        ////////////////////////////////////////////////////////////////////////
         //  短牌：在“两倍前注”下, 开局后，所有玩家都call，最后应该到庄家还有一次option
         var regulations = new HashMap<Regulation, Integer>();
         regulations.put(Regulation.DoubleAnte, 1);
-        texas = Texas.builder()
+        AssertTexas.builder()
                 .smallBlind(0)
                 .ante(1)
                 .regulations(regulations)
-                .build();
-        texas.start();
-        equalsAction(2, Optype.Call, Transfer.NEXT_OP, texas);
-        equalsAction(1, Optype.Check, Transfer.CIRCLE_END, texas);
+                .build().start()
+                .assertCircle(Circle.PREFLOP)
+                .assertOperator(2).action(Call).assertState(Transfer.NEXT_OP)
+                .assertOperator(1).action(Check).assertState(Transfer.CIRCLE_END);
+
 
         ////////////////////////////////////////////////////////////////////////
         //  短牌：在“smallBlind == 0”下, 开局后，所有玩家都check，最后应该到庄家还有一次option
-        texas = Texas.builder()
+        AssertTexas.builder()
                 .smallBlind(0)
                 .ante(1)
-                .build();
-        texas.start();
-        equalsAction(2, Optype.Check, Transfer.NEXT_OP, texas);
-        equalsAction(1, Optype.Check, Transfer.CIRCLE_END, texas);
+                .build().start()
+                .assertCircle(Circle.PREFLOP)
+                .assertOperator(2).action(Check).assertState(Transfer.NEXT_OP)
+                .assertOperator(1).action(Check).assertState(Transfer.CIRCLE_END);
     }
 
     @Test
@@ -262,135 +247,119 @@ public class TexasTest extends AllCard {
 
     @Test
     public void testLeave() throws Exception {
-        var texas = Texas.builder()
-                .build();
-        texas.start();
-        texas.leave(1);
-        assertEquals(Transfer.SHOWDOWN, texas.state());
-        assertTrue(texas.isOver());
+        AssertTexas.builder().build().start()
+                .assertIsOver(false)
+                .leave(1).assertState(Transfer.SHOWDOWN)
+                .assertIsOver(true);
 
-        //////////////
-        texas = Texas.builder()
-                .build();
-        texas.start();
-        texas.leave(2);
-        assertEquals(Transfer.SHOWDOWN, texas.state());
-        assertTrue(texas.isOver());
+        AssertTexas.builder()
+                .build().start()
+                .assertIsOver(false)
+                .leave(2).assertState(Transfer.SHOWDOWN)
+                .assertIsOver(true);
 
-        //////////////
-        texas = Texas.builder(3)
-                .build();
-        texas.start();
-        texas.leave(1);
-        assertEquals(2, texas.operator().getId());
-        assertFalse(texas.isOver());
-        texas.leave(2);
-        assertTrue(texas.isOver());
+        AssertTexas.builder(3)
+                .build().start()
+                .leave(1).assertIsOver(false)
+                .leave(2).assertIsOver(true);
 
-        // 离开玩家自动弃牌
-        texas = Texas.builder(4)
-                .build();
-        texas.start();
-        texas.leave(1);
-        texas.action(Optype.Fold);
-        assertEquals(2, texas.operator().getId());
+        AssertTexas.builder(4)
+                .build().start()
+                .leave(1)
+                .action(Fold)
+                .assertOperator(2);
 
-        //////////////////////////////
-        texas = Texas.builder(4).build();
-        texas.start()
-                .action(Optype.Call)
-                .action(Optype.Call)
-                .action(Optype.Call)
+        AssertTexas.builder(4).build().start()
+                .action(Call)
+                .action(Call)
+                .action(Call)
                 .leave(2)
-                .action(Optype.Check);
-        assertEquals(Circle.FLOP, texas.circle());
-        assertEquals(3, texas.operator().getId());
+                .action(Check)
+                .assertCircle(Circle.FLOP)
+                .assertOperator(3);
 
-        //////////////////////////////
-        texas = Texas.builder(3).build();
-        texas.start()
+        AssertTexas.builder(3).build().start()
                 .leave(3)
-                .action(Optype.Fold);
-        assertTrue(texas.isOver());
+                .action(Fold)
+                .assertIsOver(true);
     }
 
     @Test
     public void testSettle() throws Exception {
-        var texas = Texas
+        var result = AssertTexas
                 .builder(5)
                 .build()
                 .start()
-                .action(Optype.Fold)
-                .action(Optype.Fold)
-                .action(Optype.Fold)
-                .action(Optype.Fold);
-        var result = texas.settle();
+                .action(Fold)
+                .action(Fold)
+                .action(Fold)
+                .action(Fold)
+                .settle();
         assertEquals(5, result.size());
         assertEquals(3, result.getPlayer(3).pot.values().stream().reduce(Integer::sum).get());
 
 
-        result = Texas.builder()
+        result = AssertTexas.builder()
                 .players(createPlayers(2, 100))
                 .communityCards(club9, club10, spadesA, heartK, club8)
                 .build()
                 .start()
-                .action(Optype.Call)
-                .action(Optype.Raise, 2)
-                .action(Optype.Call)
+                .action(Call)
+                .action(Raise, 2)
+                .action(Call)
 
-                .action(Optype.Check)
-                .action(Optype.Check)
+                .action(Check)
+                .action(Check)
 
-                .action(Optype.Check)
-                .action(Optype.Check)
+                .action(Check)
+                .action(Check)
 
-                .action(Optype.Check)
-                .action(Optype.Check)
+                .action(Check)
+                .action(Check)
                 .settle();
 
         assertEquals(2, result.size());
         assertEquals(8, result.getPlayer(1).pot.values().stream().reduce(Integer::sum).get());
 
         // 所有人都allin的话, 结算看5张底牌
-        result = Texas.builder()
+        result = AssertTexas.builder()
                 .players(createPlayers(2, 10))
                 .communityCards(club9, club10, spadesA, heartK, club8)
                 .build()
                 .start()
-                .action(Optype.Allin)
-                .action(Optype.Allin)
+                .action(Allin)
+                .action(Allin)
                 .settle();
         assertEquals(20, result.getPlayer(1).pot.get(0));
 
         // 有人离开
-        texas = Texas.builder()
+        result = AssertTexas.builder()
                 .players(createPlayersByChips(100, 90, 80, 70))
                 .communityCards(club9, club10, spadesA, heartK, club8)
                 .build()
                 .start()
-                .action(Optype.Allin)
-                .action(Optype.Allin)
-                .action(Optype.Allin)
+                .action(Allin)
+                .action(Allin)
+                .action(Allin)
                 .leave(1)
                 .leave(2)
-                .action(Optype.Allin);
-        assertTrue(texas.isOver());
+                .action(Allin)
+                .assertIsOver(true).settle();
 
-        result = texas.settle();
         assertEquals(280, result.getPlayer(4).pot.get(0));
         assertEquals(30, result.getPlayer(3).pot.get(1));
         assertEquals(20, result.getPlayer(4).pot.get(2));
         assertEquals(10, result.getPlayer(4).pot.get(3));
 
         /////////////
-        texas = Texas.builder(3)
+        result = AssertTexas.builder(3)
                 .communityCards(club9, club10, spadesA, heartK, club8)
                 .build()
                 .start()
                 .leave(2)
-                .leave(3);
-        assertTrue(texas.isOver());
-        result = texas.settle();
+                .leave(3)
+                .assertIsOver(true)
+                .settle();
         assertEquals(3, result.getPlayer(1).pot.get(0));
 
         // TODO ------------- 短牌 --------------------------------
@@ -427,13 +396,13 @@ public class TexasTest extends AllCard {
 //        assert(history.playerList[1].pot[1] == 2)
 
         // 结算后最后一个单人单池筹码返回
-        result = Texas.builder()
+        result = AssertTexas.builder()
                 .players(createPlayersByChips(10, 20))
                 .communityCards(club9, club10, spadesA, heartK, club8)
                 .build()
                 .start()
-                .action(Optype.Allin)
-                .action(Optype.Allin)
+                .action(Allin)
+                .action(Allin)
                 .settle();
         var info = result.getPlayer(1);
         assertEquals(20, info.pot.get(0));
@@ -444,12 +413,12 @@ public class TexasTest extends AllCard {
         assertEquals(-10, info.getProfit());
 
         // 最后只有一个人的话不分池
-        result = Texas.builder()
+        result = AssertTexas.builder()
                 .players(createPlayersByChips(10, 20))
                 .communityCards(club9, club10, spadesA, heartK, club8)
                 .build()
                 .start()
-                .action(Optype.Fold)
+                .action(Fold)
                 .settle();
         info = result.getPlayer(1);
         assertFalse(info.pot.containsKey(1));
@@ -482,17 +451,17 @@ public class TexasTest extends AllCard {
         // 10 20 B
         // 10 20 10 C
         // B 玩家弃牌，A 玩家赢
-        result = Texas.builder()
+        result = AssertTexas.builder()
                 .players(createPlayersByChips(10, 100, 40))
                 .communityCards(club9, club10, spadesA, heartK, club8)
                 .build()
                 .start()
-                .action(Optype.Allin)
-                .action(Optype.Call)
-                .action(Optype.Call)
-                .action(Optype.Raise, 20)
-                .action(Optype.Allin)
-                .action(Optype.Fold)
+                .action(Allin)
+                .action(Call)
+                .action(Call)
+                .action(Raise, 20)
+                .action(Allin)
+                .action(Fold)
                 .settle();
         assertEquals(20, result.getPlayer(1).getProfit());
         assertEquals(-30, result.getPlayer(2).getProfit());
@@ -503,18 +472,18 @@ public class TexasTest extends AllCard {
         // 10 20 C
         // 10 20 10 A
         // B 玩家弃牌，C 玩家赢
-        result = Texas.builder()
+        result = AssertTexas.builder()
                 .players(createPlayersByChips(40, 10, 40))
                 .communityCards(club9, club10, spadesA, heartK, club8)
                 .build()
                 .start()
-                .action(Optype.Call)
-                .action(Optype.Allin)
-                .action(Optype.Call)
-                .action(Optype.Call)
-                .action(Optype.Raise, 20)
-                .action(Optype.Allin)
-                .action(Optype.Fold)
+                .action(Call)
+                .action(Allin)
+                .action(Call)
+                .action(Call)
+                .action(Raise, 20)
+                .action(Allin)
+                .action(Fold)
                 .settle();
         assertEquals(40, result.getPlayer(1).getProfit());
         assertEquals(-10, result.getPlayer(2).getProfit());
@@ -555,168 +524,113 @@ public class TexasTest extends AllCard {
 
     @Test
     public void testAuth() throws Exception {
-        var texas = Texas.builder(5).build();
-        texas.start();
+        var texas = AssertTexas.builder(5).build().start()
+                .leftChips(2).assertAuth(Fold, Allin).action(Allin)
+                .leftChips(3).assertAuth(Fold, Allin, Call).action(Call)
+                .leftChips(10).action(Call)
+                .leftChips(1).assertAuth(Fold, Allin).action(Allin)
+                .leftChips(3).assertAuth(Raise, Fold, Allin, Check).action(Check)
+                .leftChips(2).assertAuth(Fold, Allin, Check).action(Allin)
+                .leftChips(10).action(Call);
 
-        equalsAuth(texas, 2, Optype.Fold, Optype.Allin);
-        texas.action(Optype.Allin);
+        AssertTexas.builder(5).build().start()
+                .leftChips(10).assertAuth(Fold, Call, Raise, Allin, BBlind2, BBlind3, BBlind4)
+                .action(Raise, 10)
+                .action(Fold)
+                .leftChips(40).assertAuth(Fold, Call, Raise, Allin, Pot1_1, Pot1_2, Pot2_3);
 
-        equalsAuth(texas, 3, Optype.Fold, Optype.Allin, Optype.Call);
-        texas.action(Optype.Call);
-
-        var player = texas.operator();
-        player.changeChips(10 - player.getChips());
-        texas.action(Optype.Call);
-
-        equalsAuth(texas, 1, Optype.Fold, Optype.Allin);
-        texas.action(Optype.Allin);
-
-        equalsAuth(texas, 3, Optype.Raise, Optype.Fold, Optype.Allin, Optype.Check);
-        texas.action(Optype.Check);
-
-        equalsAuth(texas, 2, Optype.Fold, Optype.Allin, Optype.Check);
-        texas.action(Optype.Allin);
-
-        player = texas.operator();
-        player.changeChips(10 - player.getChips());
-        texas.action(Optype.Call);
-
-        ////////////////////////////////////////////////////////////////////////////////
-        texas = Texas.builder(5).build();
-        texas.start();
-
-        equalsAuth(texas, 10, Optype.Fold, Optype.Call, Optype.Raise, Optype.Allin, Optype.BBlind2, Optype.BBlind3, Optype.BBlind4);
-        texas.action(Optype.Raise, 10);
-
-        texas.action(Optype.Fold);
-
-        equalsAuth(texas, 40, Optype.Fold, Optype.Call, Optype.Raise, Optype.Allin, Optype.Pot1_1, Optype.Pot1_2, Optype.Pot2_3);
-
-        ////////////////////////////////////////////////////////////////////////////////
-        texas = Texas.builder().build();
-        texas.start();
+        texas = AssertTexas.builder().build().start();
         var auth = texas.authority();
         assertEquals(7, auth.size());
-        assertEquals(0, auth.get(Optype.Fold));
-        assertEquals(1, auth.get(Optype.Call));
-        assertEquals(4, auth.get(Optype.Raise));
-        assertEquals(99, auth.get(Optype.Allin));
-        assertEquals(5, auth.get(Optype.BBlind2));
-        assertEquals(7, auth.get(Optype.BBlind3));
-        assertEquals(9, auth.get(Optype.BBlind4));
+        assertEquals(0, auth.get(Fold));
+        assertEquals(1, auth.get(Call));
+        assertEquals(4, auth.get(Raise));
+        assertEquals(99, auth.get(Allin));
+        assertEquals(5, auth.get(BBlind2));
+        assertEquals(7, auth.get(BBlind3));
+        assertEquals(9, auth.get(BBlind4));
 
-        texas.action(Optype.Raise, 8);
+        texas.action(Raise, 8);
         auth = texas.authority();
         assertEquals(7, auth.size());
-        assertEquals(0, auth.get(Optype.Fold));
-        assertEquals(7, auth.get(Optype.Call));
-        assertEquals(16, auth.get(Optype.Raise));
-        assertEquals(98, auth.get(Optype.Allin));
-        assertEquals(16 + 2, auth.get(Optype.Pot1_2));
-        assertEquals(19 + 2, auth.get(Optype.Pot2_3));
-        assertEquals(25 + 2, auth.get(Optype.Pot1_1));
+        assertEquals(0, auth.get(Fold));
+        assertEquals(7, auth.get(Call));
+        assertEquals(16, auth.get(Raise));
+        assertEquals(98, auth.get(Allin));
+        assertEquals(16 + 2, auth.get(Pot1_2));
+        assertEquals(19 + 2, auth.get(Pot2_3));
+        assertEquals(25 + 2, auth.get(Pot1_1));
 
         // 最小加注线等于最大加注则只能allin, 没有加注
-        texas = Texas.builder()
+        texas = AssertTexas.builder()
                 .players(new Player(1, 10), new Player(2, 100))
-                .build();
-        texas.start();
-        texas.action(Optype.Call);
-        texas.action(Optype.Check);
-        texas.action(Optype.Raise, 4);
+                .build().start()
+                .action(Call)
+                .action(Check)
+                .action(Raise, 4);
         auth = texas.authority();
-        assertTrue(auth.containsKey(Optype.Allin));
-        assertFalse(auth.containsKey(Optype.Raise));
+        assertTrue(auth.containsKey(Allin));
+        assertFalse(auth.containsKey(Raise));
 
         // 只有弃牌操作复现
-        texas = Texas.builder()
+        AssertTexas.builder()
                 .players(new Player(1, 100)
                         , new Player(2, 110)
                         , new Player(3, 110)
                         , new Player(4, 100))
-                .build();
-        texas.start();
-        texas.action(Optype.Raise, 70);
-        texas.action(Optype.Allin);
-        texas.action(Optype.Call);
-        texas.action(Optype.Allin);
-        texas.action(Optype.Fold);
-        equalsAuth(texas, null, Optype.Fold, Optype.Allin);
+                .build().start()
+                .action(Raise, 70)
+                .action(Allin).action(Call)
+                .action(Allin).action(Fold)
+                .assertAuth(Fold, Allin);
 
         // 对allin不足的人call后不能再allin
         // 需求先不要
-        texas = Texas.builder()
+        auth = AssertTexas.builder()
                 .players(new Player(1, 40)
                         , new Player(2, 60)
                         , new Player(3, 80))
-                .build();
-        texas.start();
-        texas.action(Optype.Call);
-        texas.action(Optype.Call);
-        texas.action(Optype.Raise, 32);
-        texas.action(Optype.Allin);
+                .build().start()
+                .action(Call)
+                .action(Call)
+                .action(Raise, 32)
+                .action(Allin)
+                .authority();
         assertTrue(auth.containsKey(Optype.Call));
-//        equalsAuth(texas, null, Optype.Fold, Optype.Allin);
+//        equalsAuth(texas, null, Fold, Allin);
 
         // AllinOrFold
-        texas = Texas.builder()
+        AssertTexas.builder()
                 .players(new Player(1, 200)
                         , new Player(2, 10000))
                 .smallBlind(100)
                 .regulation(Regulation.AllinOrFold, 1)
-                .build();
-        texas.start();
-        equalsAuth(texas, null, Optype.Fold, Optype.Allin);
-        texas.action(Optype.Allin);
-        equalsAuth(texas, null, Optype.Fold, Optype.Allin);
-    }
-
-    private void equalsAuth(Texas texas, Integer chipsLeft, Optype... ops) throws Exception {
-        var player = texas.operator();
-        if (chipsLeft != null) {
-            player.changeChips(chipsLeft - player.getChips());
-        }
-
-        var auth = texas.authority();
-        if (false) {
-            var mp = new ObjectMapper();
-            System.out.println(mp.writeValueAsString(auth));
-        }
-        assertEquals(auth.size(), ops.length);
-        for (var v : ops) {
-            assertTrue(auth.containsKey(v));
-        }
+                .build().start()
+                .assertAuth(Fold, Allin)
+                .action(Allin)
+                .assertAuth(Fold, Allin);
     }
 
     @Test
     public void testAnte() throws Exception {
-        var texas = Texas.builder(3)
-                .ante(1)
-                .build();
-        assertEquals(1, texas.ante());
-
-        texas.start();
-        assertEquals(3, texas.anteSum());
-        assertEquals(6, texas.sumPot());
+        var texas = AssertTexas.builder(3).ante(1).build().start()
+                .assertAnte(1)
+                .assertAnteSum(3)
+                .assertSumPot(6);
         assertEquals(99, texas.dealer().getChips());
         assertEquals(98, texas.sbPlayer().getChips());
         assertEquals(97, texas.bbPlayer().getChips());
 
-        texas = Texas.builder(4)
-                .ante(2)
-                .build();
-        assertEquals(2, texas.ante());
-        texas.start();
-        assertEquals(11, texas.sumPot());
+        AssertTexas.builder(4).ante(2).build().start()
+                .assertAnte(2)
+                .assertSumPot(11);
+
 
         // 庄家自动压一个前注
-        texas = Texas.builder()
-                .smallBlind(1)
-                .ante(20)
+        AssertTexas.builder().smallBlind(1).ante(20)
                 .players(new Player(1, 10), new Player(1, 50))
-                .build();
-        texas.start();
-        assertTrue(texas.isOver());
+                .build().start()
+                .assertIsOver(true);
         // TODO
 //        local result = game:MakeResult()
 //        assert(result.playersMap[1].profit == 10)
@@ -730,161 +644,112 @@ public class TexasTest extends AllCard {
         Ring<Player> ring = Ring.create(2);
         ring.setValue(new Player(1, 500));
         ring.getNext().setValue(new Player(2, 50));
-        var texas = Texas.builder()
+        AssertTexas.builder()
                 .ring(ring)
                 .smallBlind(50)
-                .build();
-        texas.start();
-        assertEquals(1, texas.dealer().getId());
-        assertEquals(1, texas.sbPlayer().getId());
-        assertEquals(2, texas.bbPlayer().getId());
-        assertEquals(50, texas.smallBlind());
-        assertEquals(Transfer.SHOWDOWN, texas.state());
+                .build().start()
+                .assertDealer(1)
+                .assertSbPlayer(1)
+                .assertBbPlayer(2)
+                .assertSmallBlind(50)
+                .assertState(Transfer.SHOWDOWN);
     }
 
     @Test
     public void testCommunityCards() throws Exception {
-        var texas = Texas.builder()
+        AssertTexas.builder()
                 .communityCards(club9, club10, spadesA, heartK, club8)
-                .build();
-        texas.start();
-        assertTrue(texas.getCommunityCards().isEmpty());
+                .build().start()
+                .assertCommunityCards()
 
-        texas.action(Optype.Call);
-        texas.action(Optype.Raise, 2);
-        texas.action(Optype.Call);
-        equalsCommunityCards(texas, club9, club10, spadesA);
+                .action(Call)
+                .action(Raise, 2)
+                .action(Call)
+                .assertCommunityCards(club9, club10, spadesA)
 
-        texas.action(Optype.Check);
-        texas.action(Optype.Check);
-        equalsCommunityCards(texas, club9, club10, spadesA, heartK);
+                .action(Check)
+                .action(Check)
+                .assertCommunityCards(club9, club10, spadesA, heartK)
 
-        texas.action(Optype.Check);
-        texas.action(Optype.Check);
-        equalsCommunityCards(texas, club9, club10, spadesA, heartK, club8);
+                .action(Check)
+                .action(Check)
+                .assertCommunityCards(club9, club10, spadesA, heartK, club8)
 
-        texas.action(Optype.Check);
-        texas.action(Optype.Check);
-        equalsCommunityCards(texas, club9, club10, spadesA, heartK, club8);
+                .action(Check)
+                .action(Check)
+                .assertCommunityCards(club9, club10, spadesA, heartK, club8);
 
-        texas = Texas.builder()
+        AssertTexas.builder()
                 .communityCards(club9, club10, spadesA, heartK, club8)
                 .players(new Player(1, 100), new Player(2, 200), new Player(3, 300))
-                .build();
-        texas.start();
-        texas.action(Optype.Allin);
-        texas.action(Optype.Call);
-        texas.action(Optype.Fold);
-        equalsCommunityCards(texas, club9, club10, spadesA, heartK, club8);
+                .build().start().action(Allin).action(Call).action(Fold)
+                .assertCommunityCards(club9, club10, spadesA, heartK, club8);
     }
 
     @Test
     public void testIsOver() throws Exception {
-        var texas = Texas.builder().build();
-        texas.start();
+        AssertTexas.builder().build().start()
+                .assertIsOver(false)
+                .action(Call)
+                .assertIsOver(false)
+                .action(Fold)
+                .assertIsOver(true);
 
-        assertFalse(texas.isOver());
-        texas.action(Optype.Call);
-        assertFalse(texas.isOver());
-        texas.action(Optype.Fold);
-        assertTrue(texas.isOver());
+        AssertTexas.builder().build().start()
+                .assertIsOver(false)
+                .action(Call)
+                .action(Raise, 2)
+                .action(Call)
+                .assertIsOver(false)
+                .action(Check)
+                .action(Check)
+                .assertIsOver(false)
+                .action(Check)
+                .action(Check)
+                .assertIsOver(false)
+                .action(Check)
+                .action(Check)
+                .assertIsOver(true);
 
-        ////////////////////////////////////
-        texas = Texas.builder().build();
-        texas.start();
-        assertFalse(texas.isOver());
 
-        texas.action(Optype.Call);
-        texas.action(Optype.Raise, 2);
-        texas.action(Optype.Call);
-        assertFalse(texas.isOver());
-
-        texas.action(Optype.Check);
-        texas.action(Optype.Check);
-        assertFalse(texas.isOver());
-
-        texas.action(Optype.Check);
-        texas.action(Optype.Check);
-        assertFalse(texas.isOver());
-
-        texas.action(Optype.Check);
-        texas.action(Optype.Check);
-        assertTrue(texas.isOver());
-
-        ////////////////////////////////////
         // 大盲直接allin结束
-        texas = Texas.builder()
+        AssertTexas.builder()
                 .players(new Player(1, 600), new Player(2, 200))
                 .smallBlind(200)
-                .build();
-        texas.start();
-        assertTrue(texas.isOver());
+                .build().start()
+                .assertIsOver(true);
 
         // 大盲直接allin不结束
-        texas = Texas.builder()
+        AssertTexas.builder()
                 .players(new Player(1, 600), new Player(2, 300))
                 .smallBlind(200)
-                .build();
-        texas.start();
-        assertFalse(texas.isOver());
+                .build().start()
+                .assertIsOver(false);
 
         // 小盲直接allin结束
-        texas = Texas.builder()
+        AssertTexas.builder()
                 .players(new Player(1, 200), new Player(2, 600))
                 .smallBlind(200)
-                .build();
-        texas.start();
-        assertTrue(texas.isOver());
+                .build().start()
+                .assertIsOver(true);
 
         // 大小盲同时allin结束
-        texas = Texas.builder()
+        AssertTexas.builder()
                 .players(new Player(1, 200), new Player(2, 300))
                 .smallBlind(200)
-                .build();
-        texas.start();
-        assertTrue(texas.isOver());
+                .build().start()
+                .assertIsOver(true);
 
         // 通过Raise将所有的筹码加上, 实际是allin
         // 最低最低加注筹码刚好等于剩余筹码，只能allin
-        texas = Texas.builder()
+        AssertTexas.builder()
                 .players(new Player(1, 750), new Player(2, 2000))
                 .smallBlind(20)
-                .build();
-        texas.start();
-        assertFalse(texas.isOver());
-
-        texas.action(Optype.Call);
-        texas.action(Optype.Raise, 710);
-        texas.action(Optype.Allin);
-        assertTrue(texas.isOver());
-    }
-
-    private void equalsCommunityCards(Texas texas, Card... cards) throws Exception {
-        var board = texas.getCommunityCards();
-        assertEquals(board.size(), cards.length);
-        for (var i = 0; i < cards.length; i++) {
-            assertEquals(board.get(i), cards[i]);
-        }
-    }
-
-    private void equalsAction(Integer opId, Optype op, Transfer state, Texas texas) throws Exception {
-        assertEquals(opId, texas.operator().getId());
-        assertEquals(state, texas.action(op).state());
-    }
-
-    private void equalsAction(Integer opId, Optype op, int chipsAdd, Transfer state, Texas texas) throws Exception {
-        assertEquals(opId, texas.operator().getId());
-        assertEquals(state, texas.action(op, chipsAdd).state());
-    }
-
-
-    private void equalsCircle(Integer opId, Optype op, String circle, Texas texas) throws Exception {
-        equalsCircle(opId, op, 0, circle, texas);
-    }
-
-    private void equalsCircle(Integer opId, Optype op, int chipsAdd, String circle, Texas texas) throws Exception {
-        assertEquals(opId.toString(), texas.operator().getId() + "");
-        assertEquals(circle, texas.circle());
-        texas.action(op, chipsAdd);
+                .build().start()
+                .assertIsOver(false)
+                .action(Call)
+                .action(Raise, 710)
+                .action(Allin)
+                .assertIsOver(true);
     }
 }
