@@ -26,16 +26,17 @@ public class TexasTest extends AllCard {
      */
     @Test
     public void testOther() throws Exception {
-        var texas = Texas.builder(3)
+        AssertTexas.builder(3)
                 .smallBlind(1)
                 .ante(1)
                 .build()
-                .start();
-        assertEquals(1, texas.dealer().getId());
-        assertEquals(2, texas.sbPlayer().getId());
-        assertEquals(3, texas.bbPlayer().getId());
-        assertEquals(1, texas.smallBlind());
-        assertEquals(1, texas.ante());
+                .start()
+
+                .assertAnte(1)
+                .assertSmallBlind(1)
+                .assertDealer(1)
+                .assertSbPlayer(2)
+                .assertBbPlayer(3);
     }
 
     @Test

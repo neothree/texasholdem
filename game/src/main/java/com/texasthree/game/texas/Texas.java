@@ -88,10 +88,6 @@ public class Texas {
             return this;
         }
 
-        public Builder communityCards(List<Card> board) {
-            this.board = board;
-            return this;
-        }
 
         public Builder communityCards(Card... board) {
             this.board = Arrays.asList(board);
@@ -99,10 +95,10 @@ public class Texas {
         }
 
         public List<Card> getCommunityCards() {
-            return board;
+            return this.board;
         }
 
-        public Texas build() {
+        public Ring<Player> getRing() {
             if (ring == null) {
                 if (players == null) {
                     players = new ArrayList<>(playerNum);
@@ -117,9 +113,10 @@ public class Texas {
                 }
             }
             this.playerNum = ring.size();
+            return ring;
+        }
 
-            this.deal();
-
+        public Map<Regulation, Integer> regulations() {
             if (regulations == null) {
                 regulations = new HashMap<>();
             }
@@ -146,10 +143,18 @@ public class Texas {
                 regulations.put(Regulation.SB, this.ring.getNext().value.getId());
                 regulations.put(Regulation.BB, this.ring.getNext().getNext().value.getId());
             }
-            return new Texas(regulations, ring, board);
+            return regulations;
         }
 
-        private void deal() {
+        public Texas build() {
+            var ring = this.getRing();
+            this.deal();
+            var regulations = this.regulations();
+            var cc = this.getCommunityCards();
+            return new Texas(regulations, ring, cc);
+        }
+
+         void deal() {
             var leftCard = Deck.getInstance().shuffle();
             if (board == null || board.size() != 5) {
                 board = leftCard.subList(0, 5);
@@ -195,7 +200,7 @@ public class Texas {
 
     private Transfer STATE;
 
-    private Texas(Map<Regulation, Integer> regulations, Ring<Player> ring, List<Card> leftCard) {
+    Texas(Map<Regulation, Integer> regulations, Ring<Player> ring, List<Card> leftCard) {
         this.regulations = regulations;
         this.ring = ring;
         this.communityCards = leftCard;
@@ -385,7 +390,7 @@ public class Texas {
         // 只剩下一个人，结束
         // TODO 不应该在这里判断，应该放到turn中，只有turn才行判断和决定状态转移
         if (this.remainingNum() == 1) {
-             this.transit();
+            this.transit();
         }
         return this;
     }
