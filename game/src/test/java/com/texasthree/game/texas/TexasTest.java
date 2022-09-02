@@ -3,6 +3,7 @@ package com.texasthree.game.texas;
 
 import com.texasthree.game.AllCard;
 import com.texasthree.game.Deck;
+import com.texasthree.game.Tester;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -653,6 +654,9 @@ public class TexasTest extends AllCard {
                 .assertBbPlayer(2)
                 .assertSmallBlind(50)
                 .assertState(Transfer.SHOWDOWN);
+
+        var texas = AssertTexas.builder().build().start();
+        Tester.assertException(texas::start, IllegalStateException.class);
     }
 
     @Test

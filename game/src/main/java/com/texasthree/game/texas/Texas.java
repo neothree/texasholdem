@@ -154,7 +154,7 @@ public class Texas {
             return new Texas(regulations, ring, cc);
         }
 
-         void deal() {
+        void deal() {
             var leftCard = Deck.getInstance().shuffle();
             if (board == null || board.size() != 5) {
                 board = leftCard.subList(0, 5);
@@ -244,6 +244,46 @@ public class Texas {
         return this;
     }
 
+    Texas action(Optype op) {
+        this.action(op, 0, false);
+        return this;
+    }
+
+    public Texas action(Optype op, int chipsAdd) {
+        this.action(op, chipsAdd, false);
+        return this;
+    }
+
+    /**
+     * 玩家离开
+     */
+    public Texas leave(Integer id) {
+        if (this.isOver) {
+            return this;
+        }
+
+        var player = this.getPlayerById(id);
+        if (player == null) {
+            throw new IllegalArgumentException(id + " 不存在");
+        }
+        if (player.isLeave()) {
+            return this;
+        }
+
+        player.leave();
+
+        // 如果是正在押注玩家直接弃牌
+        if (this.operator().equals(player)) {
+            this.action(Optype.Fold, 0, false);
+        }
+
+        if (this.remainingNum() == 1) {
+            this.transit();
+        }
+        return this;
+    }
+
+
     /**
      * 前注
      */
@@ -273,15 +313,6 @@ public class Texas {
         this.pot.actionDealerAnte(this.dealer(), this.ante());
     }
 
-    Texas action(Optype op) {
-        this.action(op, 0, false);
-        return this;
-    }
-
-    public Texas action(Optype op, int chipsAdd) {
-        this.action(op, chipsAdd, false);
-        return this;
-    }
 
     private Texas action(Optype op, int chipsAdd, boolean straddle) {
         if (this.isOver) {
@@ -365,37 +396,6 @@ public class Texas {
         // 从庄家下一位开始
         Player op = this.nextOpPlayer(this.dealer().getId());
         ring = this.ring.move(v -> v == op);
-    }
-
-    /**
-     * 玩家离开
-     */
-    Texas leave(Integer id) {
-        var player = this.getPlayerById(id);
-        if (player == null) {
-            throw new IllegalArgumentException(id + " 不存在");
-        }
-        if (player.isLeave()) {
-            return this;
-        }
-
-        player.leave();
-
-        if (this.isOver) {
-            return this;
-        }
-
-        // 如果是正在押注玩家直接弃牌
-        if (this.operator().equals(player)) {
-            this.action(Optype.Fold, 0, false);
-        }
-
-        // 只剩下一个人，结束
-        // TODO 不应该在这里判断，应该放到turn中，只有turn才行判断和决定状态转移
-        if (this.remainingNum() == 1) {
-            this.transit();
-        }
-        return this;
     }
 
     /**

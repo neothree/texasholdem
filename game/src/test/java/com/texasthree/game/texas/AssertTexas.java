@@ -107,7 +107,7 @@ public class AssertTexas extends Texas {
     }
 
     @Override
-    AssertTexas leave(Integer id) {
+    public AssertTexas leave(Integer id) {
         super.leave(id);
         return this;
     }
