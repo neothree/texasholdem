@@ -71,7 +71,7 @@ public class RoomController extends AbstractMeController<User> {
     public void action(@RequestParam("op") String op,
                        int chipsBet) {
         var room = zone.getRoom();
-        room.getDesk().getRound().action(getOptype(op), chipsBet);
+        room.getRound().action(getOptype(op), chipsBet);
     }
 
     private Optype getOptype(String op) {

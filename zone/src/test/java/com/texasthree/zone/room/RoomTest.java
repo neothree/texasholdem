@@ -4,9 +4,85 @@ import com.texasthree.utility.utlis.StringUtils;
 import com.texasthree.zone.Tester;
 import org.junit.jupiter.api.Test;
 
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertFalse;
+import static junit.framework.TestCase.assertNotNull;
+import static junit.framework.TestCase.assertTrue;
 import static org.junit.jupiter.api.Assertions.*;
 
 class RoomTest {
+
+    @Test
+    void testSitDown() throws Exception {
+        var room = new Room("1",9);
+        assertEquals(0, room.playerNum());
+        var u1 = Tester.createUser();
+        room.sitDown(u1, 0);
+        assertEquals(1, room.playerNum());
+        var u2 = Tester.createUser();
+        room.sitDown(u2, 1);
+        assertEquals(2, room.playerNum());
+
+        var u3 = Tester.createUser();
+        room.sitDown(u3, 2);
+        assertEquals(3, room.playerNum());
+    }
+
+    @Test
+    void testTryStart() throws Exception {
+        var room = new Room("1",9);
+        var u1 = Tester.createUser();
+        room.sitDown(u1, 0);
+
+        assertFalse(room.running());
+        room.force();
+        assertFalse(room.running());
+
+        var u2 = Tester.createUser();
+        room.sitDown(u2, 1);
+
+        // 两个人自动开局
+        assertFalse(room.running());
+        room.force();
+        assertTrue(room.running());
+        assertNotNull(room.getRound());
+    }
+
+    @Test
+    void testShowdown() throws Exception {
+        var room = new Room("1",9);
+        room.sitDown(Tester.createUser(), 0);
+        room.sitDown(Tester.createUser(), 1);
+        room.force();
+        assertTrue(room.running());
+        room.force();
+
+        // 结算
+        assertTrue(room.running());
+        room.onShowdown();
+        assertFalse(room.running());
+    }
+
+    @Test
+    void testRestart() throws Exception {
+        var room = new Room( "1",9);
+        assertEquals(0, room.getRoundNum());
+        room.sitDown(Tester.createUser(), 0);
+        room.sitDown(Tester.createUser(), 1);
+        room.force();
+        assertTrue(room.running());
+        assertEquals(1, room.getRoundNum());
+        room.force();
+
+        room.onShowdown();
+        assertFalse(room.running());
+
+        // 重新开局
+        room.force();
+        room.force();
+        assertTrue(room.running());
+        assertEquals(2, room.getRoundNum());
+    }
 
     @Test
     void testData() throws Exception {
@@ -18,10 +94,10 @@ class RoomTest {
         room.sitDown(user, seatId);
 
         var data = room.data();
-        assertEquals(data.id, room.getId());
-        assertEquals(data.capacity, room.getCapacity());
+        assertEquals(id, data.id);
+        assertEquals(capacity, data.capacity.intValue());
         assertEquals(1, data.seats.size());
-        assertEquals(seatId, data.seats.get(0).seatId);
+        assertEquals(seatId, data.seats.get(0).seatId.intValue());
     }
 
     @Test

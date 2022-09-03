@@ -63,7 +63,7 @@ public class Zone {
     public Room getRoom() {
         if (room == null) {
             room = new Room(StringUtils.get10UUID(), 9);
-            room.getDesk().setServer(server);
+            room.setServer(server);
 
             var user = createUser(StringUtils.get10UUID(), StringUtils.get10UUID());
             room.addUser(user);
