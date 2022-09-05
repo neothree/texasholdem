@@ -84,7 +84,7 @@ public class Room {
 
         this.onSeat(seatId);
 
-        this.tryStart();
+        this.scheduler.once(this::tryStart, 1);
     }
 
     public void sitUp(User user) {
@@ -127,21 +127,6 @@ public class Room {
         }
 
         // 座位的人数
-        if (playerNum() < 2) {
-            return;
-        }
-
-
-        // 准备开始
-        this.scheduler.once(this::start, 2000);
-    }
-
-    /**
-     * 牌局开始
-     */
-    private void start() {
-        this.roundNum++;
-        log.info("开始牌局");
         var users = new ArrayList<UserPlayer>();
         for (var v : seats) {
             if (v.occupied()) {
@@ -149,6 +134,19 @@ public class Room {
                 users.add(up);
             }
         }
+        if (users.size() < 2) {
+            return;
+        }
+
+        this.start(users);
+    }
+
+    /**
+     * 牌局开始
+     */
+    private void start(List<UserPlayer> users) {
+        this.roundNum++;
+        log.info("开始牌局");
 
         this.round = new TexasRound(roundNum, "333111", users, handler);
         try {
@@ -173,7 +171,7 @@ public class Room {
             this.changeUserChips(player.getId(), profit);
         }
         this.round = null;
-        this.scheduler.once(this::tryStart, 3000);
+        this.scheduler.once(this::tryStart, 5000);
     }
 
     public void loop() {
@@ -203,7 +201,7 @@ public class Room {
         server.send(set, msg);
     }
 
-    public int playerNum() {
+    public int occupiedNum() {
         return (int) Arrays.stream(this.seats)
                 .filter(Seat::occupied)
                 .count();

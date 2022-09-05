@@ -23,20 +23,20 @@ class RoomTest {
     @Test
     void testSitDown() throws Exception {
         var room = new Room("1", 9);
-        assertEquals(0, room.playerNum());
+        assertEquals(0, room.occupiedNum());
         var u1 = Tester.createUser();
         room.addUser(u1);
         room.sitDown(u1, 0);
-        assertEquals(1, room.playerNum());
+        assertEquals(1, room.occupiedNum());
         var u2 = Tester.createUser();
         room.addUser(u2);
         room.sitDown(u2, 1);
-        assertEquals(2, room.playerNum());
+        assertEquals(2, room.occupiedNum());
 
         var u3 = Tester.createUser();
         room.addUser(u3);
         room.sitDown(u3, 2);
-        assertEquals(3, room.playerNum());
+        assertEquals(3, room.occupiedNum());
     }
 
     @Test
@@ -53,8 +53,7 @@ class RoomTest {
                 .toSitDown(u2, 2)
                 .toForce().assertRunning(true)
                 .assertPlayerChips(u1.getId(), initChips * 2 - 1)
-                .assertPlayerChips(u2.getId(), initChips - 2)
-        ;
+                .assertPlayerChips(u2.getId(), initChips - 2);
     }
 
     @Test
@@ -67,6 +66,15 @@ class RoomTest {
                 .toAddUser(u2).toSitDown(u2, 1)
                 .assertRunning(false).toForce().assertRunning(true);
         assertNotNull(room.getRound());
+
+        AssertRoom.build()
+                .toAddUser(u1).assertUserChips(u1.getId(), Room.initChips)
+                .toAddUser(u2).assertUserChips(u2.getId(), Room.initChips)
+                .toSitDown(u1, 1)
+                .toSitDown(u2, 2)
+                // 玩家余额不足，不能开局
+                .toTakeout(u2.getId()).assertUserChips(u2.getId(), 0)
+                .toForce().assertRunning(false);
     }
 
     @Test
@@ -89,7 +97,6 @@ class RoomTest {
 
     @Test
     void testRestart() throws Exception {
-
         var u1 = Tester.createUser();
         var u2 = Tester.createUser();
         AssertRoom.build()
@@ -103,7 +110,6 @@ class RoomTest {
                 .toRoundForce().toRoundForce().toRoundForce().assertRunning(true)
                 // 一局结束
                 .toOnShowdown().assertRunning(false)
-                .toForce().assertRunning(false)
                 .toForce().assertRunning(true)
                 .assertRoundNum(2);
     }
