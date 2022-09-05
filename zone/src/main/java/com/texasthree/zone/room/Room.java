@@ -31,7 +31,7 @@ public class Room {
 
     private final int capacity;
 
-    private final User[] seats;
+    private final Seat[] seats;
 
     private final Map<String, User> audience = new HashMap<>();
 
@@ -48,7 +48,10 @@ public class Room {
     private ScheduledEventChecker scheduler = new ScheduledEventChecker();
 
     public Room(String id, int capacity) {
-        seats = new User[capacity];
+        seats = new Seat[capacity];
+        for (var i = 0; i < capacity; i++) {
+            seats[i] = new Seat(i);
+        }
         handler = new RoundEventHandler(this::onShowdown, this::send, this::send);
         this.id = id;
         this.capacity = capacity;
@@ -69,7 +72,7 @@ public class Room {
     }
 
     public void sitDown(User user, int seatId) {
-        if (seatId >= seats.length || seats[seatId] != null) {
+        if (seatId >= seats.length || seats[seatId].user != null) {
             throw new IllegalArgumentException();
         }
         var chips = this.getUserChips(user.getId());
@@ -77,7 +80,7 @@ public class Room {
             throw new IllegalArgumentException("玩家筹码太少 {}" + user + " chips=" + chips);
         }
         log.info("玩家坐下 id={} name={} seatId={}", user.getId(), user.getName(), seatId);
-        seats[seatId] = user;
+        seats[seatId].user = user;
         this.audience.remove(user.getId());
 
         this.onSeat(seatId);
@@ -86,13 +89,13 @@ public class Room {
     }
 
     public void sitUp(User user) {
-        for (var i = 0; i < seats.length; i++) {
-            var v = seats[i];
-            if (v != null && v.getId().equals(user.getId())) {
-                log.info("玩家站起 id={} name={} seatId={}", user.getId(), user.getName(), i);
+        for (var v : seats) {
+            var u = v.user;
+            if (u != null && u.getId().equals(user.getId())) {
+                log.info("玩家站起 id={} name={} seatId={}", user.getId(), user.getName(), v.id);
                 this.audience.put(user.getId(), user);
-                seats[i] = null;
-                this.onSeat(i);
+                v.user = null;
+                this.onSeat(v.id);
             }
         }
     }
@@ -100,7 +103,7 @@ public class Room {
     private void onSeat(int seatId) {
         var info = new Protocal.Seat();
         info.seatId = seatId;
-        var user = this.getSeats()[seatId];
+        var user = seats[seatId].user;
         if (user != null) {
             var p = new Protocal.Player();
             p.uid = user.getId();
@@ -144,7 +147,7 @@ public class Room {
         log.info("开始牌局");
         var users = new ArrayList<UserPlayer>();
         for (var i = 0; i < this.seats.length; i++) {
-            var user = this.seats[i];
+            var user = this.seats[i].user;
             if (user != null) {
                 var up = new UserPlayer(i, user, this.getUserChips(user.getId()));
                 users.add(up);
@@ -197,8 +200,8 @@ public class Room {
         }
         var set = new HashSet<>(this.audience.keySet());
         for (var v : seats) {
-            if (v != null) {
-                set.add(v.getId());
+            if (v.user != null) {
+                set.add(v.user.getId());
             }
         }
         server.send(set, msg);
@@ -206,7 +209,7 @@ public class Room {
 
     public int playerNum() {
         return (int) Arrays.stream(this.seats)
-                .filter(Objects::nonNull)
+                .filter(v -> v.user != null)
                 .count();
     }
 
@@ -222,10 +225,6 @@ public class Room {
         return round != null;
     }
 
-
-    public User[] getSeats() {
-        return Arrays.copyOf(seats, seats.length);
-    }
 
     public TexasRound getRound() {
         return this.round;
@@ -268,15 +267,14 @@ public class Room {
         info.seats = new ArrayList<>();
 
         // 座位
-        var seats = this.getSeats();
-        for (var i = 0; i < capacity; i++) {
-            var v = seats[i];
-            if (v != null) {
+        for (var v : seats) {
+            var u = v.user;
+            if (u != null) {
                 var p = new Protocal.Player();
-                p.uid = v.getId();
-                p.name = v.getName();
-                p.chips = v.getChips();
-                p.seatId = i;
+                p.uid = u.getId();
+                p.name = u.getName();
+                p.chips = u.getChips();
+                p.seatId = v.id;
                 info.seats.add(p);
             }
         }
@@ -307,7 +305,7 @@ public class Room {
 
     private Integer getSeatId(String uid) {
         for (var i = 0; i < seats.length; i++) {
-            var u = seats[i];
+            var u = seats[i].user;
             if (u != null && u.getId().equals(uid)) {
                 return i;
             }
