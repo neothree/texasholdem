@@ -44,8 +44,23 @@ public class AssertRoom extends Room {
         return this;
     }
 
+    public AssertRoom toRoundForce() {
+        super.getRound().force();
+        return this;
+    }
+
+    public AssertRoom toOnShowdown() {
+        super.onShowdown();
+        return this;
+    }
+
     public AssertRoom assertUserChips(String id, int chips) {
         assertEquals(chips, this.getUserChips(id));
+        return this;
+    }
+
+    public AssertRoom assertRoundNum(int num) {
+        assertEquals(num, this.getRoundNum());
         return this;
     }
 

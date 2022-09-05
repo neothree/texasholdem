@@ -147,6 +147,7 @@ public class Texas {
         }
 
         public Texas build() {
+            var ring = this.getRing();
             this.deal();
             var regulations = this.regulations();
             var cc = this.getCommunityCards();

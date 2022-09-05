@@ -72,6 +72,10 @@ public class Room {
         if (seatId >= seats.length || seats[seatId] != null) {
             throw new IllegalArgumentException();
         }
+        var chips = this.getUserChips(user.getId());
+        if (chips <= 0) {
+            throw new IllegalArgumentException("玩家筹码太少 {}" + user + " chips=" + chips);
+        }
         log.info("玩家坐下 id={} name={} seatId={}", user.getId(), user.getName(), seatId);
         seats[seatId] = user;
         this.audience.remove(user.getId());
@@ -127,6 +131,7 @@ public class Room {
             return;
         }
 
+
         // 准备开始
         this.scheduler.once(this::start, 2000);
     }
@@ -158,8 +163,17 @@ public class Room {
 
 
     public void onShowdown() {
+        if (!this.round.finished()) {
+            throw new IllegalStateException();
+        }
         log.info("桌子一局结束");
         var s = this.round.settle();
+        for (var v : s) {
+            var profit = v.getPot().values().stream().mapToInt(Integer::intValue).sum();
+            var player = this.round.getPlayerBySeatId(v.getId());
+            log.info("玩家结算利润 id={} profit={}", player.getId(), profit);
+            changeUserChips(player.getId(), profit);
+        }
         this.round = null;
         this.scheduler.once(this::tryStart, 3000);
     }

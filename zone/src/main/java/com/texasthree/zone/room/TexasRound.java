@@ -248,7 +248,7 @@ public class TexasRound {
         return game.circle();
     }
 
-    private UserPlayer getPlayerBySeatId(int seatId) {
+    public UserPlayer getPlayerBySeatId(int seatId) {
         return this.users.stream().filter(v -> v.seatId == seatId).findFirst().get();
     }
 
@@ -293,6 +293,7 @@ public class TexasRound {
     public int getPlayerChips(int seatId) {
         return this.game.getPlayerById(seatId).getChips();
     }
+
 
     public boolean isPlayerInGame(int seatId) {
         return this.game.getPlayerById(seatId) != null;
