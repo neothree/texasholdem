@@ -24,4 +24,28 @@ class SeatTest {
         assertTrue(seat.occupied());
         assertEquals(user.getId(), seat.getUid());
     }
+
+    @Test
+    void testExecute() throws Exception {
+        var seat = new Seat(StringUtils.get10UUID(), 2);
+        assertEquals(0, seat.getNoExecute());
+        seat.execute(false);
+        assertEquals(0, seat.getNoExecute());
+
+        seat.sitDown(Tester.createUser());
+        assertEquals(0, seat.getNoExecute());
+        seat.execute(false);
+        assertEquals(1, seat.getNoExecute());
+        seat.execute(false);
+        assertEquals(2, seat.getNoExecute());
+        seat.execute(false);
+        assertEquals(3, seat.getNoExecute());
+        seat.execute(true);
+        assertEquals(0, seat.getNoExecute());
+
+        seat.execute(false);
+        assertEquals(1, seat.getNoExecute());
+        seat.sitUp();
+        assertEquals(0, seat.getNoExecute());
+    }
 }

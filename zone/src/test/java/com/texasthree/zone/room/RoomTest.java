@@ -115,6 +115,23 @@ class RoomTest {
     }
 
     @Test
+    void testSeatExecute() throws Exception {
+        var u1 = Tester.createUser();
+        var u2 = Tester.createUser();
+        AssertRoom.build()
+                .toAddUser(u1).toSitDown(u1, 0)
+                .toAddUser(u2).toSitDown(u2, 1)
+                .assertNoExecute(0, 0)
+                .assertNoExecute(1, 0)
+                .toForce().assertRunning(true)
+                .toForce().assertRunning(true)
+                .toRoundForce().toRoundForce().toRoundForce().assertRunning(true)
+                .toOnShowdown()
+                .assertNoExecute(0, 1)
+                .assertNoExecute(1, 1);
+    }
+
+    @Test
     void testData() throws Exception {
         var id = StringUtils.get10UUID();
         var capacity = 8;

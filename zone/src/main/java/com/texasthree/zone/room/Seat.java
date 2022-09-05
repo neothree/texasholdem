@@ -19,6 +19,11 @@ public class Seat {
 
     private User user;
 
+    /**
+     * 没有主动押注次数
+     */
+    private int noExecute;
+
     Seat(String roomId, int id) {
         this.roomId = roomId;
         this.id = id;
@@ -33,10 +38,30 @@ public class Seat {
     void sitUp() {
         log.info("玩家站起 roomId={} seatId={} id={} name={}", roomId, id, user.getId(), user.getName());
         this.user = null;
+        this.noExecute = 0;
     }
 
     boolean occupied() {
         return this.user != null;
+    }
+
+    boolean occupiedBy(String uid) {
+        return this.user != null && this.user.getId().equals(uid);
+    }
+
+    void execute(boolean e) {
+        if (!occupied()) {
+            return;
+        }
+        if (e) {
+            this.noExecute = 0;
+        } else {
+            this.noExecute++;
+        }
+    }
+
+    int getNoExecute() {
+        return noExecute;
     }
 
     String getUid() {

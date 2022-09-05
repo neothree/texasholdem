@@ -1,5 +1,6 @@
 package com.texasthree.zone.room;
 
+import com.texasthree.game.texas.Optype;
 import com.texasthree.utility.utlis.StringUtils;
 import com.texasthree.zone.user.User;
 
@@ -49,6 +50,15 @@ class AssertRoom extends Room {
         return this;
     }
 
+    AssertRoom toAction(Optype op, int chipsBet) {
+        super.getRound().action(op, chipsBet);
+        return this;
+    }
+
+    AssertRoom toAction(Optype op) {
+        return toAction(op, 0);
+    }
+
     AssertRoom toOnShowdown() {
         super.onShowdown();
         return this;
@@ -71,6 +81,12 @@ class AssertRoom extends Room {
 
     AssertRoom assertRunning(boolean running) {
         assertEquals(running, super.running());
+        return this;
+    }
+
+    AssertRoom assertNoExecute(int seatId, int noExecute) {
+        var seat = this.getSeats().get(seatId);
+        assertEquals(noExecute, seat.getNoExecute());
         return this;
     }
 }

@@ -164,12 +164,22 @@ public class Room {
             throw new IllegalStateException();
         }
         log.info("桌子一局结束");
+        var execute = this.round.getPlayers().stream()
+                .filter(UserPlayer::isExecute)
+                .map(v -> v.seatId).collect(Collectors.toSet());
         for (var v : this.round.settle()) {
             var profit = v.getProfit();
             var player = this.round.getPlayerBySeatId(v.getId());
             log.info("玩家结算利润 id={} profit={}", player.getId(), profit);
             this.changeUserChips(player.getId(), profit);
+
+            // 记录未操作次数
+            var seat = seats[v.getId()];
+            if (seat.occupiedBy(player.getId())) {
+                seat.execute(execute.contains(v.getId()));
+            }
         }
+
         this.round = null;
         this.scheduler.once(this::tryStart, 5000);
     }
@@ -343,5 +353,9 @@ public class Room {
         var balance = this.getUserChips(uid);
         log.info("房间带出 roomId={} uid={} amount={}", id, uid, balance);
         return this.changeUserChips(uid, -balance);
+    }
+
+    List<Seat> getSeats() {
+        return Arrays.asList(seats);
     }
 }
