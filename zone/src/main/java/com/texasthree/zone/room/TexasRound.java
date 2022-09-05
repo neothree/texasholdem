@@ -59,7 +59,7 @@ public class TexasRound {
         // 位置图谱
         var players = new ArrayList<Player>();
         for (var v : users) {
-            players.add(new Player(v.seatId, v.user.getChips()));
+            players.add(new Player(v.seatId, v.getChips()));
         }
 
         this.game = Texas.builder()
@@ -124,7 +124,7 @@ public class TexasRound {
         this.operator = this.getPlayerBySeatId(game.operator().getId());
         this.checker.once(this::onOpTimeout, TIMEOUT_ACTION);
         this.eventHandler.trigger(this, RoundEvent.OPERATOR);
-        log.info("{}轮到下一位进行押注 uid={} seatId={}", logpre, this.operator.user.getId(), this.operator.seatId);
+        log.info("{}轮到下一位进行押注 uid={} seatId={}", logpre, this.operator.getId(), this.operator.seatId);
     }
 
     /**
@@ -288,5 +288,13 @@ public class TexasRound {
 
     public void force() {
         this.checker.force();
+    }
+
+    public int getPlayerChips(int seatId) {
+        return this.game.getPlayerById(seatId).getChips();
+    }
+
+    public boolean isPlayerInGame(int seatId) {
+        return this.game.getPlayerById(seatId) != null;
     }
 }

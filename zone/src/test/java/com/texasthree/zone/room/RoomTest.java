@@ -38,6 +38,24 @@ class RoomTest {
     }
 
     @Test
+    void testStart() throws Exception {
+        // 设定的smallBling=1
+        var initChips = Room.initChips;
+        var u1 = Tester.createUser();
+        var u2 = Tester.createUser();
+        AssertRoom.build()
+                .toAddUser(u1).assertUserChips(u1.getId(), initChips)
+                .toAddUser(u2).assertUserChips(u2.getId(), initChips)
+                .toBring(u1.getId()).assertUserChips(u1.getId(), initChips * 2)
+                .toSitDown(u1, 1)
+                .toSitDown(u2, 2)
+                .toForce().assertRunning(true)
+                .assertPlayerChips(u1.getId(), initChips * 2 - 1)
+                .assertPlayerChips(u2.getId(), initChips - 2)
+        ;
+    }
+
+    @Test
     void testTryStart() throws Exception {
         var room = new Room("1", 9);
         var u1 = Tester.createUser();

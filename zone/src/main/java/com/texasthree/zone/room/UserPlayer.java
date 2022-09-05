@@ -6,11 +6,14 @@ public class UserPlayer {
 
     public final int seatId;
 
-    public final User user;
+    private final User user;
 
-    public UserPlayer(int seatId, User user) {
+    private int chips;
+
+    public UserPlayer(int seatId, User user, int chips) {
         this.seatId = seatId;
         this.user = user;
+        this.chips= chips;
     }
 
     @Override
@@ -20,5 +23,9 @@ public class UserPlayer {
 
     public String getId() {
         return this.user.getId();
+    }
+
+    public int getChips() {
+        return chips;
     }
 }

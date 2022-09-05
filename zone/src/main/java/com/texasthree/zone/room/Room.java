@@ -69,7 +69,6 @@ public class Room {
     }
 
     public void sitDown(User user, int seatId) {
-
         if (seatId >= seats.length || seats[seatId] != null) {
             throw new IllegalArgumentException();
         }
@@ -142,7 +141,7 @@ public class Room {
         for (var i = 0; i < this.seats.length; i++) {
             var user = this.seats[i];
             if (user != null) {
-                var up = new UserPlayer(i, user);
+                var up = new UserPlayer(i, user, this.getUserChips(user.getId()));
                 users.add(up);
             }
         }
@@ -292,6 +291,33 @@ public class Room {
         return info;
     }
 
+    private Integer getSeatId(String uid) {
+        for (var i = 0; i < seats.length; i++) {
+            var u = seats[i];
+            if (u != null && u.getId().equals(uid)) {
+                return i;
+            }
+        }
+        return null;
+    }
+
+    public int getPlayerChips(String uid) {
+        var chips = this.getUserChips(uid);
+        if (!this.running()) {
+            return chips;
+        }
+
+        var seatId = this.getSeatId(uid);
+        if (seatId == null) {
+            return chips;
+        }
+
+        if (!this.round.isPlayerInGame(seatId)) {
+            return chips;
+        }
+        return this.round.getPlayerChips(seatId);
+    }
+
     public int getUserChips(String uid) {
         return this.userChips.getOrDefault(uid, 0);
     }
@@ -307,5 +333,4 @@ public class Room {
         this.userChips.remove(uid);
         return balance;
     }
-
 }

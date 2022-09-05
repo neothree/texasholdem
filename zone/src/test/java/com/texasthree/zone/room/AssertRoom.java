@@ -29,8 +29,18 @@ public class AssertRoom extends Room {
         return this;
     }
 
+    public AssertRoom toSitDown(User user, int seatId) {
+        super.sitDown(user, seatId);
+        return this;
+    }
+
     public AssertRoom toTakeout(String uid) {
         super.takeout(uid);
+        return this;
+    }
+
+    public AssertRoom toForce() {
+        super.force();
         return this;
     }
 
@@ -39,4 +49,13 @@ public class AssertRoom extends Room {
         return this;
     }
 
+    public AssertRoom assertPlayerChips(String id, int chips) {
+        assertEquals(chips, this.getPlayerChips(id));
+        return this;
+    }
+
+    public AssertRoom assertRunning(boolean running) {
+        assertEquals(running, super.running());
+        return this;
+    }
 }
