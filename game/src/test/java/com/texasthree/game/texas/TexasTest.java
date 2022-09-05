@@ -38,6 +38,14 @@ public class TexasTest extends AllCard {
                 .assertDealer(1)
                 .assertSbPlayer(2)
                 .assertBbPlayer(3);
+
+        var texas = AssertTexas.builder().build().start();
+        Tester.assertException(texas::start, IllegalStateException.class);
+
+        Tester.assertException(() -> AssertTexas.builder(2)
+                .players(new Player(1, 0), new Player(1, 1))
+                .smallBlind(1)
+                .build(), IllegalArgumentException.class);
     }
 
     @Test
@@ -215,7 +223,7 @@ public class TexasTest extends AllCard {
                 .assertOperator(1).action(Check).assertState(Transfer.CIRCLE_END);
     }
 
-    @Test
+    //    @Test
     public void testStraddle() throws Exception {
         var texas = Texas.builder(4)
                 .straddle()

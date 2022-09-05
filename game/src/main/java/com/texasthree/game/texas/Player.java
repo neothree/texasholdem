@@ -31,11 +31,11 @@ public class Player {
         return !leave;
     }
 
-    public void leave() {
+    void leave() {
         leave = true;
     }
 
-    public void changeChips(int change) {
+    void changeChips(int change) {
         this.chips += change;
     }
 
@@ -43,7 +43,7 @@ public class Player {
         return hand;
     }
 
-    public void setHand(Hand hand) {
+    void setHand(Hand hand) {
         this.hand = hand;
     }
 

@@ -84,7 +84,7 @@ public class Texas {
         }
 
         public Builder players(Player... players) {
-            this.players = Arrays.asList(players);
+            this.players(Arrays.asList(players));
             return this;
         }
 
@@ -98,7 +98,7 @@ public class Texas {
             return this.board;
         }
 
-        public Ring<Player> getRing() {
+        Ring<Player> getRing() {
             if (ring == null) {
                 if (players == null) {
                     players = new ArrayList<>(playerNum);
@@ -116,7 +116,7 @@ public class Texas {
             return ring;
         }
 
-        public Map<Regulation, Integer> regulations() {
+        Map<Regulation, Integer> regulations() {
             if (regulations == null) {
                 regulations = new HashMap<>();
             }
@@ -147,7 +147,6 @@ public class Texas {
         }
 
         public Texas build() {
-            var ring = this.getRing();
             this.deal();
             var regulations = this.regulations();
             var cc = this.getCommunityCards();
@@ -201,6 +200,19 @@ public class Texas {
     private Transfer STATE;
 
     Texas(Map<Regulation, Integer> regulations, Ring<Player> ring, List<Card> leftCard) {
+        var smallBlind = regulations.getOrDefault(Regulation.SmallBlind, 0);
+        if (smallBlind < 0) {
+            throw new IllegalArgumentException("小盲错误 " + smallBlind);
+        }
+        var ante = regulations.getOrDefault(Regulation.Ante, 0);
+        if (ante < 0) {
+            throw new IllegalArgumentException("前注错误 " + smallBlind);
+        }
+        for (var v : ring.toList()) {
+            if (v.getChips() < smallBlind) {
+                throw new IllegalArgumentException("玩家筹码数错误 chips=" + v.getChips() + " smallBlind=" + smallBlind);
+            }
+        }
         this.regulations = regulations;
         this.ring = ring;
         this.communityCards = leftCard;
@@ -411,7 +423,9 @@ public class Texas {
     }
 
     public Settlement settle() {
-        this.freshHand();
+        if (!this.isOver) {
+            throw new IllegalStateException();
+        }
         var open = this.showCardStrategy();
         return this.pot.settle(this.ring, bbPlayer(), open);
     }
