@@ -2,9 +2,7 @@ package com.texasthree.zone.room;
 
 import com.texasthree.game.texas.Circle;
 import com.texasthree.game.texas.Optype;
-import com.texasthree.utility.utlis.StringUtils;
 import com.texasthree.zone.Tester;
-import com.texasthree.zone.user.UserData;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -39,7 +37,11 @@ class TexasRoundTest {
 
         round.force();
         assertEquals(0, round.getOperator().seatId);
+        // 只主动执行押注
+        var op = round.getOperator();
+        assertFalse(op.isExecute());
         round.action(Optype.Call, 0);
+        assertTrue(op.isExecute());
 
         round.force();
         assertEquals(1, round.getOperator().seatId);

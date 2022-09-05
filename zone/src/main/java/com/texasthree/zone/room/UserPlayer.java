@@ -10,10 +10,15 @@ public class UserPlayer {
 
     private int chips;
 
+    /**
+     * 是否主动执行押注
+     */
+    private boolean execute = false;
+
     public UserPlayer(int seatId, User user, int chips) {
         this.seatId = seatId;
         this.user = user;
-        this.chips= chips;
+        this.chips = chips;
     }
 
     @Override
@@ -27,5 +32,13 @@ public class UserPlayer {
 
     public int getChips() {
         return chips;
+    }
+
+    public void execute() {
+        this.execute = true;
+    }
+
+    public boolean isExecute() {
+        return execute;
     }
 }

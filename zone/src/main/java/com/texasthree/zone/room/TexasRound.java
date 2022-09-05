@@ -78,7 +78,12 @@ public class TexasRound {
     /**
      * 押注
      */
+
     public void action(Optype op, int chipsBet) {
+        this.operator.execute();
+        this.doAction(op, chipsBet);
+    }
+    private void doAction(Optype op, int chipsBet) {
         if (operator == null) {
             log.error("{}押注异常，没有操作人", logpre);
             return;
@@ -172,7 +177,7 @@ public class TexasRound {
         log.info("{}压住超时: {}", logpre, this.operator.toString());
         var au = this.game.authority();
         var op = au.containsKey(Optype.Check) ? Optype.Check : Optype.Fold;
-        this.action(op, 0);
+        this.doAction(op, 0);
     }
 
     public Hand getPlayerHand(int seatId) {
