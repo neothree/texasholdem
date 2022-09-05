@@ -35,10 +35,14 @@ class TexasRoundTest {
         assertEquals(Circle.PREFLOP, round.circle());
         assertTrue(round.leftSec() > 0);
 
+        // 获取过押注的权限
+        assertFalse(round.getPlayerBySeatId(0).isGain());
         round.force();
-        assertEquals(0, round.getOperator().seatId);
-        // 只主动执行押注
+        assertTrue(round.getPlayerBySeatId(0).isGain());
+
         var op = round.getOperator();
+        assertEquals(0, op.seatId);
+        // 只主动执行押注
         assertFalse(op.isExecute());
         round.action(Optype.Call, 0);
         assertTrue(op.isExecute());

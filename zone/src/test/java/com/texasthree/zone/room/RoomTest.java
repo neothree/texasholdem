@@ -128,7 +128,7 @@ class RoomTest {
                 .toRoundForce().toRoundForce().toRoundForce().assertRunning(true)
                 .toOnShowdown()
                 .assertNoExecute(0, 1)
-                .assertNoExecute(1, 1);
+                .assertNoExecute(1, 0);
     }
 
     @Test

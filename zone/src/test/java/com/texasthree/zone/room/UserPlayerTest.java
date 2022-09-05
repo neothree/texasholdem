@@ -20,5 +20,9 @@ class UserPlayerTest {
 
         up.execute();
         assertTrue(up.isExecute());
+
+        assertFalse(up.isGain());
+        up.gain();
+        assertTrue(up.isGain());
     }
 }

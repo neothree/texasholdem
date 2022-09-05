@@ -158,7 +158,9 @@ public class Room {
         }
     }
 
-
+    /**
+     * 亮牌
+     */
     void onShowdown() {
         if (!this.round.finished()) {
             throw new IllegalStateException();
@@ -173,9 +175,9 @@ public class Room {
             log.info("玩家结算利润 id={} profit={}", player.getId(), profit);
             this.changeUserChips(player.getId(), profit);
 
-            // 记录未操作次数
+            // 获取到押注权限的玩家要记录未操作次数
             var seat = seats[v.getId()];
-            if (seat.occupiedBy(player.getId())) {
+            if (seat.occupiedBy(player.getId()) && player.isGain()) {
                 seat.execute(execute.contains(v.getId()));
             }
         }

@@ -127,6 +127,7 @@ public class TexasRound {
      */
     private void moveNextOp() {
         this.operator = this.getPlayerBySeatId(game.operator().getId());
+        this.operator.gain();
         this.scheduler.once(this::onOpTimeout, TIMEOUT_ACTION);
         this.eventHandler.trigger(this, RoundEvent.OPERATOR);
         log.info("{}轮到下一位进行押注 uid={} seatId={}", logpre, this.operator.getId(), this.operator.seatId);

@@ -15,6 +15,8 @@ public class UserPlayer {
      */
     private boolean execute = false;
 
+    private boolean gain = false;
+
     public UserPlayer(int seatId, User user, int chips) {
         this.seatId = seatId;
         this.user = user;
@@ -30,15 +32,23 @@ public class UserPlayer {
         return this.user.getId();
     }
 
-    public int getChips() {
+     int getChips() {
         return chips;
     }
 
-    public void execute() {
+     void gain() {
+        this.gain = true;
+    }
+
+     boolean isGain() {
+        return gain;
+    }
+
+     void execute() {
         this.execute = true;
     }
 
-    public boolean isExecute() {
+     boolean isExecute() {
         return execute;
     }
 }
