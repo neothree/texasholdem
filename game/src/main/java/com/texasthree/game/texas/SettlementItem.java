@@ -36,7 +36,7 @@ public class SettlementItem {
         return pot != null ? pot.values().stream().reduce(Integer::sum).orElse(0) : 0;
     }
 
-    int getProfit() {
+    public int getProfit() {
         return this.getWin() - betSum + refund;
     }
 

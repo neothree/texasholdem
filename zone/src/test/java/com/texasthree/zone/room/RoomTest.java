@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 class RoomTest {
@@ -72,14 +73,18 @@ class RoomTest {
     void testShowdown() throws Exception {
         var u1 = Tester.createUser();
         var u2 = Tester.createUser();
-        AssertRoom.build()
+        var room = AssertRoom.build()
                 .toAddUser(u1).toSitDown(u1, 0)
                 .assertRunning(false).toForce().assertRunning(false)
                 .toAddUser(u2).toSitDown(u2, 1)
+                .assertPlayerChips(u1.getId(), Room.initChips)
+                .assertPlayerChips(u2.getId(), Room.initChips)
                 .assertRunning(false).toForce().assertRunning(true)
                 .toForce().assertRunning(true)
                 .toRoundForce().toRoundForce().toRoundForce().assertRunning(true)
                 .toOnShowdown().assertRunning(false);
+        assertNotEquals(Room.initChips, room.getUserChips(u1.getId()));
+        assertNotEquals(Room.initChips, room.getUserChips(u2.getId()));
     }
 
     @Test

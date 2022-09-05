@@ -162,14 +162,14 @@ public class Room {
     }
 
 
-    public void onShowdown() {
+    void onShowdown() {
         if (!this.round.finished()) {
             throw new IllegalStateException();
         }
         log.info("桌子一局结束");
         var s = this.round.settle();
         for (var v : s) {
-            var profit = v.getPot().values().stream().mapToInt(Integer::intValue).sum();
+            var profit = v.getProfit();
             var player = this.round.getPlayerBySeatId(v.getId());
             log.info("玩家结算利润 id={} profit={}", player.getId(), profit);
             changeUserChips(player.getId(), profit);
