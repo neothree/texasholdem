@@ -45,7 +45,7 @@ public class Room {
 
     private int roundNum;
 
-    private ScheduledEventChecker checker = new ScheduledEventChecker();
+    private ScheduledEventChecker scheduler = new ScheduledEventChecker();
 
     public Room(String id, int capacity) {
         seats = new User[capacity];
@@ -128,7 +128,7 @@ public class Room {
         }
 
         // 准备开始
-        this.checker.once(this::start, 2000);
+        this.scheduler.once(this::start, 2000);
     }
 
     /**
@@ -159,12 +159,13 @@ public class Room {
 
     public void onShowdown() {
         log.info("桌子一局结束");
+        var s = this.round.settle();
         this.round = null;
-        this.checker.once(this::tryStart, 3000);
+        this.scheduler.once(this::tryStart, 3000);
     }
 
     public void loop() {
-        this.checker.check();
+        this.scheduler.check();
         if (this.round != null) {
             this.round.loop();
         }
@@ -222,7 +223,7 @@ public class Room {
     }
 
     public void force() {
-        this.checker.force();
+        this.scheduler.force();
     }
 
     @Override
@@ -322,15 +323,21 @@ public class Room {
         return this.userChips.getOrDefault(uid, 0);
     }
 
+    private int changeUserChips(String uid, int amount) {
+        var old = this.getUserChips(uid);
+        this.userChips.put(uid, old + amount);
+        log.info("修改玩家筹码数 roomId={} uid={} amount={} old={}", id, uid, amount, old);
+        return old;
+    }
+
     public int bring(String uid) {
-        var now = this.getUserChips(uid) + initChips;
-        this.userChips.put(uid, now);
-        return now;
+        log.info("房间带入 roomId={} uid={} amount={}", id, uid, initChips);
+        return changeUserChips(uid, initChips);
     }
 
     public int takeout(String uid) {
         var balance = this.getUserChips(uid);
-        this.userChips.remove(uid);
-        return balance;
+        log.info("房间带出 roomId={} uid={} amount={}", id, uid, balance);
+        return this.changeUserChips(uid, -balance);
     }
 }
