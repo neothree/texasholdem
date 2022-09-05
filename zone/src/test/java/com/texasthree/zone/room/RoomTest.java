@@ -13,8 +13,17 @@ import static org.junit.jupiter.api.Assertions.*;
 class RoomTest {
 
     @Test
+    void testBring() throws Exception {
+        var user = Tester.createUser();
+        AssertRoom.build()
+                .toAddUser(user).assertUserChips(user.getId(), Room.initChips)
+                .toBring(user.getId()).assertUserChips(user.getId(), Room.initChips * 2)
+                .toTakeout(user.getId()).assertUserChips(user.getId(), 0);
+    }
+
+    @Test
     void testSitDown() throws Exception {
-        var room = new Room("1",9);
+        var room = new Room("1", 9);
         assertEquals(0, room.playerNum());
         var u1 = Tester.createUser();
         room.sitDown(u1, 0);
@@ -30,7 +39,7 @@ class RoomTest {
 
     @Test
     void testTryStart() throws Exception {
-        var room = new Room("1",9);
+        var room = new Room("1", 9);
         var u1 = Tester.createUser();
         room.sitDown(u1, 0);
 
@@ -50,7 +59,7 @@ class RoomTest {
 
     @Test
     void testShowdown() throws Exception {
-        var room = new Room("1",9);
+        var room = new Room("1", 9);
         room.sitDown(Tester.createUser(), 0);
         room.sitDown(Tester.createUser(), 1);
         room.force();
@@ -65,7 +74,7 @@ class RoomTest {
 
     @Test
     void testRestart() throws Exception {
-        var room = new Room( "1",9);
+        var room = new Room("1", 9);
         assertEquals(0, room.getRoundNum());
         room.sitDown(Tester.createUser(), 0);
         room.sitDown(Tester.createUser(), 1);

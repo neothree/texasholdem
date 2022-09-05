@@ -25,6 +25,8 @@ public class Room {
         return roomMap.values();
     }
 
+    public static final int initChips = 2000;
+
     private final String id;
 
     private final int capacity;
@@ -32,6 +34,8 @@ public class Room {
     private final User[] seats;
 
     private final Map<String, User> audience = new HashMap<>();
+
+    private Map<String, Integer> userChips = new HashMap<>();
 
     private final RoundEventHandler handler;
 
@@ -53,6 +57,9 @@ public class Room {
     }
 
     public void addUser(User user) {
+        if (!userChips.containsKey(user.getId())) {
+            this.bring(user.getId());
+        }
         audience.put(user.getId(), user);
     }
 
@@ -284,4 +291,21 @@ public class Room {
 
         return info;
     }
+
+    public int getUserChips(String uid) {
+        return this.userChips.getOrDefault(uid, 0);
+    }
+
+    public int bring(String uid) {
+        var now = this.getUserChips(uid) + initChips;
+        this.userChips.put(uid, now);
+        return now;
+    }
+
+    public int takeout(String uid) {
+        var balance = this.getUserChips(uid);
+        this.userChips.remove(uid);
+        return balance;
+    }
+
 }
