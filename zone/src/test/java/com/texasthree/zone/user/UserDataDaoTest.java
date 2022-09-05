@@ -24,7 +24,8 @@ class UserDataDaoTest {
     public void testSave() throws Exception {
         var username = StringUtils.get10UUID();
         var name = StringUtils.get10UUID();
-        var data = new UserData(username, name);
+        var real = false;
+        var data = new UserData(username, name, real);
         this.userDataDao.save(data);
         var opt = this.userDataDao.findByUsername(username);
         assertTrue(opt.isPresent());
@@ -32,6 +33,7 @@ class UserDataDaoTest {
         assertEquals(username, data.getUsername());
         assertEquals(name, data.getName());
         assertEquals(0, data.getVersion());
+        assertEquals(real, data.isReal());
 
         var avatar = StringUtils.get10UUID();
         data.setAvatar(avatar);

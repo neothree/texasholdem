@@ -15,7 +15,7 @@ public class PacketDispatcherTest {
 
     @Test
     void testStart() throws Exception {
-        var data = new UserData(StringUtils.get10UUID(), StringUtils.get10UUID());
+        var data = new UserData(StringUtils.get10UUID(), StringUtils.get10UUID(), true);
         data.setId(1 + "");
         var user = new SomeUser(data);
         assertNull(user.say);

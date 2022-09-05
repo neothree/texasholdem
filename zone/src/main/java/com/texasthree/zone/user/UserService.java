@@ -22,7 +22,7 @@ public class UserService {
     }
 
     public User user(String username, String name) {
-        var data = new UserData(username, name);
+        var data = new UserData(username, name, true);
         this.userDataDao.save(data);
         log.info("创建玩家 {} {}", username, username);
         return new User(data);

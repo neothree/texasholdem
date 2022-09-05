@@ -36,6 +36,9 @@ public class UserData {
     @Column(nullable = false, updatable = false)
     private String name;
 
+    @Column(nullable = false, updatable = false)
+    private boolean real;
+
     /**
      * 头像
      */
@@ -44,9 +47,10 @@ public class UserData {
     public UserData() {
     }
 
-    public UserData(String username, String name) {
+    public UserData(String username, String name, boolean real) {
         this.username = username;
         this.name = name;
+        this.real = real;
     }
 
 
@@ -88,6 +92,14 @@ public class UserData {
 
     public void setAvatar(String avatar) {
         this.avatar = avatar;
+    }
+
+    public boolean isReal() {
+        return real;
+    }
+
+    public void setReal(boolean real) {
+        this.real = real;
     }
 
     @Override

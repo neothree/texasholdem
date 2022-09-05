@@ -1,6 +1,5 @@
 package com.texasthree.zone.user;
 
-import com.texasthree.zone.net.Server;
 import com.texasthree.zone.room.Room;
 
 import java.util.HashMap;
@@ -10,24 +9,15 @@ public class User {
 
     private static Map<String, User> userMap = new HashMap<>();
 
-    private static Map<String, User> usernameMap = new HashMap<>();
-
     public static User getUserById(String id) {
         return userMap.get(id);
     }
-
-    public static User getUserByUsername(String username) {
-        return usernameMap.get(username);
-    }
-
 
     private int chips = 1000;
 
     private Room room;
 
     private UserData data;
-
-    private Server server;
 
     public User(UserData data) {
         this.data = data;
@@ -75,13 +65,11 @@ public class User {
         this.chips = chips;
     }
 
-    public void send(Object obj) {
-        this.server.send(getId(), obj);
-    }
-
-
-
     public String getId() {
         return data.getId();
+    }
+
+    public boolean isReal() {
+        return this.data.isReal();
     }
 }

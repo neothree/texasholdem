@@ -3,7 +3,7 @@ package com.texasthree.zone.room;
 import com.texasthree.game.texas.Circle;
 import com.texasthree.game.texas.Optype;
 import com.texasthree.utility.utlis.StringUtils;
-import com.texasthree.zone.user.User;
+import com.texasthree.zone.Tester;
 import com.texasthree.zone.user.UserData;
 import org.junit.jupiter.api.Test;
 
@@ -17,9 +17,7 @@ class TexasRoundTest {
     void testRound() throws Exception {
         var users = new ArrayList<UserPlayer>();
         for (int i = 0; i < 3; i++) {
-            var data = new UserData(StringUtils.get10UUID(), StringUtils.get10UUID());
-            data.setId(i + "");
-            var user = new User(data);
+            var user = Tester.createUser();
             users.add(new UserPlayer(i, user, 100));
         }
 

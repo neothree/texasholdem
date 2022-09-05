@@ -167,12 +167,11 @@ public class Room {
             throw new IllegalStateException();
         }
         log.info("桌子一局结束");
-        var s = this.round.settle();
-        for (var v : s) {
+        for (var v : this.round.settle()) {
             var profit = v.getProfit();
             var player = this.round.getPlayerBySeatId(v.getId());
             log.info("玩家结算利润 id={} profit={}", player.getId(), profit);
-            changeUserChips(player.getId(), profit);
+            this.changeUserChips(player.getId(), profit);
         }
         this.round = null;
         this.scheduler.once(this::tryStart, 3000);
@@ -185,14 +184,14 @@ public class Room {
         }
     }
 
-    public void send(String uid, Object msg) {
+    private void send(String uid, Object msg) {
         if (server == null) {
             return;
         }
         this.server.send(uid, msg);
     }
 
-    public void send(Object msg) {
+    private void send(Object msg) {
         if (server == null) {
             return;
         }
