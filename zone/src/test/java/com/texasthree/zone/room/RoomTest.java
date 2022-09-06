@@ -129,37 +129,44 @@ class RoomTest {
 
     @Test
     void testSeatExecute() throws Exception {
-        var u1 = Tester.createUser();
+        var u1 = Tester.createRobot();
         var u2 = Tester.createUser();
+        var u3 = Tester.createUser();
         AssertRoom.build()
                 .toAddUser(u1).toSitDown(u1, 0)
                 .toAddUser(u2).toSitDown(u2, 1)
+                .toAddUser(u3).toSitDown(u3, 2)
                 .assertNoExecute(0, 0)
                 .assertNoExecute(1, 0)
+                .assertNoExecute(2, 0)
                 .toForce().assertRunning(true)
                 .toForce().assertRunning(true)
-                .toRoundForce().toRoundForce().toRoundForce().assertRunning(true)
+                .toRoundForce(5).assertRunning(true)
                 .toOnShowdown()
                 // 第一局未操作
                 .assertNoExecute(0, 1)
-                .assertNoExecute(1, 0)
+                .assertNoExecute(1, 1)
+                .assertNoExecute(2, 0)
                 .toForce().assertRunning(true)
                 .toForce().assertRunning(true)
-                .toRoundForce().toRoundForce().toRoundForce().assertRunning(true)
+                .toRoundForce(5).assertRunning(true)
                 .toOnShowdown()
                 // 第二局未操作
                 .assertNoExecute(0, 2)
-                .assertNoExecute(1, 0)
+                .assertNoExecute(1, 2)
+                .assertNoExecute(2, 0)
                 .toForce().assertRunning(true)
                 .toForce().assertRunning(true)
-                .toRoundForce().toRoundForce().toRoundForce().assertRunning(true)
+                .toRoundForce(5).assertRunning(true)
                 .toOnShowdown()
-                .assertOccupiedNum(2)
+                .assertOccupiedNum(3)
                 .assertNoExecute(0, 3)
-                .assertNoExecute(1, 0)
-                // 第三局未操作，下次检测会强制站起
-                .toForce().assertRunning(false)
-                .assertOccupiedNum(1)
+                .assertNoExecute(1, 3)
+                .assertNoExecute(2, 0)
+                .toForce().assertRunning(true)
+                // 第三局未操作，下次检测会 seatId=1 强制站起, seatId=0 是机器人可以不用站起
+                .assertOccupiedNum(2)
+                .assertPlayerSeat(0, 2)
         ;
     }
 

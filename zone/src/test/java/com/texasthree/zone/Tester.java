@@ -15,4 +15,10 @@ public class Tester {
         data.setId(StringUtils.get10UUID());
         return new User(data);
     }
+
+    public static User createRobot() {
+        var data = new UserData(StringUtils.get10UUID(), StringUtils.get10UUID(), false);
+        data.setId(StringUtils.get10UUID());
+        return new User(data);
+    }
 }

@@ -122,7 +122,7 @@ public class Room {
     private void tryStart() {
         // 清理一直没有操作的玩家
         for (var v : seats) {
-            if (v.getNoExecute() >= 3) {
+            if ( v.occupied() && v.getUser().isReal() && v.getNoExecute() >= 3) {
                 log.info("玩家多次没有操作，强制站起 seatId{} user={} noExecute={}", v.id, v.getUser(), v.getNoExecute());
                 this.sitUp(v.getUser());
             }

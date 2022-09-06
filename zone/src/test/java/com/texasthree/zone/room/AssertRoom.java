@@ -57,6 +57,14 @@ public class AssertRoom extends Room {
         return this;
     }
 
+    AssertRoom toRoundForce(int num) {
+        for (var i = 0; i < num; i++) {
+            super.getRound().force();
+        }
+
+        return this;
+    }
+
     AssertRoom toAction(Optype op, int chipsBet) {
         super.getRound().action(op, chipsBet);
         return this;
@@ -108,6 +116,15 @@ public class AssertRoom extends Room {
             assertTrue(false);
         } catch (Exception e) {
             Assertions.assertEquals(biz, e.getClass());
+        }
+        return this;
+    }
+
+    AssertRoom assertPlayerSeat(Integer ... seatIds) {
+        assertOccupiedNum(seatIds.length);
+        var seats = this.getSeats();
+        for (var v : seatIds) {
+            assertTrue(seats.get(v).occupied());
         }
         return this;
     }
