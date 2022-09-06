@@ -36,7 +36,7 @@ public class HttpController extends AbstractMeController<User> {
         // 没有的话创建一个
         var user = this.userService.getDataByUsername(username);
         if (user == null) {
-            user = this.zone.createUser(username, password);
+            user = this.zone.createUser(username, password, true);
         }
 
         var res = loginerRealm.login(username, password);

@@ -40,10 +40,10 @@ public class Zone {
     }
 
 
-    public User createUser(String username, String password) {
+    public User createUser(String username, String password, boolean real) {
         var name = StringUtils.getChineseName();
         this.loginerService.loginer(username, password, LoginApp.USER);
-        return this.userService.user(username, name);
+        return this.userService.user(username, name, real);
     }
 
 
@@ -59,7 +59,7 @@ public class Zone {
             room = new Room(StringUtils.get10UUID(), 9);
             room.setServer(server);
 
-            var user = createUser(StringUtils.get10UUID(), StringUtils.get10UUID());
+            var user = createUser(StringUtils.get10UUID(), StringUtils.get10UUID(), false);
             user.enter(room);
             room.addUser(user);
             room.sitDown(user, 7);

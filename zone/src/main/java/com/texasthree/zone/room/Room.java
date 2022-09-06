@@ -303,7 +303,6 @@ public class Room {
         // 牌局
         var round = this.getRound();
         if (round != null) {
-
             var rd = new Protocal.RoundData();
             rd.dealer = round.dealer();
             rd.sbSeatId = round.sbSeatId();
@@ -317,6 +316,7 @@ public class Room {
                 var p = new Protocal.Player();
                 p.seatId = v.seatId;
                 p.uid = v.getId();
+                rd.players.add(p);
             }
             info.round = rd;
         }
