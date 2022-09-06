@@ -21,7 +21,7 @@ class Pot {
 
     private Map<Integer, Integer> anteBet = new HashMap<>();
 
-    private List<Divide> divides;
+    private List<Divide> divides = new ArrayList<>();
 
     private Player refundPlayer;
 

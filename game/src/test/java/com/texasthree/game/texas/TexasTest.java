@@ -294,6 +294,16 @@ public class TexasTest extends AllCard {
     }
 
     @Test
+    public void testGetPots() throws Exception {
+        AssertTexas
+                .builder(5)
+                .build()
+                .start()
+                .assertPots();
+
+    }
+
+    @Test
     public void testSettle() throws Exception {
         var result = AssertTexas
                 .builder(5)

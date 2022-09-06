@@ -177,6 +177,8 @@ public class Texas {
      * 是否结束
      */
     private boolean isOver;
+
+    private boolean isStart;
     /**
      * 底池
      */
@@ -218,16 +220,17 @@ public class Texas {
         this.ring = ring;
         this.communityCards = leftCard;
         this.playerNum = ring.size();
+        this.pot = new Pot(playerNum, this.smallBlind(), this.ante());
     }
 
     /**
      * 开始
      */
     public Texas start() {
-        if (this.pot != null) {
-            throw new IllegalStateException();
+        if (this.isStart) {
+            throw new IllegalArgumentException();
         }
-        this.pot = new Pot(playerNum, this.smallBlind(), this.ante());
+        this.isStart = true;
 
         // 一圈开始
         this.circleStart();

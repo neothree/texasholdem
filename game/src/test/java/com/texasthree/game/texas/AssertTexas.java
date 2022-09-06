@@ -180,6 +180,15 @@ public class AssertTexas extends Texas {
         return this;
     }
 
+    public AssertTexas assertPots(Integer ... pots) {
+        var actual = this.getPots();
+        assertEquals(pots.length, actual.size());
+        for (var i = 0; i < pots.length ; i++) {
+            assertEquals(pots[i], actual.get(i));
+        }
+        return this;
+    }
+
     AssertTexas assertAuth(Optype... ops) throws Exception {
         var auth = this.authority();
         if (false) {
