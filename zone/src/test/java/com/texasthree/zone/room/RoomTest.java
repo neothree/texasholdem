@@ -22,21 +22,20 @@ class RoomTest {
 
     @Test
     void testSitDown() throws Exception {
-        var room = new Room("1", 9);
-        assertEquals(0, room.occupiedNum());
         var u1 = Tester.createUser();
-        room.addUser(u1);
-        room.sitDown(u1, 0);
-        assertEquals(1, room.occupiedNum());
         var u2 = Tester.createUser();
-        room.addUser(u2);
-        room.sitDown(u2, 1);
-        assertEquals(2, room.occupiedNum());
+        var room = AssertRoom.build();
 
-        var u3 = Tester.createUser();
-        room.addUser(u3);
-        room.sitDown(u3, 2);
-        assertEquals(3, room.occupiedNum());
+        room.assertOccupiedNum(0)
+                .toAddUser(u1).assertOccupiedNum(0)
+                .toAddUser(u2).assertOccupiedNum(0)
+                .toSitDown(u1, 4).assertOccupiedNum(1)
+                .toSitUp(u1).assertOccupiedNum(0)
+                .toSitUp(u2).assertOccupiedNum(0)
+                .toSitDown(u2, 3).assertOccupiedNum(1)
+                .toSitDown(u1, 4).assertOccupiedNum(2)
+                .assertException(() -> room.toSitDown(u1, 5), IllegalArgumentException.class).assertOccupiedNum(2)
+        ;
     }
 
     @Test

@@ -72,8 +72,12 @@ public class Room {
     }
 
     public void sitDown(User user, int seatId) {
+        Objects.requireNonNull(user);
         if (seatId >= seats.length || seats[seatId].occupied()) {
             throw new IllegalArgumentException();
+        }
+        if (this.getSeatId(user.getId()) != null) {
+            throw new IllegalArgumentException("玩家已经在座位上");
         }
         var chips = this.getUserChips(user.getId());
         if (chips <= 0) {

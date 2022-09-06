@@ -3,8 +3,10 @@ package com.texasthree.zone.room;
 import com.texasthree.game.texas.Optype;
 import com.texasthree.utility.utlis.StringUtils;
 import com.texasthree.zone.user.User;
+import org.junit.jupiter.api.Assertions;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author: neo
@@ -97,6 +99,16 @@ class AssertRoom extends Room {
 
     AssertRoom assertOccupiedNum(int num) {
         assertEquals(num, this.occupiedNum());
+        return this;
+    }
+
+    AssertRoom assertException(Runnable func, Class biz) {
+        try {
+            func.run();
+            assertTrue(false);
+        } catch (Exception e) {
+            Assertions.assertEquals(biz, e.getClass());
+        }
         return this;
     }
 }
