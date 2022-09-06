@@ -36,6 +36,9 @@ public class Seat {
     }
 
     void sitUp() {
+        if (!occupied()) {
+            throw new IllegalArgumentException("座位上没有玩家");
+        }
         log.info("玩家站起 roomId={} seatId={} id={} name={}", roomId, id, user.getId(), user.getName());
         this.user = null;
         this.noExecute = 0;

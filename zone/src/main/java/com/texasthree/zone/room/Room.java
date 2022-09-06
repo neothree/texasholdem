@@ -84,12 +84,12 @@ public class Room {
 
         this.onSeat(seatId);
 
-        this.scheduler.once(this::tryStart, 1);
+        this.scheduler.once(this::tryStart, 2 * 1000);
     }
 
     public void sitUp(User user) {
         for (var v : seats) {
-            if (user.getId().equals(user.getId())) {
+            if (v.occupiedBy(user.getId())) {
                 this.audience.put(user.getId(), user);
                 v.sitUp();
                 this.onSeat(v.id);
@@ -120,7 +120,7 @@ public class Room {
         for (var v : seats) {
             if (v.getNoExecute() >= 3) {
                 log.info("玩家多次没有操作，强制站起 seatId{} user={} noExecute={}", v.id, v.getUser(), v.getNoExecute());
-                v.sitUp();
+                this.sitUp(v.getUser());
             }
         }
 

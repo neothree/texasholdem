@@ -35,6 +35,11 @@ class AssertRoom extends Room {
         return this;
     }
 
+    AssertRoom toSitUp(User user) {
+        super.sitUp(user);
+        return this;
+    }
+
     AssertRoom toTakeout(String uid) {
         super.takeout(uid);
         return this;

@@ -40,6 +40,18 @@ class RoomTest {
     }
 
     @Test
+    void testSitUp() throws Exception {
+        var u1 = Tester.createUser();
+        var u2 = Tester.createUser();
+        AssertRoom.build().assertOccupiedNum(0)
+                .toAddUser(u1).assertOccupiedNum(0)
+                .toAddUser(u2).assertOccupiedNum(0)
+                .toSitDown(u1, 4).assertOccupiedNum(1)
+                .toSitUp(u1).assertOccupiedNum(0)
+                .toSitUp(u2).assertOccupiedNum(0);
+    }
+
+    @Test
     void testStart() throws Exception {
         // 设定的smallBling=1
         var initChips = Room.initChips;
@@ -91,6 +103,8 @@ class RoomTest {
                 .toForce().assertRunning(true)
                 .toRoundForce().toRoundForce().toRoundForce().assertRunning(true)
                 .toOnShowdown().assertRunning(false);
+
+        // 不知道输赢，所以没办法判断现在玩家的筹码是多少
         assertNotEquals(Room.initChips, room.getUserChips(u1.getId()));
         assertNotEquals(Room.initChips, room.getUserChips(u2.getId()));
     }
