@@ -89,4 +89,9 @@ class AssertRoom extends Room {
         assertEquals(noExecute, seat.getNoExecute());
         return this;
     }
+
+    AssertRoom assertOccupiedNum(int num) {
+        assertEquals(num, this.occupiedNum());
+        return this;
+    }
 }

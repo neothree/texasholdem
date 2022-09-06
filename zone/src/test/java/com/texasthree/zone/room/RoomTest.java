@@ -127,8 +127,27 @@ class RoomTest {
                 .toForce().assertRunning(true)
                 .toRoundForce().toRoundForce().toRoundForce().assertRunning(true)
                 .toOnShowdown()
+                // 第一局未操作
                 .assertNoExecute(0, 1)
-                .assertNoExecute(1, 0);
+                .assertNoExecute(1, 0)
+                .toForce().assertRunning(true)
+                .toForce().assertRunning(true)
+                .toRoundForce().toRoundForce().toRoundForce().assertRunning(true)
+                .toOnShowdown()
+                // 第二局未操作
+                .assertNoExecute(0, 2)
+                .assertNoExecute(1, 0)
+                .toForce().assertRunning(true)
+                .toForce().assertRunning(true)
+                .toRoundForce().toRoundForce().toRoundForce().assertRunning(true)
+                .toOnShowdown()
+                .assertOccupiedNum(2)
+                .assertNoExecute(0, 3)
+                .assertNoExecute(1, 0)
+                // 第三局未操作，下次检测会强制站起
+                .toForce().assertRunning(false)
+                .assertOccupiedNum(1)
+        ;
     }
 
     @Test

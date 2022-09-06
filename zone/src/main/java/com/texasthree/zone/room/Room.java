@@ -116,6 +116,14 @@ public class Room {
      * 尝试开局
      */
     private void tryStart() {
+        // 清理一直没有操作的玩家
+        for (var v : seats) {
+            if (v.getNoExecute() >= 3) {
+                log.info("玩家多次没有操作，强制站起 seatId{} user={} noExecute={}", v.id, v.getUser(), v.getNoExecute());
+                v.sitUp();
+            }
+        }
+
         if (roundNum >= 10) {
             log.info("已经进行了 10 局比赛，不再开启");
             return;
@@ -213,7 +221,7 @@ public class Room {
         server.send(set, msg);
     }
 
-    public int occupiedNum() {
+    int occupiedNum() {
         return (int) Arrays.stream(this.seats)
                 .filter(Seat::occupied)
                 .count();
