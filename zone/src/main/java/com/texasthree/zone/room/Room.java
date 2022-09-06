@@ -243,6 +243,14 @@ public class Room {
         return round != null;
     }
 
+    public boolean running(String uid) {
+        var seatId = this.getSeatId(uid);
+        if (seatId == null) {
+            return false;
+        }
+        return round != null && round.isPlayerInGame(seatId);
+    }
+
 
     public TexasRound getRound() {
         return this.round;
@@ -371,5 +379,12 @@ public class Room {
 
     List<Seat> getSeats() {
         return Arrays.asList(seats);
+    }
+
+    public boolean contains(String uid) {
+        if (audience.containsKey(uid)) {
+            return true;
+        }
+        return this.getSeatId(uid) != null;
     }
 }

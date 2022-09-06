@@ -60,6 +60,7 @@ public class Zone {
             room.setServer(server);
 
             var user = createUser(StringUtils.get10UUID(), StringUtils.get10UUID());
+            user.enter(room);
             room.addUser(user);
             room.sitDown(user, 7);
         }

@@ -31,7 +31,7 @@ public class RoomController extends AbstractMeController<User> {
     @PostMapping(value = "/{roomId}")
     public RestResponse enter(@PathVariable("roomId") String roomId) throws Exception {
         log.info("进入房间 {}", roomId);
-        zone.getRoom().addUser(this.getMe());
+        this.getMe().enter(zone.getRoom());
         return RestResponse.SUCCESS;
     }
 
@@ -55,13 +55,17 @@ public class RoomController extends AbstractMeController<User> {
      * 站起
      */
     @DeleteMapping(value = "/seat/{seatId}")
-    public void sitUp(@PathVariable("seatId") String seatId) {
+    public RestResponse sitUp(@PathVariable("seatId") String seatId) {
         var user = this.getMe();
         var room = user.getRoom();
         if (room == null) {
             throw new IllegalArgumentException("房间不存在");
         }
+        if (room.running(user.getId())) {
+            return RestResponse.error("牌局进行中不能站起");
+        }
         room.sitUp(user);
+        return RestResponse.SUCCESS;
     }
 
     /**

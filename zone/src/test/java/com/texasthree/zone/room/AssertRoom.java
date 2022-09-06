@@ -12,9 +12,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author: neo
  * @create: 2022-09-05 11:21
  */
-class AssertRoom extends Room {
+public class AssertRoom extends Room {
 
-    static AssertRoom build() {
+    public static AssertRoom build() {
         return new AssertRoom(StringUtils.get10UUID(), 9);
     }
 
