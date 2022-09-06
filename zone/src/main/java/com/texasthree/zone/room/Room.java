@@ -128,11 +128,6 @@ public class Room {
             }
         }
 
-        if (roundNum >= 10) {
-            log.info("已经进行了 10 局比赛，不再开启");
-            return;
-        }
-
         // 已经有牌局
         if (running()) {
             return;
