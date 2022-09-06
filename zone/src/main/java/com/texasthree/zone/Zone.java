@@ -54,12 +54,6 @@ public class Zone {
 
     private Room room;
 
-    public Room newRoom() {
-        room.dispose();
-        room = null;
-        return getRoom();
-    }
-
     public Room getRoom() {
         if (room == null) {
             room = new Room(StringUtils.get10UUID(), 9);
