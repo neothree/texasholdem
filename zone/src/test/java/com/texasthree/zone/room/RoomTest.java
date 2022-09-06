@@ -181,7 +181,7 @@ class RoomTest {
         room.addUser(user);
         room.sitDown(user, seatId);
 
-        var data = room.data();
+        var data = room.data(user.getId());
         assertEquals(id, data.id);
         assertEquals(capacity, data.capacity.intValue());
         assertEquals(1, data.seats.size());

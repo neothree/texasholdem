@@ -89,7 +89,7 @@ public class RoundEventHandler {
     private void onAction(TexasRound round) {
         var action = round.getLastAction();
         var send = new Protocal.Action();
-        send.op = action.op.name();
+        send.op = action.op;
         send.seatId = action.id;
         send.chipsBet = action.chipsBet;
         send.chips = action.chipsLeft;
@@ -131,7 +131,7 @@ public class RoundEventHandler {
                 .entrySet().stream()
                 .map(v -> {
                     var act = new Protocal.Action();
-                    act.op = v.getKey().name();
+                    act.op = v.getKey();
                     act.chipsBet = v.getValue();
                     return act;
                 }).collect(Collectors.toList());

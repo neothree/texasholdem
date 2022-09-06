@@ -1,5 +1,7 @@
 package com.texasthree.zone.room;
 
+import com.texasthree.game.texas.Optype;
+
 import java.util.List;
 
 /**
@@ -36,7 +38,10 @@ public class Protocal {
         public String name;
         public String avator = "";
         public Integer seatId;
+        public Integer betChips;
         public Integer chips;
+        public Optype op;
+        public Hand hand;
     }
 
     public static class Seat {
@@ -45,7 +50,7 @@ public class Protocal {
     }
 
     public static class Action {
-        public String op;
+        public Optype op;
         public Integer seatId;
         public Integer chipsBet;
         public Integer chips;

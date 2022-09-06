@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 德扑游戏
@@ -83,6 +84,7 @@ public class TexasRound {
         this.operator.execute();
         this.doAction(op, chipsBet);
     }
+
     private void doAction(Optype op, int chipsBet) {
         if (operator == null) {
             log.error("{}押注异常，没有操作人", logpre);
@@ -303,5 +305,46 @@ public class TexasRound {
 
     public boolean isPlayerInGame(int seatId) {
         return this.game.getPlayerById(seatId) != null;
+    }
+
+    public Protocal.RoundData data(String uid) {
+        var data = new Protocal.RoundData();
+        data.dealer = this.dealer();
+        data.sbSeatId = this.sbSeatId();
+        data.bbSeatId = this.bbSeatId();
+        data.sumPot = this.sumPot();
+        data.circle = this.circle();
+        data.pots = this.getPots();
+        data.communityCards = toCardIds(this.getCommunityCards());
+        data.players = new ArrayList<>();
+        for (var v : this.getPlayers()) {
+            var p = this.game.getPlayerById(v.seatId);
+            var info = new Protocal.Player();
+            info.seatId = v.seatId;
+            info.chips = p.getChips();
+
+            // 押注
+            var action = this.game.getAction(v.seatId);
+            if (action != null) {
+                info.betChips = action.chipsBet;
+                info.op = action.op;
+            }
+
+            // 主角手牌
+            if (v.getId().equals(uid)) {
+                var h = new Protocal.Hand();
+                h.cards = toCardIds(p.getHand().getHold());
+                h.best = toCardIds(p.getHand().getBest());
+                h.key = toCardIds(p.getHand().getKeys());
+                h.type = p.getHand().getType().name();
+                info.hand = h;
+            }
+            data.players.add(info);
+        }
+        return data;
+    }
+
+    private List<Integer> toCardIds(List<Card> cards) {
+        return cards.stream().map(Card::getId).collect(Collectors.toList());
     }
 }

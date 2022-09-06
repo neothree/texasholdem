@@ -22,7 +22,7 @@ public class RoomController extends AbstractMeController<User> {
     public RestResponse room(@PathVariable("roomId") String roomId) throws Exception {
         log.info("获取房间数据 {}", roomId);
         var room = zone.getRoom();
-        return new RestResponse<>(room.data());
+        return new RestResponse<>(room.data(this.getMe().getId()));
     }
 
     /**

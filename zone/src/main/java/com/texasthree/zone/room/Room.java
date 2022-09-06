@@ -1,7 +1,6 @@
 package com.texasthree.zone.room;
 
 
-import com.texasthree.game.texas.Card;
 import com.texasthree.zone.net.Server;
 import com.texasthree.zone.user.User;
 import org.slf4j.Logger;
@@ -213,7 +212,7 @@ public class Room {
         }
         var set = new HashSet<>(this.audience.keySet());
         for (var v : seats) {
-            if (v.occupied()) {
+            if (v.occupied() && v.getUser().isReal()) {
                 set.add(v.getUid());
             }
         }
@@ -277,7 +276,7 @@ public class Room {
         roomMap.remove(id);
     }
 
-    public Protocal.RoomData data() {
+    public Protocal.RoomData data(String uid) {
         var info = new Protocal.RoomData();
         info.id = id;
         info.name = "test";
@@ -303,22 +302,7 @@ public class Room {
         // 牌局
         var round = this.getRound();
         if (round != null) {
-            var rd = new Protocal.RoundData();
-            rd.dealer = round.dealer();
-            rd.sbSeatId = round.sbSeatId();
-            rd.bbSeatId = round.bbSeatId();
-            rd.sumPot = round.sumPot();
-            rd.circle = round.circle();
-            rd.pots = round.getPots();
-            rd.communityCards = round.getCommunityCards().stream().map(Card::getId).collect(Collectors.toList());
-            rd.players = new ArrayList<>();
-            for (var v : round.getPlayers()) {
-                var p = new Protocal.Player();
-                p.seatId = v.seatId;
-                p.uid = v.getId();
-                rd.players.add(p);
-            }
-            info.round = rd;
+            info.round = round.data(uid);
         }
 
         return info;
