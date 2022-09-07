@@ -67,7 +67,7 @@ public class Protocal {
         public List<Integer> cards;
         public String type;
         public List<Integer> best;
-        public List<Integer> key;
+        public List<Integer> keys;
     }
 
     public static class Start {

@@ -335,7 +335,7 @@ public class TexasRound {
                 var h = new Protocal.Hand();
                 h.cards = toCardIds(p.getHand().getHold());
                 h.best = toCardIds(p.getHand().getBest());
-                h.key = toCardIds(p.getHand().getKeys());
+                h.keys = toCardIds(p.getHand().getKeys());
                 h.type = p.getHand().getType().name();
                 info.hand = h;
             }

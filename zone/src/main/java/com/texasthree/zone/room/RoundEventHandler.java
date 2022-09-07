@@ -76,7 +76,7 @@ public class RoundEventHandler {
             var update = new Protocal.Hand();
             update.cards = toCardIds(hand.getHold());
             update.best = toCardIds(hand.getBest());
-            update.key = toCardIds(hand.getKeys());
+            update.keys = toCardIds(hand.getKeys());
             update.type = hand.getType().name();
             send(v.getId(), update);
         }
