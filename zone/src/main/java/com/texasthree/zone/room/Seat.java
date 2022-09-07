@@ -56,6 +56,7 @@ public class Seat {
         log.info("玩家站起 roomId={} seatId={} id={} name={}", roomId, id, user.getId(), user.getName());
         this.user = null;
         this.noExecute = 0;
+        this.pendingAt = null;
     }
 
     /**
@@ -102,6 +103,7 @@ public class Seat {
      */
     void pending() {
         if (occupied()) {
+            log.info("留座离桌 roomId={} seatId={} user={}", roomId, id, user);
             this.pendingAt = LocalDateTime.now();
         }
     }
@@ -110,6 +112,7 @@ public class Seat {
      * 留座离桌结束
      */
     void pendingCancel() {
+        log.info("留座离桌取消 roomId={} seatId={} user={}", roomId, id, user);
         this.pendingAt = null;
     }
 

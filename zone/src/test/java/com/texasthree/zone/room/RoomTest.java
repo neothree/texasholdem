@@ -167,6 +167,32 @@ class RoomTest {
     }
 
     @Test
+    void testPending() throws Exception {
+        var u0 = Tester.createUser();
+        var u1 = Tester.createUser();
+        var capacity = 2;
+        AssertRoom.build(capacity).assertCapacity(capacity)
+                .toAddUser(u0)
+                // 初始化状态
+                .assertPending(0, false).assertPending(1, false)
+
+                // u0在座位上
+                .toSitDown(u0, 0)
+                .assertPending(0, false).assertPending(1, false)
+                .toPending(u0)
+                .assertPending(0, true).assertPending(1, false)
+                .toPendingCancel(u0)
+                .assertPending(0, false).assertPending(1, false)
+
+                // u1 没有在座位上，操作无效
+                .toPending(u1)
+                .assertPending(0, false).assertPending(1, false)
+                .toPendingCancel(u1)
+                .assertPending(0, false).assertPending(1, false)
+        ;
+    }
+
+    @Test
     void testData() throws Exception {
         var id = StringUtils.get10UUID();
         var capacity = 8;

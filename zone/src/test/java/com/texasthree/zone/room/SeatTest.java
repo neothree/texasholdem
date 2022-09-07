@@ -63,5 +63,10 @@ class SeatTest {
         assertTrue(seat.isPending());
         seat.pendingCancel();
         assertFalse(seat.isPending());
+
+        seat.pending();
+        assertTrue(seat.isPending());
+        seat.occupyEnd();
+        assertFalse(seat.isPending());
     }
 }

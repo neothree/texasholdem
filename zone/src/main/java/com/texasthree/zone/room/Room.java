@@ -131,7 +131,7 @@ public class Room {
         if (seatId >= seats.length || seats[seatId].occupied()) {
             throw new IllegalArgumentException();
         }
-        if (this.getSeatId(user.getId()) != null) {
+        if (this.getUserSeat(user.getId()) != null) {
             throw new IllegalArgumentException("玩家已经在座位上");
         }
         var chips = this.getUserChips(user.getId());
@@ -175,6 +175,29 @@ public class Room {
         this.send(info);
     }
 
+    /**
+     * 玩家留座离桌
+     *
+     * @param user 玩家
+     */
+    public void pending(User user) {
+        var seat = this.getUserSeat(user.getId());
+        if (seat != null) {
+            seat.pending();
+        }
+    }
+
+    /**
+     * 玩家留座离桌结束
+     *
+     * @param user 玩家
+     */
+    public void pendingCancel(User user) {
+        var seat = this.getUserSeat(user.getId());
+        if (seat != null) {
+            seat.pendingCancel();
+        }
+    }
 
     /**
      * 尝试开局
@@ -255,16 +278,6 @@ public class Room {
         }
     }
 
-    int occupiedNum() {
-        return (int) Arrays.stream(this.seats)
-                .filter(Seat::occupied)
-                .count();
-    }
-
-    public void setServer(Server server) {
-        this.server = server;
-    }
-
 
     /**
      * 牌局是否在进行中
@@ -280,37 +293,11 @@ public class Room {
      * @return
      */
     public boolean running(String uid) {
-        var seatId = this.getSeatId(uid);
-        if (seatId == null) {
+        var seat = this.getUserSeat(uid);
+        if (seat == null) {
             return false;
         }
-        return round != null && round.isPlayerInGame(seatId);
-    }
-
-
-    public TexasRound getRound() {
-        return this.round;
-    }
-
-    public int getRoundNum() {
-        return roundNum;
-    }
-
-    public void force() {
-        this.scheduler.force();
-    }
-
-    @Override
-    public String toString() {
-        return this.id;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public int getCapacity() {
-        return capacity;
+        return round != null && round.isPlayerInGame(seat.id);
     }
 
     public void dispose() {
@@ -350,15 +337,6 @@ public class Room {
         return info;
     }
 
-    private Integer getSeatId(String uid) {
-        for (var v : seats) {
-            if (uid.equals(v.getUid())) {
-                return v.id;
-            }
-        }
-        return null;
-    }
-
     /**
      * 玩家{@code uid}在房间的筹码数
      * <p>
@@ -374,15 +352,15 @@ public class Room {
             return chips;
         }
 
-        var seatId = this.getSeatId(uid);
-        if (seatId == null) {
+        var seat = this.getUserSeat(uid);
+        if (seat == null) {
             return chips;
         }
 
-        if (!this.round.isPlayerInGame(seatId)) {
+        if (!this.round.isPlayerInGame(seat.id)) {
             return chips;
         }
-        return this.round.getPlayerChips(seatId);
+        return this.round.getPlayerChips(seat.id);
     }
 
     public int getUserChips(String uid) {
@@ -400,11 +378,59 @@ public class Room {
         return Arrays.asList(seats);
     }
 
+    Seat getSeat(int seatId) {
+        return seats[seatId];
+    }
+
+    Seat getUserSeat(String uid) {
+        for (var v : seats) {
+            if (uid.equals(v.getUid())) {
+                return v;
+            }
+        }
+        return null;
+    }
+
     public boolean contains(String uid) {
         if (audience.containsKey(uid)) {
             return true;
         }
-        return this.getSeatId(uid) != null;
+        return this.getUserSeat(uid) != null;
+    }
+
+    int occupiedNum() {
+        return (int) Arrays.stream(this.seats)
+                .filter(Seat::occupied)
+                .count();
+    }
+
+    public void setServer(Server server) {
+        this.server = server;
+    }
+
+    public TexasRound getRound() {
+        return this.round;
+    }
+
+    public int getRoundNum() {
+        return roundNum;
+    }
+
+    public void force() {
+        this.scheduler.force();
+    }
+
+    @Override
+    public String toString() {
+        return this.id;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public int getCapacity() {
+        return capacity;
     }
 
     private void send(String uid, Object obj) {

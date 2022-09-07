@@ -18,6 +18,10 @@ public class AssertRoom extends Room {
         return new AssertRoom(StringUtils.get10UUID(), 9);
     }
 
+    public static AssertRoom build(int capacity) {
+        return new AssertRoom(StringUtils.get10UUID(), capacity);
+    }
+
     AssertRoom(String id, int capacity) {
         super(id, capacity);
     }
@@ -32,6 +36,11 @@ public class AssertRoom extends Room {
         return this;
     }
 
+    AssertRoom toTakeout(String uid) {
+        super.takeout(uid);
+        return this;
+    }
+
     AssertRoom toSitDown(User user, int seatId) {
         super.sitDown(user, seatId);
         return this;
@@ -42,10 +51,16 @@ public class AssertRoom extends Room {
         return this;
     }
 
-    AssertRoom toTakeout(String uid) {
-        super.takeout(uid);
+    AssertRoom toPending(User user) {
+        super.pending(user);
         return this;
     }
+
+    AssertRoom toPendingCancel(User user) {
+        super.pendingCancel(user);
+        return this;
+    }
+
 
     AssertRoom toForce() {
         super.force();
@@ -100,13 +115,24 @@ public class AssertRoom extends Room {
     }
 
     AssertRoom assertNoExecute(int seatId, int noExecute) {
-        var seat = this.getSeats().get(seatId);
+        var seat = this.getSeat(seatId);
         assertEquals(noExecute, seat.getNoExecute());
+        return this;
+    }
+
+    AssertRoom assertPending(int seatId, boolean value) {
+        var seat = this.getSeat(seatId);
+        assertEquals(value, seat.isPending());
         return this;
     }
 
     AssertRoom assertOccupiedNum(int num) {
         assertEquals(num, this.occupiedNum());
+        return this;
+    }
+
+    AssertRoom assertCapacity(int num) {
+        assertEquals(num, this.getCapacity());
         return this;
     }
 
@@ -120,7 +146,7 @@ public class AssertRoom extends Room {
         return this;
     }
 
-    AssertRoom assertPlayerSeat(Integer ... seatIds) {
+    AssertRoom assertPlayerSeat(Integer... seatIds) {
         assertOccupiedNum(seatIds.length);
         var seats = this.getSeats();
         for (var v : seatIds) {
