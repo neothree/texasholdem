@@ -4,7 +4,6 @@ import com.texasthree.utility.utlis.StringUtils;
 import com.texasthree.zone.Tester;
 import org.junit.jupiter.api.Test;
 
-import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -190,24 +189,6 @@ class RoomTest {
                 .toPendingCancel(u1)
                 .assertPending(0, false).assertPending(1, false)
         ;
-    }
-
-    @Test
-    void testData() throws Exception {
-        var id = StringUtils.get10UUID();
-        var capacity = 8;
-        var user = Tester.createUser();
-        var seatId = 2;
-
-        var room = new Room(id, capacity);
-        room.addUser(user);
-        room.sitDown(user, seatId);
-
-        var data = room.data(user.getId());
-        assertEquals(id, data.id);
-        assertEquals(capacity, data.capacity.intValue());
-        assertEquals(1, data.seats.size());
-        assertEquals(seatId, data.seats.get(0).seatId.intValue());
     }
 
     @Test

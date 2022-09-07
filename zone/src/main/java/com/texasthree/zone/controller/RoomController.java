@@ -4,6 +4,7 @@ import com.texasthree.game.texas.Optype;
 import com.texasthree.security.shiro.AbstractMeController;
 import com.texasthree.utility.restful.RestResponse;
 import com.texasthree.zone.Zone;
+import com.texasthree.zone.room.Protocal;
 import com.texasthree.zone.room.Room;
 import com.texasthree.zone.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +23,8 @@ public class RoomController extends AbstractMeController<User> {
     @GetMapping(value = "/{roomId}")
     public RestResponse room(@PathVariable("roomId") String roomId) throws Exception {
         log.info("获取房间数据 {}", roomId);
-        var room = zone.getRoom();
-        return new RestResponse<>(room.data(this.getMe().getId()));
+        var data = new Protocal.RoomData(zone.getRoom(), this.getMe().getId());
+        return new RestResponse<>(data);
     }
 
     /**
@@ -71,7 +72,9 @@ public class RoomController extends AbstractMeController<User> {
      */
     @PostMapping(value = "/seat/{seatId}")
     public void sitDown(@PathVariable("seatId") int seatId) {
-        zone.getRoom().sitDown(this.getMe(), seatId);
+        var room = zone.getRoom();
+        room.sitDown(this.getMe(), seatId);
+        onSeat(room, seatId);
     }
 
     /**
@@ -87,9 +90,30 @@ public class RoomController extends AbstractMeController<User> {
         if (room.running(user.getId())) {
             return RestResponse.error("牌局进行中不能站起");
         }
+
+        var seat = room.getUserSeat(user.getId());
+        if (seat == null) {
+            return RestResponse.SUCCESS;
+        }
         room.sitUp(user);
+        onSeat(room, seat.id);
         return RestResponse.SUCCESS;
     }
+
+    private void onSeat(Room room, int seatId) {
+        var info = new Protocal.Seat();
+        info.seatId = seatId;
+        var user = room.getSeats().get(seatId).getUser();
+        if (user != null) {
+            var p = new Protocal.Player();
+            p.uid = user.getId();
+            p.name = user.getName();
+            p.chips = user.getChips();
+            info.player = p;
+        }
+        room.send(info);
+    }
+
 
     /**
      * 押注

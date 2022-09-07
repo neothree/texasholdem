@@ -10,10 +10,6 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.stream.Collectors;
 
-
-/**
- *
- */
 public class Room {
 
     private static Logger log = LoggerFactory.getLogger(Room.class);
@@ -141,8 +137,6 @@ public class Room {
         seats[seatId].occupy(user);
         this.audience.remove(user.getId());
 
-        this.onSeat(seatId);
-
         this.scheduler.once(this::tryStart, 2 * 1000);
     }
 
@@ -156,23 +150,8 @@ public class Room {
             if (v.occupiedBy(user.getId())) {
                 this.audience.put(user.getId(), user);
                 v.occupyEnd();
-                this.onSeat(v.id);
             }
         }
-    }
-
-    private void onSeat(int seatId) {
-        var info = new Protocal.Seat();
-        info.seatId = seatId;
-        var user = seats[seatId].getUser();
-        if (user != null) {
-            var p = new Protocal.Player();
-            p.uid = user.getId();
-            p.name = user.getName();
-            p.chips = user.getChips();
-            info.player = p;
-        }
-        this.send(info);
     }
 
     /**
@@ -305,38 +284,6 @@ public class Room {
         roomMap.remove(id);
     }
 
-    public Protocal.RoomData data(String uid) {
-        var info = new Protocal.RoomData();
-        info.id = id;
-        info.name = "test";
-        info.ante = 1;
-        info.smallBlind = 1;
-        info.button = 1;
-        info.capacity = capacity;
-        info.seats = new ArrayList<>();
-
-        // 座位
-        for (var v : seats) {
-            if (v.occupied()) {
-                var u = v.getUser();
-                var p = new Protocal.Player();
-                p.uid = u.getId();
-                p.name = u.getName();
-                p.chips = u.getChips();
-                p.seatId = v.id;
-                info.seats.add(p);
-            }
-        }
-
-        // 牌局
-        var round = this.getRound();
-        if (round != null) {
-            info.round = round.data(uid);
-        }
-
-        return info;
-    }
-
     /**
      * 玩家{@code uid}在房间的筹码数
      * <p>
@@ -374,7 +321,7 @@ public class Room {
         return old;
     }
 
-    List<Seat> getSeats() {
+    public List<Seat> getSeats() {
         return Arrays.asList(seats);
     }
 
@@ -382,7 +329,7 @@ public class Room {
         return seats[seatId];
     }
 
-    Seat getUserSeat(String uid) {
+    public Seat getUserSeat(String uid) {
         for (var v : seats) {
             if (uid.equals(v.getUid())) {
                 return v;
@@ -442,7 +389,7 @@ public class Room {
         this.server.send(uid, info);
     }
 
-    private void send(Object obj) {
+    public void send(Object obj) {
         if (server == null) {
             return;
         }

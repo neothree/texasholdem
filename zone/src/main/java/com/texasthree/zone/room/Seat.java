@@ -124,7 +124,7 @@ public class Seat {
         return this.user != null ? this.user.getId() : null;
     }
 
-    User getUser() {
+    public User getUser() {
         return this.user;
     }
 }

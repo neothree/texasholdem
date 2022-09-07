@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * 德扑游戏
@@ -307,42 +306,11 @@ public class TexasRound {
         return this.game.getPlayerById(seatId) != null;
     }
 
-    public Protocal.RoundData data(String uid) {
-        var data = new Protocal.RoundData();
-        data.dealer = this.dealer();
-        data.sbSeatId = this.sbSeatId();
-        data.bbSeatId = this.bbSeatId();
-        data.sumPot = this.sumPot();
-        data.circle = this.circle();
-        data.pots = this.getPots();
-        data.communityCards = toCardIds(this.getCommunityCards());
-        data.players = new ArrayList<>();
-        for (var v : this.getPlayers()) {
-            var p = this.game.getPlayerById(v.seatId);
-            var info = new Protocal.Player();
-            info.seatId = v.seatId;
-            info.chips = p.getChips();
-
-            // 押注
-            var action = this.game.getAction(v.seatId);
-            if (action != null) {
-                info.betChips = action.chipsBet;
-                info.op = action.op;
-            }
-
-            // 主角手牌
-            if (v.getId().equals(uid)) {
-                info.hand = new Protocal.Hand(p.getHand());
-            }
-            data.players.add(info);
-        }
-        if (this.operator != null) {
-            data.operator = new Protocal.Operator(this);
-        }
-        return data;
+    public Player getPlayerById(int seatId) {
+        return this.game.getPlayerById(seatId);
     }
 
-    private List<Integer> toCardIds(List<Card> cards) {
-        return cards.stream().map(Card::getId).collect(Collectors.toList());
+    public Action getAction(int seatId) {
+        return this.game.getAction(seatId);
     }
 }

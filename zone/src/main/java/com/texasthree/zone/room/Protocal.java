@@ -3,6 +3,7 @@ package com.texasthree.zone.room;
 import com.texasthree.game.texas.Card;
 import com.texasthree.game.texas.Optype;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,6 +23,24 @@ public class Protocal {
         public Integer ante;
         public List<Player> seats;
         public RoundData round;
+
+        public RoomData(Room room, String uid) {
+            this.id = room.getId();
+            this.name = "test";
+            this.ante = 1;
+            this.smallBlind = 1;
+            this.button = 1;
+            this.capacity = room.getCapacity();
+            this.seats = room.getSeats().stream()
+                    .filter(com.texasthree.zone.room.Seat::occupied)
+                    .map(Protocal.Player::new)
+                    .collect(Collectors.toList());
+            // 牌局
+            var round = room.getRound();
+            if (round != null) {
+                this.round = new Protocal.RoundData(round, uid) ;
+            }
+        }
     }
 
     public static class RoundData {
@@ -34,6 +53,39 @@ public class Protocal {
         public List<Integer> communityCards;
         public List<Player> players;
         public Operator operator;
+
+        public RoundData(TexasRound round, String uid) {
+            this.dealer = round.dealer();
+            this.sbSeatId = round.sbSeatId();
+            this.bbSeatId = round.bbSeatId();
+            this.sumPot = round.sumPot();
+            this.circle = round.circle();
+            this.pots = round.getPots();
+            this.communityCards = toCardIds(round.getCommunityCards());
+            this.players = new ArrayList<>();
+            for (var v : round.getPlayers()) {
+                var p = round.getPlayerById(v.seatId);
+                var info = new Protocal.Player();
+                info.seatId = v.seatId;
+                info.chips = p.getChips();
+
+                // 押注
+                var action = round.getAction(v.seatId);
+                if (action != null) {
+                    info.betChips = action.chipsBet;
+                    info.op = action.op;
+                }
+
+                // 主角手牌
+                if (v.getId().equals(uid)) {
+                    info.hand = new Protocal.Hand(p.getHand());
+                }
+                this.players.add(info);
+            }
+            if (round.getOperator() != null) {
+                this.operator = new Protocal.Operator(round);
+            }
+        }
     }
 
     public static class Player {
@@ -45,6 +97,17 @@ public class Protocal {
         public Integer chips;
         public Optype op;
         public Hand hand;
+
+        public Player() {
+        }
+
+        public Player(com.texasthree.zone.room.Seat seat) {
+            var u = seat.getUser();
+            this.uid = u.getId();
+            this.name = u.getName();
+            this.chips = u.getChips();
+            this.seatId = seat.id;
+        }
     }
 
     public static class Seat {
