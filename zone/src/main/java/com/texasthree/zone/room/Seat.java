@@ -4,6 +4,7 @@ import com.texasthree.zone.user.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
@@ -23,6 +24,10 @@ public class Seat {
      * 没有主动押注次数
      */
     private int noExecute;
+    /**
+     * 留座离桌开始计时时间
+     */
+    private LocalDateTime pendingAt;
 
     Seat(String roomId, int id) {
         this.roomId = roomId;
@@ -44,14 +49,30 @@ public class Seat {
         this.noExecute = 0;
     }
 
+    /**
+     * 座位是否被占据
+     *
+     * @return
+     */
     boolean occupied() {
         return this.user != null;
     }
 
+    /**
+     * 是否被玩家{@code uid}占据
+     *
+     * @param uid 玩家id
+     * @return
+     */
     boolean occupiedBy(String uid) {
         return this.user != null && this.user.getId().equals(uid);
     }
 
+    /**
+     * 记录座位是否主动压住
+     *
+     * @param e 是否主动押注
+     */
     void execute(boolean e) {
         if (!occupied()) {
             return;
@@ -65,6 +86,26 @@ public class Seat {
 
     int getNoExecute() {
         return noExecute;
+    }
+
+    /**
+     * 留座离桌
+     */
+    void pending() {
+        if (occupied()) {
+            this.pendingAt = LocalDateTime.now();
+        }
+    }
+
+    /**
+     * 留座离桌结束
+     */
+    void pendingCancel() {
+        this.pendingAt = null;
+    }
+
+    boolean isPending() {
+        return this.pendingAt != null;
     }
 
     String getUid() {

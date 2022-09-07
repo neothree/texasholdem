@@ -48,4 +48,20 @@ class SeatTest {
         seat.sitUp();
         assertEquals(0, seat.getNoExecute());
     }
+
+    @Test
+    void testPending() throws Exception {
+        var seat = new Seat(StringUtils.get10UUID(), 2);
+        assertFalse(seat.isPending());
+        seat.pending();
+        assertFalse(seat.isPending());
+
+        var user = Tester.createUser();
+        seat.sitDown(user);
+        assertFalse(seat.isPending());
+        seat.pending();
+        assertTrue(seat.isPending());
+        seat.pendingCancel();
+        assertFalse(seat.isPending());
+    }
 }
