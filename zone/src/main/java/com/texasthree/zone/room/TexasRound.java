@@ -332,14 +332,12 @@ public class TexasRound {
 
             // 主角手牌
             if (v.getId().equals(uid)) {
-                var h = new Protocal.Hand();
-                h.cards = toCardIds(p.getHand().getHold());
-                h.best = toCardIds(p.getHand().getBest());
-                h.keys = toCardIds(p.getHand().getKeys());
-                h.type = p.getHand().getType().name();
-                info.hand = h;
+                info.hand = new Protocal.Hand(p.getHand());
             }
             data.players.add(info);
+        }
+        if (this.operator != null) {
+            data.operator = new Protocal.Operator(this);
         }
         return data;
     }

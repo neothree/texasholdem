@@ -1,8 +1,10 @@
 package com.texasthree.zone.room;
 
+import com.texasthree.game.texas.Card;
 import com.texasthree.game.texas.Optype;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author: neo
@@ -31,6 +33,7 @@ public class Protocal {
         public List<Integer> pots;
         public List<Integer> communityCards;
         public List<Player> players;
+        public Operator operator;
     }
 
     public static class Player {
@@ -55,12 +58,30 @@ public class Protocal {
         public Integer chipsBet;
         public Integer chips;
         public Integer sumPot;
+
+        Action() {
+        }
+
+        Action(Optype op, Integer chipsBet) {
+            this.op = op;
+            this.chipsBet = chipsBet;
+        }
     }
 
     public static class Operator {
         public Integer seatId;
         public long leftSec;
         public List<Action> actions;
+
+        Operator(TexasRound round) {
+            this.leftSec = round.leftSec();
+            this.seatId = round.getOperator().seatId;
+            this.actions = round.authority()
+                    .entrySet().stream()
+                    .map(v -> new Protocal.Action(v.getKey(), v.getValue()))
+                    .collect(Collectors.toList());
+        }
+
     }
 
     public static class Hand {
@@ -68,6 +89,17 @@ public class Protocal {
         public String type;
         public List<Integer> best;
         public List<Integer> keys;
+
+        public Hand() {
+
+        }
+
+        public Hand(com.texasthree.game.texas.Hand h) {
+            this.cards = toCardIds(h.getHold());
+            this.best = toCardIds(h.getBest());
+            this.keys = toCardIds(h.getKeys());
+            this.type = h.getType().name();
+        }
     }
 
     public static class Start {
@@ -104,6 +136,10 @@ public class Protocal {
             this.potId = potId;
             this.profit = profit;
         }
+    }
+
+    private static List<Integer> toCardIds(List<Card> cards) {
+        return cards.stream().map(Card::getId).collect(Collectors.toList());
     }
 
 }

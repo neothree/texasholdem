@@ -73,12 +73,7 @@ public class RoundEventHandler {
                 continue;
             }
             var hand = round.getPlayerHand(v.seatId);
-            var update = new Protocal.Hand();
-            update.cards = toCardIds(hand.getHold());
-            update.best = toCardIds(hand.getBest());
-            update.keys = toCardIds(hand.getKeys());
-            update.type = hand.getType().name();
-            send(v.getId(), update);
+            send(v.getId(), new Protocal.Hand(hand));
         }
     }
 
@@ -124,17 +119,7 @@ public class RoundEventHandler {
     }
 
     private void onOperator(TexasRound round) {
-        var info = new Protocal.Operator();
-        info.leftSec = round.leftSec();
-        info.seatId = round.getOperator().seatId;
-        info.actions = round.authority()
-                .entrySet().stream()
-                .map(v -> {
-                    var act = new Protocal.Action();
-                    act.op = v.getKey();
-                    act.chipsBet = v.getValue();
-                    return act;
-                }).collect(Collectors.toList());
+        var info = new Protocal.Operator(round);
         this.send(info);
     }
 
