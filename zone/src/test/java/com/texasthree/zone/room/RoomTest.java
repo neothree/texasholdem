@@ -79,6 +79,21 @@ class RoomTest {
         assertNotNull(room.getRound());
 
         AssertRoom.build()
+                .toAddUser(u1).toSitDown(u1, 0)
+                .assertRunning(false).toForce().assertRunning(false)
+                .toAddUser(u2).toSitDown(u2, 1)
+                .assertRoundNum(0)
+                .assertRunning(false).toForce().assertRunning(true)
+                .assertRoundNum(1)
+                .toForce().assertRunning(true)
+                .toRoundForce().toRoundForce().toRoundForce().assertRunning(true)
+                // 一局结束
+                .toOnShowdown().assertRunning(false)
+                // 新一局开始
+                .toForce().assertRunning(true)
+                .assertRoundNum(2);
+
+        AssertRoom.build()
                 .toAddUser(u1).assertUserChips(u1.getId(), Room.initChips)
                 .toAddUser(u2).assertUserChips(u2.getId(), Room.initChips)
                 .toSitDown(u1, 1)
@@ -106,25 +121,6 @@ class RoomTest {
         // 不知道输赢，所以没办法判断现在玩家的筹码是多少
         assertNotEquals(Room.initChips, room.getUserChips(u1.getId()));
         assertNotEquals(Room.initChips, room.getUserChips(u2.getId()));
-    }
-
-    @Test
-    void testRestart() throws Exception {
-        var u1 = Tester.createUser();
-        var u2 = Tester.createUser();
-        AssertRoom.build()
-                .toAddUser(u1).toSitDown(u1, 0)
-                .assertRunning(false).toForce().assertRunning(false)
-                .toAddUser(u2).toSitDown(u2, 1)
-                .assertRoundNum(0)
-                .assertRunning(false).toForce().assertRunning(true)
-                .assertRoundNum(1)
-                .toForce().assertRunning(true)
-                .toRoundForce().toRoundForce().toRoundForce().assertRunning(true)
-                // 一局结束
-                .toOnShowdown().assertRunning(false)
-                .toForce().assertRunning(true)
-                .assertRoundNum(2);
     }
 
     @Test

@@ -68,9 +68,7 @@ public class Server {
         this.dispatcher.dispatch(packet, user);
     }
 
-    public void send(Set<String> uids, Object obj) {
-        var msg = Packet.convertAsString(obj);
-        log.info(msg);
+    public void send(Set<String> uids, String msg) {
         for (var uid : uids) {
             this.send(uid, msg);
         }
@@ -84,7 +82,6 @@ public class Server {
      * 发送消息给玩家
      */
     public void send(String uid, String msg) {
-        log.info("{}", msg);
         var destination = USER_DESTINATION + "/" + uid;
         this.messagingTemplate.convertAndSend(destination, msg);
     }

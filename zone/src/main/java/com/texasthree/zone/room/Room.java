@@ -1,6 +1,7 @@
 package com.texasthree.zone.room;
 
 
+import com.texasthree.utility.packet.Packet;
 import com.texasthree.zone.net.Server;
 import com.texasthree.zone.user.User;
 import org.slf4j.Logger;
@@ -44,6 +45,8 @@ public class Room {
 
     private int roundNum;
 
+    private int smallBlind = 1;
+
     private ScheduledEventChecker scheduler = new ScheduledEventChecker();
 
     public Room(String id, int capacity) {
@@ -70,6 +73,9 @@ public class Room {
         audience.remove(user.getId());
     }
 
+    /**
+     * 玩家坐下
+     */
     public void sitDown(User user, int seatId) {
         Objects.requireNonNull(user);
         if (seatId >= seats.length || seats[seatId].occupied()) {
@@ -90,6 +96,9 @@ public class Room {
         this.scheduler.once(this::tryStart, 2 * 1000);
     }
 
+    /**
+     * 玩家站起
+     */
     public void sitUp(User user) {
         for (var v : seats) {
             if (v.occupiedBy(user.getId())) {
@@ -121,7 +130,7 @@ public class Room {
     private void tryStart() {
         // 清理一直没有操作的玩家
         for (var v : seats) {
-            if ( v.occupied() && v.getUser().isReal() && v.getNoExecute() >= 3) {
+            if (v.occupied() && v.getUser().isReal() && v.getNoExecute() >= 3) {
                 log.info("玩家多次没有操作，强制站起 seatId{} user={} noExecute={}", v.id, v.getUser(), v.getNoExecute());
                 this.sitUp(v.getUser());
             }
@@ -132,14 +141,12 @@ public class Room {
             return;
         }
 
-        // 座位的人数
-        var users = new ArrayList<UserPlayer>();
-        for (var v : seats) {
-            if (v.occupied()) {
-                var up = new UserPlayer(v.id, v.getUser(), this.getUserChips(v.getUid()));
-                users.add(up);
-            }
-        }
+        // 可以进入牌局的玩家
+        var users = Arrays.stream(seats)
+                .filter(Seat::occupied)
+                .filter(v -> this.getUserChips(v.getUid()) > 0)
+                .map(v -> new UserPlayer(v.id, v.getUser(), this.getUserChips(v.getUid())))
+                .collect(Collectors.toList());
         if (users.size() < 2) {
             return;
         }
@@ -154,14 +161,9 @@ public class Room {
         this.roundNum++;
         log.info("开始牌局");
 
-        this.round = new TexasRound(roundNum, "333111", users, handler);
-        try {
-            this.round.start(users.get(0).seatId);
-        } catch (Exception e) {
-            e.printStackTrace();
-            log.info("启动牌局失败");
-            this.round = null;
-        }
+        var round = new TexasRound(roundNum, "333111", users, handler);
+        round.start(users.get(0).seatId);
+        this.round = round;
     }
 
     /**
@@ -197,26 +199,6 @@ public class Room {
         if (this.round != null) {
             this.round.loop();
         }
-    }
-
-    private void send(String uid, Object msg) {
-        if (server == null) {
-            return;
-        }
-        this.server.send(uid, msg);
-    }
-
-    private void send(Object msg) {
-        if (server == null) {
-            return;
-        }
-        var set = new HashSet<>(this.audience.keySet());
-        for (var v : seats) {
-            if (v.occupied() && v.getUser().isReal()) {
-                set.add(v.getUid());
-            }
-        }
-        server.send(set, msg);
     }
 
     int occupiedNum() {
@@ -365,5 +347,29 @@ public class Room {
             return true;
         }
         return this.getSeatId(uid) != null;
+    }
+
+    private void send(String uid, Object obj) {
+        if (server == null) {
+            return;
+        }
+        var info = Packet.convertAsString(obj);
+        log.info("[{}] {} {}", id, info, uid);
+        this.server.send(uid, info);
+    }
+
+    private void send(Object obj) {
+        if (server == null) {
+            return;
+        }
+        var set = new HashSet<>(this.audience.keySet());
+        for (var v : seats) {
+            if (v.occupied() && v.getUser().isReal()) {
+                set.add(v.getUid());
+            }
+        }
+        var info = Packet.convertAsString(obj);
+        log.info("[{}] {}", id, info);
+        server.send(set, info);
     }
 }
