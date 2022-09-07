@@ -19,8 +19,8 @@ public class TexasRound {
 
     final static int TIMEOUT_ACTION = 5000;
     final static int TIMEOUT_MOVE_FOLD = 800;
-    final static int TIMEOUT_MOVE_ACTION = 500;
-    final static int TIMEOUT_MOVE_CIRCLE = 2300;
+    final static int TIMEOUT_MOVE_ACTION = 1000;
+    final static int TIMEOUT_MOVE_CIRCLE = 3300;
 
     private final int id;
 
@@ -71,7 +71,7 @@ public class TexasRound {
                 .build();
         this.game.start();
         this.printStart();
-        this.scheduler.once(() -> this.move(this.game.state()), 2000);
+        this.scheduler.once(() -> this.move(this.game.state()), 1000);
         this.eventHandler.trigger(this, RoundEvent.START_GAME);
         this.updateHand();
     }
