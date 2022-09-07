@@ -34,13 +34,22 @@ public class Seat {
         this.id = id;
     }
 
-    void sitDown(User user) {
+
+    /**
+     * 玩家占据座位
+     *
+     * @param user 玩家
+     */
+    void occupy(User user) {
         Objects.requireNonNull(user);
         log.info("玩家坐下 roomId={} seatId={} id={} name={}", roomId, id, user.getId(), user.getName());
         this.user = user;
     }
 
-    void sitUp() {
+    /**
+     * 玩家离开座位
+     */
+    void occupyEnd() {
         if (!occupied()) {
             throw new IllegalArgumentException("座位上没有玩家");
         }

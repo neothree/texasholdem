@@ -34,10 +34,19 @@ public class Room {
 
     private final int capacity;
 
+    /**
+     * 座位
+     */
     private final Seat[] seats;
 
+    /**
+     * 观众
+     */
     private final Map<String, User> audience = new HashMap<>();
 
+    /**
+     * 玩家带入的筹码数
+     */
     private Map<String, Integer> userChips = new HashMap<>();
 
     private final RoundEventHandler handler;
@@ -129,7 +138,7 @@ public class Room {
         if (chips <= 0) {
             throw new IllegalArgumentException("玩家筹码太少 {}" + user + " chips=" + chips);
         }
-        seats[seatId].sitDown(user);
+        seats[seatId].occupy(user);
         this.audience.remove(user.getId());
 
         this.onSeat(seatId);
@@ -146,7 +155,7 @@ public class Room {
         for (var v : seats) {
             if (v.occupiedBy(user.getId())) {
                 this.audience.put(user.getId(), user);
-                v.sitUp();
+                v.occupyEnd();
                 this.onSeat(v.id);
             }
         }
@@ -352,7 +361,7 @@ public class Room {
 
     /**
      * 玩家{@code uid}在房间的筹码数
-     *
+     * <p>
      * 如果玩家没有在牌局中，则是房间内总带入的数量
      * 如果玩家在牌局中，则是牌局中剩余的筹码数
      *
