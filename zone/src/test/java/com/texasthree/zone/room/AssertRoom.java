@@ -28,7 +28,7 @@ public class AssertRoom extends Room {
     }
 
     AssertRoom toBring(String uid) {
-        super.bring(uid);
+        super.bring(uid, Room.initChips);
         return this;
     }
 

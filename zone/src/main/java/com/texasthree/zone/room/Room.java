@@ -11,6 +11,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 
+/**
+ *
+ */
 public class Room {
 
     private static Logger log = LoggerFactory.getLogger(Room.class);
@@ -61,20 +64,58 @@ public class Room {
         log.info("创建房间 {}", id);
     }
 
+    /**
+     * 玩家进入房间
+     *
+     * @param user 玩家
+     */
     public void addUser(User user) {
         if (!userChips.containsKey(user.getId())) {
-            this.bring(user.getId());
+            this.bring(user.getId(), initChips);
         }
         audience.put(user.getId(), user);
     }
 
+    /**
+     * 玩家离开房间
+     *
+     * @param user 玩家
+     */
     public void removeUser(User user) {
         log.info("离开房间");
         audience.remove(user.getId());
     }
 
+
+    /**
+     * 购买记分牌
+     *
+     * @param uid    玩家id
+     * @param amount 金额
+     * @return
+     */
+    public int bring(String uid, Integer amount) {
+        log.info("房间带入 roomId={} uid={} amount={}", id, uid, amount);
+        return changeUserChips(uid, amount);
+    }
+
+    /**
+     * 提前结算
+     *
+     * @param uid 玩家id
+     * @return
+     */
+    public int takeout(String uid) {
+        var balance = this.getUserChips(uid);
+        log.info("房间带出 roomId={} uid={} amount={}", id, uid, balance);
+        return this.changeUserChips(uid, -balance);
+    }
+
     /**
      * 玩家坐下
+     *
+     * @param user   玩家
+     * @param seatId 座位号
      */
     public void sitDown(User user, int seatId) {
         Objects.requireNonNull(user);
@@ -98,6 +139,8 @@ public class Room {
 
     /**
      * 玩家站起
+     *
+     * @param user 玩家
      */
     public void sitUp(User user) {
         for (var v : seats) {
@@ -156,6 +199,8 @@ public class Room {
 
     /**
      * 牌局开始
+     *
+     * @param users 参与牌局的玩家
      */
     private void start(List<UserPlayer> users) {
         this.roundNum++;
@@ -167,7 +212,7 @@ public class Room {
     }
 
     /**
-     * 亮牌
+     * 亮牌回调
      */
     void onShowdown() {
         if (!this.round.finished()) {
@@ -219,6 +264,12 @@ public class Room {
         return round != null;
     }
 
+    /**
+     * 玩家是否在牌局中
+     *
+     * @param uid 玩家id
+     * @return
+     */
     public boolean running(String uid) {
         var seatId = this.getSeatId(uid);
         if (seatId == null) {
@@ -299,6 +350,15 @@ public class Room {
         return null;
     }
 
+    /**
+     * 玩家{@code uid}在房间的筹码数
+     *
+     * 如果玩家没有在牌局中，则是房间内总带入的数量
+     * 如果玩家在牌局中，则是牌局中剩余的筹码数
+     *
+     * @param uid 玩家id
+     * @return
+     */
     public int getPlayerChips(String uid) {
         var chips = this.getUserChips(uid);
         if (!this.running()) {
@@ -325,17 +385,6 @@ public class Room {
         this.userChips.put(uid, old + amount);
         log.info("修改玩家筹码数 roomId={} uid={} amount={} old={}", id, uid, amount, old);
         return old;
-    }
-
-    public int bring(String uid) {
-        log.info("房间带入 roomId={} uid={} amount={}", id, uid, initChips);
-        return changeUserChips(uid, initChips);
-    }
-
-    public int takeout(String uid) {
-        var balance = this.getUserChips(uid);
-        log.info("房间带出 roomId={} uid={} amount={}", id, uid, balance);
-        return this.changeUserChips(uid, -balance);
     }
 
     List<Seat> getSeats() {

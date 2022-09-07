@@ -4,6 +4,7 @@ import com.texasthree.game.texas.Optype;
 import com.texasthree.security.shiro.AbstractMeController;
 import com.texasthree.utility.restful.RestResponse;
 import com.texasthree.zone.Zone;
+import com.texasthree.zone.room.Room;
 import com.texasthree.zone.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -41,6 +42,28 @@ public class RoomController extends AbstractMeController<User> {
     @DeleteMapping("/{roomId}")
     public void leave(@PathVariable("roomId") String roomId) {
         zone.getRoom().removeUser(this.getMe());
+    }
+
+
+    /**
+     * 购买记分牌
+     */
+    @PostMapping(value = "/{roomId}/chips")
+    public RestResponse bring(@PathVariable("roomId") String roomId,
+                              @RequestParam("amount") Integer amount) throws Exception {
+        var room = Room.getRoom(roomId);
+        room.bring(this.getMe().getId(), amount);
+        return RestResponse.SUCCESS;
+    }
+
+    /**
+     * 提前结算
+     */
+    @DeleteMapping(value = "/{roomId}/chips")
+    public RestResponse takeout(@PathVariable("roomId") String roomId) throws Exception {
+        var room = Room.getRoom(roomId);
+        room.takeout(this.getMe().getId());
+        return RestResponse.SUCCESS;
     }
 
     /**
