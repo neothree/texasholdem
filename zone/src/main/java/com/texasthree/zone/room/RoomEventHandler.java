@@ -7,15 +7,15 @@ import com.texasthree.zone.user.User;
  * @author: neo
  * @create: 2022-09-08 16:44
  */
-public class RoomEventHandler {
+class RoomEventHandler {
 
     private Room room;
 
-    public RoomEventHandler(Room room) {
+    RoomEventHandler(Room room) {
         this.room = room;
     }
 
-    public void on(RoomEvent event, User user, int seatId) {
+    void on(RoomEvent event, User user, int seatId) {
         switch (event) {
             case SEAT:
                 this.onSeat(user, seatId);
@@ -34,8 +34,9 @@ public class RoomEventHandler {
             p.name = user.getName();
             p.chips = user.getChips();
             info.player = p;
+        } else {
+            room.send(user.getId(), info);
         }
-        room.send(user.getId(), info);
         room.send(info);
     }
 }

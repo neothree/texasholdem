@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
  * @author: neo
  * @create: 2022-08-09 16:50
  */
-public class RoundEventHandler {
+class RoundEventHandler {
 
     private final Runnable onShowdown;
 
@@ -20,15 +20,15 @@ public class RoundEventHandler {
 
     private final BiConsumer<String, Object> single;
 
-    public RoundEventHandler(Runnable onShowdown,
-                             Consumer<Object> broadcast,
-                             BiConsumer<String, Object> single) {
+    RoundEventHandler(Runnable onShowdown,
+                      Consumer<Object> broadcast,
+                      BiConsumer<String, Object> single) {
         this.onShowdown = onShowdown;
         this.broadcast = broadcast;
         this.single = single;
     }
 
-    public void on(TexasRound round, RoundEvent event) {
+    void on(TexasRound round, RoundEvent event) {
         switch (event) {
             case START_GAME:
                 this.onStartGame(round);
