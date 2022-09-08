@@ -380,7 +380,7 @@ public class Room {
         return capacity;
     }
 
-    private void send(String uid, Object obj) {
+    public void send(String uid, Object obj) {
         if (server == null) {
             return;
         }

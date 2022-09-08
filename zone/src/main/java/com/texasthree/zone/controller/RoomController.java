@@ -4,6 +4,7 @@ import com.texasthree.game.texas.Optype;
 import com.texasthree.security.shiro.AbstractMeController;
 import com.texasthree.utility.restful.RestResponse;
 import com.texasthree.zone.Zone;
+import com.texasthree.zone.net.Server;
 import com.texasthree.zone.room.Protocal;
 import com.texasthree.zone.room.Room;
 import com.texasthree.zone.user.User;
@@ -19,6 +20,9 @@ public class RoomController extends AbstractMeController<User> {
 
     @Autowired
     private Zone zone;
+
+    @Autowired
+    private Server server;
 
     @GetMapping(value = "/{roomId}")
     public RestResponse room(@PathVariable("roomId") String roomId) throws Exception {
@@ -52,7 +56,7 @@ public class RoomController extends AbstractMeController<User> {
     @PostMapping(value = "/{roomId}/chips")
     public RestResponse bring(@PathVariable("roomId") String roomId,
                               @RequestParam("amount") Integer amount) throws Exception {
-        var room = Room.getRoom(roomId);
+        var room = zone.getRoom();
         room.bring(this.getMe().getId(), amount);
         return RestResponse.SUCCESS;
     }
@@ -74,7 +78,7 @@ public class RoomController extends AbstractMeController<User> {
     public void sitDown(@PathVariable("seatId") int seatId) {
         var room = zone.getRoom();
         room.sitDown(this.getMe(), seatId);
-        onSeat(room, seatId);
+        onSeat(room, null, seatId);
     }
 
     /**
@@ -96,11 +100,11 @@ public class RoomController extends AbstractMeController<User> {
             return RestResponse.SUCCESS;
         }
         room.sitUp(user);
-        onSeat(room, seat.id);
+        onSeat(room, user.getId(), seat.id);
         return RestResponse.SUCCESS;
     }
 
-    private void onSeat(Room room, int seatId) {
+    private Protocal.Seat onSeat(Room room, String uid, int seatId) {
         var info = new Protocal.Seat();
         info.seatId = seatId;
         var user = room.getSeats().get(seatId).getUser();
@@ -111,7 +115,9 @@ public class RoomController extends AbstractMeController<User> {
             p.chips = user.getChips();
             info.player = p;
         }
+        room.send(uid, info);
         room.send(info);
+        return info;
     }
 
 
