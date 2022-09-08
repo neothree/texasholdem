@@ -57,6 +57,8 @@ public class Room {
 
     private ScheduledEventChecker scheduler = new ScheduledEventChecker();
 
+    private final RoomEventHandler eventHandler = new RoomEventHandler(this);
+
     public Room(String id, int capacity) {
         seats = new Seat[capacity];
         for (var i = 0; i < capacity; i++) {
@@ -136,6 +138,7 @@ public class Room {
         }
         seats[seatId].occupy(user);
         this.audience.remove(user.getId());
+        this.eventHandler.on(RoomEvent.SEAT, user, seatId);
 
         this.scheduler.once(this::tryStart, 2 * 1000);
     }
@@ -150,6 +153,7 @@ public class Room {
             if (v.occupiedBy(user.getId())) {
                 this.audience.put(user.getId(), user);
                 v.occupyEnd();
+                this.eventHandler.on(RoomEvent.SEAT, user, v.id);
             }
         }
     }

@@ -28,7 +28,7 @@ public class RoundEventHandler {
         this.single = single;
     }
 
-    public void trigger(TexasRound round, RoundEvent event) {
+    public void on(TexasRound round, RoundEvent event) {
         switch (event) {
             case START_GAME:
                 this.onStartGame(round);

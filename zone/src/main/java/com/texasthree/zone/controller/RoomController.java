@@ -78,7 +78,6 @@ public class RoomController extends AbstractMeController<User> {
     public void sitDown(@PathVariable("seatId") int seatId) {
         var room = zone.getRoom();
         room.sitDown(this.getMe(), seatId);
-        onSeat(room, null, seatId);
     }
 
     /**
@@ -100,26 +99,8 @@ public class RoomController extends AbstractMeController<User> {
             return RestResponse.SUCCESS;
         }
         room.sitUp(user);
-        onSeat(room, user.getId(), seat.id);
         return RestResponse.SUCCESS;
     }
-
-    private Protocal.Seat onSeat(Room room, String uid, int seatId) {
-        var info = new Protocal.Seat();
-        info.seatId = seatId;
-        var user = room.getSeats().get(seatId).getUser();
-        if (user != null) {
-            var p = new Protocal.Player();
-            p.uid = user.getId();
-            p.name = user.getName();
-            p.chips = user.getChips();
-            info.player = p;
-        }
-        room.send(uid, info);
-        room.send(info);
-        return info;
-    }
-
 
     /**
      * 押注

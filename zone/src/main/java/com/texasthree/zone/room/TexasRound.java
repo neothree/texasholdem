@@ -71,7 +71,7 @@ public class TexasRound {
         this.game.start();
         this.printStart();
         this.scheduler.once(() -> this.move(this.game.state()), 1000);
-        this.eventHandler.trigger(this, RoundEvent.START_GAME);
+        this.eventHandler.on(this, RoundEvent.START_GAME);
         this.updateHand();
     }
 
@@ -96,7 +96,7 @@ public class TexasRound {
         this.game.action(op, chipsAdd);
         this.lastAction = this.game.getAction(this.operator.seatId);
         this.operator = null;
-        this.eventHandler.trigger(this, RoundEvent.ACTION);
+        this.eventHandler.on(this, RoundEvent.ACTION);
 
         var move = this.game.state();
         if (Optype.Check.equals(op)) {
@@ -130,7 +130,7 @@ public class TexasRound {
         this.operator = this.getPlayerBySeatId(game.operator().getId());
         this.operator.gain();
         this.scheduler.once(this::onOpTimeout, TIMEOUT_ACTION);
-        this.eventHandler.trigger(this, RoundEvent.OPERATOR);
+        this.eventHandler.on(this, RoundEvent.OPERATOR);
         log.info("{}轮到下一位进行押注 uid={} seatId={}", logpre, this.operator.getId(), this.operator.seatId);
     }
 
@@ -142,7 +142,7 @@ public class TexasRound {
      */
     private void moveCircleEnd() {
         this.printCircle();
-        this.eventHandler.trigger(this, RoundEvent.CIRCLE_END);
+        this.eventHandler.on(this, RoundEvent.CIRCLE_END);
 
         this.updateHand();
 
@@ -161,7 +161,7 @@ public class TexasRound {
         this.scheduler.clear();
         this.operator = null;
         this.isOver = true;
-        this.scheduler.once(() -> this.eventHandler.trigger(this, RoundEvent.SHOWDOWN), 2000);
+        this.scheduler.once(() -> this.eventHandler.on(this, RoundEvent.SHOWDOWN), 2000);
     }
 
     /**
@@ -200,7 +200,7 @@ public class TexasRound {
      * 更新手牌
      */
     private void updateHand() {
-        this.eventHandler.trigger(this, RoundEvent.HAND);
+        this.eventHandler.on(this, RoundEvent.HAND);
     }
 
 
