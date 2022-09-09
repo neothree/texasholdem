@@ -40,7 +40,7 @@ public class TexasTest extends AllCard {
                 .assertBbPlayer(3);
 
         var texas = AssertTexas.builder().build().start();
-        Tester.assertException(texas::start, IllegalStateException.class);
+        Tester.assertException(texas::start, IllegalArgumentException.class);
 
         Tester.assertException(() -> AssertTexas.builder(2)
                 .players(new Player(1, 0), new Player(1, 1))
@@ -140,6 +140,13 @@ public class TexasTest extends AllCard {
                 .action(Call).assertState(Transfer.NEXT_OP)
                 .action(Call).assertState(Transfer.CIRCLE_END)
                 .action(Fold).assertState(Transfer.SHOWDOWN);
+
+        var room = AssertTexas.builder(2)
+                .build()
+                .start().assertState(Transfer.NEXT_OP)
+                .assertOperator(1).action(Call).assertState(Transfer.NEXT_OP);
+        var act = room.getAction(1);
+        assertEquals(98, act.chipsLeft);
     }
 
     @Test
@@ -674,7 +681,7 @@ public class TexasTest extends AllCard {
                 .assertState(Transfer.SHOWDOWN);
 
         var texas = AssertTexas.builder().build().start();
-        Tester.assertException(texas::start, IllegalStateException.class);
+        Tester.assertException(texas::start, IllegalArgumentException.class);
     }
 
     @Test

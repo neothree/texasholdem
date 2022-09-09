@@ -148,7 +148,7 @@ public class Circle {
         if (chipsAdd > player.getChips()) {
             throw new IllegalArgumentException("押注余额不足");
         }
-        return new Action(player.getId(), op, chipsBet, chipsAdd, chipsLeft, 0);
+        return new Action(player.getId(), op, chipsBet, chipsAdd, chipsLeft - chipsAdd, 0);
     }
 
     int chipsThisCircle(int id) {
