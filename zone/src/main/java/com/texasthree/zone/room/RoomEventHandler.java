@@ -24,7 +24,7 @@ class RoomEventHandler {
     }
 
     private void onSeat(int seatId) {
-        var info = new Protocal.Seat(room.getSeat(seatId));
+        var info = new Protocal.Seat(room.getSeat(seatId), room);
         room.send(info);
     }
 }

@@ -13,8 +13,6 @@ public class User {
         return userMap.get(id);
     }
 
-    private int chips = 1000;
-
     private Room room;
 
     private UserData data;
@@ -56,14 +54,6 @@ public class User {
 
     public String getName() {
         return data.getName();
-    }
-
-    public int getChips() {
-        return chips;
-    }
-
-    public void setChips(int chips) {
-        this.chips = chips;
     }
 
     public String getId() {

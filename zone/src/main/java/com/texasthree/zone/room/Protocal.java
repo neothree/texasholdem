@@ -33,7 +33,7 @@ public class Protocal {
             this.capacity = room.getCapacity();
             this.seats = room.getSeats().stream()
                     .filter(com.texasthree.zone.room.Seat::occupied)
-                    .map(Protocal.Seat::new)
+                    .map(v -> new Seat(v, room))
                     .collect(Collectors.toList());
             // 牌局
             var round = room.getRound();
@@ -82,11 +82,11 @@ public class Protocal {
         public String avatar;
         public Integer chips;
 
-        public User(com.texasthree.zone.user.User user) {
+        public User(com.texasthree.zone.user.User user, Room room) {
             this.uid = user.getId();
             this.name = user.getName();
             this.avatar = user.getAvatar();
-            this.chips = user.getChips();
+            this.chips = room.getUserChips(user.getId());
         }
     }
 
@@ -118,10 +118,10 @@ public class Protocal {
         public Integer seatId;
         public User user;
 
-        public Seat(com.texasthree.zone.room.Seat s) {
+        public Seat(com.texasthree.zone.room.Seat s, Room room) {
             this.seatId = s.id;
             if (s.occupied()) {
-                this.user = new User(s.getUser());
+                this.user = new User(s.getUser(), room);
             }
         }
     }
