@@ -138,7 +138,7 @@ public class Room {
         }
         seats[seatId].occupy(user);
         this.audience.remove(user.getId());
-        this.eventHandler.on(RoomEvent.SEAT, user, seatId);
+        this.eventHandler.on(RoomEvent.SEAT, seatId);
 
         this.scheduler.once(this::tryStart, 2 * 1000);
     }
@@ -153,7 +153,7 @@ public class Room {
             if (v.occupiedBy(user.getId())) {
                 this.audience.put(user.getId(), user);
                 v.occupyEnd();
-                this.eventHandler.on(RoomEvent.SEAT, user, v.id);
+                this.eventHandler.on(RoomEvent.SEAT, v.id);
             }
         }
     }
