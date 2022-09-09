@@ -133,7 +133,12 @@ public class Protocal {
         public Integer chips;
         public Integer sumPot;
 
-        Action() {
+        Action(com.texasthree.game.texas.Action action, int sumPot) {
+            this.op = action.op;
+            this.seatId = action.id;
+            this.chipsBet = action.chipsBet;
+            this.chips = action.chipsLeft;
+            this.sumPot = sumPot;
         }
 
         Action(Optype op, Integer chipsBet) {
@@ -164,10 +169,6 @@ public class Protocal {
         public List<Integer> best;
         public List<Integer> keys;
 
-        public Hand() {
-
-        }
-
         public Hand(com.texasthree.game.texas.Hand h) {
             this.cards = toCardIds(h.getHold());
             this.best = toCardIds(h.getBest());
@@ -184,16 +185,49 @@ public class Protocal {
         public Integer ante;
         public Integer sumPot;
         public List<Integer> players;
+
+        public Start(TexasRound round) {
+            this.ante = round.ante();
+            this.sbSeatId = round.sbSeatId();
+            this.bbSeatId = round.bbSeatId();
+            this.dealer = round.dealer();
+            this.smallBlind = round.smallBlind();
+            this.sumPot = round.sumPot();
+            this.players = round.getPlayers().stream()
+                    .map(v -> v.seatId)
+                    .collect(Collectors.toList());
+        }
+
     }
 
     public static class CircleEnd {
         public List<Integer> communityCards;
         public List<Integer> pots;
+
+        CircleEnd(TexasRound round) {
+            this.communityCards = toCardIds(round.getCommunityCards());
+            this.pots = round.getPots();
+        }
     }
 
     public static class Showdown {
         public List<Integer> winners;
         public List<ShowdownHand> hands;
+
+        Showdown(TexasRound round) {
+            var result = round.settle();
+            this.winners = new ArrayList<>(result.getWinners());
+            this.hands = new ArrayList<>();
+            for (var v : result) {
+                var sh = new Protocal.ShowdownHand();
+                sh.seatId = v.getId();
+                sh.hand = new Protocal.Hand(round.getPlayerHand(v.getId()));
+                sh.profits = v.getPot().entrySet().stream()
+                        .map(e -> new Protocal.PotProfit(e.getKey(), e.getValue()))
+                        .collect(Collectors.toList());
+                this.hands.add(sh);
+            }
+        }
     }
 
     public static class ShowdownHand {

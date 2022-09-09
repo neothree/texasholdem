@@ -1,12 +1,7 @@
 package com.texasthree.zone.room;
 
-import com.texasthree.game.texas.Card;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 /**
  * @author: neo
@@ -59,16 +54,7 @@ class RoundEventHandler {
     }
 
     private void onStartGame(TexasRound round) {
-        var info = new Protocal.Start();
-        info.ante = round.ante();
-        info.sbSeatId = round.sbSeatId();
-        info.bbSeatId = round.bbSeatId();
-        info.dealer = round.dealer();
-        info.smallBlind = round.smallBlind();
-        info.sumPot = round.sumPot();
-        info.players = round.getPlayers().stream()
-                .map(v -> v.seatId)
-                .collect(Collectors.toList());
+        var info = new Protocal.Start(round);
         this.send(info);
     }
 
@@ -82,43 +68,19 @@ class RoundEventHandler {
         }
     }
 
-    private List<Integer> toCardIds(List<Card> cards) {
-        return cards.stream().map(Card::getId).collect(Collectors.toList());
-    }
-
     private void onAction(TexasRound round) {
         var action = round.getLastAction();
-        var send = new Protocal.Action();
-        send.op = action.op;
-        send.seatId = action.id;
-        send.chipsBet = action.chipsBet;
-        send.chips = action.chipsLeft;
-        send.sumPot = round.sumPot();
-        this.send(send);
+        var info = new Protocal.Action(action, round.sumPot());
+        this.send(info);
     }
 
     private void onCircleEnd(TexasRound round) {
-        var info = new Protocal.CircleEnd();
-        info.communityCards = toCardIds(round.getCommunityCards());
-        info.pots = round.getPots();
+        var info = new Protocal.CircleEnd(round);
         this.send(info);
     }
 
     private void onShowdown(TexasRound round) {
-        var result = round.settle();
-        var info = new Protocal.Showdown();
-        info.winners = new ArrayList<>(result.getWinners());
-        info.hands = new ArrayList<>();
-        for (var v : result) {
-            var sh = new Protocal.ShowdownHand();
-            sh.seatId = v.getId();
-            sh.hand = new Protocal.Hand();
-            sh.hand.cards = toCardIds(round.getPlayerHand(v.getId()).getHold());
-            sh.profits = v.getPot().entrySet().stream()
-                    .map(e -> new Protocal.PotProfit(e.getKey(), e.getValue()))
-                    .collect(Collectors.toList());
-            info.hands.add(sh);
-        }
+        var info = new Protocal.Showdown(round);
         this.send(info);
         this.onShowdown.run();
     }
