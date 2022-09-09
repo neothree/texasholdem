@@ -24,9 +24,14 @@ public class RoomController extends AbstractMeController<User> {
     @Autowired
     private Server server;
 
+    @GetMapping
+    public RestResponse rooms() {
+        return new RestResponse<>();
+    }
+
     @GetMapping(value = "/{roomId}")
     public RestResponse room(@PathVariable("roomId") String roomId) throws Exception {
-        log.info("获取房间数据 {}", roomId);
+        log.info("请求获取房间数据 {}", roomId);
         var data = new Protocal.RoomData(zone.getRoom(), this.getMe().getId());
         return new RestResponse<>(data);
     }
@@ -36,7 +41,7 @@ public class RoomController extends AbstractMeController<User> {
      */
     @PostMapping(value = "/{roomId}")
     public RestResponse enter(@PathVariable("roomId") String roomId) throws Exception {
-        log.info("进入房间 {}", roomId);
+        log.info("请求进入房间 {}", roomId);
         this.getMe().enter(zone.getRoom());
         return RestResponse.SUCCESS;
     }
@@ -46,6 +51,7 @@ public class RoomController extends AbstractMeController<User> {
      */
     @DeleteMapping("/{roomId}")
     public void leave(@PathVariable("roomId") String roomId) {
+        log.info("请求离开房间 {}", roomId);
         zone.getRoom().removeUser(this.getMe());
     }
 
@@ -56,6 +62,7 @@ public class RoomController extends AbstractMeController<User> {
     @PostMapping(value = "/{roomId}/chips")
     public RestResponse bring(@PathVariable("roomId") String roomId,
                               @RequestParam("amount") Integer amount) throws Exception {
+        log.info("请求购买记分牌 {}", roomId);
         var room = zone.getRoom();
         room.bring(this.getMe().getId(), amount);
         return RestResponse.SUCCESS;
@@ -66,6 +73,7 @@ public class RoomController extends AbstractMeController<User> {
      */
     @DeleteMapping(value = "/{roomId}/chips")
     public RestResponse takeout(@PathVariable("roomId") String roomId) throws Exception {
+        log.info("请求提前结算 {}", roomId);
         var room = Room.getRoom(roomId);
         room.takeout(this.getMe().getId());
         return RestResponse.SUCCESS;
@@ -76,6 +84,7 @@ public class RoomController extends AbstractMeController<User> {
      */
     @PostMapping(value = "/seat/{seatId}")
     public void sitDown(@PathVariable("seatId") int seatId) {
+        log.info("请求坐下 {}", seatId);
         var room = zone.getRoom();
         room.sitDown(this.getMe(), seatId);
     }
@@ -85,6 +94,7 @@ public class RoomController extends AbstractMeController<User> {
      */
     @DeleteMapping(value = "/seat/{seatId}")
     public RestResponse sitUp(@PathVariable("seatId") String seatId) {
+        log.info("请求站起 {}", seatId);
         var user = this.getMe();
         var room = user.getRoom();
         if (room == null) {
@@ -108,6 +118,7 @@ public class RoomController extends AbstractMeController<User> {
     @PostMapping(value = "/round/action")
     public void action(@RequestParam("op") String op,
                        int chipsBet) {
+        log.info("请求押注 op{} chipsBet={}", op, chipsBet);
         var room = zone.getRoom();
         room.getRound().action(getOptype(op), chipsBet);
     }
