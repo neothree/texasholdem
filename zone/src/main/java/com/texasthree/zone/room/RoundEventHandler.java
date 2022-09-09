@@ -16,8 +16,13 @@ class RoundEventHandler {
 
     private final Runnable onShowdown;
 
+    /**
+     * 广播
+     */
     private final Consumer<Object> broadcast;
-
+    /**
+     * 单播
+     */
     private final BiConsumer<String, Object> single;
 
     RoundEventHandler(Runnable onShowdown,

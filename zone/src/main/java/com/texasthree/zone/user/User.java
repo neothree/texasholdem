@@ -19,6 +19,8 @@ public class User {
 
     private UserData data;
 
+    public String avator = "";
+
     public User(UserData data) {
         this.data = data;
     }
@@ -71,5 +73,13 @@ public class User {
 
     public boolean isReal() {
         return this.data.isReal();
+    }
+
+    public String getAvator() {
+        return avator;
+    }
+
+    public void setAvator(String avator) {
+        this.avator = avator;
     }
 }

@@ -9,7 +9,7 @@ import com.texasthree.zone.user.User;
  */
 class RoomEventHandler {
 
-    private Room room;
+    private final Room room;
 
     RoomEventHandler(Room room) {
         this.room = room;
@@ -25,16 +25,10 @@ class RoomEventHandler {
         }
     }
 
-    private void onSeat(User user, Integer seatId) {
-        var info = new Protocal.Seat();
-        info.seatId = seatId;
-        if (room.getSeat(seatId).occupied()) {
-            var p = new Protocal.Player();
-            p.uid = user.getId();
-            p.name = user.getName();
-            p.chips = user.getChips();
-            info.player = p;
-        } else {
+    private void onSeat(User user, int seatId) {
+        var seat = room.getSeat(seatId);
+        var info = new Protocal.Seat(seat);
+        if (!seat.occupied()) {
             room.send(user.getId(), info);
         }
         room.send(info);

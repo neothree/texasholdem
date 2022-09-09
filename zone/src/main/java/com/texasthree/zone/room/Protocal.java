@@ -21,7 +21,7 @@ public class Protocal {
         public Integer button;
         public Integer smallBlind;
         public Integer ante;
-        public List<Player> seats;
+        public List<Seat> seats;
         public RoundData round;
 
         public RoomData(Room room, String uid) {
@@ -33,12 +33,12 @@ public class Protocal {
             this.capacity = room.getCapacity();
             this.seats = room.getSeats().stream()
                     .filter(com.texasthree.zone.room.Seat::occupied)
-                    .map(Protocal.Player::new)
+                    .map(Protocal.Seat::new)
                     .collect(Collectors.toList());
             // 牌局
             var round = room.getRound();
             if (round != null) {
-                this.round = new Protocal.RoundData(round, uid) ;
+                this.round = new Protocal.RoundData(round, uid);
             }
         }
     }
@@ -64,22 +64,11 @@ public class Protocal {
             this.communityCards = toCardIds(round.getCommunityCards());
             this.players = new ArrayList<>();
             for (var v : round.getPlayers()) {
-                var p = round.getPlayerById(v.seatId);
-                var info = new Protocal.Player();
-                info.seatId = v.seatId;
-                info.chips = p.getChips();
-
-                // 押注
+                var chips = round.getPlayerChips(v.seatId);
+                var hand = v.getId().equals(uid) ? round.getPlayerHand(v.seatId) : null;
                 var action = round.getAction(v.seatId);
-                if (action != null) {
-                    info.betChips = action.chipsBet;
-                    info.op = action.op;
-                }
+                var info = new Protocal.Player(v.seatId, chips, action, hand);
 
-                // 主角手牌
-                if (v.getId().equals(uid)) {
-                    info.hand = new Protocal.Hand(p.getHand());
-                }
                 this.players.add(info);
             }
             if (round.getOperator() != null) {
@@ -88,31 +77,54 @@ public class Protocal {
         }
     }
 
-    public static class Player {
+    public static class User {
         public String uid;
         public String name;
-        public String avator = "";
-        public Integer seatId;
-        public Integer betChips;
+        public String avator;
         public Integer chips;
+
+        public User(com.texasthree.zone.user.User user) {
+            this.uid = user.getId();
+            this.name = user.getName();
+            this.avator = user.getAvator();
+            this.chips = user.getChips();
+        }
+    }
+
+    public static class Player {
+        public Integer seatId;
+        public Integer chips;
+        public Integer betChips;
         public Optype op;
         public Hand hand;
 
-        public Player() {
-        }
+        public Player(int seatId, int chips, com.texasthree.game.texas.Action action, com.texasthree.game.texas.Hand h) {
+            this.seatId = seatId;
+            this.chips = chips;
 
-        public Player(com.texasthree.zone.room.Seat seat) {
-            var u = seat.getUser();
-            this.uid = u.getId();
-            this.name = u.getName();
-            this.chips = u.getChips();
-            this.seatId = seat.id;
+            // 押注
+            if (action != null) {
+                this.betChips = action.chipsBet;
+                this.op = action.op;
+            }
+
+            // 主角手牌
+            if (h != null) {
+                this.hand = new Protocal.Hand(h);
+            }
         }
     }
 
     public static class Seat {
         public Integer seatId;
-        public Player player;
+        public User user;
+
+        public Seat(com.texasthree.zone.room.Seat s) {
+            this.seatId = s.id;
+            if (s.occupied()) {
+                this.user = new User(s.getUser());
+            }
+        }
     }
 
     public static class Action {
