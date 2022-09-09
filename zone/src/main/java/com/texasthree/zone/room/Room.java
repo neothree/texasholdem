@@ -53,8 +53,6 @@ public class Room {
 
     private int roundNum;
 
-    private int smallBlind = 1;
-
     private ScheduledEventChecker scheduler = new ScheduledEventChecker();
 
     private final RoomEventHandler eventHandler = new RoomEventHandler(this);
@@ -369,6 +367,18 @@ public class Room {
 
     public void force() {
         this.scheduler.force();
+    }
+
+    public int getSmallBlind() {
+        return 1;
+    }
+
+    public int getAnte() {
+        return 1;
+    }
+
+    public int getButton() {
+        return 1;
     }
 
     @Override

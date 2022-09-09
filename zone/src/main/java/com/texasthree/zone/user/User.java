@@ -19,7 +19,6 @@ public class User {
 
     private UserData data;
 
-    public String avator = "";
 
     public User(UserData data) {
         this.data = data;
@@ -75,11 +74,7 @@ public class User {
         return this.data.isReal();
     }
 
-    public String getAvator() {
-        return avator;
-    }
-
-    public void setAvator(String avator) {
-        this.avator = avator;
+    public String getAvatar() {
+        return this.data.getAvatar();
     }
 }

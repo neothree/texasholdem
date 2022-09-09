@@ -27,9 +27,9 @@ public class Protocal {
         public RoomData(Room room, String uid) {
             this.id = room.getId();
             this.name = "test";
-            this.ante = 1;
-            this.smallBlind = 1;
-            this.button = 1;
+            this.ante = room.getAnte();
+            this.smallBlind = room.getSmallBlind();
+            this.button = room.getButton();
             this.capacity = room.getCapacity();
             this.seats = room.getSeats().stream()
                     .filter(com.texasthree.zone.room.Seat::occupied)
@@ -68,7 +68,6 @@ public class Protocal {
                 var hand = v.getId().equals(uid) ? round.getPlayerHand(v.seatId) : null;
                 var action = round.getAction(v.seatId);
                 var info = new Protocal.Player(v.seatId, chips, action, hand);
-
                 this.players.add(info);
             }
             if (round.getOperator() != null) {
@@ -80,13 +79,13 @@ public class Protocal {
     public static class User {
         public String uid;
         public String name;
-        public String avator;
+        public String avatar;
         public Integer chips;
 
         public User(com.texasthree.zone.user.User user) {
             this.uid = user.getId();
             this.name = user.getName();
-            this.avator = user.getAvator();
+            this.avatar = user.getAvatar();
             this.chips = user.getChips();
         }
     }
