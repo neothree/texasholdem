@@ -126,42 +126,6 @@ public class Protocal {
         }
     }
 
-    public static class Action {
-        public Optype op;
-        public Integer seatId;
-        public Integer chipsBet;
-        public Integer chips;
-        public Integer sumPot;
-
-        Action(com.texasthree.game.texas.Action action, int sumPot) {
-            this.op = action.op;
-            this.seatId = action.id;
-            this.chipsBet = action.chipsBet;
-            this.chips = action.chipsLeft;
-            this.sumPot = sumPot;
-        }
-
-        Action(Optype op, Integer chipsBet) {
-            this.op = op;
-            this.chipsBet = chipsBet;
-        }
-    }
-
-    public static class Operator {
-        public Integer seatId;
-        public long leftSec;
-        public List<Action> actions;
-
-        Operator(TexasRound round) {
-            this.leftSec = round.leftSec();
-            this.seatId = round.getOperator().seatId;
-            this.actions = round.authority()
-                    .entrySet().stream()
-                    .map(v -> new Protocal.Action(v.getKey(), v.getValue()))
-                    .collect(Collectors.toList());
-        }
-
-    }
 
     public static class Hand {
         public List<Integer> cards;
@@ -195,6 +159,42 @@ public class Protocal {
             this.sumPot = round.sumPot();
             this.players = round.getPlayers().stream()
                     .map(v -> v.seatId)
+                    .collect(Collectors.toList());
+        }
+    }
+
+    public static class Action {
+        public Optype op;
+        public Integer seatId;
+        public Integer chipsBet;
+        public Integer chips;
+        public Integer sumPot;
+
+        Action(com.texasthree.game.texas.Action action, int sumPot) {
+            this.op = action.op;
+            this.seatId = action.id;
+            this.chipsBet = action.chipsBet;
+            this.chips = action.chipsLeft;
+            this.sumPot = sumPot;
+        }
+
+        Action(Optype op, Integer chipsBet) {
+            this.op = op;
+            this.chipsBet = chipsBet;
+        }
+    }
+
+    public static class Operator {
+        public Integer seatId;
+        public long leftSec;
+        public List<Action> actions;
+
+        Operator(TexasRound round) {
+            this.leftSec = round.leftSec();
+            this.seatId = round.getOperator().seatId;
+            this.actions = round.authority()
+                    .entrySet().stream()
+                    .map(v -> new Protocal.Action(v.getKey(), v.getValue()))
                     .collect(Collectors.toList());
         }
 

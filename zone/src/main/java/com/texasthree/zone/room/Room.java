@@ -1,6 +1,5 @@
 package com.texasthree.zone.room;
 
-
 import com.texasthree.utility.packet.Packet;
 import com.texasthree.zone.net.Server;
 import com.texasthree.zone.user.User;
@@ -53,7 +52,9 @@ public class Room {
 
     private int roundNum;
 
-    private ScheduledEventChecker scheduler = new ScheduledEventChecker();
+    private ScheduledEventChecker roundScheduler = new ScheduledEventChecker();
+
+    private ScheduledEventChecker otherScheduler = new ScheduledEventChecker();
 
     private final RoomEventHandler eventHandler = new RoomEventHandler(this);
 
@@ -136,9 +137,9 @@ public class Room {
         }
         seats[seatId].occupy(user);
         this.audience.remove(user.getId());
-        this.eventHandler.on(RoomEvent.SEAT, seatId);
+        this.seatUpdate(seatId);
 
-        this.scheduler.once(this::tryStart, 2 * 1000);
+        this.roundScheduler.once(this::tryStart, 2 * 1000);
     }
 
     /**
@@ -151,7 +152,7 @@ public class Room {
             if (v.occupiedBy(user.getId())) {
                 this.audience.put(user.getId(), user);
                 v.occupyEnd();
-                this.eventHandler.on(RoomEvent.SEAT, v.id);
+                this.seatUpdate(v.id);
             }
         }
     }
@@ -248,17 +249,50 @@ public class Room {
             }
         }
 
+        var delay = 5 * 1000;
         this.round = null;
-        this.scheduler.once(this::tryStart, 5000);
+        this.roundScheduler.once(this::tryStart, delay);
+
+        // 更新筹码数
+        this.otherScheduler.once(() -> this.seatUpdate(null), delay - 1000);
     }
 
     public void loop() {
-        this.scheduler.check();
+        this.roundScheduler.check();
+        this.otherScheduler.check();
         if (this.round != null) {
             this.round.loop();
         }
     }
 
+
+    /**
+     * 更新 {@code seatId} 座位的筹码数
+     *
+     * @param seatId 座位号
+     */
+    private void seatUpdate(int seatId) {
+        var set = new HashSet<Integer>();
+        set.add(seatId);
+        this.seatUpdate(set);
+    }
+
+    /**
+     * 更新所有 {@code set} 里座位的筹码数
+     *
+     * @param set 所有更新的座位号
+     */
+    private void seatUpdate(Set<Integer> set) {
+        if (set == null) {
+            set = Arrays.stream(this.seats)
+                    .filter(Seat::occupied)
+                    .map(v -> v.id)
+                    .collect(Collectors.toSet());
+        }
+        for (var v : set) {
+            this.eventHandler.on(RoomEvent.SEAT, v);
+        }
+    }
 
     /**
      * 牌局是否在进行中
@@ -366,7 +400,7 @@ public class Room {
     }
 
     public void force() {
-        this.scheduler.force();
+        this.roundScheduler.force();
     }
 
     public int getSmallBlind() {
