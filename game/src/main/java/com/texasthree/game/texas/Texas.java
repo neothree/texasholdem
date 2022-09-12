@@ -690,4 +690,20 @@ public class Texas {
     public Transfer state() {
         return STATE;
     }
+
+    static List<Player> winners(List<Player> players) {
+        var winners = new ArrayList<Player>();
+        winners.add(players.get(0));
+        for (var i = 1; i < players.size(); i++) {
+            var other = players.get(i);
+            var com = other.getHand().compareTo(winners.get(0).getHand());
+            if (com == 0) {
+                winners.add(other);
+            } else if (com > 0) {
+                winners.clear();
+                winners.add(other);
+            }
+        }
+        return winners;
+    }
 }

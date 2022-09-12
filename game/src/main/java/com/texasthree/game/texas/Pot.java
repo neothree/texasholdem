@@ -238,12 +238,12 @@ class Pot {
                     .stream()
                     .map(v -> ring.move(p -> p.getId() == v).value)
                     .filter(Player::inGame)
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toList());
 
             var index = potId;
             if (!members.isEmpty()) {
                 // 有玩家比牌, 正常计算输赢
-                var winner = winners(members);
+                var winner = Texas.winners(members).stream().map(Player::getId).collect(Collectors.toSet());
                 if (potId == 0) {
                     mainPotWinner = winner;
                 }
@@ -295,29 +295,6 @@ class Pot {
         }
         return ret;
     }
-
-
-    private Set<Integer> winners(Collection<Player> players) {
-        var winner = new HashSet<Integer>();
-        Player win = null;
-        for (var v : players) {
-            if (winner.isEmpty()) {
-                winner.add(v.getId());
-                win = v;
-            } else {
-                var com = v.getHand().compareTo(win.getHand());
-                if (com >= 1) {
-                    win = v;
-                    winner = new HashSet<>();
-                    winner.add(v.getId());
-                } else if (com == 0) {
-                    winner.add(v.getId());
-                }
-            }
-        }
-        return winner;
-    }
-
 
     /**
      * 押注统计信息
