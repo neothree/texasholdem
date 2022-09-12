@@ -16,4 +16,9 @@ class InsuranceTest {
         }
         assertEquals(0, Insurance.odds(15).compareTo(BigDecimal.ZERO));
     }
+
+    @Test
+    public void testInsurance() {
+//        AssertInsurance.builder();
+    }
 }

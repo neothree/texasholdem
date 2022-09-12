@@ -79,7 +79,7 @@ public class Card implements Comparable<Card> {
 
     @Override
     public int hashCode() {
-        return point * 10 + suit;
+        return getId();
     }
 
 

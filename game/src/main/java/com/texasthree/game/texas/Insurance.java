@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
  */
 public class Insurance {
 
-    static final BigDecimal[] ODDS = new BigDecimal[21];
+    private static final BigDecimal[] ODDS = new BigDecimal[21];
 
     static {
         String[] init = {"0", "31", "16", "10", "8", "6", "5", "4", "3.5", "3", "2.5", "2.3", "2", "1.8", "1.6",
@@ -23,32 +23,14 @@ public class Insurance {
         }
     }
 
-    /**
-     * 正在购买保险的圈
-     */
     private String circle;
-    /**
-     * 公共牌
-     */
-    private final List<Card> communityCards;
-    /**
-     * 剩余的牌
-     */
-    private final List<Card> leftCard;
-    /**
-     * 参与的玩家
-     */
-    private final List<Player> players;
     /**
      * 分池
      */
     private final List<InsurancePot> pots = new ArrayList<>();
 
     Insurance(List<Player> players, List<Card> communityCards, List<Card> leftCard, String circle, List<Divide> pots) {
-        this.players = players;
         this.circle = circle;
-        this.communityCards = communityCards;
-        this.leftCard = leftCard;
 
         // 第四张牌
         var cc4 = communityCards.subList(0, 3);
@@ -58,8 +40,8 @@ public class Insurance {
         var cc5 = communityCards.subList(0, 4);
         var lc5 = new ArrayList<>(leftCard);
         lc5.addAll(communityCards.subList(4, 5));
-        for (var pot : pots) {
 
+        for (var pot : pots) {
             // 超过3个人不触发保险
             if (pot.getMembers().size() > 3) {
                 continue;
@@ -67,20 +49,25 @@ public class Insurance {
 
             // 河牌保险
             this.init(pot, players, cc5, lc5, Circle.RIVER);
-            if (Circle.FLOP.equals(circle)) {
+            if (Circle.TURN.equals(circle)) {
                 // 转牌保险
                 this.init(pot, players, cc4, lc4, Circle.TURN);
-            } else if (!Circle.TURN.equals(circle)) {
+            } else if (!Circle.RIVER.equals(circle)) {
                 throw new IllegalArgumentException("circle 错误: " + circle);
             }
         }
     }
 
     private void init(Divide pot, List<Player> players, List<Card> communityCards, List<Card> leftCard, String circle) {
+        // 筛选出池中的玩家
         players = players.stream()
                 .filter(v -> pot.getMembers().containsKey(v.getId()))
                 .collect(Collectors.toList());
+
+        // 更新手牌
         players.forEach(v -> v.getHand().fresh(communityCards));
+
+        // 赢家
         var winners = Texas.winners(players);
         if (winners.size() != 1) {
             return;
@@ -89,9 +76,43 @@ public class Insurance {
         var others = players.stream()
                 .filter(p -> p.getId() != winner.getId())
                 .collect(Collectors.toList());
+
+        // 保险池
         var ip = new InsurancePot(pot, circle, winner, others, communityCards, leftCard);
         this.pots.add(ip);
+    }
 
+    /**
+     * 购买保险
+     */
+    public Insurance buy(int potId, int amount, List<Card> outs) {
+        var pot = this.pots.stream()
+                .filter(v -> v.getId() == potId && !v.finished())
+                .findFirst().get();
+        pot.buy(new BigDecimal(amount), outs);
+        return this;
+    }
+
+    /**
+     * 一圈保险购买结束
+     */
+    public Insurance end() {
+        for (var v : pots) {
+            if (!v.finished() && v.circle.equals(circle)) {
+                v.buy(BigDecimal.ZERO, v.outs);
+            }
+        }
+        if (Circle.TURN.equals(this.circle)) {
+            this.circle = Circle.RIVER;
+        }
+        return this;
+    }
+
+    /**
+     * 是否全部购买结束
+     */
+    public boolean finished() {
+        return Circle.TURN.equals(this.circle) && this.pots.stream().allMatch(InsurancePot::finished);
     }
 
     public static BigDecimal odds(int count) {
@@ -99,15 +120,5 @@ public class Insurance {
             return BigDecimal.ZERO;
         }
         return ODDS[count];
-    }
-
-    private int buyIndex() {
-        if (Circle.PREFLOP.equals(this.circle) || Circle.FLOP.equals(this.circle)) {
-            return 4;
-        } else if (Circle.TURN.equals(this.circle)) {
-            return 5;
-        } else {
-            throw new IllegalStateException();
-        }
     }
 }

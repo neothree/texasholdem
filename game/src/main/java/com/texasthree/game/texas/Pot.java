@@ -140,7 +140,7 @@ class Pot {
     private List<Divide> makeDivide(boolean com) {
         var divides = new ArrayList<Divide>();
         var mapChips = this.playerBetChips();
-        var single = new Divide();
+        var single = new Divide(0);
         while (!mapChips.isEmpty()) {
             var min = mapChips.values()
                     .stream()
@@ -174,7 +174,7 @@ class Pot {
             }
             if (append) {
                 divides.add(single);
-                single = new Divide();
+                single = new Divide(single.id + 1);
             }
         }
         if (single.getChips() > 0) {
