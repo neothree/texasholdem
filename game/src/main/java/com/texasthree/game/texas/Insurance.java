@@ -99,7 +99,7 @@ public class Insurance {
     public Insurance end() {
         for (var v : pots) {
             if (!v.finished() && v.circle.equals(circle)) {
-                v.buy(BigDecimal.ZERO, v.outs);
+                v.buy(BigDecimal.ZERO, v.getOuts());
             }
         }
         if (Circle.TURN.equals(this.circle)) {
@@ -120,5 +120,9 @@ public class Insurance {
             return BigDecimal.ZERO;
         }
         return ODDS[count];
+    }
+
+    public List<InsurancePot> getPots() {
+        return new ArrayList<>(pots);
     }
 }

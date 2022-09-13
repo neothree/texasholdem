@@ -33,7 +33,7 @@ public class InsurancePot {
     /**
      * 所有的outs
      */
-    public final List<Card> outs;
+    private final List<Card> outs;
 
     /**
      * 购买金额上限
@@ -54,6 +54,7 @@ public class InsurancePot {
         // 转牌圈不能超过底池的0.25, 河牌圈不能超过底池的0.5
         this.limit = Circle.RIVER.equals(circle) ? (int) Math.floor(pot.getChips() * 0.5) : (int) Math.floor(pot.getChips() * 0.25);
         this.outs = new ArrayList<>();
+        others.add(winner);
         for (var v : leftCard) {
             var extra = new ArrayList<>(communityCards);
             extra.add(v);
@@ -155,5 +156,17 @@ public class InsurancePot {
 
     BigDecimal getOdds() {
         return Insurance.odds(outs.size());
+    }
+
+    public int getLimit() {
+        return limit;
+    }
+
+    public int getChips() {
+        return this.pot.getChips();
+    }
+
+    public List<Card> getOuts() {
+        return new ArrayList<>(outs);
     }
 }
