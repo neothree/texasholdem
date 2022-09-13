@@ -43,7 +43,7 @@ public class Insurance {
 
         for (var pot : pots) {
             // 超过3个人不触发保险
-            if (pot.getMembers().size() > 3) {
+            if (pot.size() > 3) {
                 continue;
             }
 
@@ -61,7 +61,7 @@ public class Insurance {
     private void init(Divide pot, List<Player> players, List<Card> communityCards, List<Card> leftCard, String circle) {
         // 筛选出池中的玩家
         players = players.stream()
-                .filter(v -> pot.getMembers().containsKey(v.getId()))
+                .filter(v -> pot.contains(v.getId()))
                 .collect(Collectors.toList());
 
         // 更新手牌

@@ -1,7 +1,6 @@
 package com.texasthree.game.texas;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 分池
@@ -10,32 +9,51 @@ import java.util.Map;
  * @create: 2021-06-13 17:38
  */
 public class Divide {
+
     public final int id;
 
-    private int chips;
+    /**
+     * 可以进行亮牌玩家的投注
+     */
+    private Set<Integer> members = new HashSet<>();
 
-    private Map<Integer, Integer> members = new HashMap<>();
-
+    /**
+     * 所有玩家的投注
+     */
     private Map<Integer, Integer> putin = new HashMap<>();
 
     Divide(int id) {
         this.id = id;
     }
 
+    public void add(Set<Integer> all, int amount, Set<Integer> m) {
+        for (var key : all) {
+            putin.putIfAbsent(key, 0);
+            putin.compute(key, (k, v) -> v + amount);
+            if (m.contains(key)) {
+                members.add(key);
+            }
+        }
+    }
+
+    public boolean contains(Integer id) {
+        return members.contains(id);
+    }
+
+    public int size() {
+        return this.members.size();
+    }
+
+    int chipsBet(int id) {
+        return this.putin.getOrDefault(id, 0);
+    }
+
+    List<Integer> members() {
+        return new ArrayList<>(this.members);
+    }
+
     public int getChips() {
-        return chips;
+        return this.putin.values().stream().reduce(Integer::sum)
+                .orElse(0);
     }
-
-    public void setChips(int chips) {
-        this.chips = chips;
-    }
-
-    public Map<Integer, Integer> getMembers() {
-        return members;
-    }
-
-    public Map<Integer, Integer> getPutin() {
-        return putin;
-    }
-
 }

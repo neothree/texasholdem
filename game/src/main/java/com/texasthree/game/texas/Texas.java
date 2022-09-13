@@ -468,7 +468,7 @@ public class Texas {
         var stub = this.pot.lastBetOrRaise();
         for (var divide : this.pot.divides()) {
             var pr = playerRing.move(player -> {
-                if (!divide.getMembers().containsKey(player.getId())) {
+                if (!divide.contains(player.getId())) {
                     return false;
                 }
                 return stub != null
@@ -479,7 +479,7 @@ public class Texas {
             show.add(last);
             for (var player : pr.toList()) {
                 // 大于等于必须亮牌
-                if (divide.getMembers().containsKey(player.getId())
+                if (divide.contains(player.getId())
                         && !this.pot.isFold(player)
                         && player.getHand().compareTo(last.getHand()) > -1) {
                     show.add(player);

@@ -132,7 +132,7 @@ public class InsurancePot {
      * 赢家在池中的投注额
      */
     int chipsBet() {
-        return this.pot.getMembers().get(winner.getId());
+        return this.pot.chipsBet(winner.getId());
     }
 
     /**

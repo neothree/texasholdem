@@ -107,9 +107,8 @@ class Pot {
         var com = texas.isCompareShowdown();
         this.divides = makeDivide(com);
         var last = this.divides.get(divides.size() - 1);
-        if (last.getMembers().size() == 1) {
-            var id = last.getMembers().keySet().stream().findFirst().orElseThrow();
-            var player = texas.getPlayerById(id);
+        if (last.size() == 1) {
+            var player = texas.getPlayerById(last.members().get(0));
             if (!player.isLeave() && com) {
                 this.refundLastSinglePlayerPot();
             }
@@ -129,10 +128,9 @@ class Pot {
      * 返回最后的单人单池筹码
      */
     private void refundLastSinglePlayerPot() {
-        var putin = this.divides.get(divides.size() - 1).getPutin();
+        var putin = this.divides.get(divides.size() - 1);
         if (putin.size() == 1) {
-            var entry = putin.entrySet().stream().findFirst().get();
-            this.refundPlayer = new Player(entry.getKey(), entry.getValue());
+            this.refundPlayer = new Player(putin.members().get(0), putin.getChips());
             this.divides.remove(divides.size() - 1);
         }
     }
@@ -147,18 +145,13 @@ class Pot {
                     .min(Comparator.comparing(Integer::intValue))
                     .get();
 
-            // 以 min 为分池标准
-            for (var key : mapChips.keySet()) {
-                mapChips.put(key, mapChips.get(key) - min);
-
-                var putin = single.getPutin();
-                putin.putIfAbsent(key, 0);
-                putin.compute(key, (k, v) -> v + min);
-                if (!this.fold.contains(key)) {
-                    single.getMembers().put(key, putin.get(key));
-                }
-            }
-            single.setChips(single.getChips() + mapChips.size() * min);
+            // 以 min 为分池金额标准，把投注金额记录在一个池中
+            mapChips.forEach((k, v) -> mapChips.put(k, v - min));
+            var putin = mapChips.keySet();
+            var member = putin.stream()
+                    .filter(v -> !this.fold.contains(v))
+                    .collect(Collectors.toSet());
+            single.add(putin, min, member);
 
             // 是否需要添加一个分池
             var append = false;
@@ -233,8 +226,7 @@ class Pot {
         Set<Integer> mainPotWinner = null;
         for (var potId = 0; potId < divide.size(); potId++) {
             var pot = divide.get(potId);
-            var members = pot.getMembers()
-                    .keySet()
+            var members = pot.members()
                     .stream()
                     .map(v -> ring.move(p -> p.getId() == v).value)
                     .filter(Player::inGame)
