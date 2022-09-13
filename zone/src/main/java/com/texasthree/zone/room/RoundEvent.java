@@ -32,4 +32,21 @@ public enum RoundEvent {
      * 亮牌
      */
     SHOWDOWN,
+
+    /**
+     * 保险开始
+     */
+    INSUSRANCE,
+    /**
+     * 新的购买人
+     */
+    BUYER,
+    /**
+     * 购买保险
+     */
+    BUY,
+    /**
+     * 购买保险结束
+     */
+    BUY_END,
 }

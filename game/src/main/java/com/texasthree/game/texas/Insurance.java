@@ -29,8 +29,14 @@ public class Insurance {
      */
     private final List<InsurancePot> pots = new ArrayList<>();
 
-    Insurance(List<Player> players, List<Card> communityCards, List<Card> leftCard, String circle, List<Divide> pots) {
+    private final List<Player> players;
+
+    private final List<Card> communityCards;
+
+    public Insurance(List<Player> players, List<Card> communityCards, List<Card> leftCard, String circle, List<Divide> pots) {
+        this.players = players;
         this.circle = circle;
+        this.communityCards = communityCards;
 
         // 第四张牌
         var cc4 = communityCards.subList(0, 3);
@@ -124,5 +130,13 @@ public class Insurance {
 
     public List<InsurancePot> getPots() {
         return new ArrayList<>(pots);
+    }
+
+    public List<Player> getPlayers() {
+        return new ArrayList<>(players);
+    }
+
+    public List<Card> getCommunityCards() {
+        return communityCards;
     }
 }

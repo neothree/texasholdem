@@ -45,6 +45,8 @@ public class TexasRound {
 
     private Action lastAction;
 
+    private TexasInsurance insurance;
+
     public TexasRound(int id, String roomId, List<UserPlayer> users, RoundEventHandler eventHandler) {
         this.id = id;
         this.logpre = "[" + roomId + " - " + id + "]";
@@ -312,5 +314,9 @@ public class TexasRound {
 
     public Action getAction(int seatId) {
         return this.game.getAction(seatId);
+    }
+
+    public TexasInsurance getInsurance() {
+        return insurance;
     }
 }

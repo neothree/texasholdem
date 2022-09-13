@@ -125,8 +125,8 @@ public class InsurancePot {
         return odds(outs.size()).compareTo(BigDecimal.ZERO) > 0;
     }
 
-    boolean finished() {
-        return !this.policies.isEmpty();
+    public boolean finished() {
+        return !activate() || !this.policies.isEmpty();
     }
 
     /**
@@ -139,18 +139,18 @@ public class InsurancePot {
     /**
      * 满池
      */
-    int fullPot() {
+    public int fullPot() {
         return new BigDecimal(this.pot.getChips()).divide(getOdds(), RoundingMode.CEILING).intValue();
     }
 
     /**
      * 保本
      */
-    int breakEven() {
+    public int breakEven() {
         return new BigDecimal(chipsBet()).divide(getOdds(), RoundingMode.CEILING).intValue();
     }
 
-    int getId() {
+    public int getId() {
         return this.pot.id;
     }
 
@@ -168,5 +168,9 @@ public class InsurancePot {
 
     public List<Card> getOuts() {
         return new ArrayList<>(outs);
+    }
+
+    public int getAmount() {
+        return this.policies.stream().mapToInt(v -> v.amount.intValue()).sum();
     }
 }

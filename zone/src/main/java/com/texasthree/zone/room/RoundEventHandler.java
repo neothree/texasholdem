@@ -48,6 +48,19 @@ class RoundEventHandler {
             case SHOWDOWN:
                 this.onShowdown(round);
                 break;
+
+            case INSUSRANCE:
+                this.onInsurance(round);
+                break;
+            case BUYER:
+                this.onBuyer(round);
+                break;
+            case BUY:
+                this.onBuy(round);
+                break;
+            case BUY_END:
+                this.onBuyEnd(round);
+                break;
             default:
                 throw new IllegalArgumentException(event.name());
         }
@@ -68,6 +81,11 @@ class RoundEventHandler {
         }
     }
 
+    private void onOperator(TexasRound round) {
+        var info = new Protocal.Operator(round);
+        this.send(info);
+    }
+
     private void onAction(TexasRound round) {
         var action = round.getLastAction();
         var info = new Protocal.Action(action, round.sumPot());
@@ -85,8 +103,23 @@ class RoundEventHandler {
         this.onShowdown.run();
     }
 
-    private void onOperator(TexasRound round) {
-        var info = new Protocal.Operator(round);
+    private void onInsurance(TexasRound round) {
+        var info = new Protocal.Insurance(round.getInsurance());
+        this.send(info);
+    }
+
+    private void onBuyer(TexasRound round) {
+        var info = new Protocal.Buyer(round.getInsurance());
+        this.send(info);
+    }
+
+    private void onBuy(TexasRound round) {
+        var info = new Protocal.Buy(0, 0);
+        this.send(info);
+    }
+
+    private void onBuyEnd(TexasRound round) {
+        var info = new Protocal.BuyEnd(round.getInsurance());
         this.send(info);
     }
 

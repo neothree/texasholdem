@@ -126,7 +126,6 @@ public class Protocal {
         }
     }
 
-
     public static class Hand {
         public List<Integer> cards;
         public String type;
@@ -234,6 +233,14 @@ public class Protocal {
         public Integer seatId;
         public Hand hand;
         public List<PotProfit> profits;
+
+        ShowdownHand() {
+        }
+
+        ShowdownHand(com.texasthree.game.texas.Player p) {
+            this.seatId = p.getId();
+            this.hand = new Hand(p.getHand());
+        }
     }
 
     public static class PotProfit {
@@ -250,4 +257,81 @@ public class Protocal {
         return cards.stream().map(Card::getId).collect(Collectors.toList());
     }
 
+    public static class Insurance {
+        List<ShowdownHand> players;
+        public List<Integer> communityCards;
+
+        Insurance(TexasInsurance ins) {
+            this.players = ins.getPlayers().stream().map(ShowdownHand::new).collect(Collectors.toList());
+            this.communityCards = toCardIds(ins.getCommunityCards());
+        }
+    }
+
+    public static class InsurancePot {
+        public Integer potId;
+        public Integer amount;
+        public Integer seatId;
+        public List<Integer> outs;
+        public Integer fullPot;
+        public Integer breakEven;
+        public Integer max;
+        public Integer min;
+
+        InsurancePot(int potId, Integer amount) {
+            this.potId = potId;
+            this.amount = amount;
+        }
+
+        InsurancePot(com.texasthree.game.texas.InsurancePot p) {
+            this.potId = p.getId();
+            this.seatId = p.winner.getId();
+            this.outs = toCardIds(p.getOuts());
+            this.fullPot = p.fullPot();
+            this.breakEven = p.breakEven();
+            this.max = p.getLimit();
+            this.min = 0;
+        }
+    }
+
+    public static class Buyer {
+        public long leftSec;
+        /**
+         * 可以购买的保险池
+         */
+        public List<InsurancePot> buying = new ArrayList<>();
+        /**
+         * 已经购买的保险池
+         */
+        public List<InsurancePot> bought = new ArrayList<>();
+
+        Buyer(TexasInsurance ins) {
+            this.leftSec = ins.leftSec();
+            var pots = ins.getPots();
+            for (var v : pots) {
+                if (v.finished()) {
+                    var p = new InsurancePot(v.getId(), v.getAmount());
+                    this.bought.add(p);
+                } else {
+                    this.buying.add(new InsurancePot(v));
+                }
+            }
+        }
+    }
+
+    public static class Buy {
+        public Integer potId;
+        public Integer amount;
+
+        Buy(int potId, Integer amount) {
+            this.potId = potId;
+            this.amount = amount;
+        }
+    }
+
+    public static class BuyEnd extends Insurance {
+
+        BuyEnd(TexasInsurance ins) {
+            super(ins);
+        }
+    }
 }
