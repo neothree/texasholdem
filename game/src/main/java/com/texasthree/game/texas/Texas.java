@@ -14,31 +14,14 @@ public class Texas {
         return new Texas.Builder();
     }
 
-    public static Texas.Builder builder(int playerNum) {
-        var builder = new Texas.Builder();
-        builder.playerNum = playerNum;
-        return builder;
-    }
-
     public static class Builder {
-        private int playerNum = 2;
         private int smallBlind = 1;
         private int ante = 0;
-        private int initChips = 100;
         private boolean straddle;
-        private Ring<Player> ring;
+        Ring<Player> ring;
         private List<Card> board;
         private Map<Regulation, Integer> regulations;
-        private List<Player> players;
-
-        public Builder() {
-
-        }
-
-        public Builder playerNum(int playerNum) {
-            this.playerNum = playerNum;
-            return this;
-        }
+        List<Player> players;
 
         public Builder smallBlind(int smallBlind) {
             this.smallBlind = smallBlind;
@@ -52,11 +35,6 @@ public class Texas {
 
         public Builder straddle() {
             this.straddle = true;
-            return this;
-        }
-
-        Builder initChips(int initChips) {
-            this.initChips = initChips;
             return this;
         }
 
@@ -88,7 +66,6 @@ public class Texas {
             return this;
         }
 
-
         public Builder communityCards(Card... board) {
             this.board = Arrays.asList(board);
             return this;
@@ -96,19 +73,12 @@ public class Texas {
 
         Ring<Player> getRing() {
             if (ring == null) {
-                if (players == null) {
-                    players = new ArrayList<>(playerNum);
-                    for (int i = 1; i <= playerNum; i++) {
-                        players.add(new Player(i, initChips));
-                    }
-                }
                 ring = Ring.create(players.size());
                 for (var v : players) {
                     ring.setValue(v);
                     ring = ring.getNext();
                 }
             }
-            this.playerNum = ring.size();
             return ring;
         }
 
@@ -160,7 +130,7 @@ public class Texas {
             }
 
             if (ring.value.getHand() == null) {
-                for (int i = 0; i < playerNum; i++) {
+                for (int i = 0; i < ring.size(); i++) {
                     ring.value.setHand(new Hand(leftCard.subList(i * 2, i * 2 + 2)));
                     ring = ring.getNext();
                 }

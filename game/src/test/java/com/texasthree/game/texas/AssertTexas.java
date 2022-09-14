@@ -2,6 +2,7 @@ package com.texasthree.game.texas;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +26,22 @@ public class AssertTexas extends Texas {
     }
 
     public static class Builder extends Texas.Builder {
+
+        private int playerNum = 2;
+
+        private int initChips = 100;
+
+
+        public Builder playerNum(int playerNum) {
+            this.playerNum = playerNum;
+            return this;
+        }
+
+        Builder initChips(int initChips) {
+            this.initChips = initChips;
+            return this;
+        }
+
 
         @Override
         public Builder communityCards(Card... board) {
@@ -63,12 +80,6 @@ public class AssertTexas extends Texas {
         }
 
         @Override
-        public Builder initChips(int initChips) {
-            super.initChips(initChips);
-            return this;
-        }
-
-        @Override
         public Builder smallBlind(int smallBlind) {
             super.smallBlind(smallBlind);
             return this;
@@ -78,6 +89,19 @@ public class AssertTexas extends Texas {
         public Builder ante(int ante) {
             super.ante(ante);
             return this;
+        }
+
+        @Override
+        Ring<Player> getRing() {
+            if (ring == null) {
+                if (players == null) {
+                    players = new ArrayList<>(playerNum);
+                    for (int i = 1; i <= playerNum; i++) {
+                        players.add(new Player(i, initChips));
+                    }
+                }
+            }
+            return super.getRing();
         }
 
         @Override

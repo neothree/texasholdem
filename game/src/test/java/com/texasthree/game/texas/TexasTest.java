@@ -236,14 +236,14 @@ public class TexasTest extends AllCard {
 
     //    @Test
     public void testStraddle() throws Exception {
-        var texas = Texas.builder(4)
-                .straddle()
-                .build();
-        assertEquals(Transfer.NEXT_OP, texas.start().state());
+//        var texas = Texas.builder(4)
+//                .straddle()
+//                .build();
+//        assertEquals(Transfer.NEXT_OP, texas.start().state());
 //        assert(game:OpPlayer() == config.playerList[1])
 //        assert(config.playerList[4]:Chips() == 196)
-        assertEquals(texas.operator().getId(), 1);
-        assertEquals(texas.getPlayerById(4).getChips(), 96);
+//        assertEquals(texas.operator().getId(), 1);
+//        assertEquals(texas.getPlayerById(4).getChips(), 96);
 
         // TODO
 //        local config = {
