@@ -90,14 +90,14 @@ public class AssertInsurance {
                 p.add(m, 100, m);
                 this.pots.add(p);
             }
-            return new AssertInsurance(players, communityCards, leftCard, circle, pots);
+            return new AssertInsurance(players, leftCard, circle, pots);
         }
     }
 
     private final Insurance insurance;
 
-    private AssertInsurance(List<Player> players, List<Card> communityCards, List<Card> leftCard, String circle, List<Divide> pots) {
-        this.insurance = new Insurance(players, communityCards, leftCard, circle, pots);
+    private AssertInsurance(List<Player> players, List<Card> leftCard, String circle, List<Divide> pots) {
+        this.insurance = new Insurance(players, leftCard, circle, pots);
     }
 
     AssertInsurance buy(int potId, int amount, List<Card> outs) {

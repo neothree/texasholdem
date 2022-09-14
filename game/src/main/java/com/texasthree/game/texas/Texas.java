@@ -592,6 +592,10 @@ public class Texas {
         return this.pot.divides().stream().map(Divide::getChips).collect(Collectors.toList());
     }
 
+    public List<Divide> getDivides() {
+        return new ArrayList<>(this.pot.divides()) ;
+    }
+
     public int smallBlind() {
         return this.regulations.getOrDefault(Regulation.SmallBlind, 0);
     }
@@ -682,5 +686,9 @@ public class Texas {
 
     public List<Player> players() {
         return this.ring.toList();
+    }
+
+    public boolean isFold(int id) {
+        return this.pot.isFold(id);
     }
 }

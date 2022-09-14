@@ -32,10 +32,13 @@ public class TexasInsurance {
         this.round = round;
         this.handler = handler;
         this.onFinish = onFinished;
-
         var players = new ArrayList<Player>();
-
-        this.game = new Insurance(players, null, null, null, null);
+        for (var v : round.players()) {
+            if (!v.isLeave() && round.isFold(v.getId())) {
+                players.add(v);
+            }
+        }
+        this.game = new Insurance(players, round.getLeftCard(), round.circle(), round.getDivides());
     }
 
     /**
@@ -66,6 +69,7 @@ public class TexasInsurance {
      * 购买
      */
     void buy(int potId, int amount, List<Card> outs) {
+        log.info("购买保险");
         this.game.buy(potId, amount, outs);
         this.handler.on(round, RoundEvent.BUY);
         if (!this.game.circleFinished()) {
@@ -78,6 +82,7 @@ public class TexasInsurance {
      * 一轮结束
      */
     void buyEnd() {
+        log.info(">>>>>>>>>>>>>>>>> 一轮保险结束 : {} <<<<<<<<<<<<<<<<<<<<<<<<", game.getCircle());
         this.game.end();
         this.handler.on(round, RoundEvent.BUY_END);
         if (!this.game.finished()) {

@@ -302,6 +302,10 @@ public class TexasRound {
         return game.getPots();
     }
 
+    public List<Divide> getDivides() {
+        return game.getDivides();
+    }
+
     public int getId() {
         return id;
     }
@@ -323,6 +327,11 @@ public class TexasRound {
         return this.game.getPlayerById(seatId) != null;
     }
 
+    public boolean isFold(int seatId) {
+        return this.game.isFold(seatId) ;
+    }
+
+
     public Player getPlayerById(int seatId) {
         return this.game.getPlayerById(seatId);
     }
@@ -340,6 +349,10 @@ public class TexasRound {
     }
 
     public List<Card> getLeftCard() {
-        return null;
+        return this.game.getLeftCard();
+    }
+
+    public List<Player> players() {
+        return this.game.players();
     }
 }

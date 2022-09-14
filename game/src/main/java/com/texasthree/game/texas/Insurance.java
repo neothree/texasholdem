@@ -2,6 +2,7 @@ package com.texasthree.game.texas;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,21 +32,19 @@ public class Insurance {
 
     private final List<Player> players;
 
-    private final List<Card> communityCards;
+    private final List<Card> leftCard;
 
-    public Insurance(List<Player> players, List<Card> communityCards, List<Card> leftCard, String circle, List<Divide> pots) {
+    public Insurance(List<Player> players, List<Card> leftCard, String circle, List<Divide> pots) {
         this.players = players;
         this.circle = circle;
-        this.communityCards = communityCards;
+        this.leftCard = leftCard;
 
         // 第四张牌
-        var cc4 = communityCards.subList(0, 3);
-        var lc4 = new ArrayList<>(leftCard);
-        lc4.addAll(communityCards.subList(3, 5));
+        var cc4 = leftCard.subList(0, 3);
+        var lc4 = leftCard.subList(3, leftCard.size());
         // 第五张牌
-        var cc5 = communityCards.subList(0, 4);
-        var lc5 = new ArrayList<>(leftCard);
-        lc5.addAll(communityCards.subList(4, 5));
+        var cc5 = leftCard.subList(0, 4);
+        var lc5 = new ArrayList<>(leftCard.subList(4, leftCard.size()));
 
         for (var pot : pots) {
             // 超过3个人不触发保险
@@ -141,7 +140,16 @@ public class Insurance {
     }
 
     public List<Card> getCommunityCards() {
-        return communityCards;
+        switch (circle) {
+            case Circle.FLOP:
+                return this.leftCard.subList(0, 3);
+            case Circle.TURN:
+                return this.leftCard.subList(0, 4);
+            case Circle.RIVER:
+                return this.leftCard.subList(0, 5);
+            default:
+                return Collections.emptyList();
+        }
     }
 
     public String getCircle() {
