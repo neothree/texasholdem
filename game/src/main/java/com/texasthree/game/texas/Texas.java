@@ -94,10 +94,6 @@ public class Texas {
             return this;
         }
 
-        public List<Card> getCommunityCards() {
-            return this.board;
-        }
-
         Ring<Player> getRing() {
             if (ring == null) {
                 if (players == null) {
@@ -148,13 +144,12 @@ public class Texas {
 
         public Texas build() {
             var ring = this.getRing();
-            this.deal();
+            var leftCards = this.deal();
             var regulations = this.regulations();
-            var cc = this.getCommunityCards();
-            return new Texas(regulations, ring, cc);
+            return new Texas(regulations, ring, leftCards);
         }
 
-        void deal() {
+        List<Card> deal() {
             var leftCard = Deck.getInstance().shuffle();
             if (board == null || board.size() != 5) {
                 board = leftCard.subList(0, 5);
@@ -165,11 +160,15 @@ public class Texas {
             }
 
             if (ring.value.getHand() == null) {
-                for (int i = 1; i <= playerNum; i++) {
+                for (int i = 0; i < playerNum; i++) {
                     ring.value.setHand(new Hand(leftCard.subList(i * 2, i * 2 + 2)));
                     ring = ring.getNext();
                 }
             }
+            var list = new ArrayList<Card>();
+            list.addAll(board);
+            list.addAll(leftCard);
+            return list;
         }
     }
 
@@ -190,7 +189,7 @@ public class Texas {
     /**
      * 桌面
      */
-    private List<Card> communityCards;
+    private List<Card> leftCard;
     /**
      * 规则
      */
@@ -218,7 +217,7 @@ public class Texas {
         }
         this.regulations = regulations;
         this.ring = ring;
-        this.communityCards = leftCard;
+        this.leftCard = leftCard;
         this.playerNum = ring.size();
         this.pot = new Pot(playerNum, this.smallBlind(), this.ante());
     }
@@ -597,15 +596,15 @@ public class Texas {
      */
     public List<Card> getCommunityCards() {
         if (this.isOver && this.isCompareShowdown()) {
-            return this.communityCards.subList(0, 5);
+            return this.leftCard.subList(0, 5);
         }
         switch (this.pot.circle()) {
             case Circle.FLOP:
-                return this.communityCards.subList(0, 3);
+                return this.leftCard.subList(0, 3);
             case Circle.TURN:
-                return this.communityCards.subList(0, 4);
+                return this.leftCard.subList(0, 4);
             case Circle.RIVER:
-                return this.communityCards.subList(0, 5);
+                return this.leftCard.subList(0, 5);
             default:
                 return Collections.emptyList();
         }
@@ -705,5 +704,13 @@ public class Texas {
             }
         }
         return winners;
+    }
+
+    public List<Card> getLeftCard() {
+        return new ArrayList<>(leftCard);
+    }
+
+    public List<Player> players() {
+        return this.ring.toList();
     }
 }

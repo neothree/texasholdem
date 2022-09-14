@@ -83,10 +83,9 @@ public class AssertTexas extends Texas {
         @Override
         public AssertTexas build() {
             var ring = this.getRing();
-            this.deal();
+            var leftCards = this.deal();
             var regulations = this.regulations();
-            var cc = this.getCommunityCards();
-            return new AssertTexas(regulations, ring, cc);
+            return new AssertTexas(regulations, ring, leftCards);
         }
     }
 

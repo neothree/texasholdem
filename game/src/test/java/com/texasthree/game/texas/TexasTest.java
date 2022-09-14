@@ -6,10 +6,7 @@ import com.texasthree.game.Deck;
 import com.texasthree.game.Tester;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import static com.texasthree.game.texas.Optype.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -27,7 +24,7 @@ public class TexasTest extends AllCard {
      */
     @Test
     public void testOther() throws Exception {
-        AssertTexas.builder(3)
+        var texas = AssertTexas.builder(3)
                 .smallBlind(1)
                 .ante(1)
                 .build()
@@ -39,7 +36,14 @@ public class TexasTest extends AllCard {
                 .assertSbPlayer(2)
                 .assertBbPlayer(3);
 
-        var texas = AssertTexas.builder().build().start();
+        // 52 张牌
+        var set = new HashSet<>(texas.getLeftCard());
+        for (var v : texas.players()) {
+            set.addAll(v.getHand().getHold());
+        }
+        assertEquals(52, set.size());
+
+        texas = AssertTexas.builder().build().start();
         Tester.assertException(texas::start, IllegalArgumentException.class);
 
         Tester.assertException(() -> AssertTexas.builder(2)
