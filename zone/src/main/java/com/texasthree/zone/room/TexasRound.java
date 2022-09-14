@@ -118,7 +118,11 @@ public class TexasRound {
         } else if (Transfer.CIRCLE_END.equals(move)) {
             this.moveCircleEnd();
         } else if (Transfer.SHOWDOWN.equals(move)) {
-            this.moveShowdown();
+            if (this.enableInsurance()) {
+                this.moveInsurance();
+            } else {
+                this.moveShowdown();
+            }
         }
     }
 
@@ -164,6 +168,14 @@ public class TexasRound {
         this.operator = null;
         this.isOver = true;
         this.scheduler.once(() -> this.eventHandler.on(this, RoundEvent.SHOWDOWN), 2000);
+    }
+
+    /**
+     * 进入保险
+     */
+    private void moveInsurance() {
+        this.insurance = new TexasInsurance(this, eventHandler, this::moveShowdown);
+        this.insurance.start();
     }
 
     /**
@@ -277,6 +289,9 @@ public class TexasRound {
 
     public void loop() {
         this.scheduler.check();
+        if (this.insurance != null) {
+            this.insurance.loop();
+        }
     }
 
     public List<Card> getCommunityCards() {
@@ -318,5 +333,13 @@ public class TexasRound {
 
     public TexasInsurance getInsurance() {
         return insurance;
+    }
+
+    private boolean enableInsurance() {
+        return false;
+    }
+
+    public List<Card> getLeftCard() {
+        return null;
     }
 }

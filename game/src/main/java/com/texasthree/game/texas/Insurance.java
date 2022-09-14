@@ -121,6 +121,10 @@ public class Insurance {
         return Circle.TURN.equals(this.circle) && this.pots.stream().allMatch(InsurancePot::finished);
     }
 
+    public boolean circleFinished() {
+        return true;
+    }
+
     public static BigDecimal odds(int count) {
         if (count <= 0 || count > 14) {
             return BigDecimal.ZERO;
@@ -138,5 +142,9 @@ public class Insurance {
 
     public List<Card> getCommunityCards() {
         return communityCards;
+    }
+
+    public String getCircle() {
+        return circle;
     }
 }

@@ -30,6 +30,7 @@ class RoundEventHandler {
 
     void on(TexasRound round, RoundEvent event) {
         switch (event) {
+            // 德州扑克
             case START_GAME:
                 this.onStartGame(round);
                 break;
@@ -49,6 +50,7 @@ class RoundEventHandler {
                 this.onShowdown(round);
                 break;
 
+            // 保险
             case INSUSRANCE:
                 this.onInsurance(round);
                 break;

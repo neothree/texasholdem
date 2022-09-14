@@ -4,7 +4,10 @@ import com.texasthree.game.texas.Card;
 import com.texasthree.game.texas.Insurance;
 import com.texasthree.game.texas.InsurancePot;
 import com.texasthree.game.texas.Player;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,6 +15,8 @@ import java.util.List;
  * @create: 2022-09-13 12:56
  */
 public class TexasInsurance {
+
+    private static Logger log = LoggerFactory.getLogger(TexasInsurance.class);
 
     private final Insurance game;
 
@@ -21,35 +26,73 @@ public class TexasInsurance {
 
     private final TexasRound round;
 
-    TexasInsurance(TexasRound round, RoundEventHandler handler) {
+    private final Runnable onFinish;
+
+    TexasInsurance(TexasRound round, RoundEventHandler handler, Runnable onFinished) {
         this.round = round;
         this.handler = handler;
-        this.game = new Insurance(null, null, null, null, null);
+        this.onFinish = onFinished;
+
+        var players = new ArrayList<Player>();
+
+        this.game = new Insurance(players, null, null, null, null);
     }
 
+    /**
+     * 开始
+     */
     void start() {
+        log.info(">>>>>>>>>>>>>>>>> 保险阶段开始 <<<<<<<<<<<<<<<<<<<<<<<<");
         this.handler.on(round, RoundEvent.INSUSRANCE);
+
+        this.scheduler.once(this::buyBegin, 2 * 1000);
     }
 
+    /**
+     * 一轮开始
+     */
     void buyBegin() {
-        this.handler.on(round, RoundEvent.BUYER);
-
+        log.info(">>>>>>>>>>>>>>>>> 一轮购买开始 : {}<<<<<<<<<<<<<<<<<<<<<<<<", game.getCircle());
+        if (!this.game.circleFinished()) {
+            this.scheduler.once(this::buyEnd, 2 * 1000);
+            this.handler.on(round, RoundEvent.BUYER);
+        } else {
+            // 无法购买，直接下一轮
+            this.scheduler.once(this::buyEnd, 20 * 1000);
+        }
     }
 
-    void buy() {
+    /**
+     * 购买
+     */
+    void buy(int potId, int amount, List<Card> outs) {
+        this.game.buy(potId, amount, outs);
         this.handler.on(round, RoundEvent.BUY);
-
+        if (!this.game.circleFinished()) {
+            // 这轮购买结束
+            this.scheduler.once(this::buyEnd, 2 * 1000);
+        }
     }
 
+    /**
+     * 一轮结束
+     */
     void buyEnd() {
+        this.game.end();
         this.handler.on(round, RoundEvent.BUY_END);
-    }
-
-    private void onOpTimeout() {
+        if (!this.game.finished()) {
+            // 下一轮开始
+            this.scheduler.once(this::buyBegin, 1000);
+        } else {
+            // 整体结束
+            this.scheduler.once(this::finish, 1000);
+        }
     }
 
     private void finish() {
-
+        log.info(">>>>>>>>>>>>>>>>> 保险阶段结束 <<<<<<<<<<<<<<<<<<<<<<<<");
+        this.scheduler.clear();
+        this.onFinish.run();
     }
 
 
