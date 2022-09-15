@@ -42,10 +42,6 @@ public enum RoundEvent {
      */
     BUYER,
     /**
-     * 购买保险
-     */
-    BUY,
-    /**
      * 购买保险结束
      */
     BUY_END,

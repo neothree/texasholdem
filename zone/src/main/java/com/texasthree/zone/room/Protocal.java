@@ -258,7 +258,7 @@ public class Protocal {
     }
 
     public static class Insurance {
-        List<ShowdownHand> players;
+        public List<ShowdownHand> players;
         public List<Integer> communityCards;
 
         Insurance(TexasInsurance ins) {
@@ -318,20 +318,13 @@ public class Protocal {
         }
     }
 
-    public static class Buy {
-        public Integer potId;
-        public Integer amount;
-
-        Buy(int potId, Integer amount) {
-            this.potId = potId;
-            this.amount = amount;
-        }
-    }
-
     public static class BuyEnd extends Insurance {
-
-        BuyEnd(TexasInsurance ins) {
+        public Integer seatId;
+        public Integer amount;
+        BuyEnd(TexasInsurance ins, int seatId, Integer amount) {
             super(ins);
+            this.seatId = seatId;
+            this.amount = amount;
         }
     }
 }

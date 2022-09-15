@@ -57,9 +57,6 @@ class RoundEventHandler {
             case BUYER:
                 this.onBuyer(round);
                 break;
-            case BUY:
-                this.onBuy(round);
-                break;
             case BUY_END:
                 this.onBuyEnd(round);
                 break;
@@ -115,13 +112,8 @@ class RoundEventHandler {
         this.send(info);
     }
 
-    private void onBuy(TexasRound round) {
-        var info = new Protocal.Buy(0, 0);
-        this.send(info);
-    }
-
     private void onBuyEnd(TexasRound round) {
-        var info = new Protocal.BuyEnd(round.getInsurance());
+        var info = new Protocal.BuyEnd(round.getInsurance(), 0, 0);
         this.send(info);
     }
 

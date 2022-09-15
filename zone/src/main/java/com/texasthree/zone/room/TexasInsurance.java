@@ -22,11 +22,11 @@ public class TexasInsurance {
 
     private final RoundEventHandler handler;
 
-    private final ScheduledEventChecker scheduler = new ScheduledEventChecker();
-
     private final TexasRound round;
 
     private final Runnable onFinish;
+
+    private final ScheduledEventChecker scheduler = new ScheduledEventChecker();
 
     TexasInsurance(TexasRound round, RoundEventHandler handler, Runnable onFinished) {
         this.round = round;
@@ -71,7 +71,6 @@ public class TexasInsurance {
     void buy(int potId, int amount, List<Card> outs) {
         log.info("购买保险");
         this.game.buy(potId, amount, outs);
-        this.handler.on(round, RoundEvent.BUY);
         if (!this.game.circleFinished()) {
             // 这轮购买结束
             this.scheduler.once(this::buyEnd, 2 * 1000);
