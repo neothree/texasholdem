@@ -6,6 +6,7 @@ import com.texasthree.zone.Tester;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -13,17 +14,9 @@ class TexasRoundTest {
 
     @Test
     void testRound() throws Exception {
-        var users = new ArrayList<UserPlayer>();
-        for (int i = 0; i < 3; i++) {
-            var user = Tester.createUser();
-            users.add(new UserPlayer(i, user, 100));
-        }
-
+        var users = createUsers(3);
         var id = 12;
-        var round = new TexasRound(id, "12311", users, new RoundEventHandler(() -> {
-        }, (v) -> {
-        }, (v, s) -> {
-        }));
+        var round = new TexasRound(id, "12311", users, handler());
         assertEquals(id, round.getId());
 
         // PREFLOP
@@ -99,5 +92,37 @@ class TexasRoundTest {
 
         // SHOWDOWN
         assertTrue(round.finished());
+    }
+
+    @Test
+    void testInsurance() throws Exception {
+        var users = createUsers(2);
+        var id = 12;
+        var round = new TexasRound(id, "12311", users, handler());
+
+        var dealer = users.get(0).seatId;
+        round.start(dealer);
+        round.force();
+        round.action(Optype.Allin, 0);
+        round.force();
+        round.action(Optype.Allin, 0);
+        round.force();
+        assertNotNull(round.getInsurance());
+    }
+
+    private List<UserPlayer> createUsers(int num) {
+        var users = new ArrayList<UserPlayer>();
+        for (int i = 0; i < num; i++) {
+            var user = Tester.createUser();
+            users.add(new UserPlayer(i, user, 100));
+        }
+        return users;
+    }
+
+    private RoundEventHandler handler() {
+        return new RoundEventHandler(() -> {
+        }, (v) -> {
+        }, (v, s) -> {
+        });
     }
 }

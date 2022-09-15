@@ -14,6 +14,7 @@ public class Texas {
         return new Texas.Builder();
     }
 
+
     public static class Builder {
         private int smallBlind = 1;
         private int ante = 0;
@@ -155,7 +156,7 @@ public class Texas {
     /**
      * 玩家人数
      */
-    private final int playerNum;
+    public final int playerNum;
     /**
      * 桌面
      */
@@ -593,7 +594,7 @@ public class Texas {
     }
 
     public List<Divide> getDivides() {
-        return new ArrayList<>(this.pot.divides()) ;
+        return new ArrayList<>(this.pot.divides());
     }
 
     public int smallBlind() {
@@ -691,4 +692,16 @@ public class Texas {
     public boolean isFold(int id) {
         return this.pot.isFold(id);
     }
+
+    public int leaveOrderFoldNum() {
+        return (int) this.ring.toList().stream()
+                .filter(v -> !v.inGame() && this.pot.isFold(v.getId()))
+                .count();
+    }
+
+    public boolean isAllinShowdown() {
+        var notFold = this.pot.notFoldNum();
+        return this.isOver && notFold > 1 && notFold - this.pot.allinNum() <= 1;
+    }
+
 }

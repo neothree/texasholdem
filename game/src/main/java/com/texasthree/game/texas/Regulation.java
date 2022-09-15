@@ -50,6 +50,10 @@ public enum Regulation {
      * 倍数
      */
     Level,
+    /**
+     * 保险
+     */
+    Insurance,
     ;
 
 

@@ -350,7 +350,11 @@ class Pot {
         return this.allin.size() + this.fold.size();
     }
 
-    private int notFoldNum() {
+    int allinNum() {
+        return this.allin.size();
+    }
+
+    int notFoldNum() {
         return this.payerNum - this.fold.size();
     }
 

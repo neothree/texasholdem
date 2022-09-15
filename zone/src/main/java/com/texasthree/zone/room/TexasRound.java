@@ -322,15 +322,13 @@ public class TexasRound {
         return this.game.getPlayerById(seatId).getChips();
     }
 
-
     public boolean isPlayerInGame(int seatId) {
         return this.game.getPlayerById(seatId) != null;
     }
 
     public boolean isFold(int seatId) {
-        return this.game.isFold(seatId) ;
+        return this.game.isFold(seatId);
     }
-
 
     public Player getPlayerById(int seatId) {
         return this.game.getPlayerById(seatId);
@@ -345,7 +343,15 @@ public class TexasRound {
     }
 
     private boolean enableInsurance() {
-        return false;
+        var gameNum = this.game.playerNum - this.game.leaveOrderFoldNum();
+        return regulation(Regulation.Insurance)
+                && !Circle.RIVER.equals(this.game.circle())
+                && this.game.isAllinShowdown()
+                && 1 < gameNum && gameNum <= 3;
+    }
+
+    private boolean regulation(Regulation regulation) {
+        return true;
     }
 
     public List<Card> getLeftCard() {

@@ -1,9 +1,6 @@
 package com.texasthree.zone.room;
 
-import com.texasthree.game.texas.Card;
-import com.texasthree.game.texas.Insurance;
-import com.texasthree.game.texas.InsurancePot;
-import com.texasthree.game.texas.Player;
+import com.texasthree.game.texas.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,11 +31,15 @@ public class TexasInsurance {
         this.onFinish = onFinished;
         var players = new ArrayList<Player>();
         for (var v : round.players()) {
-            if (!v.isLeave() && round.isFold(v.getId())) {
+            if (!v.isLeave() && !round.isFold(v.getId())) {
                 players.add(v);
             }
         }
-        this.game = new Insurance(players, round.getLeftCard(), round.circle(), round.getDivides());
+        var circle = Circle.RIVER;
+        if (Circle.PREFLOP.equals(round.circle()) || Circle.FLOP.equals(round.circle())) {
+            circle = Circle.TURN;
+        }
+        this.game = new Insurance(players, round.getLeftCard(), circle, round.getDivides());
     }
 
     /**
