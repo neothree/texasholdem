@@ -1,5 +1,6 @@
 package com.texasthree.game.texas;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -14,10 +15,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @create: 2022-09-12 22:45
  */
 public class AssertInsurance {
-    static Builder builder() {
-        return new Builder();
-    }
-
     static Builder builder(Card... cards) {
         var builder = new Builder();
         builder.players(cards);
@@ -26,8 +23,6 @@ public class AssertInsurance {
 
     public static class Builder {
 
-        private List<Card> communityCards;
-
         private List<Player> players;
 
         private List<Card> leftCard = new ArrayList<>();
@@ -35,13 +30,6 @@ public class AssertInsurance {
         private String circle = Circle.TURN;
 
         private List<Divide> pots = new ArrayList<>();
-
-        public Builder communityCards(Card... communityCards) {
-            assertEquals(5, communityCards.length);
-            this.communityCards = Arrays.asList(communityCards);
-            return this;
-        }
-
 
         public Builder players(Player... players) {
             this.players = Arrays.asList(players);
@@ -81,9 +69,6 @@ public class AssertInsurance {
             if (players.isEmpty()) {
                 throw new IllegalArgumentException();
             }
-            if (communityCards == null || communityCards.size() != 5) {
-                throw new IllegalArgumentException();
-            }
             if (pots.isEmpty()) {
                 var p = new Divide(0);
                 var m = players.stream().map(Player::getId).collect(Collectors.toSet());
@@ -100,8 +85,13 @@ public class AssertInsurance {
         this.insurance = new Insurance(players, leftCard, circle, pots);
     }
 
-    AssertInsurance buy(int potId, int amount, List<Card> outs) {
-        this.insurance.buy(potId, amount, outs);
+    AssertInsurance buy(int potId, int amount, Card... outs) {
+        this.insurance.buy(potId, amount, Arrays.asList(outs));
+        return this;
+    }
+
+    AssertInsurance buyEnd() {
+        this.insurance.end();
         return this;
     }
 
@@ -120,17 +110,37 @@ public class AssertInsurance {
     }
 
     AssertInsurance assertPot(int id, int chipsBet, int chips) {
+        assertEquals(id, pot.winner.getId());
         assertEquals(chipsBet, pot.chipsBet());
         assertEquals(chips, pot.getChips());
         return this;
     }
 
-    AssertInsurance assertOuts(Card... cards) {
-        var set = new HashSet<>(Arrays.asList(cards));
+    AssertInsurance assertPots(String circle, int winner, int size) {
+        var pots = this.insurance.getPots().stream()
+                .filter(v -> v.circle.equals(circle))
+                .collect(Collectors.toList());
+
+        assertTrue(pots.stream().allMatch(v -> v.winner.getId() == winner));
+        assertEquals(size, pots.size());
+        return this;
+    }
+
+    AssertInsurance assertOuts(Card... expect) {
+        var set = new HashSet<>(Arrays.asList(expect));
         var outs = pot.getOuts();
         assertEquals(set.size(), outs.size());
         assertTrue(set.containsAll(outs));
+        return this;
+    }
 
+    AssertInsurance assertOdds(BigDecimal expect) {
+        assertEquals(0, pot.getOdds().compareTo(expect));
+        return this;
+    }
+
+    AssertInsurance assertCircleFinished(boolean expect) {
+        assertEquals(expect, this.insurance.circleFinished());
         return this;
     }
 }

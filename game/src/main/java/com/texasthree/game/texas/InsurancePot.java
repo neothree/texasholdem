@@ -173,4 +173,16 @@ public class InsurancePot {
     public int getAmount() {
         return this.policies.stream().mapToInt(v -> v.amount.intValue()).sum();
     }
+
+    @Override
+    public String toString() {
+        return new StringBuilder()
+                .append("id=").append(this.getId())
+                .append(", active=").append(activate())
+                .append(", circle=").append(circle)
+                .append(", winner=").append(winner.getId())
+                .append(", limit=").append(limit)
+                .append(", policies=").append(policies.size())
+                .toString();
+    }
 }

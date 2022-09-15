@@ -92,7 +92,7 @@ public class Insurance {
      */
     public Insurance buy(int potId, int amount, List<Card> outs) {
         var pot = this.pots.stream()
-                .filter(v -> v.getId() == potId && !v.finished())
+                .filter(v -> v.circle.equals(circle) && v.getId() == potId && !v.finished())
                 .findFirst().get();
         pot.buy(new BigDecimal(amount), outs);
         return this;
@@ -107,10 +107,18 @@ public class Insurance {
                 v.buy(BigDecimal.ZERO, v.getOuts());
             }
         }
+
         if (Circle.TURN.equals(this.circle)) {
             this.circle = Circle.RIVER;
         }
         return this;
+    }
+
+    /**
+     * 赔付
+     */
+    public void claim() {
+
     }
 
     /**
@@ -121,7 +129,9 @@ public class Insurance {
     }
 
     public boolean circleFinished() {
-        return true;
+        return this.pots.stream()
+                .filter(v -> v.circle.equals(this.circle))
+                .noneMatch(v -> v.activate() && v.policies.isEmpty());
     }
 
     public static BigDecimal odds(int count) {
