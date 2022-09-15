@@ -24,6 +24,9 @@ public class Insurance {
         }
     }
 
+    /**
+     * 保险圈，只有 TURN、RIVER
+     */
     private String circle;
     /**
      * 分池
@@ -35,6 +38,9 @@ public class Insurance {
     private final List<Card> leftCard;
 
     public Insurance(List<Player> players, List<Card> leftCard, String circle, List<Divide> pots) {
+        if (!(Circle.TURN.equals(circle) || Circle.RIVER.equals(circle))) {
+            throw new IllegalArgumentException("保险圈错误 " + circle);
+        }
         this.players = players;
         this.circle = circle;
         this.leftCard = leftCard;
@@ -151,12 +157,10 @@ public class Insurance {
 
     public List<Card> getCommunityCards() {
         switch (circle) {
-            case Circle.FLOP:
-                return this.leftCard.subList(0, 3);
             case Circle.TURN:
-                return this.leftCard.subList(0, 4);
+                return this.leftCard.subList(0, 3);
             case Circle.RIVER:
-                return this.leftCard.subList(0, 5);
+                return this.leftCard.subList(0, 4);
             default:
                 return Collections.emptyList();
         }

@@ -127,10 +127,12 @@ public class AssertInsurance {
     }
 
     AssertInsurance assertOuts(Card... expect) {
-        var set = new HashSet<>(Arrays.asList(expect));
-        var outs = pot.getOuts();
-        assertEquals(set.size(), outs.size());
-        assertTrue(set.containsAll(outs));
+        assertCards(pot.getOuts(), Arrays.asList(expect));
+        return this;
+    }
+
+    AssertInsurance assertCommunityCards(Card... expect) {
+        assertCards(insurance.getCommunityCards(), Arrays.asList(expect));
         return this;
     }
 
@@ -139,8 +141,19 @@ public class AssertInsurance {
         return this;
     }
 
+    AssertInsurance assertCircle(String expect) {
+        assertEquals(expect, this.insurance.getCircle());
+        return this;
+    }
+
     AssertInsurance assertCircleFinished(boolean expect) {
         assertEquals(expect, this.insurance.circleFinished());
         return this;
+    }
+
+    private void assertCards(List<Card> a, List<Card> b) {
+        var set = new HashSet<>(a);
+        assertEquals(set.size(), b.size());
+        assertTrue(set.containsAll(b));
     }
 }

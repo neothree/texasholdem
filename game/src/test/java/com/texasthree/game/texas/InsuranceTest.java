@@ -51,14 +51,18 @@ class InsuranceTest extends AllCard {
                 .assertPots(Circle.TURN, 1, 1)
                 .assertPots(Circle.RIVER, 1, 1)
 
+                .assertCircle(Circle.TURN)
+                .assertCommunityCards(spades5, diamond7, spades4)
                 .assertCircleFinished(false)
                 .buy(0, 20, spadesA)
                 .assertCircleFinished(true)
                 .buyEnd()
+
+                .assertCircle(Circle.RIVER)
+                .assertCommunityCards(spades5, diamond7, spades4, club9)
                 .assertCircleFinished(false)
                 .buy(0, 20, spadesA)
                 .assertCircleFinished(true)
-
         ;
     }
 }
