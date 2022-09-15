@@ -131,7 +131,7 @@ public class Insurance {
      * 是否全部购买结束
      */
     public boolean finished() {
-        return Circle.TURN.equals(this.circle) && this.pots.stream().allMatch(InsurancePot::finished);
+        return Circle.RIVER.equals(this.circle) && this.pots.stream().allMatch(InsurancePot::finished);
     }
 
     public boolean circleFinished() {

@@ -90,7 +90,7 @@ public class AssertInsurance {
         return this;
     }
 
-    AssertInsurance buyEnd() {
+    AssertInsurance end() {
         this.insurance.end();
         return this;
     }
@@ -148,6 +148,11 @@ public class AssertInsurance {
 
     AssertInsurance assertCircleFinished(boolean expect) {
         assertEquals(expect, this.insurance.circleFinished());
+        return this;
+    }
+
+    AssertInsurance assertFinished(boolean expect) {
+        assertEquals(expect, this.insurance.finished());
         return this;
     }
 

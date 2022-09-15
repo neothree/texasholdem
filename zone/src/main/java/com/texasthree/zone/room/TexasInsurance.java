@@ -55,7 +55,7 @@ public class TexasInsurance {
     /**
      * 一轮开始
      */
-    void buyBegin() {
+    private void buyBegin() {
         log.info(">>>>>>>>>>>>>>>>> 一轮购买开始 : {}<<<<<<<<<<<<<<<<<<<<<<<<", game.getCircle());
         if (!this.game.circleFinished()) {
             this.scheduler.once(this::buyEnd, 2 * 1000);
@@ -69,7 +69,16 @@ public class TexasInsurance {
     /**
      * 购买
      */
-    void buy(int potId, int amount, List<Card> outs) {
+    void buy(int id, int potId, int amount, List<Card> outs) {
+        var pot = this.getPot(this.game.getCircle(), potId);
+        if (pot.winner.getId() != id) {
+            throw new IllegalArgumentException();
+        }
+
+        if (outs == null) {
+            // 调试
+            outs = pot.getOuts();
+        }
         log.info("购买保险");
         this.game.buy(potId, amount, outs);
         if (!this.game.circleFinished()) {
@@ -81,7 +90,7 @@ public class TexasInsurance {
     /**
      * 一轮结束
      */
-    void buyEnd() {
+    private void buyEnd() {
         log.info(">>>>>>>>>>>>>>>>> 一轮保险结束 : {} <<<<<<<<<<<<<<<<<<<<<<<<", game.getCircle());
         this.game.end();
         this.handler.on(round, RoundEvent.BUY_END);
@@ -109,8 +118,10 @@ public class TexasInsurance {
         return this.scheduler.leftSec();
     }
 
-    private void updateHand() {
-
+    InsurancePot getPot(String circle, int potId) {
+        return this.getPots().stream()
+                .filter(v -> v.circle.equals(circle) && v.getId() == potId)
+                .findFirst().get();
     }
 
     List<InsurancePot> getPots() {
@@ -123,5 +134,13 @@ public class TexasInsurance {
 
     List<Card> getCommunityCards() {
         return game.getCommunityCards();
+    }
+
+    boolean finished() {
+        return this.game.finished();
+    }
+
+    public void force() {
+        this.scheduler.force();
     }
 }

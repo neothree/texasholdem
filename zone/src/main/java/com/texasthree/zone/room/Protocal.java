@@ -258,11 +258,11 @@ public class Protocal {
     }
 
     public static class Insurance {
-        public List<ShowdownHand> players;
+        public List<ShowdownHand> hands;
         public List<Integer> communityCards;
 
         Insurance(TexasInsurance ins) {
-            this.players = ins.getPlayers().stream().map(ShowdownHand::new).collect(Collectors.toList());
+            this.hands = ins.getPlayers().stream().map(ShowdownHand::new).collect(Collectors.toList());
             this.communityCards = toCardIds(ins.getCommunityCards());
         }
     }
@@ -272,6 +272,7 @@ public class Protocal {
         public Integer amount;
         public Integer seatId;
         public List<Integer> outs;
+        public String odds;
         public Integer fullPot;
         public Integer breakEven;
         public Integer max;
@@ -286,6 +287,7 @@ public class Protocal {
             this.potId = p.getId();
             this.seatId = p.winner.getId();
             this.outs = toCardIds(p.getOuts());
+            this.odds = p.getOuts().toString();
             this.fullPot = p.fullPot();
             this.breakEven = p.breakEven();
             this.max = p.getLimit();

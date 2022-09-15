@@ -170,10 +170,16 @@ public class TexasRound {
         this.scheduler.once(() -> this.eventHandler.on(this, RoundEvent.SHOWDOWN), 2000);
     }
 
+    public void buy(String uid, int potId, int amount) {
+        var p = this.getPlayerByUid(uid);
+        this.insurance.buy(p.seatId, potId, amount, null);
+    }
+
     /**
      * 进入保险
      */
     private void moveInsurance() {
+        this.scheduler.clear();
         this.insurance = new TexasInsurance(this, eventHandler, this::moveShowdown);
         this.insurance.start();
     }
@@ -273,6 +279,10 @@ public class TexasRound {
         return this.users.stream().filter(v -> v.seatId == seatId).findFirst().get();
     }
 
+    public UserPlayer getPlayerByUid(String id) {
+        return this.users.stream().filter(v -> v.getId().equals(id) ).findFirst().get();
+    }
+
     private void printStart() {
         log.info("{} ============开始牌局==============", logpre);
         log.info("{} 开始牌局 playerNum={} dealer={} sbSeatId={} bbSeatId={} smallBlind={} ante={}", logpre, getPlayers().size(), dealer(), sbSeatId(), bbSeatId(), smallBlind(), ante());
@@ -328,10 +338,6 @@ public class TexasRound {
 
     public boolean isFold(int seatId) {
         return this.game.isFold(seatId);
-    }
-
-    public Player getPlayerById(int seatId) {
-        return this.game.getPlayerById(seatId);
     }
 
     public Action getAction(int seatId) {

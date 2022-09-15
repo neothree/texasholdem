@@ -46,6 +46,15 @@ class InsuranceTest extends AllCard {
                 diamond5, heart5};
         AssertInsurance.builder(cards)
                 .leftCard(spades5, diamond7, spades4, club9, club10, spadesA)
+                .build()
+                .assertCircle(Circle.TURN)
+                .end()
+                .assertCircle(Circle.RIVER)
+                .end()
+                .assertFinished(true);
+
+        AssertInsurance.builder(cards)
+                .leftCard(spades5, diamond7, spades4, club9, club10, spadesA)
                 .circle(Circle.TURN)
                 .build()
                 .assertPots(Circle.TURN, 1, 1)
@@ -56,13 +65,15 @@ class InsuranceTest extends AllCard {
                 .assertCircleFinished(false)
                 .buy(0, 20, spadesA)
                 .assertCircleFinished(true)
-                .buyEnd()
+                .end()
+                .assertFinished(false)
 
                 .assertCircle(Circle.RIVER)
                 .assertCommunityCards(spades5, diamond7, spades4, club9)
                 .assertCircleFinished(false)
                 .buy(0, 20, spadesA)
                 .assertCircleFinished(true)
+                .assertFinished(true)
         ;
     }
 }

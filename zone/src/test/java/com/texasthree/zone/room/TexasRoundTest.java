@@ -107,7 +107,19 @@ class TexasRoundTest {
         round.force();
         round.action(Optype.Allin, 0);
         round.force();
-        assertNotNull(round.getInsurance());
+
+        var insurance = round.getInsurance();
+        assertNotNull(insurance);
+        assertFalse(insurance.finished());
+
+        insurance.force();
+        assertFalse(insurance.finished());
+        insurance.force();
+        assertFalse(insurance.finished());
+        insurance.force();
+        assertFalse(insurance.finished());
+        insurance.force();
+        assertTrue(insurance.finished());
     }
 
     private List<UserPlayer> createUsers(int num) {

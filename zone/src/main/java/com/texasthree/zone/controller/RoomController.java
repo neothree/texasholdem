@@ -119,12 +119,28 @@ public class RoomController extends AbstractMeController<User> {
     public void action(@RequestParam("op") String op,
                        int chipsBet) {
         log.info("请求押注 op{} chipsBet={}", op, chipsBet);
-        var room = zone.getRoom();
-        room.getRound().action(getOptype(op), chipsBet);
+        var round = zone.getRoom().getRound();
+        if (round == null
+                || round.getOperator() == null
+                || !round.getOperator().getId().equals(this.getMe().getId())) {
+            log.error("押注错误 {} {}", op, chipsBet);
+            return;
+        }
+        round.action(getOptype(op), chipsBet);
     }
 
     private Optype getOptype(String op) {
         return Arrays.stream(Optype.values()).filter(v -> v.name().equalsIgnoreCase(op)).findFirst().get();
     }
 
+    /**
+     * 购买保险
+     */
+    @PostMapping(value = "/round/buy")
+    public void buy(@RequestParam("potId") int potId,
+                    @RequestParam("amount") int amount) {
+        log.info("请求购买保险 potId={} amount={}", potId, amount);
+        var round = zone.getRoom().getRound();
+        round.buy(this.getMe().getId(), potId, amount);
+    }
 }
