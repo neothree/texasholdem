@@ -154,7 +154,7 @@ public class InsurancePot {
         return this.pot.id;
     }
 
-    BigDecimal getOdds() {
+    public BigDecimal getOdds() {
         return Insurance.odds(outs.size());
     }
 

@@ -58,11 +58,12 @@ public class TexasInsurance {
     private void buyBegin() {
         log.info(">>>>>>>>>>>>>>>>> 一轮购买开始 : {}<<<<<<<<<<<<<<<<<<<<<<<<", game.getCircle());
         if (!this.game.circleFinished()) {
-            this.scheduler.once(this::buyEnd, 2 * 1000);
+            // 玩家购买
+            this.scheduler.once(this::buyEnd, 20 * 1000);
             this.handler.on(round, RoundEvent.BUYER);
         } else {
             // 无法购买，直接下一轮
-            this.scheduler.once(this::buyEnd, 20 * 1000);
+            this.scheduler.once(this::buyEnd, 3 * 1000);
         }
     }
 

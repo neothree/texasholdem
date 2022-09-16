@@ -278,16 +278,17 @@ public class Protocal {
         public Integer max;
         public Integer min;
 
-        InsurancePot(int potId, Integer amount) {
+        InsurancePot(int potId, int seatId, Integer amount) {
             this.potId = potId;
             this.amount = amount;
+            this.seatId = seatId;
         }
 
         InsurancePot(com.texasthree.game.texas.InsurancePot p) {
             this.potId = p.getId();
             this.seatId = p.winner.getId();
             this.outs = toCardIds(p.getOuts());
-            this.odds = p.getOuts().toString();
+            this.odds = p.getOdds().toString();
             this.fullPot = p.fullPot();
             this.breakEven = p.breakEven();
             this.max = p.getLimit();
@@ -311,7 +312,7 @@ public class Protocal {
             var pots = ins.getPots();
             for (var v : pots) {
                 if (v.finished()) {
-                    var p = new InsurancePot(v.getId(), v.getAmount());
+                    var p = new InsurancePot(v.getId(), v.winner.getId(), v.getAmount());
                     this.bought.add(p);
                 } else {
                     this.buying.add(new InsurancePot(v));
