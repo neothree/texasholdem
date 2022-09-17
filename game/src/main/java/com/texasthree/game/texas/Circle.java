@@ -71,13 +71,13 @@ public class Circle {
         }
         // 小盲注
         var chipsBet = sb.getChips() > smallBind ? smallBind : sb.getChips();
-        sb.changeChips(-chipsBet);
+        sb.minus(chipsBet);
         var actSb = new Action(sb.getId(), Optype.SmallBlind, chipsBet, chipsBet, sb.getChips(), 0);
         this.actions.add(actSb);
 
         // 大盲注
         chipsBet = bb.getChips() > smallBind * 2 ? smallBind * 2 : bb.getChips();
-        bb.changeChips(-chipsBet);
+        bb.minus(chipsBet);
         var actBb = new Action(bb.getId(), Optype.BigBlind, chipsBet, chipsBet, bb.getChips(), 0);
         this.actions.add(actBb);
 
@@ -104,7 +104,7 @@ public class Circle {
         }
 
         if (act.chipsAdd > 0) {
-            player.changeChips(-act.chipsAdd);
+            player.minus(act.chipsAdd);
             if (player.getChips() <= 0) {
                 act.op = Optype.Allin;
             }

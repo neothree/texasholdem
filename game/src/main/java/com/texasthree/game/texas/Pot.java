@@ -38,7 +38,7 @@ class Pot {
         for (var player : ring.toList()) {
             var give = Math.min(player.getChips(), ante);
             this.anteBet.put(player.getId(), give);
-            player.changeChips(-give);
+            player.minus(give);
             if (player.getChips() == 0) {
                 this.allin.add(player.getId());
             }
@@ -63,7 +63,7 @@ class Pot {
             return;
         }
         var chipsBet = Math.min(dealer.getChips(), ante);
-        dealer.changeChips(-chipsBet);
+        dealer.minus(chipsBet);
         this.action(dealer, Optype.DealerAnte, chipsBet, false, false);
     }
 
@@ -109,7 +109,7 @@ class Pot {
         var last = this.divides.get(divides.size() - 1);
         if (last.size() == 1) {
             var player = texas.getPlayerById(last.members().get(0));
-            if (!player.isLeave() && com) {
+            if (player.inGame() && com) {
                 this.refundLastSinglePlayerPot();
             }
         }
@@ -235,7 +235,7 @@ class Pot {
             var index = potId;
             if (!members.isEmpty()) {
                 // 有玩家比牌, 正常计算输赢
-                var winner = Texas.winners(members).stream().map(Player::getId).collect(Collectors.toSet());
+                var winner = Player.winners(members).stream().map(Player::getId).collect(Collectors.toSet());
                 if (potId == 0) {
                     mainPotWinner = winner;
                 }

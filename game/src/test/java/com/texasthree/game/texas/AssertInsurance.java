@@ -115,7 +115,7 @@ public class AssertInsurance {
     AssertInsurance assertPot(int id, int chipsBet, int chips) {
         assertEquals(id, pot.applicant);
         assertEquals(chipsBet, pot.chipsBet);
-        assertEquals(chips, pot.getChips());
+        assertEquals(chips, pot.sum);
         return this;
     }
 

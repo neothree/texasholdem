@@ -3,7 +3,6 @@ package com.texasthree.game.insurance;
 import com.texasthree.game.texas.Card;
 import com.texasthree.game.texas.Circle;
 import com.texasthree.game.texas.Player;
-import com.texasthree.game.texas.Texas;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -23,7 +22,7 @@ public class InsurancePot {
     /**
      * 池的筹码总额
      */
-    private final int sum;
+    public final int sum;
 
     public final int id;
 
@@ -72,7 +71,7 @@ public class InsurancePot {
             for (var p : players) {
                 p.getHand().fresh(extra);
             }
-            var ws = Texas.winners(players);
+            var ws = Player.winners(players);
             if (ws.stream().noneMatch(w -> w.getId() == applicant)) {
                 outs.add(v);
             } else if (Circle.RIVER.equals(circle) && ws.size() > 1) {

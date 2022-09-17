@@ -236,7 +236,7 @@ public class AssertTexas extends Texas {
 
     AssertTexas leftChips(int left) {
         var player = this.operator();
-        player.changeChips(left - player.getChips());
+        player.minus(player.getChips() - left);
         return this;
     }
 

@@ -560,8 +560,7 @@ public class TexasTest extends AllCard {
                 .leftChips(10).action(Call)
                 .leftChips(1).assertAuth(Fold, Allin).action(Allin)
                 .leftChips(3).assertAuth(Raise, Fold, Allin, Check).action(Check)
-                .leftChips(2).assertAuth(Fold, Allin, Check).action(Allin)
-                .leftChips(10).action(Call);
+                .leftChips(2).assertAuth(Fold, Allin, Check).action(Allin);
 
         AssertTexas.builder(5).build().start()
                 .leftChips(10).assertAuth(Fold, Call, Raise, Allin, BBlind2, BBlind3, BBlind4)

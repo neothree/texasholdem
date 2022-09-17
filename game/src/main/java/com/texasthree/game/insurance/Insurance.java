@@ -4,7 +4,6 @@ import com.texasthree.game.texas.*;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -65,8 +64,6 @@ public class Insurance {
             if (Circle.TURN.equals(circle)) {
                 // 转牌保险
                 this.init(pot, players, cc4, lc4, Circle.TURN);
-            } else if (!Circle.RIVER.equals(circle)) {
-                throw new IllegalArgumentException("circle 错误: " + circle);
             }
         }
     }
@@ -81,7 +78,7 @@ public class Insurance {
         players.forEach(v -> v.getHand().fresh(communityCards));
 
         // 赢家
-        var winners = Texas.winners(players);
+        var winners = Player.winners(players);
         if (winners.size() != 1) {
             return;
         }
@@ -155,14 +152,7 @@ public class Insurance {
     }
 
     public List<Card> getCommunityCards() {
-        switch (circle) {
-            case Circle.TURN:
-                return this.leftCard.subList(0, 3);
-            case Circle.RIVER:
-                return this.leftCard.subList(0, 4);
-            default:
-                return Collections.emptyList();
-        }
+        return Circle.TURN.equals(circle) ? this.leftCard.subList(0, 3) : this.leftCard.subList(0, 4);
     }
 
     public String getCircle() {

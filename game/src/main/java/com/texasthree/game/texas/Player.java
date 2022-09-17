@@ -1,5 +1,8 @@
 package com.texasthree.game.texas;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Player {
 
     private int id;
@@ -35,8 +38,14 @@ public class Player {
         leave = true;
     }
 
-    void changeChips(int change) {
-        this.chips += change;
+    void minus(int value) {
+        if (value < 0) {
+            throw new IllegalArgumentException();
+        }
+        if (this.chips < value) {
+            throw new IllegalArgumentException("玩家筹码不足 chips=" + chips + "  value=" + value);
+        }
+        this.chips -= value;
     }
 
     public Hand getHand() {
@@ -65,5 +74,21 @@ public class Player {
     @Override
     public int hashCode() {
         return super.hashCode();
+    }
+
+    public static List<Player> winners(List<Player> players) {
+        var winners = new ArrayList<Player>();
+        winners.add(players.get(0));
+        for (var i = 1; i < players.size(); i++) {
+            var other = players.get(i);
+            var com = other.getHand().compareTo(winners.get(0).getHand());
+            if (com == 0) {
+                winners.add(other);
+            } else if (com > 0) {
+                winners.clear();
+                winners.add(other);
+            }
+        }
+        return winners;
     }
 }

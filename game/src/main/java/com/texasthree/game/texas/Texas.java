@@ -665,22 +665,6 @@ public class Texas {
         return STATE;
     }
 
-    public static List<Player> winners(List<Player> players) {
-        var winners = new ArrayList<Player>();
-        winners.add(players.get(0));
-        for (var i = 1; i < players.size(); i++) {
-            var other = players.get(i);
-            var com = other.getHand().compareTo(winners.get(0).getHand());
-            if (com == 0) {
-                winners.add(other);
-            } else if (com > 0) {
-                winners.clear();
-                winners.add(other);
-            }
-        }
-        return winners;
-    }
-
     public List<Card> getLeftCard() {
         return new ArrayList<>(leftCard);
     }
@@ -695,7 +679,7 @@ public class Texas {
 
     public int leaveOrderFoldNum() {
         return (int) this.ring.toList().stream()
-                .filter(v -> !v.inGame() && this.pot.isFold(v.getId()))
+                .filter(v -> v.isLeave() && this.pot.isFold(v.getId()))
                 .count();
     }
 
