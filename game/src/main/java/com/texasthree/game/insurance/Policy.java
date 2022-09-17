@@ -11,7 +11,7 @@ import java.util.List;
  * @author: neo
  * @create: 2022-09-11 22:37
  */
-public class policy {
+public class Policy {
 
     /**
      * 购买的outs
@@ -26,7 +26,7 @@ public class policy {
      */
     public final boolean hit;
 
-    policy(BigDecimal amount, List<Card> outs, boolean hit) {
+    Policy(BigDecimal amount, List<Card> outs, boolean hit) {
         this.outs = outs;
         this.hit = hit;
         this.amount = amount;

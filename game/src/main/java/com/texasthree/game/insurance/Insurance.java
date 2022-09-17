@@ -85,13 +85,10 @@ public class Insurance {
         if (winners.size() != 1) {
             return;
         }
-        var winner = winners.get(0);
-        var others = players.stream()
-                .filter(p -> p.getId() != winner.getId())
-                .collect(Collectors.toList());
 
         // 保险池
-        var ip = new InsurancePot(pot, circle, winner, others, communityCards, leftCard);
+        var wid = winners.get(0).getId();
+        var ip = new InsurancePot(pot.id, pot.getChips(), pot.chipsBet(wid), circle, wid, players, communityCards, leftCard);
         this.pots.add(ip);
     }
 
@@ -100,7 +97,7 @@ public class Insurance {
      */
     public Insurance buy(int potId, int amount, List<Card> outs) {
         var pot = this.pots.stream()
-                .filter(v -> v.circle.equals(circle) && v.getId() == potId && !v.finished())
+                .filter(v -> v.circle.equals(circle) && v.id == potId && !v.finished())
                 .findFirst().get();
         pot.buy(new BigDecimal(amount), outs);
         return this;

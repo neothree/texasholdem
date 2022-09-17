@@ -285,8 +285,8 @@ public class Protocal {
         }
 
         InsurancePot(com.texasthree.game.insurance.InsurancePot p) {
-            this.potId = p.getId();
-            this.seatId = p.winner.getId();
+            this.potId = p.id;
+            this.seatId = p.applicant;
             this.outs = toCardIds(p.getOuts());
             this.odds = p.getOdds().toString();
             this.fullPot = p.fullPot();
@@ -312,7 +312,7 @@ public class Protocal {
             var pots = ins.getPots();
             for (var v : pots) {
                 if (v.finished()) {
-                    var p = new InsurancePot(v.getId(), v.winner.getId(), v.getAmount());
+                    var p = new InsurancePot(v.id, v.applicant, v.getAmount());
                     this.bought.add(p);
                 } else {
                     this.buying.add(new InsurancePot(v));

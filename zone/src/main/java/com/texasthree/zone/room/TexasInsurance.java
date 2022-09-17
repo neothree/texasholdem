@@ -74,7 +74,7 @@ public class TexasInsurance {
      */
     void buy(int id, int potId, int amount, List<Card> outs) {
         var pot = this.getPot(this.game.getCircle(), potId);
-        if (pot.winner.getId() != id) {
+        if (pot.applicant != id) {
             throw new IllegalArgumentException();
         }
 
@@ -123,7 +123,7 @@ public class TexasInsurance {
 
     InsurancePot getPot(String circle, int potId) {
         return this.getPots().stream()
-                .filter(v -> v.circle.equals(circle) && v.getId() == potId)
+                .filter(v -> v.circle.equals(circle) && v.id == potId)
                 .findFirst().get();
     }
 

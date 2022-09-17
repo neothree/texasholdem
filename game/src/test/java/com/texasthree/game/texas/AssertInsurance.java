@@ -102,19 +102,19 @@ public class AssertInsurance {
 
     AssertInsurance selectPot(int potId, String circle) {
         this.pot = this.insurance.getPots().stream()
-                .filter(v -> v.getId() == potId && v.circle.equals(circle))
+                .filter(v -> v.id == potId && v.circle.equals(circle))
                 .findFirst().get();
         return this;
     }
 
     AssertInsurance assertWinner(int id) {
-        assertEquals(id, pot.winner.getId());
+        assertEquals(id, pot.applicant);
         return this;
     }
 
     AssertInsurance assertPot(int id, int chipsBet, int chips) {
-        assertEquals(id, pot.winner.getId());
-        assertEquals(chipsBet, pot.chipsBet());
+        assertEquals(id, pot.applicant);
+        assertEquals(chipsBet, pot.chipsBet);
         assertEquals(chips, pot.getChips());
         return this;
     }
@@ -124,7 +124,7 @@ public class AssertInsurance {
                 .filter(v -> v.circle.equals(circle))
                 .collect(Collectors.toList());
 
-        assertTrue(pots.stream().allMatch(v -> v.winner.getId() == winner));
+        assertTrue(pots.stream().allMatch(v -> v.applicant == winner));
         assertEquals(size, pots.size());
         return this;
     }

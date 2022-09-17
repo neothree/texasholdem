@@ -1,6 +1,9 @@
 package com.texasthree.game.insurance;
 
-import com.texasthree.game.texas.*;
+import com.texasthree.game.texas.Card;
+import com.texasthree.game.texas.Circle;
+import com.texasthree.game.texas.Player;
+import com.texasthree.game.texas.Texas;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -18,57 +21,62 @@ import static com.texasthree.game.insurance.Insurance.odds;
  */
 public class InsurancePot {
     /**
-     * 底池数据
+     * 池的筹码总额
      */
-    private final Divide pot;
+    private final int sum;
 
+    public final int id;
+
+    /**
+     * 赢家在池中的投注额
+     */
+    public final int chipsBet;
     /**
      * 押注圈
      */
     public final String circle;
 
     /**
-     * 赢家，购买保险的玩家
+     * 投保人
      */
-    public final Player winner;
+    public final int applicant;
 
     /**
      * 所有的outs
      */
     private final List<Card> outs;
-
-    /**
-     * 购买金额上限
-     */
-    private int limit;
     /**
      * 保单
      */
-    public final List<policy> policies = new ArrayList<>();
-
+    public final List<Policy> policies = new ArrayList<>();
+    /**
+     * 剩余的牌
+     */
     private List<Card> leftCard;
+    /**
+     * 出现平局
+     */
+    private boolean tie;
 
-    InsurancePot(Divide pot, String circle, Player winner, List<Player> others, List<Card> communityCards, List<Card> leftCard) {
-        this.pot = pot;
+    InsurancePot(int id, int sum, int chipsBet, String circle, int applicant, List<Player> players, List<Card> communityCards, List<Card> leftCard) {
+        this.applicant = applicant;
+        this.id = id;
+        this.sum = sum;
+        this.chipsBet = chipsBet;
         this.circle = circle;
-        this.winner = winner;
         this.leftCard = leftCard;
-        // 转牌圈不能超过底池的0.25, 河牌圈不能超过底池的0.5
-        this.limit = Circle.RIVER.equals(circle) ? (int) Math.floor(pot.getChips() * 0.5) : (int) Math.floor(pot.getChips() * 0.25);
         this.outs = new ArrayList<>();
-        others.add(winner);
         for (var v : leftCard) {
             var extra = new ArrayList<>(communityCards);
             extra.add(v);
-            for (var p : others) {
+            for (var p : players) {
                 p.getHand().fresh(extra);
             }
-            var ws = Texas.winners(others);
-            if (ws.stream().noneMatch(w -> w.getId() == winner.getId())) {
+            var ws = Texas.winners(players);
+            if (ws.stream().noneMatch(w -> w.getId() == applicant)) {
                 outs.add(v);
             } else if (Circle.RIVER.equals(circle) && ws.size() > 1) {
-                // 河牌圈有平分底池的outs, 购买的总额不能超过玩家的投注额
-                this.limit = chipsBet();
+                this.tie = true;
             }
         }
     }
@@ -83,13 +91,13 @@ public class InsurancePot {
         if (finished()) {
             throw new IllegalArgumentException("保险池已经购买结束");
         }
-        if (amount.compareTo(BigDecimal.ZERO) < 0 || amount.intValue() > limit) {
-            throw new IllegalArgumentException("购买的保险金额错误: " + amount);
+        if (amount.compareTo(BigDecimal.ZERO) < 0 || amount.intValue() > getLimit()) {
+            throw new IllegalArgumentException("购买的保险金额错误: amount=" + amount + " limit=" + getLimit());
         }
 
         // 购买的outs保单
         var hit = buyOuts.stream().anyMatch(v -> v.equals(leftCard.get(0)));
-        var policy = new policy(amount, buyOuts, hit);
+        var policy = new Policy(amount, buyOuts, hit);
         this.policies.add(policy);
 
         // 对剩余的outs进行背保
@@ -97,7 +105,7 @@ public class InsurancePot {
         if (!notBuy.isEmpty()) {
             hit = notBuy.stream().anyMatch(v -> v.equals(leftCard.get(0)));
             var m = amount.divide(policy.getOdds(), RoundingMode.CEILING);
-            this.policies.add(new policy(m, buyOuts, hit));
+            this.policies.add(new Policy(m, buyOuts, hit));
         }
 
     }
@@ -132,58 +140,63 @@ public class InsurancePot {
     }
 
     /**
-     * 赢家在池中的投注额
-     */
-    int chipsBet() {
-        return this.pot.chipsBet(winner.getId());
-    }
-
-    /**
      * 满池
      */
     public int fullPot() {
-        return new BigDecimal(this.pot.getChips()).divide(getOdds(), RoundingMode.CEILING).intValue();
+        return new BigDecimal(this.sum).divide(getOdds(), RoundingMode.CEILING).intValue();
     }
 
     /**
      * 保本
      */
     public int breakEven() {
-        return new BigDecimal(chipsBet()).divide(getOdds(), RoundingMode.CEILING).intValue();
+        return new BigDecimal(chipsBet).divide(getOdds(), RoundingMode.CEILING).intValue();
     }
 
-    public int getId() {
-        return this.pot.id;
-    }
-
+    /**
+     * 赔率
+     */
     public BigDecimal getOdds() {
         return Insurance.odds(outs.size());
     }
 
+    /**
+     * 投保额
+     */
+    public int getAmount() {
+        return this.policies.stream().mapToInt(v -> v.amount.intValue()).sum();
+    }
+
+    /**
+     * 最高投保额
+     */
     public int getLimit() {
-        return limit;
+        // 转牌圈不能超过底池的0.25
+        if (Circle.TURN.equals(circle)) {
+            return (int) Math.floor(sum * 0.25);
+        } else {
+            // 河牌圈不能超过底池的0.5
+            // 河牌圈有平分底池的outs, 不能超过玩家的投注额
+            return tie ? chipsBet : (int) Math.floor(sum * 0.5);
+        }
     }
 
     public int getChips() {
-        return this.pot.getChips();
+        return this.sum;
     }
 
     public List<Card> getOuts() {
         return new ArrayList<>(outs);
     }
 
-    public int getAmount() {
-        return this.policies.stream().mapToInt(v -> v.amount.intValue()).sum();
-    }
-
     @Override
     public String toString() {
         return new StringBuilder()
-                .append("id=").append(this.getId())
+                .append("id=").append(id)
                 .append(", active=").append(activate())
                 .append(", circle=").append(circle)
-                .append(", winner=").append(winner.getId())
-                .append(", limit=").append(limit)
+                .append(", applicant=").append(applicant)
+                .append(", limit=").append(getLimit())
                 .append(", policies=").append(policies.size())
                 .toString();
     }
