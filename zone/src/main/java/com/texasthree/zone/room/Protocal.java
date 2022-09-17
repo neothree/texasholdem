@@ -284,7 +284,7 @@ public class Protocal {
             this.seatId = seatId;
         }
 
-        InsurancePot(com.texasthree.game.texas.InsurancePot p) {
+        InsurancePot(com.texasthree.game.insurance.InsurancePot p) {
             this.potId = p.getId();
             this.seatId = p.winner.getId();
             this.outs = toCardIds(p.getOuts());

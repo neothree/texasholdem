@@ -44,7 +44,7 @@ public class Divide {
         return this.members.size();
     }
 
-    int chipsBet(int id) {
+    public int chipsBet(int id) {
         return this.putin.getOrDefault(id, 0);
     }
 

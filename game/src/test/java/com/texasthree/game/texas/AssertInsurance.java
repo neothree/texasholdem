@@ -1,5 +1,8 @@
 package com.texasthree.game.texas;
 
+import com.texasthree.game.insurance.Insurance;
+import com.texasthree.game.insurance.InsurancePot;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;

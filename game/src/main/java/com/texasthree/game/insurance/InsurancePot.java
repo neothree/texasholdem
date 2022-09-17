@@ -1,4 +1,6 @@
-package com.texasthree.game.texas;
+package com.texasthree.game.insurance;
+
+import com.texasthree.game.texas.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -6,7 +8,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import static com.texasthree.game.texas.Insurance.odds;
+import static com.texasthree.game.insurance.Insurance.odds;
 
 /**
  * 保险池
@@ -42,7 +44,7 @@ public class InsurancePot {
     /**
      * 保单
      */
-    public final List<InsurancePolicy> policies = new ArrayList<>();
+    public final List<policy> policies = new ArrayList<>();
 
     private List<Card> leftCard;
 
@@ -87,7 +89,7 @@ public class InsurancePot {
 
         // 购买的outs保单
         var hit = buyOuts.stream().anyMatch(v -> v.equals(leftCard.get(0)));
-        var policy = new InsurancePolicy(amount, buyOuts, hit);
+        var policy = new policy(amount, buyOuts, hit);
         this.policies.add(policy);
 
         // 对剩余的outs进行背保
@@ -95,7 +97,7 @@ public class InsurancePot {
         if (!notBuy.isEmpty()) {
             hit = notBuy.stream().anyMatch(v -> v.equals(leftCard.get(0)));
             var m = amount.divide(policy.getOdds(), RoundingMode.CEILING);
-            this.policies.add(new InsurancePolicy(m, buyOuts, hit));
+            this.policies.add(new policy(m, buyOuts, hit));
         }
 
     }

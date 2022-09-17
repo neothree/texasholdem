@@ -665,7 +665,7 @@ public class Texas {
         return STATE;
     }
 
-    static List<Player> winners(List<Player> players) {
+    public static List<Player> winners(List<Player> players) {
         var winners = new ArrayList<Player>();
         winners.add(players.get(0));
         for (var i = 1; i < players.size(); i++) {

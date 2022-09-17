@@ -1,4 +1,6 @@
-package com.texasthree.game.texas;
+package com.texasthree.game.insurance;
+
+import com.texasthree.game.texas.Card;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -9,7 +11,7 @@ import java.util.List;
  * @author: neo
  * @create: 2022-09-11 22:37
  */
-public class InsurancePolicy {
+public class policy {
 
     /**
      * 购买的outs
@@ -24,7 +26,7 @@ public class InsurancePolicy {
      */
     public final boolean hit;
 
-    InsurancePolicy(BigDecimal amount, List<Card> outs, boolean hit) {
+    policy(BigDecimal amount, List<Card> outs, boolean hit) {
         this.outs = outs;
         this.hit = hit;
         this.amount = amount;

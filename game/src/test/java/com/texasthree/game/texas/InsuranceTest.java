@@ -1,6 +1,7 @@
 package com.texasthree.game.texas;
 
 import com.texasthree.game.AllCard;
+import com.texasthree.game.insurance.Insurance;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;

@@ -1,5 +1,7 @@
 package com.texasthree.zone.room;
 
+import com.texasthree.game.insurance.Insurance;
+import com.texasthree.game.insurance.InsurancePot;
 import com.texasthree.game.texas.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
