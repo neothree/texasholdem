@@ -1,7 +1,6 @@
-package com.texasthree.game.texas;
+package com.texasthree.game.insurance;
 
-import com.texasthree.game.insurance.Insurance;
-import com.texasthree.game.insurance.InsurancePot;
+import com.texasthree.game.texas.*;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;

@@ -22,7 +22,7 @@ public class Divide {
      */
     private Map<Integer, Integer> putin = new HashMap<>();
 
-    Divide(int id) {
+    public Divide(int id) {
         this.id = id;
     }
 

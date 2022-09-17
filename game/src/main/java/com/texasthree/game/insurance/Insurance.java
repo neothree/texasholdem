@@ -59,21 +59,20 @@ public class Insurance {
                 continue;
             }
 
+            // 筛选出池中的玩家
+            var ps = players.stream()
+                    .filter(v -> pot.contains(v.getId()))
+                    .collect(Collectors.toList());
             // 河牌保险
-            this.init(pot, players, cc5, lc5, Circle.RIVER);
+            this.init(pot, ps, cc5, lc5, Circle.RIVER);
             if (Circle.TURN.equals(circle)) {
                 // 转牌保险
-                this.init(pot, players, cc4, lc4, Circle.TURN);
+                this.init(pot, ps, cc4, lc4, Circle.TURN);
             }
         }
     }
 
     private void init(Divide pot, List<Player> players, List<Card> communityCards, List<Card> leftCard, String circle) {
-        // 筛选出池中的玩家
-        players = players.stream()
-                .filter(v -> pot.contains(v.getId()))
-                .collect(Collectors.toList());
-
         // 更新手牌
         players.forEach(v -> v.getHand().fresh(communityCards));
 
