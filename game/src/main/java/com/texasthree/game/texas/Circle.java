@@ -134,7 +134,7 @@ public class Circle {
      * 将action中的数据补充完整
      */
     private Action parseAction(Player player, Optype op, int add) {
-        if (!op.primitive) {
+        if (!op.primitive && op != Optype.DealerAnte) {
             throw new IllegalArgumentException("押注错误，非原生操作" + op);
         }
         var chipsBetOld = this.chipsThisCircle(player.getId());
