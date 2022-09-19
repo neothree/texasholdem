@@ -109,13 +109,26 @@ public class TexasTest extends AllCard {
                 .action(Raise, 198).assertState(Transfer.NEXT_OP);
 
         // 第一圈都 call, 大盲多一次押注
-        var t = AssertTexas.builder(3)
+        AssertTexas.builder(3)
                 .build()
                 .start().assertState(Transfer.NEXT_OP)
                 .action(Call).assertState(Transfer.NEXT_OP)
                 .action(Call).assertState(Transfer.NEXT_OP)
                 .action(Check).assertState(Transfer.CIRCLE_END);
 
+        var t = AssertTexas.builder(3).build().start()
+                .assertCircleAction(1, null).assertCircleAction(2, SmallBlind).assertCircleAction(3, BigBlind)
+                .assertOperator(1).action(Call)
+                .assertCircleAction(1, Call).assertCircleAction(2, SmallBlind).assertCircleAction(3, BigBlind)
+                .assertOperator(2).action(Fold)
+                .assertOperator(3).action(Check)
+                .assertState(Transfer.CIRCLE_END)
+                .assertOperator(3).action(Check)
+                .assertCircleAction(1, null).assertCircleAction(2, null).assertCircleAction(3, Check)
+                .assertOperator(1).action(Raise, 2)
+                .assertCircleAction(1, Raise).assertCircleAction(2, null).assertCircleAction(3, Check)
+                .assertAction(1, Raise).assertAction(2, Fold).assertAction(3, Check)
+                .assertOperator(3);
         // 只有进行primitive操作
         Tester.assertException(() -> t.action(Pot1_1), IllegalArgumentException.class);
 
@@ -139,7 +152,6 @@ public class TexasTest extends AllCard {
 //        assertEquals(Transfer.NEXT_OP, texas.action(Call));
 //        assertEquals(Transfer.CIRCLE_END, texas.action(Check));
 
-        // 复现
         AssertTexas.builder()
                 .players(new Player(1, 100), new Player(2, 200), new Player(3, 200))
                 .build()

@@ -415,6 +415,10 @@ class Pot {
         this.going.setStandardInfo(new Action(id, null, chips, 0, 0, 0));
     }
 
+    Action getCircleAction(int id) {
+        return this.going.getAction(id);
+    }
+
     Action getAction(int id) {
         var cs = new ArrayList<>(circles);
         Collections.reverse(cs);

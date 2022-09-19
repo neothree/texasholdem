@@ -54,18 +54,21 @@ class TexasRoundTest {
 
         round.force();
         assertEquals(1, round.getOperator().seatId);
-        round.action(Optype.Check, 0);
+        round.action(Optype.Raise, 2);
 
+        round.force();
         assertEquals(2, round.getOperator().seatId);
-        round.action(Optype.Check, 0);
+        round.action(Optype.Call, 0);
 
+        round.force();
         assertEquals(0, round.getOperator().seatId);
-        round.action(Optype.Check, 0);
+        round.action(Optype.Call, 0);
 
         // TURN
         assertEquals(Circle.TURN, round.circle());
         assertNull(round.getOperator());
 
+        round.force();
         round.force();
         assertEquals(1, round.getOperator().seatId);
         round.action(Optype.Check, 0);

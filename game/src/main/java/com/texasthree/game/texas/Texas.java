@@ -661,6 +661,10 @@ public class Texas {
         return this.pot.getAction(id);
     }
 
+    public Action getCircleAction(int id) {
+        return this.pot.getCircleAction(id);
+    }
+
     public Transfer state() {
         return STATE;
     }

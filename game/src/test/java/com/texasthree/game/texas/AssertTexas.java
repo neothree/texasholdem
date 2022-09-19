@@ -6,8 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author: neo
@@ -201,6 +200,26 @@ public class AssertTexas extends Texas {
     public AssertTexas assertState(Transfer expect) {
         assertEquals(expect, state());
         return this;
+    }
+
+    public AssertTexas assertCircleAction(int id, Optype op) {
+        var act = this.getCircleAction(id);
+        assertAction(act, op);
+        return this;
+    }
+
+    public AssertTexas assertAction(int id, Optype op) {
+        var act = this.getAction(id);
+        assertAction(act, op);
+        return this;
+    }
+
+    private void assertAction(Action act, Optype op) {
+        if (act != null) {
+            assertEquals(op, act.op);
+        } else {
+            assertNull(op);
+        }
     }
 
     public AssertTexas assertPots(Integer ... pots) {

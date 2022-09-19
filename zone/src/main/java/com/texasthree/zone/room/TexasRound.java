@@ -72,7 +72,7 @@ public class TexasRound {
                 .build();
         this.game.start();
         this.printStart();
-        this.scheduler.once(() -> this.move(this.game.state()), 1000);
+        this.scheduler.once(() -> this.move(this.game.state()), 1100);
         this.eventHandler.on(this, RoundEvent.START_GAME);
         this.updateHand();
     }
@@ -91,7 +91,7 @@ public class TexasRound {
             log.error("{}押注异常，没有操作人", logpre);
             return;
         }
-        var bet = this.game.getAction(operator.seatId);
+        var bet = this.game.getCircleAction(operator.seatId);
         var old = bet != null ? bet.chipsBet : 0;
         var chipsAdd = Optype.Raise.equals(op) ? chipsBet - old : 0;
         log.info("{}玩家押注 seatId={} op={} chipsAdd={}", logpre, operator.seatId, op, chipsAdd);

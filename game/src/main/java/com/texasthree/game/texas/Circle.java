@@ -99,7 +99,7 @@ public class Circle {
             var auth = this.auth(player, smallBlind, act.sumPot);
             if (!auth.containsKey(act.op) ||
                     (Optype.Raise.equals(act.op) && act.chipsBet < auth.get(act.op))) {
-                throw new IllegalArgumentException("押注权限错误");
+                throw new IllegalArgumentException("押注权限错误" + act);
             }
         }
 
@@ -185,7 +185,7 @@ public class Circle {
         }
 
 
-        // 先屏蔽
+        // TODO 先屏蔽
         // 如果有玩家allin没有达到有效raise, 但是这个玩家已经对这个加注call过
         // 此后如果还没有有效加注,再次轮到这个玩家则不能加注
         var onlyCall = false;

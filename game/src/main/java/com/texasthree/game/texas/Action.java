@@ -2,7 +2,7 @@ package com.texasthree.game.texas;
 
 public class Action {
 
-    public int id;
+    public final int id;
 
     public Optype op;
 
