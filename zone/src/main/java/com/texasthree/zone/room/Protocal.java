@@ -220,10 +220,12 @@ public class Protocal {
             for (var v : result) {
                 var sh = new Protocal.ShowdownHand();
                 sh.seatId = v.getId();
-                sh.hand = new Protocal.Hand(round.getPlayerHand(v.getId()));
                 sh.profits = v.getPot().entrySet().stream()
                         .map(e -> new Protocal.PotProfit(e.getKey(), e.getValue()))
                         .collect(Collectors.toList());
+                if (round.isCompareShowdown() && !round.isFold(v.getId())) {
+                    sh.hand = new Protocal.Hand(round.getPlayerHand(v.getId()));
+                }
                 this.hands.add(sh);
             }
         }

@@ -340,6 +340,10 @@ public class TexasRound {
         return this.game.isFold(seatId);
     }
 
+    public boolean isCompareShowdown() {
+        return this.game.isCompareShowdown();
+    }
+
     public Action getAction(int seatId) {
         return this.game.getAction(seatId);
     }

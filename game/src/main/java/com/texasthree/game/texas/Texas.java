@@ -581,7 +581,7 @@ public class Texas {
         }
     }
 
-    boolean isCompareShowdown() {
+    public boolean isCompareShowdown() {
         return this.isOver && this.remainingNum() > 1;
     }
 
