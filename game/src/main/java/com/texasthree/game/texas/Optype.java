@@ -7,23 +7,23 @@ public enum Optype {
     /**
      * 弃牌
      */
-    Fold,
+    Fold(true),
     /**
      * 跟注
      */
-    Call,
+    Call(true),
     /**
      * 加注
      */
-    Raise,
+    Raise(true),
     /**
      * 全压
      */
-    Allin,
+    Allin(true),
     /**
      * 看牌
      */
-    Check,
+    Check(true),
 
     /**
      * 小盲注
@@ -62,4 +62,14 @@ public enum Optype {
      * 庄家前注
      */
     DealerAnte;
+
+    public final boolean primitive;
+
+    Optype(boolean primitive) {
+        this.primitive = primitive;
+    }
+
+    Optype() {
+        this(false);
+    }
 }

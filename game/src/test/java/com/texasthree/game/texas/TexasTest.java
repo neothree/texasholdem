@@ -109,12 +109,16 @@ public class TexasTest extends AllCard {
                 .action(Raise, 198).assertState(Transfer.NEXT_OP);
 
         // 第一圈都 call, 大盲多一次押注
-        AssertTexas.builder(3)
+        var t = AssertTexas.builder(3)
                 .build()
                 .start().assertState(Transfer.NEXT_OP)
                 .action(Call).assertState(Transfer.NEXT_OP)
                 .action(Call).assertState(Transfer.NEXT_OP)
                 .action(Check).assertState(Transfer.CIRCLE_END);
+
+        // 只有进行primitive操作
+        Tester.assertException(() -> t.action(Pot1_1), IllegalArgumentException.class);
+
 
         // 小盲为0
         AssertTexas.builder()
