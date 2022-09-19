@@ -19,7 +19,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class AssertInsurance {
     static Builder builder(Card... cards) {
         var builder = new Builder();
-        builder.players(cards);
+        if (cards.length > 0) {
+            builder.players(cards);
+        }
         return builder;
     }
 
@@ -127,8 +129,8 @@ public class AssertInsurance {
                 .filter(v -> v.circle.equals(circle))
                 .collect(Collectors.toList());
 
-        assertTrue(pots.stream().allMatch(v -> v.applicant == winner));
         assertEquals(size, pots.size());
+        assertTrue(pots.stream().allMatch(v -> v.applicant == winner));
         return this;
     }
 
@@ -162,7 +164,7 @@ public class AssertInsurance {
         return this;
     }
 
-    public static void assertCards(List<Card> a, Card ... b) {
+    public static void assertCards(List<Card> a, Card... b) {
         var bs = Arrays.asList(b);
         var set = new HashSet<>(a);
         assertEquals(set.size(), bs.size());

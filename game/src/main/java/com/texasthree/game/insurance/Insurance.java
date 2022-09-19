@@ -55,7 +55,7 @@ public class Insurance {
 
         for (var pot : pots) {
             // 超过3个人不触发保险
-            if (pot.size() > 3) {
+            if (pot.size() > 3 || !pot.compare()) {
                 continue;
             }
 

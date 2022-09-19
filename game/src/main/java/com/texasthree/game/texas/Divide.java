@@ -56,4 +56,8 @@ public class Divide {
         return this.putin.values().stream().reduce(Integer::sum)
                 .orElse(0);
     }
+
+    public boolean compare() {
+        return this.members.size() > 1;
+    }
 }

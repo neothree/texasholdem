@@ -187,6 +187,11 @@ public class Room {
     private void tryStart() {
         // 清理一直没有操作的玩家
         for (var v : seats) {
+            // 调试 - 给没有筹码的玩家加钱
+            if (this.getUserChips(v.getUid()) == 0) {
+                this.bring(v.getUid(), 500);
+            }
+
             if (v.occupied() && v.getUser().isReal() && v.getNoExecute() >= 3) {
                 log.info("玩家多次没有操作，强制站起 seatId{} user={} noExecute={}", v.id, v.getUser(), v.getNoExecute());
                 this.sitUp(v.getUser());

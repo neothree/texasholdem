@@ -3,11 +3,15 @@ package com.texasthree.game.insurance;
 import com.texasthree.game.AllCard;
 import com.texasthree.game.texas.Card;
 import com.texasthree.game.texas.Circle;
+import com.texasthree.game.texas.Divide;
+import com.texasthree.game.texas.Player;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class InsuranceTest extends AllCard {
 
@@ -21,7 +25,7 @@ class InsuranceTest extends AllCard {
     }
 
     @Test
-    public void testOuts() {
+    public void testPot() {
         var cards = new Card[]{
                 diamondA, heartA,
                 diamond4, heart4,
@@ -39,6 +43,24 @@ class InsuranceTest extends AllCard {
                 .selectPot(0, Circle.TURN)
                 .assertWinner(2)
                 .assertOuts(spadesA, club4);
+
+        // p1 只有一个玩家, 不买保险
+        var players = AssertInsurance.cardsToPlayers(cards);
+        var p0 = new Divide(0);
+        var m = players.stream().map(Player::getId).collect(Collectors.toSet());
+        p0.add(m, 100, m);
+        assertTrue(p0.compare());
+        var p1 = new Divide(1);
+        var member = new HashSet<Integer>();
+        member.add(players.get(0).getId());
+        p1.add(m, 10, member);
+        assertFalse(p1.compare());
+        AssertInsurance.builder()
+                .players(players)
+                .pots(p0, p1)
+                .leftCard(spades5, diamond3, spades4, club5, club10, spadesA, club4)
+                .build()
+                .assertPots(Circle.TURN, 2, 1);
     }
 
     @Test
