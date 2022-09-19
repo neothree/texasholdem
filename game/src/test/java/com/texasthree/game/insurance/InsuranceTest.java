@@ -98,6 +98,7 @@ class InsuranceTest extends AllCard {
                 .buy(0, 20, spadesA)
                 .assertCircleFinished(true)
                 .assertFinished(true)
+                .assertCommunityCards(spades5, diamond7, spades4, club9, club10)
         ;
     }
 }

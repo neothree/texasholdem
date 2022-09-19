@@ -151,6 +151,9 @@ public class Insurance {
     }
 
     public List<Card> getCommunityCards() {
+        if (finished()) {
+            return this.leftCard.subList(0, 5);
+        }
         return Circle.TURN.equals(circle) ? this.leftCard.subList(0, 3) : this.leftCard.subList(0, 4);
     }
 
