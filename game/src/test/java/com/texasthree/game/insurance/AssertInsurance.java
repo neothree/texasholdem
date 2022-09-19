@@ -23,6 +23,19 @@ public class AssertInsurance {
         return builder;
     }
 
+    static List<Player> cardsToPlayers(Card... cards) {
+        assertTrue(cards.length > 0);
+        assertEquals(0, cards.length % 2);
+        var players = new ArrayList<Player>();
+        for (var i = 0; i < cards.length / 2; i++) {
+            var p = new Player(i, 0);
+            var index = i * 2;
+            p.setHand(new Hand(Arrays.asList(cards[index], cards[index + 1])));
+            players.add(p);
+        }
+        return players;
+    }
+
     public static class Builder {
 
         private List<Player> players;
@@ -33,22 +46,13 @@ public class AssertInsurance {
 
         private List<Divide> pots = new ArrayList<>();
 
-        public Builder players(Player... players) {
-            this.players = Arrays.asList(players);
+        public Builder players(List<Player> players) {
+            this.players = players;
             return this;
         }
 
         public Builder players(Card... cards) {
-            assertTrue(cards.length > 0);
-            assertEquals(0, cards.length % 2);
-            this.players = new ArrayList<>();
-            for (var i = 0; i < cards.length / 2; i++) {
-                var p = new Player(i, 0);
-                var index = i * 2;
-                p.setHand(new Hand(Arrays.asList(cards[index], cards[index + 1])));
-                this.players.add(p);
-            }
-
+            this.players(cardsToPlayers(cards));
             return this;
         }
 
@@ -129,12 +133,12 @@ public class AssertInsurance {
     }
 
     AssertInsurance assertOuts(Card... expect) {
-        assertCards(pot.getOuts(), Arrays.asList(expect));
+        assertCards(pot.getOuts(), expect);
         return this;
     }
 
     AssertInsurance assertCommunityCards(Card... expect) {
-        assertCards(insurance.getCommunityCards(), Arrays.asList(expect));
+        assertCards(insurance.getCommunityCards(), expect);
         return this;
     }
 
@@ -158,9 +162,10 @@ public class AssertInsurance {
         return this;
     }
 
-    private void assertCards(List<Card> a, List<Card> b) {
+    public static void assertCards(List<Card> a, Card ... b) {
+        var bs = Arrays.asList(b);
         var set = new HashSet<>(a);
-        assertEquals(set.size(), b.size());
-        assertTrue(set.containsAll(b));
+        assertEquals(set.size(), bs.size());
+        assertTrue(set.containsAll(bs));
     }
 }
