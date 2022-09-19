@@ -309,7 +309,7 @@ public class Protocal {
 
         Buyer(TexasInsurance ins) {
             this.leftSec = ins.leftSec();
-            var pots = ins.getPots();
+            var pots = ins.getCirclePots();
             for (var v : pots) {
                 if (v.finished()) {
                     var p = new InsurancePot(v.id, v.applicant, v.getAmount());
@@ -324,6 +324,7 @@ public class Protocal {
     public static class BuyEnd extends Insurance {
         public Integer seatId;
         public Integer amount;
+
         BuyEnd(TexasInsurance ins, int seatId, Integer amount) {
             super(ins);
             this.seatId = seatId;

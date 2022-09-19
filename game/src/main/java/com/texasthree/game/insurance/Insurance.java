@@ -146,6 +146,10 @@ public class Insurance {
         return new ArrayList<>(pots);
     }
 
+    public List<InsurancePot> getCirclePots() {
+        return this.pots.stream().filter(v -> v.circle.equals(this.circle)).collect(Collectors.toList());
+    }
+
     public List<Player> getPlayers() {
         return new ArrayList<>(players);
     }

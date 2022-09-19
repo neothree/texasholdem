@@ -78,6 +78,17 @@ class InsuranceTest extends AllCard {
                 .assertFinished(true);
 
         AssertInsurance.builder(cards)
+                .leftCard(spades5, diamond7, spades4, spadesA, club10, club5)
+                .build()
+                .assertCircle(Circle.TURN)
+                .assertCirclePot(0, 1, 1)
+                .end()
+                .assertCircle(Circle.RIVER)
+                .assertCirclePot(0, 0, 1)
+                .end()
+                .assertFinished(true);
+
+        AssertInsurance.builder(cards)
                 .leftCard(spades5, diamond7, spades4, club9, club10, spadesA)
                 .circle(Circle.TURN)
                 .build()

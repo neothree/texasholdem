@@ -122,13 +122,13 @@ public class TexasInsurance {
     }
 
     InsurancePot getPot(String circle, int potId) {
-        return this.getPots().stream()
+        return this.game.getPots().stream()
                 .filter(v -> v.circle.equals(circle) && v.id == potId)
                 .findFirst().get();
     }
 
-    List<InsurancePot> getPots() {
-        return game.getPots();
+    List<InsurancePot> getCirclePots() {
+        return this.game.getCirclePots();
     }
 
     List<Player> getPlayers() {
