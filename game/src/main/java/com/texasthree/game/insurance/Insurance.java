@@ -97,7 +97,7 @@ public class Insurance {
         var pot = this.pots.stream()
                 .filter(v -> v.circle.equals(circle) && v.id == potId && !v.finished())
                 .findFirst().get();
-        pot.buy(new BigDecimal(amount), outs);
+        pot.buy(amount, outs);
         return this;
     }
 
@@ -108,7 +108,7 @@ public class Insurance {
         for (var v : pots) {
             // 没有买的池做0购买
             if (!v.finished() && v.circle.equals(circle)) {
-                v.buy(BigDecimal.ZERO, v.getOuts());
+                v.buy(0, v.getOuts());
             }
         }
 
@@ -142,7 +142,7 @@ public class Insurance {
                 .allMatch(InsurancePot::finished);
     }
 
-    public static BigDecimal odds(int count) {
+    static BigDecimal odds(int count) {
         if (count <= 0 || count > 14) {
             return BigDecimal.ZERO;
         }

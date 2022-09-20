@@ -87,14 +87,14 @@ public class InsurancePot {
      * @param amount  金额
      * @param buyOuts 购买的outs
      */
-    void buy(BigDecimal amount, List<Card> buyOuts) {
+    void buy(int amount, List<Card> buyOuts) {
         if (finished()) {
             throw new IllegalArgumentException("保险池已经购买结束");
         }
-        if (amount.compareTo(BigDecimal.ZERO) < 0 || amount.intValue() > getLimit()) {
+        if (amount < 0 || amount > getLimit()) {
             throw new IllegalArgumentException("购买的保险金额错误: amount=" + amount + " limit=" + getLimit());
         }
-        if (amount.compareTo(BigDecimal.ZERO) > 0 && buyOuts.isEmpty()) {
+        if (amount > 0 && buyOuts.isEmpty()) {
             buyOuts = new ArrayList<>(outs);
         }
 
@@ -107,8 +107,8 @@ public class InsurancePot {
         var notBuy = this.diff(buyOuts);
         if (!notBuy.isEmpty()) {
             hit = notBuy.stream().anyMatch(v -> v.equals(leftCard.get(0)));
-            var m = amount.divide(policy.getOdds(), RoundingMode.CEILING);
-            this.policies.add(new Policy(applicant, m, buyOuts, hit));
+            var m = BigDecimal.valueOf(amount).divide(policy.getOdds(), RoundingMode.CEILING);
+            this.policies.add(new Policy(applicant, m.intValue(), buyOuts, hit));
         }
 
     }
@@ -174,7 +174,7 @@ public class InsurancePot {
      * 投保额
      */
     public int getAmount() {
-        return this.policies.stream().mapToInt(v -> v.amount.intValue()).sum();
+        return this.policies.stream().mapToInt(v -> v.amount).sum();
     }
 
     /**

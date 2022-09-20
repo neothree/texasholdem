@@ -11,24 +11,24 @@ import java.util.List;
  * @author: neo
  * @create: 2022-09-11 22:37
  */
-public class Policy {
+class Policy {
 
     /**
      * 购买的outs
      */
-    public final List<Card> outs;
+    final List<Card> outs;
     /**
      * 金额
      */
-    public final BigDecimal amount;
+    final int amount;
     /**
      * 是否命中
      */
-    public final boolean hit;
+    final boolean hit;
 
-    public final int applicant;
+    final int applicant;
 
-    Policy(int applicant, BigDecimal amount, List<Card> outs, boolean hit) {
+    Policy(int applicant, int amount, List<Card> outs, boolean hit) {
         this.applicant = applicant;
         this.outs = outs;
         this.hit = hit;
@@ -40,7 +40,7 @@ public class Policy {
     }
 
     Claim claim() {
-        var give = hit ? amount.multiply(getOdds()).intValue() : 0;
-        return new Claim(applicant, amount.intValue(), give);
+        var give = hit ? BigDecimal.valueOf(amount).multiply(getOdds()).intValue() : 0;
+        return new Claim(applicant, amount, give);
     }
 }
