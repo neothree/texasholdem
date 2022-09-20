@@ -169,14 +169,16 @@ public class AssertInsurance {
         return this;
     }
 
-    private Map<Integer, Integer> claim;
+    private List<Claim> claim;
 
     AssertInsurance assertClaim(int id, int amount) {
         if (this.claim == null) {
-            this.claim = this.insurance.claim();
-            System.out.println(this.claim);
+            this.claim = this.insurance.claims();
         }
-        assertEquals(amount, claim.get(id));
+        assertEquals(amount, this.claim.stream()
+                .filter(v -> v.applicant == id)
+                .mapToInt(v -> v.claim)
+                .sum());
         return this;
     }
 

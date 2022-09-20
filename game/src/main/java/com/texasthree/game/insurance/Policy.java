@@ -26,7 +26,10 @@ public class Policy {
      */
     public final boolean hit;
 
-    Policy(BigDecimal amount, List<Card> outs, boolean hit) {
+    public final int applicant;
+
+    Policy(int applicant, BigDecimal amount, List<Card> outs, boolean hit) {
+        this.applicant = applicant;
         this.outs = outs;
         this.hit = hit;
         this.amount = amount;
@@ -36,7 +39,8 @@ public class Policy {
         return Insurance.odds(outs.size());
     }
 
-    int claimAmount() {
-        return hit ? amount.multiply(getOdds()).intValue() : 0;
+    Claim claim() {
+        var give = hit ? amount.multiply(getOdds()).intValue() : 0;
+        return new Claim(applicant, amount.intValue(), give);
     }
 }

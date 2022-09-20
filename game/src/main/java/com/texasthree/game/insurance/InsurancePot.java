@@ -9,6 +9,7 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.texasthree.game.insurance.Insurance.odds;
 
@@ -47,7 +48,7 @@ public class InsurancePot {
     /**
      * 保单
      */
-    public final List<Policy> policies = new ArrayList<>();
+    private final List<Policy> policies = new ArrayList<>();
     /**
      * 剩余的牌
      */
@@ -99,7 +100,7 @@ public class InsurancePot {
 
         // 购买的outs保单
         var hit = buyOuts.stream().anyMatch(v -> v.equals(leftCard.get(0)));
-        var policy = new Policy(amount, buyOuts, hit);
+        var policy = new Policy(applicant, amount, buyOuts, hit);
         this.policies.add(policy);
 
         // 对剩余的outs进行背保
@@ -107,7 +108,7 @@ public class InsurancePot {
         if (!notBuy.isEmpty()) {
             hit = notBuy.stream().anyMatch(v -> v.equals(leftCard.get(0)));
             var m = amount.divide(policy.getOdds(), RoundingMode.CEILING);
-            this.policies.add(new Policy(m, buyOuts, hit));
+            this.policies.add(new Policy(applicant, m, buyOuts, hit));
         }
 
     }
@@ -115,10 +116,8 @@ public class InsurancePot {
     /**
      * 计算赔付金额
      */
-    int claim() {
-        return this.activate()
-                ? this.policies.stream().mapToInt(Policy::claimAmount).sum()
-                : 0;
+    List<Claim> claims() {
+        return this.policies.stream().map(Policy::claim).collect(Collectors.toList());
     }
 
     /**
@@ -142,7 +141,7 @@ public class InsurancePot {
     /**
      * 是否激活
      */
-    boolean activate() {
+    private boolean activate() {
         return odds(outs.size()).compareTo(BigDecimal.ZERO) > 0;
     }
 

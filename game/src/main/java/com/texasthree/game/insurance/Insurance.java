@@ -6,10 +6,7 @@ import com.texasthree.game.texas.Divide;
 import com.texasthree.game.texas.Player;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -124,15 +121,12 @@ public class Insurance {
     /**
      * 赔付
      */
-    public Map<Integer, Integer> claim() {
-        var ret = new HashMap<Integer, Integer>();
-        for (var v : this.pots) {
-            var claimAmount = v.claim();
-            if (claimAmount > 0) {
-                ret.put(v.applicant, claimAmount);
-            }
-        }
-        return ret;
+    public List<Claim> claims() {
+        return this.pots.stream()
+                .map(InsurancePot::claims)
+                .flatMap(Collection::stream)
+                .filter(v -> v.amount > 0)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -145,7 +139,7 @@ public class Insurance {
     public boolean circleFinished() {
         return this.pots.stream()
                 .filter(v -> v.circle.equals(this.circle))
-                .noneMatch(v -> v.activate() && v.policies.isEmpty());
+                .allMatch(InsurancePot::finished);
     }
 
     public static BigDecimal odds(int count) {
