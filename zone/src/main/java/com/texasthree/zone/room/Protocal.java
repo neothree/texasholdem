@@ -53,6 +53,8 @@ public class Protocal {
         public List<Integer> communityCards;
         public List<Player> players;
         public Operator operator;
+        public Insurance insurance;
+        public Buyer buyer;
 
         public RoundData(TexasRound round, String uid) {
             this.dealer = round.dealer();
@@ -70,8 +72,17 @@ public class Protocal {
                 var info = new Protocal.Player(v.seatId, chips, action, hand);
                 this.players.add(info);
             }
+
+            // 操作人
             if (round.getOperator() != null) {
                 this.operator = new Protocal.Operator(round);
+            }
+
+            // 保险
+            var ins = round.getInsurance();
+            if (ins != null) {
+                this.insurance = new Insurance(ins);
+                this.buyer = new Buyer(ins);
             }
         }
     }
@@ -269,7 +280,32 @@ public class Protocal {
         }
     }
 
-    public static class InsurancePot {
+    public static class Buyer {
+        public long leftSec;
+        /**
+         * 可以购买的保险池
+         */
+        public List<InsurancePot> buying = new ArrayList<>();
+        /**
+         * 已经购买的保险池
+         */
+        public List<InsurancePot> bought = new ArrayList<>();
+
+        Buyer(TexasInsurance ins) {
+            this.leftSec = ins.leftSec();
+            var pots = ins.getCirclePots();
+            for (var v : pots) {
+                if (v.finished()) {
+                    var p = new InsurancePot(v.id, v.applicant, v.getAmount());
+                    this.bought.add(p);
+                } else {
+                    this.buying.add(new InsurancePot(v));
+                }
+            }
+        }
+    }
+
+    static class InsurancePot {
         public Integer potId;
         public Integer amount;
         public Integer seatId;
@@ -298,30 +334,6 @@ public class Protocal {
         }
     }
 
-    public static class Buyer {
-        public long leftSec;
-        /**
-         * 可以购买的保险池
-         */
-        public List<InsurancePot> buying = new ArrayList<>();
-        /**
-         * 已经购买的保险池
-         */
-        public List<InsurancePot> bought = new ArrayList<>();
-
-        Buyer(TexasInsurance ins) {
-            this.leftSec = ins.leftSec();
-            var pots = ins.getCirclePots();
-            for (var v : pots) {
-                if (v.finished()) {
-                    var p = new InsurancePot(v.id, v.applicant, v.getAmount());
-                    this.bought.add(p);
-                } else {
-                    this.buying.add(new InsurancePot(v));
-                }
-            }
-        }
-    }
 
     public static class BuyEnd extends Insurance {
         public Integer seatId;

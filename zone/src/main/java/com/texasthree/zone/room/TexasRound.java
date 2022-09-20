@@ -91,6 +91,7 @@ public class TexasRound {
             log.error("{}押注异常，没有操作人", logpre);
             return;
         }
+
         var bet = this.game.getCircleAction(operator.seatId);
         var old = bet != null ? bet.chipsBet : 0;
         var chipsAdd = Optype.Raise.equals(op) ? chipsBet - old : 0;
@@ -166,6 +167,7 @@ public class TexasRound {
         this.printShowdown();
         this.scheduler.clear();
         this.operator = null;
+        this.insurance = null;
         this.isOver = true;
         this.scheduler.once(() -> this.eventHandler.on(this, RoundEvent.SHOWDOWN), 2000);
     }
@@ -179,6 +181,7 @@ public class TexasRound {
      * 进入保险
      */
     private void moveInsurance() {
+        this.operator = null;
         this.scheduler.clear();
         this.insurance = new TexasInsurance(this, eventHandler, this::moveShowdown);
         this.insurance.start();
@@ -280,7 +283,7 @@ public class TexasRound {
     }
 
     public UserPlayer getPlayerByUid(String id) {
-        return this.users.stream().filter(v -> v.getId().equals(id) ).findFirst().get();
+        return this.users.stream().filter(v -> v.getId().equals(id)).findFirst().get();
     }
 
     private void printStart() {

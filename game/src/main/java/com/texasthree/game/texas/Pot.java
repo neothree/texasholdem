@@ -149,6 +149,7 @@ class Pot {
             mapChips.forEach((k, v) -> mapChips.put(k, v - min));
             var putin = mapChips.keySet();
             var member = putin.stream()
+                    // TODO 离开的玩家也不进入池中
                     .filter(v -> !this.fold.contains(v))
                     .collect(Collectors.toSet());
             single.add(putin, min, member);
