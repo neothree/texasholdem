@@ -1,10 +1,15 @@
 package com.texasthree.game.insurance;
 
-import com.texasthree.game.texas.*;
+import com.texasthree.game.texas.Card;
+import com.texasthree.game.texas.Circle;
+import com.texasthree.game.texas.Divide;
+import com.texasthree.game.texas.Player;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -104,6 +109,7 @@ public class Insurance {
      */
     public Insurance end() {
         for (var v : pots) {
+            // 没有买的池做0购买
             if (!v.finished() && v.circle.equals(circle)) {
                 v.buy(BigDecimal.ZERO, v.getOuts());
             }
@@ -118,8 +124,15 @@ public class Insurance {
     /**
      * 赔付
      */
-    public void claim() {
-
+    public Map<Integer, Integer> claim() {
+        var ret = new HashMap<Integer, Integer>();
+        for (var v : this.pots) {
+            var claimAmount = v.claim();
+            if (claimAmount > 0) {
+                ret.put(v.applicant, claimAmount);
+            }
+        }
+        return ret;
     }
 
     /**

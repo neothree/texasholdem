@@ -3,10 +3,7 @@ package com.texasthree.game.insurance;
 import com.texasthree.game.texas.*;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -169,6 +166,17 @@ public class AssertInsurance {
 
     AssertInsurance assertFinished(boolean expect) {
         assertEquals(expect, this.insurance.finished());
+        return this;
+    }
+
+    private Map<Integer, Integer> claim;
+
+    AssertInsurance assertClaim(int id, int amount) {
+        if (this.claim == null) {
+            this.claim = this.insurance.claim();
+            System.out.println(this.claim);
+        }
+        assertEquals(amount, claim.get(id));
         return this;
     }
 

@@ -32,7 +32,11 @@ public class Policy {
         this.amount = amount;
     }
 
-    public BigDecimal getOdds() {
+    BigDecimal getOdds() {
         return Insurance.odds(outs.size());
+    }
+
+    int claimAmount() {
+        return hit ? amount.multiply(getOdds()).intValue() : 0;
     }
 }

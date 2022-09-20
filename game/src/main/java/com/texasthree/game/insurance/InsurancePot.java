@@ -93,6 +93,9 @@ public class InsurancePot {
         if (amount.compareTo(BigDecimal.ZERO) < 0 || amount.intValue() > getLimit()) {
             throw new IllegalArgumentException("购买的保险金额错误: amount=" + amount + " limit=" + getLimit());
         }
+        if (amount.compareTo(BigDecimal.ZERO) > 0 && buyOuts.isEmpty()) {
+            buyOuts = new ArrayList<>(outs);
+        }
 
         // 购买的outs保单
         var hit = buyOuts.stream().anyMatch(v -> v.equals(leftCard.get(0)));
@@ -107,6 +110,15 @@ public class InsurancePot {
             this.policies.add(new Policy(m, buyOuts, hit));
         }
 
+    }
+
+    /**
+     * 计算赔付金额
+     */
+    int claim() {
+        return this.activate()
+                ? this.policies.stream().mapToInt(Policy::claimAmount).sum()
+                : 0;
     }
 
     /**

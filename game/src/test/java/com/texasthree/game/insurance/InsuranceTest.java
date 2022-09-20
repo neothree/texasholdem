@@ -8,6 +8,7 @@ import com.texasthree.game.texas.Player;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.stream.Collectors;
 
@@ -110,6 +111,34 @@ class InsuranceTest extends AllCard {
                 .assertCircleFinished(true)
                 .assertFinished(true)
                 .assertCommunityCards(spades5, diamond7, spades4, club9, club10)
+        ;
+    }
+
+    @Test
+    public void testClaim() {
+        var pot0 = new Divide(0);
+        pot0.add(new HashSet<>(Arrays.asList(0, 1, 2, 3, 4)), 90, new HashSet<>(Arrays.asList(0, 1, 2, 3, 4)));
+        var pot1 = new Divide(1);
+        pot1.add(new HashSet<>(Arrays.asList(2, 3, 4)), 90, new HashSet<>(Arrays.asList(2, 3, 4)));
+        var pot2 = new Divide(2);
+        pot2.add(new HashSet<>(Arrays.asList(2, 3, 4)), 90, new HashSet<>(Arrays.asList(2, 3, 4)));
+        var cards = new Card[]{
+                diamondA, heartA,
+                diamond2, heart2,
+                diamond3, heart3,
+                diamond4, heart4,
+                diamond5, heart5};
+
+        AssertInsurance.builder(cards)
+                .leftCard(club4, club10, diamond3, spades9, spades5, spadesA, spades4)
+                .pots(pot0, pot1, pot2)
+                .build()
+                .buy(1, 10)
+                .end()
+                .buy(1, 10)
+                .end()
+                .assertFinished(true)
+                .assertClaim(3, 310)
         ;
     }
 }
