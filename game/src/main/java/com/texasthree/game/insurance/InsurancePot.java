@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.texasthree.game.insurance.Insurance.odds;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.summingInt;
 
 /**
  * 保险池
@@ -117,7 +119,11 @@ public class InsurancePot {
      * 计算赔付金额
      */
     List<Claim> claims() {
-        return this.policies.stream().map(Policy::claim).collect(Collectors.toList());
+        return this.policies.stream()
+                .collect(groupingBy(Policy::getApplicant, summingInt(Policy::getProfit)))
+                .entrySet().stream()
+                .map(v -> new Claim(v.getKey(), v.getValue()))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -206,6 +212,9 @@ public class InsurancePot {
                 .append(", active=").append(activate())
                 .append(", circle=").append(circle)
                 .append(", applicant=").append(applicant)
+                .append(", sum=").append(sum)
+                .append(", outs=").append(outs.size())
+                .append(", odds=").append(getOdds())
                 .append(", limit=").append(getLimit())
                 .append(", policies=").append(policies.size())
                 .toString();

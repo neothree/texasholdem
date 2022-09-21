@@ -39,8 +39,13 @@ class Policy {
         return Insurance.odds(outs.size());
     }
 
-    Claim claim() {
-        var give = hit ? BigDecimal.valueOf(amount).multiply(getOdds()).intValue() : 0;
-        return new Claim(applicant, amount, give);
+    public int getProfit() {
+        return this.hit
+                ? BigDecimal.valueOf(amount).multiply(getOdds()).intValue()
+                : -this.amount;
+    }
+
+    public int getApplicant() {
+        return this.applicant;
     }
 }

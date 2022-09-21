@@ -88,6 +88,8 @@ public class Insurance {
         var wid = winners.get(0).getId();
         var ip = new InsurancePot(pot.id, pot.getChips(), pot.chipsBet(wid), circle, wid, players, communityCards, leftCard);
         this.pots.add(ip);
+
+        System.out.println(ip);
     }
 
     /**
@@ -125,7 +127,7 @@ public class Insurance {
         return this.pots.stream()
                 .map(InsurancePot::claims)
                 .flatMap(Collection::stream)
-                .filter(v -> v.amount > 0)
+                .filter(v -> v.profit != 0)
                 .collect(Collectors.toList());
     }
 

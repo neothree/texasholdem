@@ -177,7 +177,7 @@ public class AssertInsurance {
         }
         assertEquals(amount, this.claim.stream()
                 .filter(v -> v.applicant == id)
-                .mapToInt(v -> v.claim)
+                .mapToInt(v -> v.profit)
                 .sum());
         return this;
     }

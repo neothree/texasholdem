@@ -8,13 +8,10 @@ public class Claim {
 
     public final int applicant;
 
-    public final int amount;
+    public final int profit;
 
-    public final int claim;
-
-    Claim(int applicant, int amount, int claim) {
+    Claim(int applicant, int profit) {
         this.applicant = applicant;
-        this.amount = amount;
-        this.claim = claim;
+        this.profit = profit;
     }
 }
