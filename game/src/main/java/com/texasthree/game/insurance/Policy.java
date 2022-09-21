@@ -36,16 +36,16 @@ class Policy {
     }
 
     BigDecimal getOdds() {
-        return Insurance.odds(outs.size());
+        return InsurancePot.odds(outs.size());
     }
 
-    public int getProfit() {
+    int getProfit() {
         return this.hit
                 ? BigDecimal.valueOf(amount).multiply(getOdds()).intValue()
                 : -this.amount;
     }
 
-    public int getApplicant() {
+    int getApplicant() {
         return this.applicant;
     }
 }

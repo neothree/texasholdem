@@ -5,8 +5,9 @@ import com.texasthree.game.texas.Circle;
 import com.texasthree.game.texas.Divide;
 import com.texasthree.game.texas.Player;
 
-import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -16,17 +17,6 @@ import java.util.stream.Collectors;
  * @create: 2022-09-11 18:21
  */
 public class Insurance {
-
-    private static final BigDecimal[] ODDS = new BigDecimal[21];
-
-    static {
-        String[] init = {"0", "31", "16", "10", "8", "6", "5", "4", "3.5", "3", "2.5", "2.3", "2", "1.8", "1.6",
-                "1.4", "1.3", "1.2", "1.1", "1", "0.8"};
-        for (var i = 0; i < init.length; i++) {
-            ODDS[i] = new BigDecimal(init[i]);
-        }
-    }
-
     /**
      * 保险圈，只有 TURN、RIVER
      */
@@ -142,28 +132,20 @@ public class Insurance {
      * 是否全部购买结束
      */
     public boolean finished() {
-        return Circle.RIVER.equals(this.circle) && this.pots.stream().allMatch(InsurancePot::finished);
+        return Circle.RIVER.equals(this.circle) && this.circleFinished();
     }
 
+    /**
+     * 这一轮是否够购买结束
+     */
     public boolean circleFinished() {
         return this.pots.stream()
                 .filter(v -> v.circle.equals(this.circle))
                 .allMatch(InsurancePot::finished);
     }
 
-    static BigDecimal odds(int count) {
-        if (count <= 0 || count > 14) {
-            return BigDecimal.ZERO;
-        }
-        return ODDS[count];
-    }
-
     public List<InsurancePot> getPots() {
         return new ArrayList<>(pots);
-    }
-
-    public List<InsurancePot> getCirclePots() {
-        return this.pots.stream().filter(v -> v.circle.equals(this.circle)).collect(Collectors.toList());
     }
 
     public List<Player> getPlayers() {
@@ -174,7 +156,9 @@ public class Insurance {
         if (finished()) {
             return this.leftCard.subList(0, 5);
         }
-        return Circle.TURN.equals(circle) ? this.leftCard.subList(0, 3) : this.leftCard.subList(0, 4);
+        return Circle.TURN.equals(circle)
+                ? this.leftCard.subList(0, 3)
+                : this.leftCard.subList(0, 4);
     }
 
     public String getCircle() {

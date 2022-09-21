@@ -122,12 +122,18 @@ public class AssertInsurance {
     }
 
     AssertInsurance assertCirclePot(int id, int winner, int size) {
-        var pots = this.insurance.getCirclePots();
+        var pots = this.getCirclePots();
         assertEquals(size, pots.size());
         var pot = pots.get(id);
         assertEquals(winner, pot.applicant);
         return this;
     }
+
+    private List<InsurancePot> getCirclePots() {
+        var circle = this.insurance.getCircle();
+        return this.insurance.getPots().stream().filter(v -> v.circle.equals(circle)).collect(Collectors.toList());
+    }
+
 
     AssertInsurance assertPots(String circle, int winner, int size) {
         var pots = this.insurance.getPots().stream()

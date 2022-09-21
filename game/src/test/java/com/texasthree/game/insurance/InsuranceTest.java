@@ -7,23 +7,14 @@ import com.texasthree.game.texas.Divide;
 import com.texasthree.game.texas.Player;
 import org.junit.jupiter.api.Test;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class InsuranceTest extends AllCard {
-
-    @Test
-    public void testOdds() {
-        assertEquals(0, Insurance.odds(0).compareTo(BigDecimal.ZERO));
-        for (var count = 1; count < 15; count++) {
-            assertEquals(1, Insurance.odds(count).compareTo(BigDecimal.ZERO));
-        }
-        assertEquals(0, Insurance.odds(15).compareTo(BigDecimal.ZERO));
-    }
 
     @Test
     public void testPot() {

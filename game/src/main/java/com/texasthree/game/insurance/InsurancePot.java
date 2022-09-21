@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.texasthree.game.insurance.Insurance.odds;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.summingInt;
 
@@ -22,6 +21,26 @@ import static java.util.stream.Collectors.summingInt;
  * @create: 2022-09-12 14:59
  */
 public class InsurancePot {
+    /**
+     * 所有outs数量的赔率
+     */
+    private static final BigDecimal[] ODDS = new BigDecimal[21];
+
+    static {
+        String[] init = {"0", "31", "16", "10", "8", "6", "5", "4", "3.5", "3", "2.5", "2.3", "2", "1.8", "1.6",
+                "1.4", "1.3", "1.2", "1.1", "1", "0.8"};
+        for (var i = 0; i < init.length; i++) {
+            ODDS[i] = new BigDecimal(init[i]);
+        }
+    }
+
+    static BigDecimal odds(int count) {
+        if (count <= 0 || count > 14) {
+            return BigDecimal.ZERO;
+        }
+        return ODDS[count];
+    }
+
     /**
      * 池的筹码总额
      */
@@ -129,21 +148,24 @@ public class InsurancePot {
     }
 
     /**
-     * 找出与不一样的牌
-     *
-     * @param buyOuts
-     * @return
+     * 最高投保额
      */
-    private List<Card> diff(List<Card> buyOuts) {
-        var src = new HashSet<>(this.outs);
-        for (var card : buyOuts) {
-            if (src.contains(card)) {
-                src.remove(card);
-            } else {
-                throw new IllegalArgumentException("购买的outs异常, 不存在 " + card);
-            }
+    public int getMax() {
+        // 转牌圈不能超过底池的0.25
+        if (Circle.TURN.equals(circle)) {
+            return (int) Math.floor(sum * 0.25);
+        } else {
+            // 河牌圈不能超过底池的0.5
+            // 河牌圈有平分底池的outs, 不能超过玩家的投注额
+            return tie ? chipsBet : (int) Math.floor(sum * 0.5);
         }
-        return new ArrayList<>(src);
+    }
+
+    /**
+     * 最底投保额
+     */
+    public int getMin() {
+        return BigDecimal.valueOf(debt).divide(getOdds(), RoundingMode.CEILING).intValue();
     }
 
     /**
@@ -175,7 +197,7 @@ public class InsurancePot {
      * 赔率
      */
     public BigDecimal getOdds() {
-        return Insurance.odds(outs.size());
+        return odds(outs.size());
     }
 
     /**
@@ -183,24 +205,6 @@ public class InsurancePot {
      */
     public int getAmount() {
         return this.policies.stream().mapToInt(v -> v.amount).sum();
-    }
-
-    /**
-     * 最高投保额
-     */
-    public int getMax() {
-        // 转牌圈不能超过底池的0.25
-        if (Circle.TURN.equals(circle)) {
-            return (int) Math.floor(sum * 0.25);
-        } else {
-            // 河牌圈不能超过底池的0.5
-            // 河牌圈有平分底池的outs, 不能超过玩家的投注额
-            return tie ? chipsBet : (int) Math.floor(sum * 0.5);
-        }
-    }
-
-    public int getMin() {
-        return BigDecimal.valueOf(debt).divide(getOdds(), RoundingMode.CEILING).intValue();
     }
 
     public int getChips() {
@@ -211,13 +215,31 @@ public class InsurancePot {
         return new ArrayList<>(outs);
     }
 
-    public void setDebt(int debt) {
+    void setDebt(int debt) {
         this.debt = debt;
     }
 
-    public boolean hit() {
+    boolean hit() {
         var card = this.leftCard.get(0);
         return this.outs.stream().anyMatch(v -> v.equals(card));
+    }
+
+    /**
+     * 找出与不一样的牌
+     *
+     * @param buyOuts
+     * @return
+     */
+    private List<Card> diff(List<Card> buyOuts) {
+        var src = new HashSet<>(this.outs);
+        for (var card : buyOuts) {
+            if (src.contains(card)) {
+                src.remove(card);
+            } else {
+                throw new IllegalArgumentException("购买的outs异常, 不存在 " + card);
+            }
+        }
+        return new ArrayList<>(src);
     }
 
     @Override
