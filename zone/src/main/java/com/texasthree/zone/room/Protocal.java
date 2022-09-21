@@ -329,8 +329,8 @@ public class Protocal {
             this.odds = p.getOdds().toString();
             this.fullPot = p.fullPot();
             this.breakEven = p.breakEven();
-            this.max = p.getLimit();
-            this.min = 0;
+            this.max = p.getMax();
+            this.min = p.getMin();
         }
     }
 

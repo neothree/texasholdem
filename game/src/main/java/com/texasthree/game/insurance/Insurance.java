@@ -75,10 +75,8 @@ public class Insurance {
     }
 
     private void init(Divide pot, List<Player> players, List<Card> communityCards, List<Card> leftCard, String circle) {
-        // 更新手牌
-        players.forEach(v -> v.getHand().fresh(communityCards));
-
         // 赢家
+        players.forEach(v -> v.getHand().fresh(communityCards));
         var winners = Player.winners(players);
         if (winners.size() != 1) {
             return;
@@ -106,13 +104,24 @@ public class Insurance {
      */
     public Insurance end() {
         for (var v : pots) {
-            // 没有买的池做0购买
+            // 自动购买
             if (!v.finished() && v.circle.equals(circle)) {
-                v.buy(0, v.getOuts());
+                v.buy(v.getMin(), v.getOuts());
             }
         }
 
         if (Circle.TURN.equals(this.circle)) {
+            for (var v : pots) {
+                // 如果购买了转牌的保险，系统会强制玩家购买购买河牌的少量保险，背回转牌的保险投入。
+                if (v.circle.equals(Circle.TURN)
+                        && v.getAmount() > 0
+                        && !v.hit()) {
+                    var river = this.pots.stream()
+                            .filter(p -> p.circle.equals(Circle.RIVER) && p.id == v.id)
+                            .findFirst().get();
+                    river.setDebt(v.getAmount());
+                }
+            }
             this.circle = Circle.RIVER;
         }
         return this;

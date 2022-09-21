@@ -60,6 +60,8 @@ public class InsurancePot {
      */
     private boolean tie;
 
+    private int debt;
+
     InsurancePot(int id, int sum, int chipsBet, String circle, int applicant, List<Player> players, List<Card> communityCards, List<Card> leftCard) {
         this.applicant = applicant;
         this.id = id;
@@ -93,8 +95,8 @@ public class InsurancePot {
         if (finished()) {
             throw new IllegalArgumentException("保险池已经购买结束");
         }
-        if (amount < 0 || amount > getLimit()) {
-            throw new IllegalArgumentException("购买的保险金额错误: amount=" + amount + " limit=" + getLimit());
+        if (amount < getMin() || amount > getMax()) {
+            throw new IllegalArgumentException("购买的保险金额错误: amount=" + amount + " max=" + getMax() + " min=" + getMin());
         }
         if (amount > 0 && buyOuts.isEmpty()) {
             buyOuts = new ArrayList<>(outs);
@@ -186,7 +188,7 @@ public class InsurancePot {
     /**
      * 最高投保额
      */
-    public int getLimit() {
+    public int getMax() {
         // 转牌圈不能超过底池的0.25
         if (Circle.TURN.equals(circle)) {
             return (int) Math.floor(sum * 0.25);
@@ -197,12 +199,25 @@ public class InsurancePot {
         }
     }
 
+    public int getMin() {
+        return BigDecimal.valueOf(debt).divide(getOdds(), RoundingMode.CEILING).intValue();
+    }
+
     public int getChips() {
         return this.sum;
     }
 
     public List<Card> getOuts() {
         return new ArrayList<>(outs);
+    }
+
+    public void setDebt(int debt) {
+        this.debt = debt;
+    }
+
+    public boolean hit() {
+        var card = this.leftCard.get(0);
+        return this.outs.stream().anyMatch(v -> v.equals(card));
     }
 
     @Override
@@ -215,7 +230,8 @@ public class InsurancePot {
                 .append(", sum=").append(sum)
                 .append(", outs=").append(outs.size())
                 .append(", odds=").append(getOdds())
-                .append(", limit=").append(getLimit())
+                .append(", min=").append(getMin())
+                .append(", max=").append(getMax())
                 .append(", policies=").append(policies.size())
                 .toString();
     }
