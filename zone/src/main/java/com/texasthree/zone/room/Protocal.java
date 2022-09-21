@@ -226,16 +226,16 @@ public class Protocal {
 
         Showdown(TexasRound round) {
             var result = round.settle();
-            this.winners = new ArrayList<>(result.getWinners());
+            this.winners = new ArrayList<>();
             this.hands = new ArrayList<>();
             for (var v : result) {
                 var sh = new Protocal.ShowdownHand();
-                sh.seatId = v.getId();
-                sh.profits = v.getPot().entrySet().stream()
+                sh.seatId = v.id;
+                sh.profits = v.pot.entrySet().stream()
                         .map(e -> new Protocal.PotProfit(e.getKey(), e.getValue()))
                         .collect(Collectors.toList());
-                if (round.isCompareShowdown() && !round.isFold(v.getId())) {
-                    sh.hand = new Protocal.Hand(round.getPlayerHand(v.getId()));
+                if (round.isCompareShowdown() && !round.isFold(v.id)) {
+                    sh.hand = new Protocal.Hand(round.getPlayerHand(v.id));
                 }
                 this.hands.add(sh);
             }

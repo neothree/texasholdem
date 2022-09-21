@@ -88,8 +88,6 @@ public class Insurance {
         var wid = winners.get(0).getId();
         var ip = new InsurancePot(pot.id, pot.getChips(), pot.chipsBet(wid), circle, wid, players, communityCards, leftCard);
         this.pots.add(ip);
-
-        System.out.println(ip);
     }
 
     /**

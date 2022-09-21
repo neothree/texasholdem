@@ -2,6 +2,7 @@ package com.texasthree.zone.room;
 
 import com.texasthree.game.texas.Circle;
 import com.texasthree.game.texas.Optype;
+import com.texasthree.utility.utlis.StringUtils;
 import com.texasthree.zone.Tester;
 import org.junit.jupiter.api.Test;
 
@@ -123,6 +124,37 @@ class TexasRoundTest {
         assertFalse(insurance.finished());
         insurance.force();
         assertTrue(insurance.finished());
+
+
+        // 结算
+        round = new TexasRound(id, StringUtils.get10UUID(), users, handler());
+        dealer = users.get(0).seatId;
+        round.start(dealer);
+        round.force();
+        round.action(Optype.Allin, 0);
+        round.force();
+        round.action(Optype.Allin, 0);
+        round.force();
+        insurance = round.getInsurance();
+        assertNotNull(insurance);
+
+        var winner = insurance.getPot(Circle.TURN, 0);
+        insurance.buy(winner.applicant, 0, 10, null);
+        insurance.force();
+        insurance.force();
+        insurance.force();
+        winner = insurance.getPot(Circle.RIVER, 0);
+        insurance.buy(winner.applicant, 0, 10, null);
+        insurance.force();
+        assertTrue(insurance.finished());
+
+        var settle = round.settle();
+        for (var v : settle) {
+            assertNotEquals(v.profit, 0);
+            if (v.id == winner.applicant) {
+                assertNotEquals(v.insurance, 0);
+            }
+        }
     }
 
     private List<UserPlayer> createUsers(int num) {

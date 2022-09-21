@@ -241,16 +241,16 @@ public class Room {
         var execute = this.round.getPlayers().stream()
                 .filter(UserPlayer::isExecute)
                 .map(v -> v.seatId).collect(Collectors.toSet());
+
         for (var v : this.round.settle()) {
-            var profit = v.getProfit();
-            var player = this.round.getPlayerBySeatId(v.getId());
-            log.info("玩家结算利润 id={} profit={}", player.getId(), profit);
-            this.changeUserChips(player.getId(), profit);
+            var player = this.round.getPlayerBySeatId(v.id);
+            log.info("玩家结算利润 id={} profit={} insurance={}", player.getId(), v.profit, v.insurance);
+            this.changeUserChips(player.getId(), v.profit + v.insurance);
 
             // 获取到押注权限的玩家要记录未操作次数
-            var seat = seats[v.getId()];
+            var seat = seats[v.id];
             if (seat.occupiedBy(player.getId()) && player.isGain()) {
-                seat.execute(execute.contains(v.getId()));
+                seat.execute(execute.contains(v.id));
             }
         }
 

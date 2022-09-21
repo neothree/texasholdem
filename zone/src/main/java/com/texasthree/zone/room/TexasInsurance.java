@@ -1,13 +1,20 @@
 package com.texasthree.zone.room;
 
+import com.texasthree.game.insurance.Claim;
 import com.texasthree.game.insurance.Insurance;
 import com.texasthree.game.insurance.InsurancePot;
-import com.texasthree.game.texas.*;
+import com.texasthree.game.texas.Card;
+import com.texasthree.game.texas.Circle;
+import com.texasthree.game.texas.Player;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.summingInt;
 
 /**
  * @author: neo
@@ -110,6 +117,11 @@ public class TexasInsurance {
         log.info(">>>>>>>>>>>>>>>>> 保险阶段结束 <<<<<<<<<<<<<<<<<<<<<<<<");
         this.scheduler.clear();
         this.onFinish.run();
+    }
+
+    Map<Integer, Integer> claims() {
+        return this.game.claims().stream()
+                .collect(groupingBy(Claim::getApplicant, summingInt(Claim::getProfit)));
     }
 
 

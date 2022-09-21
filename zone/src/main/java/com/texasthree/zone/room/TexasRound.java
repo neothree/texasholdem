@@ -261,8 +261,9 @@ public class TexasRound {
         return this.operator;
     }
 
-    public Settlement settle() {
-        return this.game.settle();
+    public RoundSettlement settle() {
+        var insClaims = insurance != null ? insurance.claims() : new HashMap<Integer, Integer>();
+        return new RoundSettlement(this.game.settle(), insClaims);
     }
 
     public Action getLastAction() {

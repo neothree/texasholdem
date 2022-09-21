@@ -14,4 +14,12 @@ public class Claim {
         this.applicant = applicant;
         this.profit = profit;
     }
+
+    public int getApplicant() {
+        return applicant;
+    }
+
+    public int getProfit() {
+        return profit;
+    }
 }
