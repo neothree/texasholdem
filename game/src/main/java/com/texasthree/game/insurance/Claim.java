@@ -22,4 +22,12 @@ public class Claim {
     public int getProfit() {
         return profit;
     }
+
+    @Override
+    public String toString() {
+        return new StringBuilder()
+                .append("applicant=").append(applicant)
+                .append(", profit=").append(profit)
+                .toString();
+    }
 }

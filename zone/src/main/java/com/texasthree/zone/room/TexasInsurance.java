@@ -92,7 +92,7 @@ public class TexasInsurance {
         }
         log.info("购买保险");
         this.game.buy(potId, amount, outs);
-        if (!this.game.circleFinished()) {
+        if (this.game.circleFinished()) {
             // 这轮购买结束
             this.scheduler.once(this::buyEnd, 2 * 1000);
         }
@@ -105,12 +105,12 @@ public class TexasInsurance {
         log.info(">>>>>>>>>>>>>>>>> 一轮保险结束 : {} <<<<<<<<<<<<<<<<<<<<<<<<", game.getCircle());
         this.game.end();
         this.handler.on(round, RoundEvent.BUY_END);
-        if (!this.game.finished()) {
-            // 下一轮开始
-            this.scheduler.once(this::buyBegin, 1000);
-        } else {
+        if (this.game.finished()) {
             // 整体结束
-            this.scheduler.once(this::finish, 1000);
+            this.finish();
+        } else {
+            // 下一轮开始
+            this.buyBegin();
         }
     }
 
@@ -124,7 +124,6 @@ public class TexasInsurance {
         return this.game.claims().stream()
                 .collect(groupingBy(Claim::getApplicant, summingInt(Claim::getProfit)));
     }
-
 
     public void loop() {
         this.scheduler.check();

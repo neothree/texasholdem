@@ -26,4 +26,14 @@ public class RoundSettlementEntry {
         this.profit = profit;
         this.pot = pot;
     }
+
+    @Override
+    public String toString() {
+        return new StringBuilder()
+                .append("id=").append(id)
+                .append(", profit=").append(profit)
+                .append(", insurance=").append(insurance)
+                .append(", pot=").append(pot)
+                .toString();
+    }
 }

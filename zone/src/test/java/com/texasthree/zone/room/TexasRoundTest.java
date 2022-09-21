@@ -121,8 +121,6 @@ class TexasRoundTest {
         insurance.force();
         assertFalse(insurance.finished());
         insurance.force();
-        assertFalse(insurance.finished());
-        insurance.force();
         assertTrue(insurance.finished());
 
 
@@ -140,8 +138,6 @@ class TexasRoundTest {
 
         var winner = insurance.getPot(Circle.TURN, 0);
         insurance.buy(winner.applicant, 0, 10, null);
-        insurance.force();
-        insurance.force();
         insurance.force();
         winner = insurance.getPot(Circle.RIVER, 0);
         insurance.buy(winner.applicant, 0, 10, null);

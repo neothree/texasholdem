@@ -167,7 +167,6 @@ public class TexasRound {
         this.printShowdown();
         this.scheduler.clear();
         this.operator = null;
-        this.insurance = null;
         this.isOver = true;
         this.scheduler.once(() -> this.eventHandler.on(this, RoundEvent.SHOWDOWN), 2000);
     }
