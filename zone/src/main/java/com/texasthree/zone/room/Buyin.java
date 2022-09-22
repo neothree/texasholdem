@@ -9,6 +9,9 @@ import com.texasthree.zone.user.User;
  * @create: 2022-09-22 11:00
  */
 public class Buyin {
+    /**
+     * 玩家
+     */
     private User user;
     /**
      * 总买入
