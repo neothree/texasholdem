@@ -22,7 +22,6 @@
         <module>security</module>
         <module>utility</module>
         <module>dao</module>
-        <module>club</module>
     </modules>
 
     <!--版本维护-->

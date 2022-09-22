@@ -1,4 +1,4 @@
-package com.texasthree.club;
+package com.texasthree.zone.club;
 
 /**
  * @author: neo
