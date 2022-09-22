@@ -58,6 +58,11 @@ public class Room {
 
     private final RoomEventHandler eventHandler = new RoomEventHandler(this);
 
+    /**
+     * 保险池
+     */
+    private int insurance;
+
     public Room(String id, int capacity) {
         seats = new Seat[capacity];
         for (var i = 0; i < capacity; i++) {
@@ -188,7 +193,7 @@ public class Room {
         // 清理一直没有操作的玩家
         for (var v : seats) {
             // 调试 - 给没有筹码的玩家加钱
-            if (this.getUserChips(v.getUid()) == 0) {
+            if (this.getUserChips(v.getUid()) <= 0) {
                 this.bring(v.getUid(), 500);
             }
 
@@ -244,8 +249,11 @@ public class Room {
 
         for (var v : this.round.settle()) {
             var player = this.round.getPlayerBySeatId(v.id);
-            log.info("玩家结算利润 id={} profit={} insurance={}", player.getId(), v.profit, v.insurance);
-            this.changeUserChips(player.getId(), v.profit + v.insurance);
+            log.info("玩家结算利润 id={} chips={} profit={} insurance={}", player.getId(), player.getChips(), v.profit, v.insurance);
+            this.changeUserChips(player.getId(), v.profit);
+            if (v.insurance != 0) {
+                this.claim(player.getId(), v.insurance);
+            }
 
             // 获取到押注权限的玩家要记录未操作次数
             var seat = seats[v.id];
@@ -260,6 +268,18 @@ public class Room {
 
         // 更新筹码数
         this.otherScheduler.once(() -> this.seatUpdate(null), delay - 1000);
+    }
+
+    /**
+     * 保险理赔
+     */
+    private void claim(String id, int amount) {
+        if (amount == 0) {
+            return;
+        }
+        log.info("房间保险理赔 {} {}", id, amount);
+        this.changeUserChips(id, amount);
+        this.insurance -= amount;
     }
 
     public void loop() {
