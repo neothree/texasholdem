@@ -28,21 +28,19 @@ public class Room {
     private final String id;
 
     private final int capacity;
-
     /**
      * 座位
      */
     private final Seat[] seats;
-
     /**
      * 观众
      */
     private final Map<String, User> audience = new HashMap<>();
 
     /**
-     * 玩家带入的筹码数
+     * 玩家买入
      */
-    private Map<String, Integer> userChips = new HashMap<>();
+    private Map<String, Buyin> buyinMap = new HashMap<>();
 
     private final RoundEventHandler handler;
 
@@ -81,8 +79,8 @@ public class Room {
      * @param user 玩家
      */
     public void addUser(User user) {
-        if (!userChips.containsKey(user.getId())) {
-            this.bring(user.getId(), initChips);
+        if (!buyinMap.containsKey(user.getId())) {
+            this.buyin(user, initChips);
         }
         audience.put(user.getId(), user);
     }
@@ -101,13 +99,20 @@ public class Room {
     /**
      * 购买记分牌
      *
-     * @param uid    玩家id
+     * @param user   玩家
      * @param amount 金额
      * @return
      */
-    public int bring(String uid, Integer amount) {
+    public int buyin(User user, int amount) {
+        var uid = user.getId();
         log.info("房间带入 roomId={} uid={} amount={}", id, uid, amount);
-        return changeUserChips(uid, amount);
+        var info = buyinMap.get(user.getId());
+        if (info == null) {
+            info = new Buyin(user);
+            this.buyinMap.put(user.getId(), info);
+        }
+        info.buyin(amount);
+        return info.getBalance();
     }
 
     /**
@@ -116,10 +121,10 @@ public class Room {
      * @param uid 玩家id
      * @return
      */
-    public int takeout(String uid) {
-        var balance = this.getUserChips(uid);
-        log.info("房间带出 roomId={} uid={} amount={}", id, uid, balance);
-        return this.changeUserChips(uid, -balance);
+    public void settle(String uid) {
+        var info = this.buyinMap.get(uid);
+        info.settle();
+        log.info("玩家提前结算 roomId={} {}", id, info);
     }
 
     /**
@@ -136,7 +141,7 @@ public class Room {
         if (this.getUserSeat(user.getId()) != null) {
             throw new IllegalArgumentException("玩家已经在座位上");
         }
-        var chips = this.getUserChips(user.getId());
+        var chips = this.getUserBalance(user.getId());
         if (chips <= 0) {
             throw new IllegalArgumentException("玩家筹码太少 {}" + user + " chips=" + chips);
         }
@@ -193,8 +198,8 @@ public class Room {
         // 清理一直没有操作的玩家
         for (var v : seats) {
             // 调试 - 给没有筹码的玩家加钱
-            if (this.getUserChips(v.getUid()) <= 0) {
-                this.bring(v.getUid(), 500);
+            if (v.occupied() && this.getUserBalance(v.getUid()) <= 0) {
+                this.buyin(v.getUser(), 500);
             }
 
             if (v.occupied() && v.getUser().isReal() && v.getNoExecute() >= 3) {
@@ -211,8 +216,8 @@ public class Room {
         // 可以进入牌局的玩家
         var users = Arrays.stream(seats)
                 .filter(Seat::occupied)
-                .filter(v -> this.getUserChips(v.getUid()) > 0)
-                .map(v -> new UserPlayer(v.id, v.getUser(), this.getUserChips(v.getUid())))
+                .filter(v -> this.getUserBalance(v.getUid()) > 0)
+                .map(v -> new UserPlayer(v.id, v.getUser(), this.getUserBalance(v.getUid())))
                 .collect(Collectors.toList());
         if (users.size() < 2) {
             return;
@@ -250,7 +255,7 @@ public class Room {
         for (var v : this.round.settle()) {
             var player = this.round.getPlayerBySeatId(v.id);
             log.info("玩家结算利润 id={} chips={} profit={} insurance={}", player.getId(), player.getChips(), v.profit, v.insurance);
-            this.changeUserChips(player.getId(), v.profit);
+            this.changeProfit(player.getId(), v.profit);
             if (v.insurance != 0) {
                 this.claim(player.getId(), v.insurance);
             }
@@ -278,7 +283,7 @@ public class Room {
             return;
         }
         log.info("房间保险理赔 {} {}", id, amount);
-        this.changeUserChips(id, amount);
+        this.changeProfit(id, amount);
         this.insurance -= amount;
     }
 
@@ -355,7 +360,7 @@ public class Room {
      * @return
      */
     public int getPlayerChips(String uid) {
-        var chips = this.getUserChips(uid);
+        var chips = this.getUserBalance(uid);
         if (!this.running()) {
             return chips;
         }
@@ -371,15 +376,15 @@ public class Room {
         return this.round.getPlayerChips(seat.id);
     }
 
-    public int getUserChips(String uid) {
-        return this.userChips.getOrDefault(uid, 0);
+    public int getUserBalance(String uid) {
+        var info = this.buyinMap.get(uid);
+        return info != null ? info.getBalance() : 0;
     }
 
-    private int changeUserChips(String uid, int amount) {
-        var old = this.getUserChips(uid);
-        this.userChips.put(uid, old + amount);
-        log.info("修改玩家筹码数 roomId={} uid={} amount={} old={}", id, uid, amount, old);
-        return old;
+    private void changeProfit(String uid, int amount) {
+        var info = buyinMap.get(uid);
+        info.changeProfit(amount);
+        log.info("修改玩家筹码数 roomId={} {}", id, info);
     }
 
     public List<Seat> getSeats() {
@@ -451,6 +456,10 @@ public class Room {
 
     public int getCapacity() {
         return capacity;
+    }
+
+    public int getInsurance() {
+        return insurance;
     }
 
     public void send(String uid, Object obj) {

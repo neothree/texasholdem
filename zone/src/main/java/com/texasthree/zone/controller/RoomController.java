@@ -4,7 +4,6 @@ import com.texasthree.game.texas.Optype;
 import com.texasthree.security.shiro.AbstractMeController;
 import com.texasthree.utility.restful.RestResponse;
 import com.texasthree.zone.Zone;
-import com.texasthree.zone.net.Server;
 import com.texasthree.zone.room.Protocal;
 import com.texasthree.zone.room.Room;
 import com.texasthree.zone.user.User;
@@ -20,9 +19,6 @@ public class RoomController extends AbstractMeController<User> {
 
     @Autowired
     private Zone zone;
-
-    @Autowired
-    private Server server;
 
     @GetMapping
     public RestResponse rooms() {
@@ -57,14 +53,14 @@ public class RoomController extends AbstractMeController<User> {
 
 
     /**
-     * 购买记分牌
+     * 买入 - 购买记分牌
      */
     @PostMapping(value = "/{roomId}/chips")
-    public RestResponse bring(@PathVariable("roomId") String roomId,
+    public RestResponse buyin(@PathVariable("roomId") String roomId,
                               @RequestParam("amount") Integer amount) throws Exception {
         log.info("请求购买记分牌 {}", roomId);
         var room = zone.getRoom();
-        room.bring(this.getMe().getId(), amount);
+        room.buyin(this.getMe(), amount);
         return RestResponse.SUCCESS;
     }
 
@@ -72,10 +68,10 @@ public class RoomController extends AbstractMeController<User> {
      * 提前结算
      */
     @DeleteMapping(value = "/{roomId}/chips")
-    public RestResponse takeout(@PathVariable("roomId") String roomId) throws Exception {
+    public RestResponse settle(@PathVariable("roomId") String roomId) throws Exception {
         log.info("请求提前结算 {}", roomId);
         var room = Room.getRoom(roomId);
-        room.takeout(this.getMe().getId());
+        room.settle(this.getMe().getId());
         return RestResponse.SUCCESS;
     }
 

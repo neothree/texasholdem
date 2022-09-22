@@ -31,13 +31,13 @@ public class AssertRoom extends Room {
         return this;
     }
 
-    AssertRoom toBring(String uid) {
-        super.bring(uid, Room.initChips);
+    AssertRoom toBring(User user) {
+        super.buyin(user, Room.initChips);
         return this;
     }
 
     AssertRoom toTakeout(String uid) {
-        super.takeout(uid);
+        super.settle(uid);
         return this;
     }
 
@@ -94,8 +94,8 @@ public class AssertRoom extends Room {
         return this;
     }
 
-    AssertRoom assertUserChips(String id, int chips) {
-        assertEquals(chips, this.getUserChips(id));
+    AssertRoom assertBalance(String id, int chips) {
+        assertEquals(chips, this.getUserBalance(id));
         return this;
     }
 

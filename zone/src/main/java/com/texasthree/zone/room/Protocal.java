@@ -13,6 +13,9 @@ import java.util.stream.Collectors;
  */
 public class Protocal {
 
+    /**
+     * 房间数据
+     */
     public static class RoomData {
         public String id;
         public String name;
@@ -43,6 +46,9 @@ public class Protocal {
         }
     }
 
+    /**
+     * 牌局数据
+     */
     public static class RoundData {
         public Integer dealer;
         public Integer sbSeatId;
@@ -87,6 +93,9 @@ public class Protocal {
         }
     }
 
+    /**
+     * 用户
+     */
     public static class User {
         public String uid;
         public String name;
@@ -97,10 +106,13 @@ public class Protocal {
             this.uid = user.getId();
             this.name = user.getName();
             this.avatar = user.getAvatar();
-            this.chips = room.getUserChips(user.getId());
+            this.chips = room.getUserBalance(user.getId());
         }
     }
 
+    /**
+     * 牌局玩家
+     */
     public static class Player {
         public Integer seatId;
         public Integer chips;
@@ -125,6 +137,9 @@ public class Protocal {
         }
     }
 
+    /**
+     * 座位
+     */
     public static class Seat {
         public Integer seatId;
         public User user;
@@ -137,6 +152,9 @@ public class Protocal {
         }
     }
 
+    /**
+     * 手牌
+     */
     public static class Hand {
         public List<Integer> cards;
         public String type;
@@ -151,6 +169,9 @@ public class Protocal {
         }
     }
 
+    /**
+     * 开局
+     */
     public static class Start {
         public Integer sbSeatId;
         public Integer bbSeatId;
@@ -173,6 +194,9 @@ public class Protocal {
         }
     }
 
+    /**
+     * 押注
+     */
     public static class Action {
         public Optype op;
         public Integer seatId;
@@ -194,6 +218,9 @@ public class Protocal {
         }
     }
 
+    /**
+     * 新的操作人
+     */
     public static class Operator {
         public Integer seatId;
         public long leftSec;
@@ -210,6 +237,9 @@ public class Protocal {
 
     }
 
+    /**
+     * 一圈结束
+     */
     public static class CircleEnd {
         public List<Integer> communityCards;
         public List<Integer> pots;
@@ -220,6 +250,9 @@ public class Protocal {
         }
     }
 
+    /**
+     * 亮牌
+     */
     public static class Showdown {
         public List<Integer> winners;
         public List<ShowdownHand> hands;
@@ -270,6 +303,9 @@ public class Protocal {
         return cards.stream().map(Card::getId).collect(Collectors.toList());
     }
 
+    /**
+     * 保险
+     */
     public static class Insurance {
         public List<ShowdownHand> hands;
         public List<Integer> communityCards;
@@ -280,6 +316,9 @@ public class Protocal {
         }
     }
 
+    /**
+     * 保险购买人
+     */
     public static class Buyer {
         public long leftSec;
         /**
@@ -305,6 +344,9 @@ public class Protocal {
         }
     }
 
+    /**
+     * 保险池
+     */
     static class InsurancePot {
         public Integer potId;
         public Integer amount;
@@ -334,7 +376,9 @@ public class Protocal {
         }
     }
 
-
+    /**
+     * 保险购买结束
+     */
     public static class BuyEnd extends Insurance {
         public Integer seatId;
         public Integer amount;
@@ -344,5 +388,19 @@ public class Protocal {
             this.seatId = seatId;
             this.amount = amount;
         }
+    }
+
+    /**
+     * 房间排名
+     */
+    public static class Rank {
+        public List<RankEntry> rank;
+    }
+
+    public static class RankEntry {
+        public String name;
+        public int buyin;
+        public int profit;
+        public boolean settle;
     }
 }
