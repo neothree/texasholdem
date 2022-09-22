@@ -445,11 +445,6 @@ public class Room {
         return 1;
     }
 
-    @Override
-    public String toString() {
-        return this.id;
-    }
-
     public String getId() {
         return id;
     }
@@ -484,5 +479,15 @@ public class Room {
         var info = Packet.convertAsString(obj);
         log.info("[{}] {}", id, info);
         server.send(set, info);
+    }
+
+
+    @Override
+    public String toString() {
+        return new StringBuilder()
+                .append(", id=").append(id)
+                .append(", capacity=").append(capacity)
+                .append(", roundNum=").append(roundNum)
+                .toString();
     }
 }

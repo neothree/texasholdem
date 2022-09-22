@@ -127,4 +127,14 @@ public class Seat {
     public User getUser() {
         return this.user;
     }
+
+    @Override
+    public String toString() {
+        return new StringBuilder()
+                .append("roomId=").append(roomId)
+                .append(", id=").append(id)
+                .append(", occupied=").append(occupied())
+                .append(", user=").append(user)
+                .toString();
+    }
 }
