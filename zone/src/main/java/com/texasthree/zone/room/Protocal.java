@@ -3,6 +3,7 @@ package com.texasthree.zone.room;
 import com.texasthree.game.texas.Card;
 import com.texasthree.game.texas.Optype;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -353,7 +354,7 @@ public class Protocal {
         public Integer amount;
         public Integer seatId;
         public List<Integer> outs;
-        public String odds;
+        public BigDecimal odds;
         public Integer fullPot;
         public Integer breakEven;
         public Integer max;
@@ -369,7 +370,7 @@ public class Protocal {
             this.potId = p.id;
             this.seatId = p.applicant;
             this.outs = toCardIds(p.getOuts());
-            this.odds = p.getOdds().toString();
+            this.odds = p.getOdds();
             this.fullPot = p.fullPot();
             this.breakEven = p.breakEven();
             this.max = p.getMax();
