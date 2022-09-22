@@ -13,4 +13,9 @@ public class Member {
     Member(MemberData data) {
         this.data = data;
     }
+
+    @Override
+    public String toString() {
+        return this.data.toString();
+    }
 }

@@ -3,6 +3,7 @@ package com.texasthree.zone.user;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 /**
  * @author: neo
@@ -39,6 +40,9 @@ public class UserData {
     @Column(nullable = false, updatable = false)
     private boolean real;
 
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createAt;
+
     /**
      * 头像
      */
@@ -51,6 +55,7 @@ public class UserData {
         this.username = username;
         this.name = name;
         this.real = real;
+        this.createAt = LocalDateTime.now();
     }
 
 
