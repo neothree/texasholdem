@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 
 @RestController
-public class HttpController extends AbstractMeController<User> {
+public class LoginController extends AbstractMeController<User> {
 
     @Autowired
     private LoginerRealm<User> loginerRealm;
