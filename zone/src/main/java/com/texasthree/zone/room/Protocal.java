@@ -4,6 +4,7 @@ import com.texasthree.game.texas.Card;
 import com.texasthree.game.texas.Optype;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -394,13 +395,31 @@ public class Protocal {
      * 房间排名
      */
     public static class Rank {
-        public List<RankEntry> rank;
+        public final int insurance;
+        public final List<Buyin> buyins;
+
+        public Rank(Room room) {
+            this.insurance = room.getInsurance();
+            // 按照 balance, sum 降序排列
+            this.buyins = room.buyins().stream()
+                    .sorted(Comparator.comparing(com.texasthree.zone.room.Buyin::getProfit, Comparator.reverseOrder())
+                            .thenComparing(com.texasthree.zone.room.Buyin::getSum, Comparator.reverseOrder()))
+                    .map(Buyin::new)
+                    .collect(Collectors.toList());
+        }
     }
 
-    public static class RankEntry {
+    public static class Buyin {
         public String name;
         public int buyin;
         public int profit;
         public boolean settle;
+
+        Buyin(com.texasthree.zone.room.Buyin v) {
+            this.name = v.getName();
+            this.buyin = v.getSum();
+            this.profit = v.getProfit();
+            this.settle = v.isSettle();
+        }
     }
 }

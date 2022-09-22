@@ -48,6 +48,10 @@ public class Buyin {
         return this.user.getId();
     }
 
+    public String getName() {
+        return this.user.getName();
+    }
+
     public int getSum() {
         return sum;
     }

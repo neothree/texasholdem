@@ -381,7 +381,7 @@ public class Room {
         return info != null ? info.getBalance() : 0;
     }
 
-    private void changeProfit(String uid, int amount) {
+    void changeProfit(String uid, int amount) {
         var info = buyinMap.get(uid);
         info.changeProfit(amount);
         log.info("修改玩家筹码数 roomId={} {}", id, info);
@@ -455,6 +455,10 @@ public class Room {
 
     public int getInsurance() {
         return insurance;
+    }
+
+    public Collection<Buyin> buyins() {
+        return this.buyinMap.values();
     }
 
     public void send(String uid, Object obj) {

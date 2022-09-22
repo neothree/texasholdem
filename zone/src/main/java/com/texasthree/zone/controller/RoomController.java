@@ -51,11 +51,19 @@ public class RoomController extends AbstractMeController<User> {
         zone.getRoom().removeUser(this.getMe());
     }
 
+    /**
+     * 房间所有玩家筹码买入统计
+     */
+    @GetMapping(value = "/{roomId}/buyin")
+    public Protocal.Rank buyin(@PathVariable("roomId") String roomId) throws Exception {
+        var room = zone.getRoom();
+        return new Protocal.Rank(room);
+    }
 
     /**
      * 买入 - 购买记分牌
      */
-    @PostMapping(value = "/{roomId}/chips")
+    @PostMapping(value = "/{roomId}/buyin")
     public RestResponse buyin(@PathVariable("roomId") String roomId,
                               @RequestParam("amount") Integer amount) throws Exception {
         log.info("请求购买记分牌 {}", roomId);
@@ -67,7 +75,7 @@ public class RoomController extends AbstractMeController<User> {
     /**
      * 提前结算
      */
-    @DeleteMapping(value = "/{roomId}/chips")
+    @DeleteMapping(value = "/{roomId}/buyin")
     public RestResponse settle(@PathVariable("roomId") String roomId) throws Exception {
         log.info("请求提前结算 {}", roomId);
         var room = Room.getRoom(roomId);
