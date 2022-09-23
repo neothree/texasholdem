@@ -53,7 +53,7 @@ public class ClubService {
         log.info("俱乐部添加成员 club={} user={}", club, user);
     }
 
-    private Club getClubById(String id) {
+    public Club getClubById(String id) {
         if (!this.clubMap.containsKey(id)) {
             var data = this.cdao.findById(id);
             if (data.isEmpty()) {

@@ -10,7 +10,7 @@ public class Member {
 
     private final MemberData data;
 
-    Member(MemberData data) {
+    public Member(MemberData data) {
         this.data = data;
     }
 

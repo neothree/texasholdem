@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
  * @create: 2022-08-16 10:18
  */
 @Entity
-@Table(name = "user_data_info")
 public class UserData {
     /**
      * 版本
@@ -24,29 +23,35 @@ public class UserData {
     @GeneratedValue(generator = "system-uuid")
     @GenericGenerator(name = "system-uuid", strategy = "uuid")
     private String id;
-
     /**
      * 登录账户
      */
     @Column(nullable = false, updatable = false)
     private String username;
-
     /**
      * 名称
      */
     @Column(nullable = false, updatable = false)
     private String name;
-
+    /**
+     * 是否是真实玩家
+     */
     @Column(nullable = false, updatable = false)
     private boolean real;
-
+    /**
+     * 创建时间
+     */
     @Column(nullable = false, updatable = false)
     private LocalDateTime createAt;
-
     /**
      * 头像
      */
     private String avatar;
+    /**
+     * 俱乐部
+     */
+    private String clubId;
+
 
     public UserData() {
     }
@@ -105,6 +110,22 @@ public class UserData {
 
     public void setReal(boolean real) {
         this.real = real;
+    }
+
+    public LocalDateTime getCreateAt() {
+        return createAt;
+    }
+
+    public void setCreateAt(LocalDateTime createAt) {
+        this.createAt = createAt;
+    }
+
+    public String getClubId() {
+        return clubId;
+    }
+
+    public void setClubId(String clubId) {
+        this.clubId = clubId;
     }
 
     @Override

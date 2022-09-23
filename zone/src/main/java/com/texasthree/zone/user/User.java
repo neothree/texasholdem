@@ -67,4 +67,8 @@ public class User {
     public String getAvatar() {
         return this.data.getAvatar();
     }
+
+    public String getClubId() {
+        return this.data.getClubId();
+    }
 }

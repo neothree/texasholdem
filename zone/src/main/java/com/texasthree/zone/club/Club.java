@@ -29,6 +29,30 @@ public class Club {
         return this.data.getId();
     }
 
+    public String getName() {
+        return this.data.getName();
+    }
+
+    public String getCreator() {
+        return this.data.getCreator();
+    }
+
+    public String getAvatar() {
+        return this.data.getAvatar();
+    }
+
+    public int getCapacity() {
+        return this.data.getCapacity();
+    }
+
+    public int getBalance() {
+        return this.data.getBalance();
+    }
+
+    public int getFund() {
+        return this.data.getFund();
+    }
+
     @Override
     public String toString() {
         return this.data.toString();

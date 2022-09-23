@@ -45,6 +45,7 @@ public class LoginController extends AbstractMeController<User> {
         var ret = new LoginResponse();
         ret.uid = user.getId();
         ret.name = user.getName();
+        ret.clubId = user.getClubId();
         ret.token = request.getSession().getId();
         return new RestResponse<>(res.getCode(), res.getMessage(), ret);
     }
@@ -53,6 +54,7 @@ public class LoginController extends AbstractMeController<User> {
         public String uid;
         public String name;
         public String token;
-
+        public String clubId;
+        public int balance = 1000;
     }
 }
