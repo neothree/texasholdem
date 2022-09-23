@@ -1,4 +1,4 @@
-package com.texasthree.zone.club;
+package com.texasthree.zone.club.member;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

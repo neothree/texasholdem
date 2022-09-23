@@ -1,4 +1,4 @@
-package com.texasthree.zone.club;
+package com.texasthree.zone.club.member;
 
 /**
  * 俱乐部成员

@@ -1,5 +1,8 @@
 package com.texasthree.zone.club;
 
+import com.texasthree.zone.club.member.Member;
+import com.texasthree.zone.club.member.MemberData;
+import com.texasthree.zone.club.member.MemberDataDao;
 import com.texasthree.zone.user.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,4 +1,4 @@
-package com.texasthree.zone.club;
+package com.texasthree.zone.club.member;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -30,6 +30,9 @@ public class MemberData {
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createAt;
+
+    public MemberData() {
+    }
 
     public MemberData(String uid) {
         this.uid = uid;

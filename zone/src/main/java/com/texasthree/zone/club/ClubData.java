@@ -46,6 +46,17 @@ public class ClubData {
      * 俱乐部成员数量上限
      */
     private int capacity = 100;
+    /**
+     * 基金 - 牌局抽水
+     */
+    private int fund = 0;
+    /**
+     * 余额
+     */
+    private int balance = 0;
+
+    public ClubData() {
+    }
 
     public ClubData(String creator, String name) {
         this.creator = creator;
@@ -107,6 +118,22 @@ public class ClubData {
 
     public void setCapacity(int capacity) {
         this.capacity = capacity;
+    }
+
+    public int getFund() {
+        return fund;
+    }
+
+    public void setFund(int fund) {
+        this.fund = fund;
+    }
+
+    public int getBalance() {
+        return balance;
+    }
+
+    public void setBalance(int balance) {
+        this.balance = balance;
     }
 
     @Override

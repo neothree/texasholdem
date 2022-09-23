@@ -1,5 +1,7 @@
 package com.texasthree.zone.club;
 
+import com.texasthree.zone.club.member.Member;
+
 import java.util.ArrayList;
 import java.util.List;
 
