@@ -1,6 +1,8 @@
-package com.texasthree.zone.room;
+package com.texasthree.zone.room.round;
 
 import com.texasthree.game.texas.*;
+import com.texasthree.zone.room.RoundSettlement;
+import com.texasthree.zone.room.ScheduledEventChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

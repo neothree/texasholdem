@@ -1,4 +1,4 @@
-package com.texasthree.zone.room;
+package com.texasthree.zone.room.round;
 
 import com.texasthree.zone.user.User;
 
@@ -32,23 +32,23 @@ public class UserPlayer {
         return this.user.getId();
     }
 
-     int getChips() {
+    public int getChips() {
         return chips;
     }
 
-     void gain() {
+    void gain() {
         this.gain = true;
     }
 
-     boolean isGain() {
+    public boolean isGain() {
         return gain;
     }
 
-     void execute() {
+    public void execute() {
         this.execute = true;
     }
 
-     boolean isExecute() {
+    public boolean isExecute() {
         return execute;
     }
 }

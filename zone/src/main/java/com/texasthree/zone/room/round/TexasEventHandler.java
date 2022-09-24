@@ -1,6 +1,7 @@
-package com.texasthree.zone.room;
+package com.texasthree.zone.room.round;
 
 import com.texasthree.game.texas.Action;
+import com.texasthree.zone.room.Protocal;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -9,7 +10,7 @@ import java.util.function.Consumer;
  * @author: neo
  * @create: 2022-08-09 16:50
  */
-class TexasEventHandler implements TexasEventListener {
+public class TexasEventHandler implements TexasEventListener {
 
     private final Runnable onShowdown;
     /**
@@ -21,7 +22,7 @@ class TexasEventHandler implements TexasEventListener {
      */
     private final BiConsumer<String, Object> single;
 
-    TexasEventHandler(Runnable onShowdown,
+    public TexasEventHandler(Runnable onShowdown,
                       Consumer<Object> broadcast,
                       BiConsumer<String, Object> single) {
         this.onShowdown = onShowdown;

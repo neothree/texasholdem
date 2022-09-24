@@ -15,7 +15,7 @@ public class RoundSettlement implements Iterable<RoundSettlementEntry> {
 
     private final List<RoundSettlementEntry> entries = new ArrayList<>();
 
-    RoundSettlement(Settlement settlement, Map<Integer, Integer> claims) {
+    public RoundSettlement(Settlement settlement, Map<Integer, Integer> claims) {
         for (var v : settlement) {
             var info = new RoundSettlementEntry(v.getId(), v.getProfit(), claims.getOrDefault(v.getId(), 0), v.getPot());
             entries.add(info);

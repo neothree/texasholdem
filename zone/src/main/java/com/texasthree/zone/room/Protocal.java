@@ -2,6 +2,8 @@ package com.texasthree.zone.room;
 
 import com.texasthree.game.texas.Card;
 import com.texasthree.game.texas.Optype;
+import com.texasthree.zone.room.round.TexasInsurance;
+import com.texasthree.zone.room.round.TexasRound;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -206,7 +208,7 @@ public class Protocal {
         public Integer chips;
         public Integer sumPot;
 
-        Action(com.texasthree.game.texas.Action action, int sumPot) {
+        public Action(com.texasthree.game.texas.Action action, int sumPot) {
             this.op = action.op;
             this.seatId = action.id;
             this.chipsBet = action.chipsBet;
@@ -228,7 +230,7 @@ public class Protocal {
         public long leftSec;
         public List<Action> actions;
 
-        Operator(TexasRound round) {
+        public Operator(TexasRound round) {
             this.leftSec = round.leftSec();
             this.seatId = round.getOperator().seatId;
             this.actions = round.authority()
@@ -246,7 +248,7 @@ public class Protocal {
         public List<Integer> communityCards;
         public List<Integer> pots;
 
-        CircleEnd(TexasRound round) {
+        public CircleEnd(TexasRound round) {
             this.communityCards = toCardIds(round.getCommunityCards());
             this.pots = round.getPots();
         }
@@ -259,7 +261,7 @@ public class Protocal {
         public List<Integer> winners;
         public List<ShowdownHand> hands;
 
-        Showdown(TexasRound round) {
+        public Showdown(TexasRound round) {
             var result = round.settle();
             this.winners = new ArrayList<>();
             this.hands = new ArrayList<>();
@@ -312,7 +314,7 @@ public class Protocal {
         public List<ShowdownHand> hands;
         public List<Integer> communityCards;
 
-        Insurance(TexasInsurance ins) {
+        public Insurance(TexasInsurance ins) {
             this.hands = ins.getPlayers().stream().map(ShowdownHand::new).collect(Collectors.toList());
             this.communityCards = toCardIds(ins.getCommunityCards());
         }
@@ -332,7 +334,7 @@ public class Protocal {
          */
         public List<InsurancePot> bought = new ArrayList<>();
 
-        Buyer(TexasInsurance ins) {
+        public Buyer(TexasInsurance ins) {
             this.leftSec = ins.leftSec();
             var pots = ins.getCirclePots();
             for (var v : pots) {
@@ -385,7 +387,7 @@ public class Protocal {
         public Integer seatId;
         public Integer amount;
 
-        BuyEnd(TexasInsurance ins, int seatId, Integer amount) {
+        public BuyEnd(TexasInsurance ins, int seatId, Integer amount) {
             super(ins);
             this.seatId = seatId;
             this.amount = amount;

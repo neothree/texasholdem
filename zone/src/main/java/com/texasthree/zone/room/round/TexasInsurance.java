@@ -1,4 +1,4 @@
-package com.texasthree.zone.room;
+package com.texasthree.zone.room.round;
 
 import com.texasthree.game.insurance.Claim;
 import com.texasthree.game.insurance.Insurance;
@@ -6,6 +6,7 @@ import com.texasthree.game.insurance.InsurancePot;
 import com.texasthree.game.texas.Card;
 import com.texasthree.game.texas.Circle;
 import com.texasthree.game.texas.Player;
+import com.texasthree.zone.room.ScheduledEventChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -139,18 +140,18 @@ public class TexasInsurance {
                 .findFirst().get();
     }
 
-    List<InsurancePot> getCirclePots() {
+    public List<InsurancePot> getCirclePots() {
         var circle = this.game.getCircle();
         return this.game.getPots().stream()
                 .filter(v -> v.circle.equals(circle))
                 .collect(Collectors.toList());
     }
 
-    List<Player> getPlayers() {
+    public List<Player> getPlayers() {
         return this.game.getPlayers();
     }
 
-    List<Card> getCommunityCards() {
+    public List<Card> getCommunityCards() {
         return game.getCommunityCards();
     }
 
