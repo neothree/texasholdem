@@ -162,8 +162,8 @@ class TexasRoundTest {
         return users;
     }
 
-    private RoundEventHandler handler() {
-        return new RoundEventHandler(() -> {
+    private TexasEventHandler handler() {
+        return new TexasEventHandler(() -> {
         }, (v) -> {
         }, (v, s) -> {
         });

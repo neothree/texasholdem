@@ -44,7 +44,7 @@ public class Room {
      */
     private Map<String, Buyin> buyinMap = new HashMap<>();
 
-    private final RoundEventHandler handler;
+    private final TexasEventHandler handler;
 
     private TexasRound round;
 
@@ -67,14 +67,14 @@ public class Room {
      */
     private Consumer<Room> beforeDispose;
 
-    private BiFunction<User, Integer, Boolean> realBuyin;
+    private BiFunction<User, Integer, Boolean> realBuyin = (a, b) -> true;
 
     public Room(String id, int capacity, Consumer<Room> beforeDispose) {
         seats = new Seat[capacity];
         for (var i = 0; i < capacity; i++) {
             seats[i] = new Seat(id, i);
         }
-        handler = new RoundEventHandler(this::onShowdown, this::send, this::send);
+        handler = new TexasEventHandler(this::onShowdown, this::send, this::send);
         this.id = id;
         this.capacity = capacity;
         this.beforeDispose = beforeDispose;
@@ -247,7 +247,7 @@ public class Room {
         this.roundNum++;
         log.info("开始牌局");
 
-        var round = new TexasRound(roundNum, "333111", users, handler);
+        var round = new TexasRound(roundNum, id, users, handler);
         round.start(users.get(0).seatId);
         this.round = round;
     }

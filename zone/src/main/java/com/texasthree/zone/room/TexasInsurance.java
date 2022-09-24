@@ -27,7 +27,7 @@ public class TexasInsurance {
 
     private final Insurance game;
 
-    private final RoundEventHandler handler;
+    private final TexasEventListener handler;
 
     private final TexasRound round;
 
@@ -35,7 +35,7 @@ public class TexasInsurance {
 
     private final ScheduledEventChecker scheduler = new ScheduledEventChecker();
 
-    TexasInsurance(TexasRound round, RoundEventHandler handler, Runnable onFinished) {
+    TexasInsurance(TexasRound round, TexasEventListener handler, Runnable onFinished) {
         this.round = round;
         this.handler = handler;
         this.onFinish = onFinished;
@@ -57,7 +57,7 @@ public class TexasInsurance {
      */
     void start() {
         log.info(">>>>>>>>>>>>>>>>> 保险阶段开始 <<<<<<<<<<<<<<<<<<<<<<<<");
-        this.handler.on(round, RoundEvent.INSUSRANCE);
+        this.handler.onInsurance(new TexasEvent(round));
 
         this.scheduler.once(this::buyBegin, 2 * 1000);
     }
@@ -70,7 +70,7 @@ public class TexasInsurance {
         if (!this.game.circleFinished()) {
             // 玩家购买
             this.scheduler.once(this::buyEnd, 20 * 1000);
-            this.handler.on(round, RoundEvent.BUYER);
+            this.handler.onBuyer(new TexasEvent(round));
         } else {
             // 无法购买，直接下一轮
             this.scheduler.once(this::buyEnd, 3 * 1000);
@@ -104,7 +104,7 @@ public class TexasInsurance {
     private void buyEnd() {
         log.info(">>>>>>>>>>>>>>>>> 一轮保险结束 : {} <<<<<<<<<<<<<<<<<<<<<<<<", game.getCircle());
         this.game.end();
-        this.handler.on(round, RoundEvent.BUY_END);
+        this.handler.onBuyEnd(new TexasEvent(round));
         if (this.game.finished()) {
             // 整体结束
             this.finish();

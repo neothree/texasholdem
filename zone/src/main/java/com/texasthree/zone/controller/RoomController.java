@@ -29,7 +29,7 @@ public class RoomController extends AbstractMeController<User> {
         return new RestResponse<>();
     }
 
-    @DeleteMapping(value = "/{roomId}")
+    @DeleteMapping(value = "/debug/{roomId}")
     public RestResponse dispose(@PathVariable("roomId") String roomId) throws Exception {
         log.info("解散房间 roomId={}", roomId);
         zone.getRoom().dispose();

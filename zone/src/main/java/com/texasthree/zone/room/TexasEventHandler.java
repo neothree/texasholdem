@@ -1,5 +1,7 @@
 package com.texasthree.zone.room;
 
+import com.texasthree.game.texas.Action;
+
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -7,10 +9,9 @@ import java.util.function.Consumer;
  * @author: neo
  * @create: 2022-08-09 16:50
  */
-class RoundEventHandler {
+class TexasEventHandler implements TexasEventListener {
 
     private final Runnable onShowdown;
-
     /**
      * 广播
      */
@@ -20,7 +21,7 @@ class RoundEventHandler {
      */
     private final BiConsumer<String, Object> single;
 
-    RoundEventHandler(Runnable onShowdown,
+    TexasEventHandler(Runnable onShowdown,
                       Consumer<Object> broadcast,
                       BiConsumer<String, Object> single) {
         this.onShowdown = onShowdown;
@@ -28,49 +29,15 @@ class RoundEventHandler {
         this.single = single;
     }
 
-    void on(TexasRound round, RoundEvent event) {
-        switch (event) {
-            // 德州扑克
-            case START_GAME:
-                this.onStartGame(round);
-                break;
-            case ACTION:
-                this.onAction(round);
-                break;
-            case HAND:
-                this.onUpdateHand(round);
-                break;
-            case OPERATOR:
-                this.onOperator(round);
-                break;
-            case CIRCLE_END:
-                this.onCircleEnd(round);
-                break;
-            case SHOWDOWN:
-                this.onShowdown(round);
-                break;
-
-            // 保险
-            case INSUSRANCE:
-                this.onInsurance(round);
-                break;
-            case BUYER:
-                this.onBuyer(round);
-                break;
-            case BUY_END:
-                this.onBuyEnd(round);
-                break;
-            default:
-                throw new IllegalArgumentException(event.name());
-        }
-    }
-
-    private void onStartGame(TexasRound round) {
-        var info = new Protocal.Start(round);
+    @Override
+    public void onStartGame(TexasEvent event) {
+        var info = new Protocal.Start(event.getRound());
         this.send(info);
     }
 
-    private void onUpdateHand(TexasRound round) {
+    @Override
+    public void onUpdateHand(TexasEvent event) {
+        var round = event.getRound();
         for (var v : round.getPlayers()) {
             if (round.isLeave(v.getId())) {
                 continue;
@@ -80,39 +47,53 @@ class RoundEventHandler {
         }
     }
 
-    private void onOperator(TexasRound round) {
+    @Override
+    public void onOperator(TexasEvent event) {
+        var round = event.getRound();
         var info = new Protocal.Operator(round);
         this.send(info);
     }
 
-    private void onAction(TexasRound round) {
-        var action = round.getLastAction();
+    @Override
+    public void onAction(TexasEvent event) {
+        var round = event.getRound();
+        var action = (Action) event.getValue();
         var info = new Protocal.Action(action, round.sumPot());
         this.send(info);
     }
 
-    private void onCircleEnd(TexasRound round) {
+    @Override
+    public void onCircleEnd(TexasEvent event) {
+        var round = event.getRound();
         var info = new Protocal.CircleEnd(round);
         this.send(info);
     }
 
-    private void onShowdown(TexasRound round) {
+    @Override
+    public void onShowdown(TexasEvent event) {
+        var round = event.getRound();
         var info = new Protocal.Showdown(round);
         this.send(info);
         this.onShowdown.run();
     }
 
-    private void onInsurance(TexasRound round) {
+    @Override
+    public void onInsurance(TexasEvent event) {
+        var round = event.getRound();
         var info = new Protocal.Insurance(round.getInsurance());
         this.send(info);
     }
 
-    private void onBuyer(TexasRound round) {
+    @Override
+    public void onBuyer(TexasEvent event) {
+        var round = event.getRound();
         var info = new Protocal.Buyer(round.getInsurance());
         this.send(info);
     }
 
-    private void onBuyEnd(TexasRound round) {
+    @Override
+    public void onBuyEnd(TexasEvent event) {
+        var round = event.getRound();
         var info = new Protocal.BuyEnd(round.getInsurance(), 0, 0);
         this.send(info);
     }

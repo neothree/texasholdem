@@ -41,17 +41,15 @@ public class TexasRound {
 
     private List<UserPlayer> users;
 
-    private RoundEventHandler eventHandler;
-
-    private Action lastAction;
-
     private TexasInsurance insurance;
 
-    public TexasRound(int id, String roomId, List<UserPlayer> users, RoundEventHandler eventHandler) {
+    private TexasEventListener eventListener;
+
+    public TexasRound(int id, String roomId, List<UserPlayer> users, TexasEventListener eventListener) {
         this.id = id;
         this.logpre = "[" + roomId + " - " + id + "]";
         this.users = users;
-        this.eventHandler = eventHandler;
+        this.eventListener = eventListener;
         for (var v : users) {
             playerMap.put(v.getId(), v);
         }
@@ -73,7 +71,7 @@ public class TexasRound {
         this.game.start();
         this.printStart();
         this.scheduler.once(() -> this.move(this.game.state()), 1100);
-        this.eventHandler.on(this, RoundEvent.START_GAME);
+        this.eventListener.onStartGame(getEvent());
         this.updateHand();
     }
 
@@ -97,9 +95,9 @@ public class TexasRound {
         var chipsAdd = Optype.Raise.equals(op) ? chipsBet - old : 0;
         log.info("{}玩家押注 seatId={} op={} chipsAdd={}", logpre, operator.seatId, op, chipsAdd);
         this.game.action(op, chipsAdd);
-        this.lastAction = this.game.getAction(this.operator.seatId);
+        var lastAction = this.game.getAction(this.operator.seatId);
         this.operator = null;
-        this.eventHandler.on(this, RoundEvent.ACTION);
+        this.eventListener.onAction(new TexasEvent(this, lastAction));
 
         var move = this.game.state();
         if (Optype.Check.equals(op)) {
@@ -137,7 +135,7 @@ public class TexasRound {
         this.operator = this.getPlayerBySeatId(game.operator().getId());
         this.operator.gain();
         this.scheduler.once(this::onOpTimeout, TIMEOUT_ACTION);
-        this.eventHandler.on(this, RoundEvent.OPERATOR);
+        this.eventListener.onOperator(getEvent());
         log.info("{}轮到下一位进行押注 uid={} seatId={}", logpre, this.operator.getId(), this.operator.seatId);
     }
 
@@ -149,7 +147,7 @@ public class TexasRound {
      */
     private void moveCircleEnd() {
         this.printCircle();
-        this.eventHandler.on(this, RoundEvent.CIRCLE_END);
+        this.eventListener.onCircleEnd(getEvent());
 
         this.updateHand();
 
@@ -168,7 +166,7 @@ public class TexasRound {
         this.scheduler.clear();
         this.operator = null;
         this.isOver = true;
-        this.scheduler.once(() -> this.eventHandler.on(this, RoundEvent.SHOWDOWN), 2000);
+        this.scheduler.once(() -> this.eventListener.onShowdown(getEvent()), 2000);
     }
 
     public void buy(String uid, int potId, int amount) {
@@ -182,7 +180,7 @@ public class TexasRound {
     private void moveInsurance() {
         this.operator = null;
         this.scheduler.clear();
-        this.insurance = new TexasInsurance(this, eventHandler, this::moveShowdown);
+        this.insurance = new TexasInsurance(this, eventListener, this::moveShowdown);
         this.insurance.start();
     }
 
@@ -222,7 +220,7 @@ public class TexasRound {
      * 更新手牌
      */
     private void updateHand() {
-        this.eventHandler.on(this, RoundEvent.HAND);
+        this.eventListener.onUpdateHand(getEvent());
     }
 
 
@@ -264,11 +262,6 @@ public class TexasRound {
         var insClaims = insurance != null ? insurance.claims() : new HashMap<Integer, Integer>();
         return new RoundSettlement(this.game.settle(), insClaims);
     }
-
-    public Action getLastAction() {
-        return this.lastAction;
-    }
-
 
     public Map<Optype, Integer> authority() {
         return this.game.authority();
@@ -373,5 +366,9 @@ public class TexasRound {
 
     public List<Player> players() {
         return this.game.players();
+    }
+
+    private TexasEvent getEvent() {
+        return new TexasEvent(this);
     }
 }
