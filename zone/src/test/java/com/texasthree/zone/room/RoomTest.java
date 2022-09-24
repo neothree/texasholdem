@@ -193,7 +193,7 @@ class RoomTest {
 
     @Test
     void testDispose() throws Exception {
-        var room = new Room(StringUtils.get10UUID(), 8);
+        var room = new Room(StringUtils.get10UUID(), 8, null);
         assertNotNull(Room.getRoom(room.getId()));
 
         room.dispose();

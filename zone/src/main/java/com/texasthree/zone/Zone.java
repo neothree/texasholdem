@@ -3,7 +3,9 @@ package com.texasthree.zone;
 import com.texasthree.security.login.enums.LoginApp;
 import com.texasthree.security.login.service.LoginerService;
 import com.texasthree.utility.utlis.StringUtils;
+import com.texasthree.zone.club.ClubService;
 import com.texasthree.zone.net.Server;
+import com.texasthree.zone.room.Buyin;
 import com.texasthree.zone.room.Room;
 import com.texasthree.zone.user.User;
 import com.texasthree.zone.user.UserService;
@@ -26,6 +28,8 @@ public class Zone {
 
     private final UserService userService;
 
+    private final ClubService clubService;
+
     private final LoginerService loginerService;
 
     private final Server server;
@@ -33,10 +37,12 @@ public class Zone {
     @Autowired
     public Zone(UserService userService,
                 LoginerService loginerService,
-                Server server) {
+                Server server,
+                ClubService clubService) {
         this.userService = userService;
         this.loginerService = loginerService;
         this.server = server;
+        this.clubService = clubService;
     }
 
 
@@ -56,7 +62,7 @@ public class Zone {
 
     public Room getRoom() {
         if (room == null) {
-            room = new Room(StringUtils.get10UUID(), 9);
+            room = new Room(StringUtils.get10UUID(), 9, this::share);
             room.setServer(server);
 
             var user = createUser(StringUtils.get10UUID(), StringUtils.get10UUID(), false);
@@ -65,6 +71,34 @@ public class Zone {
             room.sitDown(user, 7);
         }
         return room;
+    }
+
+    /**
+     * 房间利润分成
+     */
+    public void share(Room room) {
+        // 返回玩家余额
+        var buyins = room.buyins();
+        var win = buyins.stream()
+                .filter(v -> v.getProfit() > 0)
+                .mapToInt(Buyin::getProfit)
+                .sum();
+        var lose = buyins.stream()
+                .filter(v -> v.getProfit() < 0)
+                .mapToInt(Buyin::getProfit)
+                .sum();
+        log.info("房间结算 win={} lose={} insurance={}", win, lose, room.getInsurance());
+        for (var v : buyins) {
+            var balance = v.getBalance();
+            // 赢家扣除5%的利润
+            var give = v.getProfit() > 0 ? (int) (v.getProfit() * 0.05) : 0;
+            this.userService.addBalance(v.getUid(), balance - give);
+            if (v.getProfit() < 0) {
+                // 输家将5%加到俱乐部基金
+                var clubId = "11";
+                this.clubService.addFund(clubId, give);
+            }
+        }
     }
 
     @Async

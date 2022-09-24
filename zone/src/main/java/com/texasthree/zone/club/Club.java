@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class Club {
 
-    private final ClubData data;
+    private ClubData data;
 
     private List<Member> list = new ArrayList<>();
 
@@ -51,6 +51,10 @@ public class Club {
 
     public int getFund() {
         return this.data.getFund();
+    }
+
+    void setData(ClubData data) {
+        this.data = data;
     }
 
     @Override

@@ -36,4 +36,8 @@ public class UserService {
         }
         return new User(data);
     }
+
+    public void addBalance(String id, int amount) {
+
+    }
 }

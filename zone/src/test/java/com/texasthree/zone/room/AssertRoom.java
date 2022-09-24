@@ -23,7 +23,7 @@ public class AssertRoom extends Room {
     }
 
     AssertRoom(String id, int capacity) {
-        super(id, capacity);
+        super(id, capacity, null);
     }
 
     AssertRoom toAddUser(User user) {

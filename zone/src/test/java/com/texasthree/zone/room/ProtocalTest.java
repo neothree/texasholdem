@@ -16,7 +16,7 @@ class ProtocalTest {
         var user = Tester.createUser();
         var seatId = 2;
 
-        var room = new Room(id, capacity);
+        var room = new Room(id, capacity, null);
         room.addUser(user);
         room.sitDown(user, seatId);
 
@@ -29,7 +29,7 @@ class ProtocalTest {
 
     @Test
     void testRank() throws Exception {
-        var room = new Room("11", 9);
+        var room = new Room("11", 9, null);
         var rank = new Protocal.Rank(room);
         assertEquals(0, rank.insurance);
         assertTrue(rank.buyins.isEmpty());

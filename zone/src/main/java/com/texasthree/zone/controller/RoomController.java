@@ -17,12 +17,23 @@ import java.util.Arrays;
 @RequestMapping("/room")
 public class RoomController extends AbstractMeController<User> {
 
+    private final Zone zone;
+
     @Autowired
-    private Zone zone;
+    public RoomController(Zone zone) {
+        this.zone = zone;
+    }
 
     @GetMapping
     public RestResponse rooms() {
         return new RestResponse<>();
+    }
+
+    @DeleteMapping(value = "/{roomId}")
+    public RestResponse dispose(@PathVariable("roomId") String roomId) throws Exception {
+        log.info("解散房间 roomId={}", roomId);
+        zone.getRoom().dispose();
+        return RestResponse.SUCCESS;
     }
 
     @GetMapping(value = "/{roomId}")

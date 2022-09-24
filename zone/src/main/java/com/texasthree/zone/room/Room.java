@@ -7,6 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class Room {
@@ -60,8 +62,14 @@ public class Room {
      * 保险池
      */
     private int insurance;
+    /**
+     * 房间解散行为注册
+     */
+    private Consumer<Room> beforeDispose;
 
-    public Room(String id, int capacity) {
+    private BiFunction<User, Integer, Boolean> realBuyin;
+
+    public Room(String id, int capacity, Consumer<Room> beforeDispose) {
         seats = new Seat[capacity];
         for (var i = 0; i < capacity; i++) {
             seats[i] = new Seat(id, i);
@@ -69,6 +77,7 @@ public class Room {
         handler = new RoundEventHandler(this::onShowdown, this::send, this::send);
         this.id = id;
         this.capacity = capacity;
+        this.beforeDispose = beforeDispose;
         roomMap.put(id, this);
         log.info("创建房间 {}", id);
     }
@@ -103,7 +112,11 @@ public class Room {
      * @param amount 金额
      * @return
      */
-    public int buyin(User user, int amount) {
+    public void buyin(User user, int amount) {
+        if (!this.realBuyin.apply(user, amount)) {
+            log.error("房间买入失败 {} {}", user, amount);
+            return;
+        }
         var uid = user.getId();
         log.info("房间带入 roomId={} uid={} amount={}", id, uid, amount);
         var info = buyinMap.get(user.getId());
@@ -112,7 +125,6 @@ public class Room {
             this.buyinMap.put(user.getId(), info);
         }
         info.buyin(amount);
-        return info.getBalance();
     }
 
     /**
@@ -287,6 +299,15 @@ public class Room {
         this.insurance -= amount;
     }
 
+    public void dispose() {
+        log.info("房间解散");
+        if (this.beforeDispose != null) {
+            this.beforeDispose.accept(this);
+        }
+        roomMap.remove(id);
+    }
+
+
     public void loop() {
         this.roundScheduler.check();
         this.otherScheduler.check();
@@ -343,11 +364,6 @@ public class Room {
             return false;
         }
         return round != null && round.isPlayerInGame(seat.id);
-    }
-
-    public void dispose() {
-        log.info("房间解散");
-        roomMap.remove(id);
     }
 
     /**

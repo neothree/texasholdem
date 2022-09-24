@@ -55,12 +55,23 @@ public class ClubService {
 
     public Club getClubById(String id) {
         if (!this.clubMap.containsKey(id)) {
-            var data = this.cdao.findById(id);
-            if (data.isEmpty()) {
-                throw new IllegalArgumentException("无找到俱乐部数据 id=" + id);
-            }
-            this.clubMap.put(id, new Club(data.get()));
+            var data = getDataById(id);
+            this.clubMap.put(id, new Club(data));
         }
         return this.clubMap.get(id);
+    }
+
+    public void addFund(String id, int amount) {
+//        var data = this.getDataById(id);
+//        var fund = data.getFund();
+//        var club = this.getClubById(id);
+    }
+
+    private ClubData getDataById(String id) {
+        var data = this.cdao.findById(id);
+        if (data.isEmpty()) {
+            throw new IllegalArgumentException("无找到俱乐部数据 id=" + id);
+        }
+        return data.get();
     }
 }
