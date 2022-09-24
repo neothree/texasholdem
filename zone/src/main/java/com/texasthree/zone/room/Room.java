@@ -298,8 +298,8 @@ public class Room {
             return;
         }
         log.info("房间保险理赔 {} {}", id, amount);
-        this.changeProfit(id, amount);
-        this.insurance -= amount;
+        var info = buyinMap.get(id);
+        info.changeInsurance(amount);
     }
 
     public void dispose() {
@@ -472,8 +472,11 @@ public class Room {
         return capacity;
     }
 
+    /**
+     * 保险赔付总额
+     */
     public int getInsurance() {
-        return insurance;
+        return this.buyins().stream().mapToInt(Buyin::getBalance).sum();
     }
 
     public Collection<Buyin> buyins() {

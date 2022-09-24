@@ -22,6 +22,10 @@ public class Buyin {
      */
     private int profit;
     /**
+     * 保险利润
+     */
+    private int insurance;
+    /**
      * 是否结算
      */
     private boolean settle;
@@ -38,10 +42,19 @@ public class Buyin {
     }
 
     public void changeProfit(int value) {
-        if (this.settle) {
-            throw new IllegalArgumentException("玩家已经结算，不能修改利润");
-        }
+        assertSettle();
         this.profit += value;
+    }
+
+    public void changeInsurance(int value) {
+        assertSettle();
+        this.insurance += value;
+    }
+
+    private void assertSettle() {
+        if (this.settle) {
+            throw new IllegalArgumentException("玩家已经结算");
+        }
     }
 
     public String getUid() {
@@ -69,7 +82,11 @@ public class Buyin {
     }
 
     public int getBalance() {
-        return this.settle ? 0 : this.sum + profit;
+        return this.settle ? 0 : this.sum + profit + insurance;
+    }
+
+    public int getInsurance() {
+        return insurance;
     }
 
     @Override
@@ -79,6 +96,7 @@ public class Buyin {
                 .append(", name=").append(user.getName())
                 .append(", sum=").append(sum)
                 .append(", profit=").append(profit)
+                .append(", insurance=").append(insurance)
                 .append(", balance=").append(getBalance())
                 .append(", settle=").append(settle)
                 .toString();
