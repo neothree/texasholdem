@@ -2,9 +2,9 @@ package com.texasthree.zone.room;
 
 import com.texasthree.utility.packet.Packet;
 import com.texasthree.zone.net.Server;
-import com.texasthree.zone.room.round.TexasEventHandler;
-import com.texasthree.zone.room.round.TexasRound;
-import com.texasthree.zone.room.round.UserPlayer;
+import com.texasthree.zone.round.TexasEventHandler;
+import com.texasthree.zone.round.TexasRound;
+import com.texasthree.zone.round.UserPlayer;
 import com.texasthree.zone.user.User;
 import com.texasthree.zone.util.ScheduledEventChecker;
 import org.slf4j.Logger;

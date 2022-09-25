@@ -1,4 +1,4 @@
-package com.texasthree.zone.room.round;
+package com.texasthree.zone.round;
 
 import com.texasthree.game.texas.*;
 import com.texasthree.zone.room.RoundSettlement;

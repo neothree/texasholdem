@@ -2,8 +2,8 @@ package com.texasthree.zone.room;
 
 import com.texasthree.game.texas.Card;
 import com.texasthree.game.texas.Optype;
-import com.texasthree.zone.room.round.TexasInsurance;
-import com.texasthree.zone.room.round.TexasRound;
+import com.texasthree.zone.round.TexasInsurance;
+import com.texasthree.zone.round.TexasRound;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
