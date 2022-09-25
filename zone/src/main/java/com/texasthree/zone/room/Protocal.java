@@ -404,7 +404,7 @@ public class Protocal {
         public Rank(Room room) {
             this.insurance = room.getInsurance();
             // 按照 balance, sum 降序排列
-            this.buyins = room.buyins().stream()
+            this.buyins = room.scoreboards().stream()
                     .sorted(Comparator.comparing(Scoreboard::getGameProfit, Comparator.reverseOrder())
                             .thenComparing(Scoreboard::getBuyin, Comparator.reverseOrder()))
                     .map(Buyin::new)

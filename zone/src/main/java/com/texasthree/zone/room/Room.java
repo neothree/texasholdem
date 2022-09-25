@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -66,8 +65,6 @@ public class Room {
      */
     private Consumer<Room> beforeDispose;
 
-    private BiFunction<User, Integer, Boolean> realBuyin = (a, b) -> true;
-
     public Room(String id, int capacity, Consumer<Room> beforeDispose) {
         seats = new Seat[capacity];
         for (var i = 0; i < capacity; i++) {
@@ -103,7 +100,6 @@ public class Room {
         audience.remove(user.getId());
     }
 
-
     /**
      * 购买记分牌
      *
@@ -112,10 +108,6 @@ public class Room {
      * @return
      */
     public void buyin(User user, int amount) {
-        if (!this.realBuyin.apply(user, amount)) {
-            log.error("房间买入失败 {} {}", user, amount);
-            return;
-        }
         var uid = user.getId();
         log.info("房间带入 roomId={} uid={} amount={}", id, uid, amount);
         var info = scoreboards.get(user.getId());
@@ -475,10 +467,10 @@ public class Room {
      * 保险赔付总额
      */
     public int getInsurance() {
-        return this.buyins().stream().mapToInt(Scoreboard::getBalance).sum();
+        return this.scoreboards().stream().mapToInt(Scoreboard::getBalance).sum();
     }
 
-    public Collection<Scoreboard> buyins() {
+    public Collection<Scoreboard> scoreboards() {
         return this.scoreboards.values();
     }
 

@@ -74,29 +74,39 @@ public class Zone {
     }
 
     /**
-     * 房间利润分成
+     * 房间买入
+     */
+    public void buyin(Room room, User user, int amount) {
+        // 玩家扣除余额
+        this.userService.balance(user.getId(), -amount);
+
+        // 增加玩家的房间筹码
+        room.buyin(user, amount);
+    }
+
+    /**
+     * 分配房间利润分成
      */
     public void share(Room room) {
         // 返回玩家余额
-        var buyins = room.buyins();
-        var win = buyins.stream()
+        var scoreboards = room.scoreboards();
+        var win = scoreboards.stream()
                 .filter(v -> v.getGameProfit() > 0)
                 .mapToInt(Scoreboard::getGameProfit)
                 .sum();
-        var lose = buyins.stream()
+        var lose = scoreboards.stream()
                 .filter(v -> v.getGameProfit() < 0)
                 .mapToInt(Scoreboard::getGameProfit)
                 .sum();
         log.info("房间结算 win={} lose={} insurance={}", win, lose, room.getInsurance());
-        for (var v : buyins) {
+        for (var v : scoreboards) {
             var balance = v.getBalance();
             // 赢家扣除5%的利润
             var give = v.getGameProfit() > 0 ? (int) (v.getGameProfit() * 0.05) : 0;
-            this.userService.addBalance(v.getUid(), balance - give);
+            var user = this.userService.balance(v.getUid(), balance - give);
             if (v.getGameProfit() < 0) {
                 // 输家将5%加到俱乐部基金
-                var clubId = "11";
-                this.clubService.addFund(clubId, give);
+                this.clubService.addFund(user.getClubId(), give);
             }
         }
     }

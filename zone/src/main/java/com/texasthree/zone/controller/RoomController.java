@@ -79,7 +79,7 @@ public class RoomController extends AbstractMeController<User> {
                               @RequestParam("amount") Integer amount) throws Exception {
         log.info("请求购买记分牌 {}", roomId);
         var room = zone.getRoom();
-        room.buyin(this.getMe(), amount);
+        zone.buyin(room, this.getMe(), amount);
         return RestResponse.SUCCESS;
     }
 
