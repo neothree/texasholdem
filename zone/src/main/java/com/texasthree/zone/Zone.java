@@ -5,7 +5,7 @@ import com.texasthree.security.login.service.LoginerService;
 import com.texasthree.utility.utlis.StringUtils;
 import com.texasthree.zone.club.ClubService;
 import com.texasthree.zone.net.Server;
-import com.texasthree.zone.room.Buyin;
+import com.texasthree.zone.room.Scoreboard;
 import com.texasthree.zone.room.Room;
 import com.texasthree.zone.user.User;
 import com.texasthree.zone.user.UserService;
@@ -80,20 +80,20 @@ public class Zone {
         // 返回玩家余额
         var buyins = room.buyins();
         var win = buyins.stream()
-                .filter(v -> v.getProfit() > 0)
-                .mapToInt(Buyin::getProfit)
+                .filter(v -> v.getGameProfit() > 0)
+                .mapToInt(Scoreboard::getGameProfit)
                 .sum();
         var lose = buyins.stream()
-                .filter(v -> v.getProfit() < 0)
-                .mapToInt(Buyin::getProfit)
+                .filter(v -> v.getGameProfit() < 0)
+                .mapToInt(Scoreboard::getGameProfit)
                 .sum();
         log.info("房间结算 win={} lose={} insurance={}", win, lose, room.getInsurance());
         for (var v : buyins) {
             var balance = v.getBalance();
             // 赢家扣除5%的利润
-            var give = v.getProfit() > 0 ? (int) (v.getProfit() * 0.05) : 0;
+            var give = v.getGameProfit() > 0 ? (int) (v.getGameProfit() * 0.05) : 0;
             this.userService.addBalance(v.getUid(), balance - give);
-            if (v.getProfit() < 0) {
+            if (v.getGameProfit() < 0) {
                 // 输家将5%加到俱乐部基金
                 var clubId = "11";
                 this.clubService.addFund(clubId, give);

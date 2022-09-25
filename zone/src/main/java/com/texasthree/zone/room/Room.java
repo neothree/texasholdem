@@ -44,9 +44,9 @@ public class Room {
     private final Map<String, User> audience = new HashMap<>();
 
     /**
-     * 玩家买入
+     * 记分牌
      */
-    private Map<String, Buyin> buyinMap = new HashMap<>();
+    private Map<String, Scoreboard> scoreboards = new HashMap<>();
 
     private final TexasEventHandler handler;
 
@@ -61,11 +61,6 @@ public class Room {
     private ScheduledEventChecker otherScheduler = new ScheduledEventChecker();
 
     private final RoomEventHandler eventHandler = new RoomEventHandler(this);
-
-    /**
-     * 保险池
-     */
-    private int insurance;
     /**
      * 房间解散行为注册
      */
@@ -92,7 +87,7 @@ public class Room {
      * @param user 玩家
      */
     public void addUser(User user) {
-        if (!buyinMap.containsKey(user.getId())) {
+        if (!scoreboards.containsKey(user.getId())) {
             this.buyin(user, initChips);
         }
         audience.put(user.getId(), user);
@@ -123,10 +118,10 @@ public class Room {
         }
         var uid = user.getId();
         log.info("房间带入 roomId={} uid={} amount={}", id, uid, amount);
-        var info = buyinMap.get(user.getId());
+        var info = scoreboards.get(user.getId());
         if (info == null) {
-            info = new Buyin(user);
-            this.buyinMap.put(user.getId(), info);
+            info = new Scoreboard(user);
+            this.scoreboards.put(user.getId(), info);
         }
         info.buyin(amount);
     }
@@ -138,7 +133,7 @@ public class Room {
      * @return
      */
     public void settle(String uid) {
-        var info = this.buyinMap.get(uid);
+        var info = this.scoreboards.get(uid);
         info.settle();
         log.info("玩家提前结算 roomId={} {}", id, info);
     }
@@ -271,7 +266,7 @@ public class Room {
         for (var v : this.round.settle()) {
             var player = this.round.getPlayerBySeatId(v.id);
             log.info("玩家结算利润 id={} chips={} profit={} insurance={}", player.getId(), player.getChips(), v.profit, v.insurance);
-            this.changeProfit(player.getId(), v.profit);
+            this.changeGameProfit(player.getId(), v.profit);
             if (v.insurance != 0) {
                 this.claim(player.getId(), v.insurance);
             }
@@ -299,8 +294,7 @@ public class Room {
             return;
         }
         log.info("房间保险理赔 {} {}", id, amount);
-        var info = buyinMap.get(id);
-        info.changeInsurance(amount);
+        scoreboards.get(id).insuranceProfit(amount);
     }
 
     public void dispose() {
@@ -397,13 +391,13 @@ public class Room {
     }
 
     public int getUserBalance(String uid) {
-        var info = this.buyinMap.get(uid);
+        var info = this.scoreboards.get(uid);
         return info != null ? info.getBalance() : 0;
     }
 
-    void changeProfit(String uid, int amount) {
-        var info = buyinMap.get(uid);
-        info.changeProfit(amount);
+    void changeGameProfit(String uid, int amount) {
+        var info = scoreboards.get(uid);
+        info.gameProfit(amount);
         log.info("修改玩家筹码数 roomId={} {}", id, info);
     }
 
@@ -477,14 +471,14 @@ public class Room {
      * 保险赔付总额
      */
     public int getInsurance() {
-        return this.buyins().stream().mapToInt(Buyin::getBalance).sum();
+        return this.buyins().stream().mapToInt(Scoreboard::getBalance).sum();
     }
 
-    public Collection<Buyin> buyins() {
-        return this.buyinMap.values();
+    public Collection<Scoreboard> buyins() {
+        return this.scoreboards.values();
     }
 
-    public void send(String uid, Object obj) {
+    private void send(String uid, Object obj) {
         if (server == null) {
             return;
         }
@@ -493,7 +487,7 @@ public class Room {
         this.server.send(uid, info);
     }
 
-    public void send(Object obj) {
+    void send(Object obj) {
         if (server == null) {
             return;
         }

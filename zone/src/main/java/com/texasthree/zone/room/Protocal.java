@@ -405,8 +405,8 @@ public class Protocal {
             this.insurance = room.getInsurance();
             // 按照 balance, sum 降序排列
             this.buyins = room.buyins().stream()
-                    .sorted(Comparator.comparing(com.texasthree.zone.room.Buyin::getProfit, Comparator.reverseOrder())
-                            .thenComparing(com.texasthree.zone.room.Buyin::getSum, Comparator.reverseOrder()))
+                    .sorted(Comparator.comparing(Scoreboard::getGameProfit, Comparator.reverseOrder())
+                            .thenComparing(Scoreboard::getBuyin, Comparator.reverseOrder()))
                     .map(Buyin::new)
                     .collect(Collectors.toList());
         }
@@ -418,10 +418,10 @@ public class Protocal {
         public int profit;
         public boolean settle;
 
-        Buyin(com.texasthree.zone.room.Buyin v) {
+        Buyin(Scoreboard v) {
             this.name = v.getName();
-            this.buyin = v.getSum();
-            this.profit = v.getProfit();
+            this.buyin = v.getBuyin();
+            this.profit = v.getGameProfit();
             this.settle = v.isSettle();
         }
     }

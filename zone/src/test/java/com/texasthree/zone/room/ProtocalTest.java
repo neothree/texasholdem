@@ -51,7 +51,7 @@ class ProtocalTest {
 
         var u2 = Tester.createUser();
         room.buyin(u2, 200);
-        room.changeProfit(u2.getId(), 10);
+        room.changeGameProfit(u2.getId(), 10);
         rank = new Protocal.Rank(room);
         assertEquals(3, rank.buyins.size());
         assertBuyin(rank.buyins.get(0), 200, 10, u2.getName());
@@ -60,7 +60,7 @@ class ProtocalTest {
 
         var u3 = Tester.createUser();
         room.buyin(u3, 300);
-        room.changeProfit(u3.getId(), 10);
+        room.changeGameProfit(u3.getId(), 10);
         rank = new Protocal.Rank(room);
         assertEquals(4, rank.buyins.size());
         assertBuyin(rank.buyins.get(0), 300, 10, u3.getName());
