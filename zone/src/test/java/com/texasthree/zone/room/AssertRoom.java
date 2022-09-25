@@ -31,12 +31,12 @@ public class AssertRoom extends Room {
         return this;
     }
 
-    AssertRoom toBring(User user) {
+    AssertRoom toBuyin(User user) {
         super.buyin(user, Room.initChips);
         return this;
     }
 
-    AssertRoom toTakeout(String uid) {
+    AssertRoom toSettle(String uid) {
         super.settle(uid);
         return this;
     }

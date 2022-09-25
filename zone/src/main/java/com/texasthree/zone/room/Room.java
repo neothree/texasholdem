@@ -133,6 +133,10 @@ public class Room {
      * @return
      */
     public void settle(String uid) {
+        var seat = this.getUserSeat(uid);
+        if (seat != null) {
+            this.sitUp(seat.getUser());
+        }
         var info = this.scoreboards.get(uid);
         info.settle();
         log.info("玩家提前结算 roomId={} {}", id, info);

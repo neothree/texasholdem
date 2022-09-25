@@ -11,12 +11,17 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 class RoomTest {
 
     @Test
-    void testBring() throws Exception {
+    void testBuyin() throws Exception {
         var user = Tester.createUser();
         AssertRoom.build()
                 .toAddUser(user).assertBalance(user.getId(), Room.initChips)
-                .toBring(user).assertBalance(user.getId(), Room.initChips * 2)
-                .toTakeout(user.getId()).assertBalance(user.getId(), 0);
+                // 买入
+                .toBuyin(user).assertBalance(user.getId(), Room.initChips * 2)
+                // 提前结算
+                .toSitDown(user, 1)
+                .assertOccupiedNum(1)
+                .toSettle(user.getId()).assertBalance(user.getId(), 0)
+                .assertOccupiedNum(0);
     }
 
     @Test
@@ -58,7 +63,7 @@ class RoomTest {
         AssertRoom.build()
                 .toAddUser(u1).assertBalance(u1.getId(), initChips)
                 .toAddUser(u2).assertBalance(u2.getId(), initChips)
-                .toBring(u1).assertBalance(u1.getId(), initChips * 2)
+                .toBuyin(u1).assertBalance(u1.getId(), initChips * 2)
                 .toSitDown(u1, 1)
                 .toSitDown(u2, 2)
                 .toForce().assertRunning(true)
@@ -98,7 +103,7 @@ class RoomTest {
                 .toSitDown(u1, 1)
                 .toSitDown(u2, 2)
                 // 玩家余额不足，不能开局
-                .toTakeout(u2.getId()).assertBalance(u2.getId(), 0)
+                .toSettle(u2.getId()).assertBalance(u2.getId(), 0)
                 .toForce().assertRunning(false);
     }
 
