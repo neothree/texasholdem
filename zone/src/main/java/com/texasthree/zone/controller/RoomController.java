@@ -3,6 +3,7 @@ package com.texasthree.zone.controller;
 import com.texasthree.game.texas.Optype;
 import com.texasthree.security.shiro.AbstractMeController;
 import com.texasthree.utility.restful.RestResponse;
+import com.texasthree.zone.FundFlow;
 import com.texasthree.zone.Zone;
 import com.texasthree.zone.room.Protocal;
 import com.texasthree.zone.room.Room;
@@ -19,9 +20,12 @@ public class RoomController extends AbstractMeController<User> {
 
     private final Zone zone;
 
+    private final FundFlow fundFlow;
+
     @Autowired
-    public RoomController(Zone zone) {
+    public RoomController(Zone zone, FundFlow fundFlow) {
         this.zone = zone;
+        this.fundFlow = fundFlow;
     }
 
     @GetMapping
@@ -79,7 +83,7 @@ public class RoomController extends AbstractMeController<User> {
                               @RequestParam("amount") Integer amount) throws Exception {
         log.info("请求购买记分牌 {}", roomId);
         var room = zone.getRoom();
-        zone.buyin(room, this.getMe(), amount);
+        fundFlow.buyin(room, this.getMe(), amount);
         return RestResponse.SUCCESS;
     }
 
