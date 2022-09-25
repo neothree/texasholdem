@@ -1,4 +1,4 @@
-package com.texasthree.zone.room;
+package com.texasthree.zone.util;
 
 /**
  * @author: neo

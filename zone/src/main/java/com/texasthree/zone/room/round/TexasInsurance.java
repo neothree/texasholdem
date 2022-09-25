@@ -6,7 +6,7 @@ import com.texasthree.game.insurance.InsurancePot;
 import com.texasthree.game.texas.Card;
 import com.texasthree.game.texas.Circle;
 import com.texasthree.game.texas.Player;
-import com.texasthree.zone.room.ScheduledEventChecker;
+import com.texasthree.zone.util.ScheduledEventChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
