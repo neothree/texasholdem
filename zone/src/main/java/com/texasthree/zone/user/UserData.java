@@ -3,6 +3,7 @@ package com.texasthree.zone.user;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -51,6 +52,10 @@ public class UserData {
      * 俱乐部
      */
     private String clubId;
+    /**
+     * 余额
+     */
+    private BigDecimal balance = BigDecimal.ZERO;
 
 
     public UserData() {
@@ -61,6 +66,7 @@ public class UserData {
         this.name = name;
         this.real = real;
         this.createAt = LocalDateTime.now();
+        this.balance = BigDecimal.ZERO;
     }
 
 
@@ -126,6 +132,14 @@ public class UserData {
 
     public void setClubId(String clubId) {
         this.clubId = clubId;
+    }
+
+    public BigDecimal getBalance() {
+        return balance;
+    }
+
+    public void setBalance(BigDecimal balance) {
+        this.balance = balance;
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.texasthree.zone.user;
 
 import com.texasthree.zone.room.Room;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -70,5 +71,9 @@ public class User {
 
     public String getClubId() {
         return this.data.getClubId();
+    }
+
+    public BigDecimal getBalance() {
+        return this.data.getBalance();
     }
 }

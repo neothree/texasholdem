@@ -63,9 +63,9 @@ public class Room {
     /**
      * 房间解散行为注册
      */
-    private Consumer<Room> beforeDispose;
+    private Consumer<Collection<Scoreboard>> beforeDispose;
 
-    public Room(String id, int capacity, Consumer<Room> beforeDispose) {
+    public Room(String id, int capacity, Consumer<Collection<Scoreboard>> beforeDispose) {
         seats = new Seat[capacity];
         for (var i = 0; i < capacity; i++) {
             seats[i] = new Seat(id, i);
@@ -296,7 +296,7 @@ public class Room {
     public void dispose() {
         log.info("房间解散");
         if (this.beforeDispose != null) {
-            this.beforeDispose.accept(this);
+            this.beforeDispose.accept(scoreboards.values());
         }
         roomMap.remove(id);
     }

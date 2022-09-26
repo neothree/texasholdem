@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+
 /**
  * @author: neo
  * @create: 2022-08-14 10:14
@@ -37,7 +39,12 @@ public class UserService {
         return new User(data);
     }
 
-    public User balance(String id, int amount) {
-        throw new IllegalArgumentException();
+    public User balance(String id, BigDecimal amount) {
+        var data = this.userDataDao.findById(id).get();
+        data.setBalance(data.getBalance().add(amount));
+        this.userDataDao.save(data);
+        return new User(data);
     }
+
+
 }
