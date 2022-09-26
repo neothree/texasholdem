@@ -22,7 +22,7 @@ class UserServiceTest {
 
     @Test
     public void testSave() throws Exception {
-        var user = this.userService.user(StringUtils.get10UUID(), StringUtils.get10UUID(), true);
+        var user = this.userService.user(StringUtils.get10UUID(), StringUtils.get10UUID(), true, StringUtils.get10UUID());
         assertEquals(BigDecimal.ZERO, user.getBalance());
 
         var amount = BigDecimal.valueOf(100);

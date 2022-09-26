@@ -30,21 +30,21 @@ public class Scoreboard {
      */
     private boolean settle;
 
-    Scoreboard(User user) {
+    public Scoreboard(User user) {
         this.user = user;
     }
 
-    void buyin(int value) {
+    public void buyin(int value) {
         requireNonSettle();
         this.buyin += value;
     }
 
-    void gameProfit(int value) {
+    public void gameProfit(int value) {
         requireNonSettle();
         this.gameProfit += value;
     }
 
-    void insuranceProfit(int value) {
+    public void insuranceProfit(int value) {
         requireNonSettle();
         this.insuranceProfit += value;
     }
@@ -73,6 +73,10 @@ public class Scoreboard {
 
     public int getGameProfit() {
         return gameProfit;
+    }
+
+    public int getProfit() {
+        return gameProfit + insuranceProfit;
     }
 
     boolean isSettle() {

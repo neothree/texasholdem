@@ -70,7 +70,7 @@ public class FundFlow {
      * 结算：
      * <p>
      * 玩家A -200       （利润）
-     * 玩家B 380        （利润）
+     * 玩家B 380        （400 * 0.95）
      * <p>
      * 玩家A保险 -665    （700 * 0.95）
      * 玩家B保险 475      (500 * 0.95)
@@ -82,15 +82,20 @@ public class FundFlow {
     @Transactional(rollbackFor = Exception.class)
     public void share(Collection<Scoreboard> scoreboards) {
         log.info("房间分配利润");
+        var feeRate = new BigDecimal("0.05");
         for (var v : scoreboards) {
-            var balance = v.getBalance();
+            var balance = BigDecimal.valueOf(v.getBalance());
+            var profit = BigDecimal.valueOf(v.getProfit());
+            log.info("{} balance={} profit{}", v.getUid(), balance, profit);
             // 赢家扣除5%的利润
-            var give = v.getGameProfit() > 0 ? (int) (v.getGameProfit() * 0.05) : 0;
-            var user = this.userService.balance(v.getUid(), BigDecimal.valueOf(balance - give));
-            if (v.getGameProfit() < 0) {
+            var fee = v.getProfit() > 0 ? profit.multiply(feeRate) : BigDecimal.ZERO;
+            var user = this.userService.balance(v.getUid(), balance.subtract(fee));
+            if (v.getProfit() < 0) {
                 // 输家将5%加到俱乐部基金
-                this.clubService.fund(user.getClubId(), BigDecimal.valueOf(give) );
+                this.clubService.fund(user.getClubId(), profit.multiply(feeRate).abs());
             }
+            var giveIns = BigDecimal.valueOf(v.getInsuranceProfit()).multiply(BigDecimal.ONE.subtract(feeRate));
+            this.clubService.fund(user.getClubId(), giveIns.negate());
         }
     }
 }

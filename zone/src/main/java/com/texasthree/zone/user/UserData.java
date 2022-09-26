@@ -61,12 +61,13 @@ public class UserData {
     public UserData() {
     }
 
-    public UserData(String username, String name, boolean real) {
+    public UserData(String username, String name, boolean real, String clubId) {
         this.username = username;
         this.name = name;
         this.real = real;
         this.createAt = LocalDateTime.now();
         this.balance = BigDecimal.ZERO;
+        this.clubId = clubId;
     }
 
 

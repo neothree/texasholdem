@@ -11,13 +11,13 @@ import com.texasthree.zone.user.UserData;
 public class Tester {
 
     public static User createUser() {
-        var data = new UserData(StringUtils.get10UUID(), StringUtils.get10UUID(), true);
+        var data = new UserData(StringUtils.get10UUID(), StringUtils.get10UUID(), true, StringUtils.get10UUID());
         data.setId(StringUtils.get10UUID());
         return new User(data);
     }
 
     public static User createRobot() {
-        var data = new UserData(StringUtils.get10UUID(), StringUtils.get10UUID(), false);
+        var data = new UserData(StringUtils.get10UUID(), StringUtils.get10UUID(), false, StringUtils.get10UUID());
         data.setId(StringUtils.get10UUID());
         return new User(data);
     }

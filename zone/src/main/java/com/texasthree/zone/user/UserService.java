@@ -23,13 +23,16 @@ public class UserService {
         this.userDataDao = userDataDao;
     }
 
-    public User user(String username, String name, boolean real) {
-        var data = new UserData(username, name, real);
+    public User user(String username, String name, boolean real, String cluId) {
+        var data = new UserData(username, name, real, cluId);
         this.userDataDao.save(data);
         log.info("创建玩家 {} {}", username, username);
         return new User(data);
     }
 
+    public User getDataById(String id) {
+        return new User(this.userDataDao.findById(id).get());
+    }
 
     public User getDataByUsername(String username) {
         var data = this.userDataDao.findByUsername(username).orElse(null);
@@ -40,6 +43,7 @@ public class UserService {
     }
 
     public User balance(String id, BigDecimal amount) {
+        log.info("修改玩家余额 {} {}", id, amount);
         var data = this.userDataDao.findById(id).get();
         data.setBalance(data.getBalance().add(amount));
         this.userDataDao.save(data);

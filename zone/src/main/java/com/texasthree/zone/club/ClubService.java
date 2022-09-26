@@ -60,6 +60,7 @@ public class ClubService {
 
     @Transactional(rollbackFor = Exception.class)
     public Club fund(String id, BigDecimal amount) {
+        log.info("修改俱乐部基金 {} {}", id, amount);
         var data = this.getDataById(id);
         data.setFund(data.getFund().add(amount));
         this.cdao.save(data);

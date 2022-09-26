@@ -47,9 +47,8 @@ public class Zone {
     public User createUser(String username, String password, boolean real) {
         var name = StringUtils.getChineseName();
         this.loginerService.loginer(username, password, LoginApp.USER);
-        return this.userService.user(username, name, real);
+        return this.userService.user(username, name, real, StringUtils.get10UUID());
     }
-
 
     public void start() {
         log.info("zone 开启启动");

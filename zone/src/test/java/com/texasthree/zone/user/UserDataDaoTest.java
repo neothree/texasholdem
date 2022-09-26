@@ -25,7 +25,8 @@ class UserDataDaoTest {
         var username = StringUtils.get10UUID();
         var name = StringUtils.get10UUID();
         var real = false;
-        var data = new UserData(username, name, real);
+        var clubId = StringUtils.get10UUID();
+        var data = new UserData(username, name, real, clubId);
         this.userDataDao.save(data);
         var opt = this.userDataDao.findByUsername(username);
         assertTrue(opt.isPresent());
@@ -34,6 +35,7 @@ class UserDataDaoTest {
         assertEquals(name, data.getName());
         assertEquals(0, data.getVersion());
         assertEquals(real, data.isReal());
+        assertEquals(clubId, data.getClubId());
 
         var avatar = StringUtils.get10UUID();
         data.setAvatar(avatar);
