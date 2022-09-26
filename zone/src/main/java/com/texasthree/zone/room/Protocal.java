@@ -17,6 +17,21 @@ import java.util.stream.Collectors;
  */
 public class Protocal {
 
+    public static class RoomLabel {
+        public String id;
+        public String name;
+        public Integer number = 112;
+        public Integer capacity;
+        public Integer occupied;
+        public RoomLabel(Room v) {
+            this.id = v.getId();
+            this.name = "test";
+            this.number = 112;
+            this.capacity = v.getCapacity();
+            this.occupied = (int) v.getSeats().stream().filter(com.texasthree.zone.room.Seat::occupied).count();
+        }
+    }
+
     /**
      * 房间数据
      */

@@ -11,11 +11,12 @@ import com.texasthree.zone.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 
 @RestController
-@RequestMapping("/room")
+@RequestMapping
 public class RoomController extends AbstractMeController<User> {
 
     private final Zone zone;
@@ -28,19 +29,21 @@ public class RoomController extends AbstractMeController<User> {
         this.fundFlow = fundFlow;
     }
 
-    @GetMapping
+    @GetMapping(value = "/rooms")
     public RestResponse rooms() {
-        return new RestResponse<>();
+        var list = new ArrayList<Protocal.RoomLabel>();
+        list.add(new Protocal.RoomLabel(this.zone.getRoom()));
+        return new RestResponse<>(list);
     }
 
-    @DeleteMapping(value = "/debug/{roomId}")
+    @DeleteMapping(value = "/room/debug/{roomId}")
     public RestResponse dispose(@PathVariable("roomId") String roomId) throws Exception {
         log.info("解散房间 roomId={}", roomId);
         zone.getRoom().dispose();
         return RestResponse.SUCCESS;
     }
 
-    @GetMapping(value = "/{roomId}")
+    @GetMapping(value = "/room/{roomId}")
     public RestResponse room(@PathVariable("roomId") String roomId) throws Exception {
         log.info("请求获取房间数据 {}", roomId);
         var data = new Protocal.RoomData(zone.getRoom(), this.getMe().getId());
@@ -50,7 +53,7 @@ public class RoomController extends AbstractMeController<User> {
     /**
      * 进入房间
      */
-    @PostMapping(value = "/{roomId}")
+    @PostMapping(value = "/room/{roomId}")
     public RestResponse enter(@PathVariable("roomId") String roomId) throws Exception {
         log.info("请求进入房间 {}", roomId);
         this.getMe().enter(zone.getRoom());
@@ -60,7 +63,7 @@ public class RoomController extends AbstractMeController<User> {
     /**
      * 离开房间
      */
-    @DeleteMapping("/{roomId}")
+    @DeleteMapping("/room/{roomId}")
     public void leave(@PathVariable("roomId") String roomId) {
         log.info("请求离开房间 {}", roomId);
         zone.getRoom().removeUser(this.getMe());
@@ -69,7 +72,7 @@ public class RoomController extends AbstractMeController<User> {
     /**
      * 房间所有玩家筹码买入统计
      */
-    @GetMapping(value = "/{roomId}/buyin")
+    @GetMapping(value = "/room/{roomId}/buyin")
     public Protocal.Rank buyin(@PathVariable("roomId") String roomId) throws Exception {
         var room = zone.getRoom();
         return new Protocal.Rank(room);
@@ -78,7 +81,7 @@ public class RoomController extends AbstractMeController<User> {
     /**
      * 买入 - 购买记分牌
      */
-    @PostMapping(value = "/{roomId}/buyin")
+    @PostMapping(value = "/room/{roomId}/buyin")
     public RestResponse buyin(@PathVariable("roomId") String roomId,
                               @RequestParam("amount") Integer amount) throws Exception {
         log.info("请求购买记分牌 {}", roomId);
@@ -90,7 +93,7 @@ public class RoomController extends AbstractMeController<User> {
     /**
      * 提前结算
      */
-    @DeleteMapping(value = "/{roomId}/buyin")
+    @DeleteMapping(value = "/room/{roomId}/buyin")
     public RestResponse settle(@PathVariable("roomId") String roomId) throws Exception {
         log.info("请求提前结算 {}", roomId);
         var room = Room.getRoom(roomId);
@@ -101,7 +104,7 @@ public class RoomController extends AbstractMeController<User> {
     /**
      * 坐下
      */
-    @PostMapping(value = "/seat/{seatId}")
+    @PostMapping(value = "/room/seat/{seatId}")
     public void sitDown(@PathVariable("seatId") int seatId) {
         log.info("请求坐下 {}", seatId);
         var room = zone.getRoom();
@@ -111,7 +114,7 @@ public class RoomController extends AbstractMeController<User> {
     /**
      * 站起
      */
-    @DeleteMapping(value = "/seat/{seatId}")
+    @DeleteMapping(value = "/room/seat/{seatId}")
     public RestResponse sitUp(@PathVariable("seatId") String seatId) {
         log.info("请求站起 {}", seatId);
         var user = this.getMe();
@@ -134,7 +137,7 @@ public class RoomController extends AbstractMeController<User> {
     /**
      * 押注
      */
-    @PostMapping(value = "/round/action")
+    @PostMapping(value = "/room/round/action")
     public void action(@RequestParam("op") String op,
                        int chipsBet) {
         log.info("请求押注 op{} chipsBet={}", op, chipsBet);
@@ -155,7 +158,7 @@ public class RoomController extends AbstractMeController<User> {
     /**
      * 购买保险
      */
-    @PostMapping(value = "/round/buy")
+    @PostMapping(value = "/room/round/buy")
     public void buy(@RequestParam("potId") int potId,
                     @RequestParam("amount") int amount) {
         log.info("请求购买保险 potId={} amount={}", potId, amount);
