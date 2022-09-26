@@ -21,6 +21,7 @@ public class RestResponseAdvice implements ResponseBodyAdvice<Object> {
     @Override
     public Object beforeBodyWrite(Object o, MethodParameter methodParameter, MediaType mediaType, Class<? extends HttpMessageConverter<?>> aClass, ServerHttpRequest serverHttpRequest, ServerHttpResponse serverHttpResponse) {
         try {
+            // 如果Controller直接返回String的话，防止SpringBoot是直接返回，需要手动转换成json
             if (o instanceof String) {
                 return JSONUtils.toString(new RestResponse<>(o));
             }

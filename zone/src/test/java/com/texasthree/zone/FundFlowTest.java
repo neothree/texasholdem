@@ -1,8 +1,10 @@
 package com.texasthree.zone;
 
 import com.texasthree.utility.utlis.StringUtils;
+import com.texasthree.zone.club.Club;
 import com.texasthree.zone.club.ClubService;
 import com.texasthree.zone.room.Scoreboard;
+import com.texasthree.zone.user.User;
 import com.texasthree.zone.user.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,24 +35,31 @@ class FundFlowTest {
     @Test
     public void testShare() throws Exception {
         var club = this.clubService.club(StringUtils.get10UUID(), StringUtils.get10UUID());
+        var club1 = this.clubService.club(StringUtils.get10UUID(), StringUtils.get10UUID());
+        var clubs = new ArrayList<Club>();
+        clubs.add(club);
+        clubs.add(club1);
         var user = this.userService.user(StringUtils.get10UUID(), StringUtils.get10UUID(), true, club.getId());
+        var user1 = this.userService.user(StringUtils.get10UUID(), StringUtils.get10UUID(), true, club1.getId());
+        var users = new ArrayList<User>();
+        users.add(user);
+        users.add(user1);
+
+        // 记分牌 - 总带入是 2000
         var sb = new Scoreboard(user);
         sb.buyin(1000);
         sb.insuranceProfit(700);
         sb.gameProfit(-900);
-
-        var club1 = this.clubService.club(StringUtils.get10UUID(), StringUtils.get10UUID());
-        var user1 = this.userService.user(StringUtils.get10UUID(), StringUtils.get10UUID(), true, club1.getId());
         var sb1 = new Scoreboard(user1);
         sb1.buyin(1000);
         sb1.insuranceProfit(-500);
         sb1.gameProfit(900);
-
         var list = new ArrayList<Scoreboard>();
         list.add(sb);
         list.add(sb1);
         this.fundFlow.share(list);
 
+        // 结算后金额变化
         user = this.userService.getDataById(user.getId());
         club = this.clubService.getClubById(club.getId());
         assertEquals(0, user.getBalance().compareTo(BigDecimal.valueOf(800)));
@@ -60,5 +69,17 @@ class FundFlowTest {
         club1 = this.clubService.getClubById(club1.getId());
         assertEquals(0, user1.getBalance().compareTo(BigDecimal.valueOf(1380)));
         assertEquals(0, club1.getFund().compareTo(BigDecimal.valueOf(475)));
+
+        // 账是平的
+        var sum = BigDecimal.ZERO;
+        for (var v : clubs) {
+            var c = this.clubService.getClubById(v.getId());
+            sum = sum.add(c.getFund());
+        }
+        for (var v : users) {
+            var c = this.userService.getDataById(v.getId());
+            sum = sum.add(c.getBalance());
+        }
+        assertEquals(0, sum.compareTo(BigDecimal.valueOf(2000)));
     }
 }
