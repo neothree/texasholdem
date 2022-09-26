@@ -3,6 +3,7 @@ package com.texasthree.zone;
 import com.texasthree.security.login.enums.LoginApp;
 import com.texasthree.security.login.service.LoginerService;
 import com.texasthree.utility.utlis.StringUtils;
+import com.texasthree.zone.club.ClubService;
 import com.texasthree.zone.net.Server;
 import com.texasthree.zone.room.Room;
 import com.texasthree.zone.user.User;
@@ -14,6 +15,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author: neo
@@ -30,24 +32,29 @@ public class Zone {
 
     private final LoginerService loginerService;
 
+    private final ClubService clubService;
+
     private final Server server;
 
     @Autowired
     public Zone(UserService userService,
+                ClubService clubService,
                 LoginerService loginerService,
                 Server server,
                 FundFlow fundFlow) {
         this.userService = userService;
         this.loginerService = loginerService;
+        this.clubService = clubService;
         this.server = server;
         this.fundFlow = fundFlow;
     }
 
-
+    @Transactional(rollbackFor = Exception.class)
     public User createUser(String username, String password, boolean real) {
         var name = StringUtils.getChineseName();
         this.loginerService.loginer(username, password, LoginApp.USER);
-        return this.userService.user(username, name, real, StringUtils.get10UUID());
+        var club = this.clubService.platform();
+        return this.userService.user(username, name, real, club.getId());
     }
 
     public void start() {

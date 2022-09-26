@@ -27,7 +27,7 @@ public class ClubData {
     /**
      * 名称
      */
-    @Column(nullable = false, updatable = false)
+    @Column(unique = true, nullable = false, updatable = false)
     private String name;
     /**
      * 头像

@@ -10,6 +10,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.math.BigDecimal;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @WebAppConfiguration
@@ -32,5 +33,10 @@ class ClubServiceTest {
         var amount1 = BigDecimal.valueOf(-50);
         club = this.clubService.fund(club.getId(), amount1);
         assertEquals(0, club.getFund().compareTo(amount.add(amount1)));
+    }
+
+    @Test
+    public void testPlatform() throws Exception {
+        assertNotNull(this.clubService.platform());
     }
 }

@@ -54,10 +54,6 @@ public class ClubService {
         log.info("俱乐部添加成员 club={} user={}", club, user);
     }
 
-    public Club getClubById(String id) {
-        return new Club(getDataById(id));
-    }
-
     @Transactional(rollbackFor = Exception.class)
     public Club fund(String id, BigDecimal amount) {
         log.info("修改俱乐部基金 {} {}", id, amount);
@@ -67,11 +63,28 @@ public class ClubService {
         return getClubById(id);
     }
 
+    public Club getClubById(String id) {
+        return new Club(getDataById(id));
+    }
+
     private ClubData getDataById(String id) {
         var data = this.cdao.findById(id);
         if (data.isEmpty()) {
             throw new IllegalArgumentException("无找到俱乐部数据 id=" + id);
         }
         return data.get();
+    }
+
+    private Club platform;
+
+    public Club platform() {
+        if (platform == null) {
+            var name = "平台俱乐部";
+            var data = this.cdao.findByName(name);
+            if (data.isEmpty()) {
+                this.platform = this.club("系统", name);
+            }
+        }
+        return this.platform;
     }
 }
