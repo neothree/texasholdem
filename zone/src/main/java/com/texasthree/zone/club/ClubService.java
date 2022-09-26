@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -54,17 +55,15 @@ public class ClubService {
     }
 
     public Club getClubById(String id) {
-        if (!this.clubMap.containsKey(id)) {
-            var data = getDataById(id);
-            this.clubMap.put(id, new Club(data));
-        }
-        return this.clubMap.get(id);
+        return new Club(getDataById(id));
     }
 
-    public void addFund(String id, int amount) {
-//        var data = this.getDataById(id);
-//        var fund = data.getFund();
-//        var club = this.getClubById(id);
+    @Transactional(rollbackFor = Exception.class)
+    public Club fund(String id, BigDecimal amount) {
+        var data = this.getDataById(id);
+        data.setFund(data.getFund().add(amount));
+        this.cdao.save(data);
+        return getClubById(id);
     }
 
     private ClubData getDataById(String id) {

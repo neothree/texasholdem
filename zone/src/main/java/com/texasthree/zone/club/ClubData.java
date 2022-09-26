@@ -3,6 +3,7 @@ package com.texasthree.zone.club;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -49,11 +50,11 @@ public class ClubData {
     /**
      * 基金 - 牌局抽水
      */
-    private int fund = 0;
+    private BigDecimal fund = BigDecimal.ZERO;
     /**
      * 余额
      */
-    private int balance = 0;
+    private BigDecimal balance = BigDecimal.ZERO;
 
     public ClubData() {
     }
@@ -120,19 +121,19 @@ public class ClubData {
         this.capacity = capacity;
     }
 
-    public int getFund() {
+    public BigDecimal getFund() {
         return fund;
     }
 
-    public void setFund(int fund) {
+    public void setFund(BigDecimal fund) {
         this.fund = fund;
     }
 
-    public int getBalance() {
+    public BigDecimal getBalance() {
         return balance;
     }
 
-    public void setBalance(int balance) {
+    public void setBalance(BigDecimal balance) {
         this.balance = balance;
     }
 

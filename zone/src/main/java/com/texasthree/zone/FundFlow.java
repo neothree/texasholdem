@@ -11,6 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.util.Collection;
+
 /**
  * 管理所有的资金流动
  *
@@ -39,7 +42,7 @@ public class FundFlow {
     @Transactional(rollbackFor = Exception.class)
     public void buyin(Room room, User user, int amount) {
         // 玩家扣除余额
-        this.userService.balance(user.getId(), -amount);
+        this.userService.balance(user.getId(), BigDecimal.valueOf(-amount));
 
         // 增加玩家的房间筹码
         room.buyin(user, amount);
@@ -47,28 +50,46 @@ public class FundFlow {
 
     /**
      * 分配房间利润分成
+     * <p>
+     * A:
+     * 买入：1000
+     * 保险：+700
+     * 牌局：-900
+     * --------------
+     * 余额：800
+     * 利润：-200
+     * <p>
+     * B:
+     * 买入：1000
+     * 保险：-500
+     * 牌局：+900
+     * --------------
+     * 余额：1400
+     * 利润：400
+     * <p>
+     * 结算：
+     * <p>
+     * 玩家A -200       （利润）
+     * 玩家B 380        （利润）
+     * <p>
+     * 玩家A保险 -665    （700 * 0.95）
+     * 玩家B保险 475      (500 * 0.95)
+     * <p>
+     * 玩家A俱乐部返水 10  (200 * 0.05)
+     * <p>
+     * -200+380-665+475+10=0
      */
     @Transactional(rollbackFor = Exception.class)
-    public void share(Room room) {
-        // 返回玩家余额
-        var scoreboards = room.scoreboards();
-        var win = scoreboards.stream()
-                .filter(v -> v.getGameProfit() > 0)
-                .mapToInt(Scoreboard::getGameProfit)
-                .sum();
-        var lose = scoreboards.stream()
-                .filter(v -> v.getGameProfit() < 0)
-                .mapToInt(Scoreboard::getGameProfit)
-                .sum();
-        log.info("房间结算 win={} lose={} insurance={}", win, lose, room.getInsurance());
+    public void share(Collection<Scoreboard> scoreboards) {
+        log.info("房间分配利润");
         for (var v : scoreboards) {
             var balance = v.getBalance();
             // 赢家扣除5%的利润
             var give = v.getGameProfit() > 0 ? (int) (v.getGameProfit() * 0.05) : 0;
-            var user = this.userService.balance(v.getUid(), balance - give);
+            var user = this.userService.balance(v.getUid(), BigDecimal.valueOf(balance - give));
             if (v.getGameProfit() < 0) {
                 // 输家将5%加到俱乐部基金
-                this.clubService.addFund(user.getClubId(), give);
+                this.clubService.fund(user.getClubId(), BigDecimal.valueOf(give) );
             }
         }
     }

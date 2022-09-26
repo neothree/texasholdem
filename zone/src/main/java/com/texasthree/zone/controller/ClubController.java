@@ -36,8 +36,8 @@ public class ClubController extends AbstractMeController<User> {
             this.creator = club.getCreator();
             this.creatorName = "张三";
             this.avatar = club.getAvatar();
-            this.balance = club.getBalance();
-            this.fund = club.getFund();
+            this.balance = club.getBalance().intValue();
+            this.fund = club.getFund().intValue();
             this.capacity = club.getCapacity();
             this.num = 10;
         }
