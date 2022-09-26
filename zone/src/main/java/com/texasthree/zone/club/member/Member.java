@@ -14,6 +14,14 @@ public class Member {
         this.data = data;
     }
 
+    public String getId() {
+        return this.data.getId();
+    }
+
+    public String getUid() {
+        return this.data.getUid();
+    }
+
     @Override
     public String toString() {
         return this.data.toString();

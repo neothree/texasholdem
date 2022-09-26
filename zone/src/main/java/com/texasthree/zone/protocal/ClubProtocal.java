@@ -7,7 +7,8 @@ import com.texasthree.zone.club.Club;
  * @create: 2022-09-26 15:37
  */
 public class ClubProtocal {
-    public static class ClubInfo {
+
+    public static class ClubData {
         public String id;
         public String name;
         public String creator;
@@ -18,7 +19,7 @@ public class ClubProtocal {
         public int fund;
         public int balance;
 
-        public ClubInfo(Club club) {
+        public ClubData(Club club) {
             this.id = club.getId();
             this.name = club.getName();
             this.creator = club.getCreator();
@@ -28,6 +29,17 @@ public class ClubProtocal {
             this.fund = club.getFund().intValue();
             this.capacity = club.getCapacity();
             this.num = 10;
+        }
+    }
+
+    public static class Member {
+        public String uid;
+        public String name;
+        public String avatar;
+
+        public Member(com.texasthree.zone.club.member.Member v) {
+            this.uid = v.getUid();
+            this.name = "张三";
         }
     }
 }
