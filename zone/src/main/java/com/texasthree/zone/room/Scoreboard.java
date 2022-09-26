@@ -79,7 +79,7 @@ public class Scoreboard {
         return gameProfit + insuranceProfit;
     }
 
-    boolean isSettle() {
+    public boolean isSettle() {
         return settle;
     }
 

@@ -1,6 +1,8 @@
 package com.texasthree.zone.room;
 
 
+import com.texasthree.zone.protocal.RoomProtocal;
+
 /**
  * @author: neo
  * @create: 2022-09-08 16:44
@@ -24,7 +26,7 @@ class RoomEventHandler {
     }
 
     private void onSeat(int seatId) {
-        var info = new Protocal.Seat(room.getSeat(seatId), room);
+        var info = new RoomProtocal.Seat(room.getSeat(seatId), room);
         room.send(info);
     }
 }

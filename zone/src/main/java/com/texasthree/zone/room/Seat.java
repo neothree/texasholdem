@@ -64,7 +64,7 @@ public class Seat {
      *
      * @return
      */
-    boolean occupied() {
+    public boolean occupied() {
         return this.user != null;
     }
 

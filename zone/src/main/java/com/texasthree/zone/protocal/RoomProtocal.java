@@ -1,7 +1,9 @@
-package com.texasthree.zone.room;
+package com.texasthree.zone.protocal;
 
 import com.texasthree.game.texas.Card;
 import com.texasthree.game.texas.Optype;
+import com.texasthree.zone.room.Room;
+import com.texasthree.zone.room.Scoreboard;
 import com.texasthree.zone.round.TexasInsurance;
 import com.texasthree.zone.round.TexasRound;
 
@@ -15,7 +17,7 @@ import java.util.stream.Collectors;
  * @author: neo
  * @create: 2022-08-28 00:07
  */
-public class Protocal {
+public class RoomProtocal {
 
     public static class RoomLabel {
         public String id;
@@ -60,7 +62,7 @@ public class Protocal {
             // 牌局
             var round = room.getRound();
             if (round != null) {
-                this.round = new Protocal.RoundData(round, uid);
+                this.round = new RoomProtocal.RoundData(round, uid);
             }
         }
     }
@@ -94,13 +96,13 @@ public class Protocal {
                 var chips = round.getPlayerChips(v.seatId);
                 var hand = v.getId().equals(uid) ? round.getPlayerHand(v.seatId) : null;
                 var action = round.getAction(v.seatId);
-                var info = new Protocal.Player(v.seatId, chips, action, hand);
+                var info = new RoomProtocal.Player(v.seatId, chips, action, hand);
                 this.players.add(info);
             }
 
             // 操作人
             if (round.getOperator() != null) {
-                this.operator = new Protocal.Operator(round);
+                this.operator = new RoomProtocal.Operator(round);
             }
 
             // 保险
@@ -151,7 +153,7 @@ public class Protocal {
 
             // 主角手牌
             if (h != null) {
-                this.hand = new Protocal.Hand(h);
+                this.hand = new RoomProtocal.Hand(h);
             }
         }
     }
@@ -250,7 +252,7 @@ public class Protocal {
             this.seatId = round.getOperator().seatId;
             this.actions = round.authority()
                     .entrySet().stream()
-                    .map(v -> new Protocal.Action(v.getKey(), v.getValue()))
+                    .map(v -> new RoomProtocal.Action(v.getKey(), v.getValue()))
                     .collect(Collectors.toList());
         }
 
@@ -281,13 +283,13 @@ public class Protocal {
             this.winners = new ArrayList<>();
             this.hands = new ArrayList<>();
             for (var v : result) {
-                var sh = new Protocal.ShowdownHand();
+                var sh = new RoomProtocal.ShowdownHand();
                 sh.seatId = v.id;
                 sh.profits = v.pot.entrySet().stream()
-                        .map(e -> new Protocal.PotProfit(e.getKey(), e.getValue()))
+                        .map(e -> new RoomProtocal.PotProfit(e.getKey(), e.getValue()))
                         .collect(Collectors.toList());
                 if (round.isCompareShowdown() && !round.isFold(v.id)) {
-                    sh.hand = new Protocal.Hand(round.getPlayerHand(v.id));
+                    sh.hand = new RoomProtocal.Hand(round.getPlayerHand(v.id));
                 }
                 this.hands.add(sh);
             }

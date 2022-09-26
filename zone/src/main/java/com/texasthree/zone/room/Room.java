@@ -391,7 +391,7 @@ public class Room {
         return info != null ? info.getBalance() : 0;
     }
 
-    void changeGameProfit(String uid, int amount) {
+    public void changeGameProfit(String uid, int amount) {
         var info = scoreboards.get(uid);
         info.gameProfit(amount);
         log.info("修改玩家筹码数 roomId={} {}", id, info);

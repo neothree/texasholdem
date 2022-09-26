@@ -5,7 +5,7 @@ import com.texasthree.security.shiro.AbstractMeController;
 import com.texasthree.utility.restful.RestResponse;
 import com.texasthree.zone.FundFlow;
 import com.texasthree.zone.Zone;
-import com.texasthree.zone.room.Protocal;
+import com.texasthree.zone.protocal.RoomProtocal;
 import com.texasthree.zone.room.Room;
 import com.texasthree.zone.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +31,8 @@ public class RoomController extends AbstractMeController<User> {
 
     @GetMapping(value = "/rooms")
     public RestResponse rooms() {
-        var list = new ArrayList<Protocal.RoomLabel>();
-        list.add(new Protocal.RoomLabel(this.zone.getRoom()));
+        var list = new ArrayList<RoomProtocal.RoomLabel>();
+        list.add(new RoomProtocal.RoomLabel(this.zone.getRoom()));
         return new RestResponse<>(list);
     }
 
@@ -46,7 +46,7 @@ public class RoomController extends AbstractMeController<User> {
     @GetMapping(value = "/room/{roomId}")
     public RestResponse room(@PathVariable("roomId") String roomId) throws Exception {
         log.info("请求获取房间数据 {}", roomId);
-        var data = new Protocal.RoomData(zone.getRoom(), this.getMe().getId());
+        var data = new RoomProtocal.RoomData(zone.getRoom(), this.getMe().getId());
         return new RestResponse<>(data);
     }
 
@@ -73,9 +73,9 @@ public class RoomController extends AbstractMeController<User> {
      * 房间所有玩家筹码买入统计
      */
     @GetMapping(value = "/room/{roomId}/buyin")
-    public Protocal.Rank buyin(@PathVariable("roomId") String roomId) throws Exception {
+    public RoomProtocal.Rank buyin(@PathVariable("roomId") String roomId) throws Exception {
         var room = zone.getRoom();
-        return new Protocal.Rank(room);
+        return new RoomProtocal.Rank(room);
     }
 
     /**
