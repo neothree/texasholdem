@@ -100,14 +100,15 @@ class ClubServiceTest {
 
         var balance = this.accountService.getDataById(club.getBalanceId());
         assertEquals(0, balance.getBalance().compareTo(BigDecimal.valueOf(700)));
-        assertEquals(0, user.getBalance().compareTo(BigDecimal.ZERO));
+        var account = this.accountService.getDataById(user.getAccountId());
+        assertEquals(0, account.getBalance().compareTo(BigDecimal.ZERO));
 
         var amount = BigDecimal.valueOf(211);
         this.clubService.balanceToMember(club.getId(), user.getId(), amount);
         balance = this.accountService.getDataById(club.getBalanceId());
         assertEquals(0, balance.getBalance().compareTo(BigDecimal.valueOf(489)));
-        user = this.userService.getDataById(user.getId());
-        assertEquals(0, user.getBalance().compareTo(amount));
+        account = this.accountService.getDataById(user.getAccountId());
+        assertEquals(0, account.getBalance().compareTo(amount));
     }
 
     @Test
@@ -118,14 +119,15 @@ class ClubServiceTest {
 
         var sum = BigDecimal.valueOf(1000);
         user = this.userService.balance(user.getId(), sum);
-        assertEquals(0, user.getBalance().compareTo(sum));
+        var account = this.accountService.getDataById(user.getAccountId());
+        assertEquals(0, account.getBalance().compareTo(sum));
         var balance = this.accountService.getDataById(club.getBalanceId());
         assertEquals(0, balance.getBalance().compareTo(BigDecimal.ZERO));
 
         var amount = BigDecimal.valueOf(200);
         this.clubService.memberToBalance(club.getId(), user.getId(), amount);
-        user = this.userService.getDataById(user.getId());
-        assertEquals(0, user.getBalance().compareTo(sum.subtract(amount)));
+        account = this.accountService.getDataById(user.getAccountId());
+        assertEquals(0, account.getBalance().compareTo(sum.subtract(amount)));
         balance = this.accountService.getDataById(club.getBalanceId());
         assertEquals(0, balance.getBalance().compareTo(amount));
     }

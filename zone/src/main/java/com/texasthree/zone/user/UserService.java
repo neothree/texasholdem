@@ -1,5 +1,7 @@
 package com.texasthree.zone.user;
 
+import com.texasthree.account.AccountService;
+import com.texasthree.utility.utlis.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,14 +21,18 @@ public class UserService {
 
     private final UserDataDao userDataDao;
 
+    private final AccountService accountService;
+
     @Autowired
-    public UserService(UserDataDao userDataDao) {
+    public UserService(UserDataDao userDataDao, AccountService accountService) {
         this.userDataDao = userDataDao;
+        this.accountService = accountService;
     }
 
     @Transactional(rollbackFor = Exception.class)
     public User user(String username, String name, boolean real, String cluId) {
-        var data = new UserData(username, name, real, cluId);
+        var account = this.accountService.account(name + "账户", false);
+        var data = new UserData(username, name, real, cluId, account.getId());
         this.userDataDao.save(data);
         log.info("创建玩家 {} {}", username, username);
         return new User(data);
@@ -36,8 +42,11 @@ public class UserService {
     public User balance(String id, BigDecimal amount) {
         log.info("修改玩家余额 {} {}", id, amount);
         var data = this.userDataDao.findById(id).get();
-        data.setBalance(data.getBalance().add(amount));
-        this.userDataDao.save(data);
+        if (amount.compareTo(BigDecimal.ZERO) > 0) {
+            this.accountService.credit(data.getAccountId(), amount, StringUtils.get10UUID());
+        } else {
+            this.accountService.debit(data.getAccountId(), amount.abs(), StringUtils.get10UUID());
+        }
         return new User(data);
     }
 

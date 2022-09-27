@@ -26,7 +26,7 @@ class UserDataDaoTest {
         var name = StringUtils.get10UUID();
         var real = false;
         var clubId = StringUtils.get10UUID();
-        var data = new UserData(username, name, real, clubId);
+        var data = new UserData(username, name, real, clubId, StringUtils.get10UUID());
         this.userDataDao.save(data);
         var opt = this.userDataDao.findByUsername(username);
         assertTrue(opt.isPresent());

@@ -15,13 +15,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class Tester {
 
     public static User createUser() {
-        var data = new UserData(StringUtils.get10UUID(), StringUtils.get10UUID(), true, StringUtils.get10UUID());
+        var data = new UserData(StringUtils.get10UUID(), StringUtils.get10UUID(), true, StringUtils.get10UUID(), StringUtils.get10UUID());
         data.setId(StringUtils.get10UUID());
         return new User(data);
     }
 
     public static User createRobot() {
-        var data = new UserData(StringUtils.get10UUID(), StringUtils.get10UUID(), false, StringUtils.get10UUID());
+        var data = new UserData(StringUtils.get10UUID(), StringUtils.get10UUID(), false, StringUtils.get10UUID(), StringUtils.get10UUID());
         data.setId(StringUtils.get10UUID());
         return new User(data);
     }

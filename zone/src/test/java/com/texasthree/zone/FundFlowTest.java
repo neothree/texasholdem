@@ -65,14 +65,16 @@ class FundFlowTest {
 
         // 结算后金额变化
         user = this.userService.getDataById(user.getId());
+        var account = this.accountService.getDataById(user.getAccountId());
+        assertEquals(0, account.getBalance().compareTo(BigDecimal.valueOf(800)));
         club = this.clubService.getClubById(club.getId());
-        assertEquals(0, user.getBalance().compareTo(BigDecimal.valueOf(800)));
         var fund = this.accountService.getDataById(club.getFundId());
         assertEquals(0, fund.getBalance().compareTo(BigDecimal.valueOf(-655)));
 
         user1 = this.userService.getDataById(user1.getId());
+        var account1 = this.accountService.getDataById(user1.getAccountId());
+        assertEquals(0, account1.getBalance().compareTo(BigDecimal.valueOf(1380)));
         club1 = this.clubService.getClubById(club1.getId());
-        assertEquals(0, user1.getBalance().compareTo(BigDecimal.valueOf(1380)));
         fund = this.accountService.getDataById(club1.getFundId());
         assertEquals(0, fund.getBalance().compareTo(BigDecimal.valueOf(475)));
 
@@ -84,7 +86,7 @@ class FundFlowTest {
             sum = sum.add(fund.getBalance());
         }
         for (var v : users) {
-            var c = this.userService.getDataById(v.getId());
+            var c = this.accountService.getDataById(v.getAccountId());
             sum = sum.add(c.getBalance());
         }
         assertEquals(0, sum.compareTo(BigDecimal.valueOf(2000)));

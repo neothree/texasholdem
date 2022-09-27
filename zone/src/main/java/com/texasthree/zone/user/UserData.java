@@ -3,7 +3,6 @@ package com.texasthree.zone.user;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -53,21 +52,22 @@ public class UserData {
      */
     private String clubId;
     /**
-     * 余额
+     * 账户
      */
-    private BigDecimal balance = BigDecimal.ZERO;
+    @Column(nullable = false, updatable = false)
+    private String accountId;
 
 
     public UserData() {
     }
 
-    public UserData(String username, String name, boolean real, String clubId) {
+    public UserData(String username, String name, boolean real, String clubId, String accountId) {
         this.username = username;
         this.name = name;
         this.real = real;
         this.createAt = LocalDateTime.now();
-        this.balance = BigDecimal.ZERO;
         this.clubId = clubId;
+        this.accountId = accountId;
     }
 
 
@@ -135,12 +135,12 @@ public class UserData {
         this.clubId = clubId;
     }
 
-    public BigDecimal getBalance() {
-        return balance;
+    public String getAccountId() {
+        return accountId;
     }
 
-    public void setBalance(BigDecimal balance) {
-        this.balance = balance;
+    public void setAccountId(String accountId) {
+        this.accountId = accountId;
     }
 
     @Override
