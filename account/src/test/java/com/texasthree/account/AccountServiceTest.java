@@ -57,7 +57,7 @@ public class AccountServiceTest {
 
         // 错误 - 不能小于0
         Runnable func = () -> this.accountService.credit(accountId, BigDecimal.valueOf(-1), StringUtils.get16UUID());
-        assertException(func, IllegalArgumentException.class);
+        Tester.assertException(func, IllegalArgumentException.class);
 
         // 可以是0
         func = () -> this.accountService.credit(accountId, BigDecimal.ZERO, StringUtils.get16UUID());
@@ -85,7 +85,7 @@ public class AccountServiceTest {
 
         // 错误 - 不能小于0
         Runnable func = () -> this.accountService.debit(accountId, BigDecimal.valueOf(-1), StringUtils.get16UUID());
-        assertException(func, IllegalArgumentException.class);
+        Tester.assertException(func, IllegalArgumentException.class);
 
         // 可以是0
         func = () -> this.accountService.debit(accountId, BigDecimal.ZERO, StringUtils.get16UUID());
@@ -94,7 +94,7 @@ public class AccountServiceTest {
         // 错误 - 不能减成负数
         var amount = old.getAvailableBalance().add(BigDecimal.ONE);
         func = () -> this.accountService.debit(accountId, amount, StringUtils.get16UUID());
-        assertException(func, AccountException.ACCOUNT_SUB_AMOUNT_OUTLIMIT);
+        Tester.assertException(func, AccountException.ACCOUNT_SUB_AMOUNT_OUTLIMIT);
 
 
         var add = BigDecimal.valueOf(1000);
@@ -125,7 +125,7 @@ public class AccountServiceTest {
         // 可以为负数
         var account = this.accountService.account(StringUtils.getChineseName(), true);
         assertTrue(account.isEnableNegative());
-        this.accountService.debit(account.getId(), BigDecimal.TEN, StringUtils.get10UUID());
+        this.accountService.debit(account.getId(), BigDecimal.TEN, StringUtils.get10UUID(), true);
         assertEquals(0, account.getBalance().compareTo(BigDecimal.valueOf(-10)));
     }
 
@@ -141,7 +141,7 @@ public class AccountServiceTest {
 
         // 错误 - 不能小于0
         Runnable func = () -> this.accountService.pending(accountId, BigDecimal.valueOf(-1));
-        assertException(func, IllegalArgumentException.class);
+        Tester.assertException(func, IllegalArgumentException.class);
 
         // 可以是0
         func = () -> this.accountService.pending(accountId, BigDecimal.ZERO);
@@ -149,7 +149,7 @@ public class AccountServiceTest {
 
         // 错误 - 减成了负数
         func = () -> this.accountService.pending(accountId, old.getAvailableBalance().add(BigDecimal.ONE));
-        assertException(func, AccountException.ACCOUNT_SUB_AMOUNT_OUTLIMIT);
+        Tester.assertException(func, AccountException.ACCOUNT_SUB_AMOUNT_OUTLIMIT);
 
 
         var freeze1 = BigDecimal.valueOf(100);
@@ -178,7 +178,7 @@ public class AccountServiceTest {
 
         // 错误 - 不能小于0
         Runnable func = () -> this.accountService.unpendingDebit(accountId, BigDecimal.valueOf(-1), StringUtils.get16UUID());
-        assertException(func, IllegalArgumentException.class);
+        Tester.assertException(func, IllegalArgumentException.class);
 
         // 可以是0
         func = () -> this.accountService.unpendingDebit(accountId, BigDecimal.ZERO, StringUtils.get16UUID());
@@ -186,7 +186,7 @@ public class AccountServiceTest {
 
         // 错误 - 减成了负数
         func = () -> this.accountService.unpendingDebit(accountId, old.getPendingBalance().add(BigDecimal.ONE), StringUtils.get16UUID());
-        assertException(func, AccountException.ACCOUNT_UN_FROZEN_AMOUNT_OUTLIMIT);
+        Tester.assertException(func, AccountException.ACCOUNT_UN_FROZEN_AMOUNT_OUTLIMIT);
 
         var freeze1 = BigDecimal.valueOf(100);
         func = () -> this.accountService.unpendingDebit(accountId, freeze1, StringUtils.get16UUID());
@@ -216,7 +216,7 @@ public class AccountServiceTest {
 
         // 错误 - 不能小于0
         Runnable func = () -> this.accountService.unpending(accountId, BigDecimal.valueOf(-1));
-        assertException(func, IllegalArgumentException.class);
+        Tester.assertException(func, IllegalArgumentException.class);
 
         // 可以是0
         func = () -> this.accountService.unpending(accountId, BigDecimal.ZERO);
@@ -224,7 +224,7 @@ public class AccountServiceTest {
 
         // 错误 - 减成了负数
         func = () -> this.accountService.unpending(accountId, old.getPendingBalance().add(BigDecimal.ONE));
-        assertException(func, AccountException.ACCOUNT_UN_FROZEN_AMOUNT_OUTLIMIT);
+        Tester.assertException(func, AccountException.ACCOUNT_UN_FROZEN_AMOUNT_OUTLIMIT);
 
         // 执行 500
         var freeze1 = BigDecimal.valueOf(500);
@@ -333,23 +333,6 @@ public class AccountServiceTest {
         }
     }
 
-    public static void assertException(Runnable func, Class biz) throws Exception {
-        try {
-            func.run();
-            assertTrue(false);
-        } catch (Exception e) {
-            assertEquals(biz, e.getClass());
-        }
-    }
-
-    public static void assertException(Runnable func, AccountException biz) throws Exception {
-        try {
-            func.run();
-            assertTrue(false);
-        } catch (AccountException e) {
-            assertEquals(biz.getCode(), e.getCode());
-        }
-    }
 
     private Account copy(Account src) {
         var v = new Account();

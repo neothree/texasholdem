@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @WebAppConfiguration
 @ExtendWith(SpringExtension.class)
@@ -34,14 +35,21 @@ class ClubServiceTest {
         assertEquals(0, fund.getBalance().compareTo(BigDecimal.ZERO));
 
         var amount = BigDecimal.valueOf(100);
-        club = this.clubService.fund(club.getId(), amount);
+        this.clubService.fund(club.getId(), amount);
         fund = this.accountService.getDataById(club.getFundId());
         assertEquals(0, fund.getBalance().compareTo(amount));
 
         var amount1 = BigDecimal.valueOf(-50);
-        club = this.clubService.fund(club.getId(), amount1);
+        this.clubService.fund(club.getId(), amount1);
         fund = this.accountService.getDataById(club.getFundId());
         assertEquals(0, fund.getBalance().compareTo(amount.add(amount1)));
+
+        // 基金扣为负数
+        var amount2 = BigDecimal.valueOf(-150);
+        this.clubService.fund(club.getId(), amount2);
+        fund = this.accountService.getDataById(club.getFundId());
+        assertEquals(0, fund.getBalance().compareTo(amount.add(amount1).add(amount2)));
+        assertTrue(fund.getBalance().compareTo(BigDecimal.ZERO) < 0);
     }
 
     @Test

@@ -81,6 +81,11 @@ public class AccountService {
      */
     @Transactional(rollbackFor = Exception.class)
     public Account debit(String accountId, BigDecimal amount, String requestNo) {
+        return this.debit(accountId, amount, requestNo, false);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public Account debit(String accountId, BigDecimal amount, String requestNo, boolean negative) {
         if (StringUtils.isEmpty(requestNo)) {
             throw new IllegalArgumentException();
         }
@@ -89,7 +94,7 @@ public class AccountService {
         if (drop(amount)) {
             return account;
         }
-        var statement = account.debit(amount, requestNo);
+        var statement = account.debit(amount, requestNo, negative);
         this.accountDao.save(account);
         this.accountStatementDao.save(statement);
         // 记录账户历史
@@ -159,7 +164,7 @@ public class AccountService {
         }
 
         account.unfreeze(amount);
-        var statement = account.debit(amount, requestNo);
+        var statement = account.debit(amount, requestNo, false);
         this.accountDao.save(account);
         this.accountStatementDao.save(statement);
         log.info("账户解冻并减去资金 {} ", statement);

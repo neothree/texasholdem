@@ -62,6 +62,9 @@ public class ClubService {
         log.info("俱乐部添加成员 club={} user={}", club, user);
     }
 
+    /**
+     * 修改基金
+     */
     @Transactional(rollbackFor = Exception.class)
     public Club fund(String id, BigDecimal amount) {
         log.info("修改俱乐部基金 {} {}", id, amount);
@@ -69,11 +72,14 @@ public class ClubService {
         if (amount.compareTo(BigDecimal.ZERO) > 0) {
             this.accountService.credit(data.getFundId(), amount, StringUtils.get10UUID());
         } else {
-            this.accountService.debit(data.getFundId(), amount.abs(), StringUtils.get10UUID());
+            this.accountService.debit(data.getFundId(), amount.abs(), StringUtils.get10UUID(), true);
         }
         return getClubById(id);
     }
 
+    /**
+     * 基金转入到余额
+     */
     @Transactional(rollbackFor = Exception.class)
     public void fundToBalance(String id, BigDecimal amount) {
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {

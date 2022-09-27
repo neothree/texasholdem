@@ -93,8 +93,10 @@ public class Account {
         return new AccountStatement(this, amount, StatDirection.ADD, requestNo);
     }
 
-    public AccountStatement debit(BigDecimal amount, String requestNo) {
-        this.assertAvailable(amount, "账户减款错误");
+    public AccountStatement debit(BigDecimal amount, String requestNo, boolean negative) {
+        if (!negative || !this.isEnableNegative()) {
+            this.assertAvailable(amount, "账户减款错误");
+        }
 
         this.balance = this.balance.subtract(amount);
         this.todayExpend = this.todayExpend.add(amount);
@@ -149,7 +151,7 @@ public class Account {
      */
     public boolean availableBalanceIsEnough(BigDecimal amount) {
         assertNonNegative(amount);
-        return this.isEnableNegative() || this.getAvailableBalance().compareTo(amount) >= 0;
+        return this.getAvailableBalance().compareTo(amount) >= 0;
     }
 
     /**
