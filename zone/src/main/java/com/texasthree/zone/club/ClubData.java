@@ -53,10 +53,6 @@ public class ClubData {
     @Column(nullable = false, updatable = false)
     private String fundId;
     /**
-     * 余额
-     */
-    private BigDecimal balance = BigDecimal.ZERO;
-    /**
      * 余额账户id
      */
     @Column(nullable = false, updatable = false)
@@ -127,14 +123,6 @@ public class ClubData {
 
     public void setCapacity(int capacity) {
         this.capacity = capacity;
-    }
-
-    public BigDecimal getBalance() {
-        return balance;
-    }
-
-    public void setBalance(BigDecimal balance) {
-        this.balance = balance;
     }
 
     public String getFundId() {

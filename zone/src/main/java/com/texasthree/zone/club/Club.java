@@ -2,7 +2,6 @@ package com.texasthree.zone.club;
 
 import com.texasthree.zone.club.member.Member;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,10 +51,6 @@ public class Club {
 
     public int getCapacity() {
         return this.data.getCapacity();
-    }
-
-    public BigDecimal getBalance() {
-        return this.data.getBalance();
     }
 
     void setData(ClubData data) {

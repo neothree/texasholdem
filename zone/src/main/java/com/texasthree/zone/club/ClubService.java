@@ -1,5 +1,6 @@
 package com.texasthree.zone.club;
 
+import com.texasthree.account.AccountException;
 import com.texasthree.account.AccountService;
 import com.texasthree.utility.utlis.StringUtils;
 import com.texasthree.zone.club.member.Member;
@@ -71,6 +72,21 @@ public class ClubService {
             this.accountService.debit(data.getFundId(), amount.abs(), StringUtils.get10UUID());
         }
         return getClubById(id);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void fundToBalance(String id, BigDecimal amount) {
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException();
+        }
+        var data = this.getDataById(id);
+        var fund = this.accountService.getDataById(data.getFundId());
+        if (fund.getAvailableBalance().compareTo(amount) < 0) {
+            throw AccountException.ACCOUNT_SUB_AMOUNT_OUTLIMIT.newInstance("俱乐部基金余额不足");
+        }
+        this.log.info("俱乐部基金转入到余额 {} amount={}", data, amount);
+        this.accountService.debit(data.getFundId(), amount, StringUtils.get10UUID());
+        this.accountService.credit(data.getBalanceId(), amount, StringUtils.get10UUID());
     }
 
     public Club getClubById(String id) {
