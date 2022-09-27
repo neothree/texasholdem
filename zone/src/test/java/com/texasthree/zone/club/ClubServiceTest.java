@@ -4,6 +4,8 @@ import com.texasthree.account.AccountException;
 import com.texasthree.account.AccountService;
 import com.texasthree.utility.utlis.StringUtils;
 import com.texasthree.zone.Tester;
+import com.texasthree.zone.user.User;
+import com.texasthree.zone.user.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +16,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import java.math.BigDecimal;
 
 import static org.junit.Assert.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @WebAppConfiguration
 @ExtendWith(SpringExtension.class)
@@ -28,9 +29,12 @@ class ClubServiceTest {
     @Autowired
     private AccountService accountService;
 
+    @Autowired
+    private UserService userService;
+
     @Test
     public void testFund() throws Exception {
-        var club = this.clubService.club(StringUtils.get10UUID(), StringUtils.get10UUID());
+        var club = getClub();
         var fund = this.accountService.getDataById(club.getFundId());
         assertEquals(0, fund.getBalance().compareTo(BigDecimal.ZERO));
 
@@ -54,7 +58,7 @@ class ClubServiceTest {
 
     @Test
     public void testFundToBalance() throws Exception {
-        var club = this.clubService.club(StringUtils.get10UUID(), StringUtils.get10UUID());
+        var club = getClub();
         var id = club.getId();
         Runnable func = () -> this.clubService.fundToBalance(id, BigDecimal.ONE);
         Tester.assertException(func, AccountException.ACCOUNT_SUB_AMOUNT_OUTLIMIT);
@@ -74,7 +78,69 @@ class ClubServiceTest {
     }
 
     @Test
+    public void testMember() throws Exception {
+        var club = getClub();
+        var user = getUser();
+        assertNotEquals(user.getClubId(), club.getId());
+        assertNull(this.clubService.getDataByClubIdAndUid(club.getId(), user.getId()));
+
+        this.clubService.addMember(club.getId(), user);
+        user = this.userService.getDataById(user.getId());
+        assertEquals(club.getId(), user.getClubId());
+        assertNotNull(this.clubService.getDataByClubIdAndUid(club.getId(), user.getId()));
+    }
+
+    @Test
+    public void testBalanceToMember() throws Exception {
+        var club = getClub();
+        var user = getUser();
+        this.clubService.addMember(club.getId(), user);
+        this.clubService.fund(club.getId(), BigDecimal.valueOf(1000));
+        this.clubService.fundToBalance(club.getId(), BigDecimal.valueOf(700));
+
+        var balance = this.accountService.getDataById(club.getBalanceId());
+        assertEquals(0, balance.getBalance().compareTo(BigDecimal.valueOf(700)));
+        assertEquals(0, user.getBalance().compareTo(BigDecimal.ZERO));
+
+        var amount = BigDecimal.valueOf(211);
+        this.clubService.balanceToMember(club.getId(), user.getId(), amount);
+        balance = this.accountService.getDataById(club.getBalanceId());
+        assertEquals(0, balance.getBalance().compareTo(BigDecimal.valueOf(489)));
+        user = this.userService.getDataById(user.getId());
+        assertEquals(0, user.getBalance().compareTo(amount));
+    }
+
+    @Test
+    public void testMemberToBalance() throws Exception {
+        var club = getClub();
+        var user = getUser();
+        this.clubService.addMember(club.getId(), user);
+
+        var sum = BigDecimal.valueOf(1000);
+        user = this.userService.balance(user.getId(), sum);
+        assertEquals(0, user.getBalance().compareTo(sum));
+        var balance = this.accountService.getDataById(club.getBalanceId());
+        assertEquals(0, balance.getBalance().compareTo(BigDecimal.ZERO));
+
+        var amount = BigDecimal.valueOf(200);
+        this.clubService.memberToBalance(club.getId(), user.getId(), amount);
+        user = this.userService.getDataById(user.getId());
+        assertEquals(0, user.getBalance().compareTo(sum.subtract(amount)));
+        balance = this.accountService.getDataById(club.getBalanceId());
+        assertEquals(0, balance.getBalance().compareTo(amount));
+    }
+
+    @Test
     public void testPlatform() throws Exception {
         assertNotNull(this.clubService.platform());
     }
+
+    private Club getClub() {
+        return this.clubService.club(StringUtils.get10UUID(), StringUtils.get10UUID());
+    }
+
+    private User getUser() {
+        return this.userService.user(StringUtils.get10UUID(), StringUtils.get10UUID(), true, StringUtils.get10UUID());
+    }
+
 }

@@ -41,6 +41,14 @@ public class UserService {
         return new User(data);
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public void club(String id, String clubId) {
+        var data = this.userDataDao.findById(id).get();
+        data.setClubId(clubId);
+        this.userDataDao.save(data);
+        log.info("修改玩家俱乐部 id={} clubId={}", id, clubId);
+    }
+
     public User getDataById(String id) {
         return new User(this.userDataDao.findById(id).get());
     }

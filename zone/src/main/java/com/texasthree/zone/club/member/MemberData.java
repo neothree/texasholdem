@@ -26,6 +26,9 @@ public class MemberData {
     private int version = 0;
 
     @Column(nullable = false, updatable = false)
+    private String clubId;
+
+    @Column(nullable = false, updatable = false)
     private String uid;
 
     @Column(nullable = false, updatable = false)
@@ -34,8 +37,10 @@ public class MemberData {
     public MemberData() {
     }
 
-    public MemberData(String uid) {
+    public MemberData(String clubId, String uid) {
+        this.clubId = clubId;
         this.uid = uid;
+        this.createAt = LocalDateTime.now();
     }
 
     public String getId() {
@@ -68,6 +73,14 @@ public class MemberData {
 
     public void setCreateAt(LocalDateTime createAt) {
         this.createAt = createAt;
+    }
+
+    public String getClubId() {
+        return clubId;
+    }
+
+    public void setClubId(String clubId) {
+        this.clubId = clubId;
     }
 
     @Override

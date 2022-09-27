@@ -33,7 +33,7 @@ public class ClubController extends AbstractMeController<User> {
     @GetMapping("/members")
     public List<ClubProtocal.Member> member() throws Exception {
         var clubId = requireMeClubId(this.getMe());
-        var m = new Member(new MemberData("111"));
+        var m = new Member(new MemberData(clubId, "111"));
         var list = new ArrayList<ClubProtocal.Member>();
         list.add(new ClubProtocal.Member(m));
         return list;
