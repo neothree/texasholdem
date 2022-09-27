@@ -498,11 +498,10 @@ public class Room {
         server.send(set, info);
     }
 
-
     @Override
     public String toString() {
         return new StringBuilder()
-                .append(", id=").append(id)
+                .append("id=").append(id)
                 .append(", capacity=").append(capacity)
                 .append(", roundNum=").append(roundNum)
                 .toString();

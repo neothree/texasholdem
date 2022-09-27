@@ -1,5 +1,7 @@
 package com.texasthree.zone.club;
 
+import com.texasthree.account.AccountService;
+import com.texasthree.utility.utlis.StringUtils;
 import com.texasthree.zone.club.member.Member;
 import com.texasthree.zone.club.member.MemberData;
 import com.texasthree.zone.club.member.MemberDataDao;
@@ -28,15 +30,20 @@ public class ClubService {
 
     private final MemberDataDao mdao;
 
+    private final AccountService accountService;
+
     @Autowired
-    public ClubService(ClubDataDao cdao, MemberDataDao mdao) {
+    public ClubService(ClubDataDao cdao, MemberDataDao mdao, AccountService accountService) {
         this.cdao = cdao;
         this.mdao = mdao;
+        this.accountService = accountService;
     }
 
     @Transactional
     public Club club(String creator, String name) {
-        var data = new ClubData(creator, name);
+        var balance = this.accountService.account(name + "余额", false);
+        var fund = this.accountService.account(name + "基金", true);
+        var data = new ClubData(creator, name, balance.getId(), fund.getId());
         this.cdao.save(data);
         var club = new Club(data);
         this.clubMap.put(club.getId(), club);
@@ -58,8 +65,11 @@ public class ClubService {
     public Club fund(String id, BigDecimal amount) {
         log.info("修改俱乐部基金 {} {}", id, amount);
         var data = this.getDataById(id);
-        data.setFund(data.getFund().add(amount));
-        this.cdao.save(data);
+        if (amount.compareTo(BigDecimal.ZERO) > 0) {
+            this.accountService.credit(data.getFundId(), amount, StringUtils.get10UUID());
+        } else {
+            this.accountService.debit(data.getFundId(), amount.abs(), StringUtils.get10UUID());
+        }
         return getClubById(id);
     }
 

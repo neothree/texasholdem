@@ -48,21 +48,29 @@ public class ClubData {
      */
     private int capacity = 100;
     /**
-     * 基金 - 牌局抽水
+     * 基金账户id - 牌局抽水
      */
-    private BigDecimal fund = BigDecimal.ZERO;
+    @Column(nullable = false, updatable = false)
+    private String fundId;
     /**
      * 余额
      */
     private BigDecimal balance = BigDecimal.ZERO;
+    /**
+     * 余额账户id
+     */
+    @Column(nullable = false, updatable = false)
+    private String balanceId;
 
     public ClubData() {
     }
 
-    public ClubData(String creator, String name) {
+    public ClubData(String creator, String name, String balanceId, String fundId) {
         this.creator = creator;
         this.name = name;
         this.createAt = LocalDateTime.now();
+        this.balanceId = balanceId;
+        this.fundId = fundId;
     }
 
     public String getId() {
@@ -121,20 +129,28 @@ public class ClubData {
         this.capacity = capacity;
     }
 
-    public BigDecimal getFund() {
-        return fund;
-    }
-
-    public void setFund(BigDecimal fund) {
-        this.fund = fund;
-    }
-
     public BigDecimal getBalance() {
         return balance;
     }
 
     public void setBalance(BigDecimal balance) {
         this.balance = balance;
+    }
+
+    public String getFundId() {
+        return fundId;
+    }
+
+    public void setFundId(String fundId) {
+        this.fundId = fundId;
+    }
+
+    public String getBalanceId() {
+        return balanceId;
+    }
+
+    public void setBalanceId(String balanceId) {
+        this.balanceId = balanceId;
     }
 
     @Override

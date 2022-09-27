@@ -1,5 +1,6 @@
 package com.texasthree.zone.club;
 
+import com.texasthree.account.AccountService;
 import com.texasthree.utility.utlis.StringUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,18 +22,24 @@ class ClubServiceTest {
     @Autowired
     private ClubService clubService;
 
+    @Autowired
+    private AccountService accountService;
+
     @Test
     public void testFund() throws Exception {
         var club = this.clubService.club(StringUtils.get10UUID(), StringUtils.get10UUID());
-        assertEquals(BigDecimal.ZERO, club.getFund());
+        var fund = this.accountService.getDataById(club.getFundId());
+        assertEquals(0, fund.getBalance().compareTo(BigDecimal.ZERO));
 
         var amount = BigDecimal.valueOf(100);
         club = this.clubService.fund(club.getId(), amount);
-        assertEquals(0, club.getFund().compareTo(amount));
+        fund = this.accountService.getDataById(club.getFundId());
+        assertEquals(0, fund.getBalance().compareTo(amount));
 
         var amount1 = BigDecimal.valueOf(-50);
         club = this.clubService.fund(club.getId(), amount1);
-        assertEquals(0, club.getFund().compareTo(amount.add(amount1)));
+        fund = this.accountService.getDataById(club.getFundId());
+        assertEquals(0, fund.getBalance().compareTo(amount.add(amount1)));
     }
 
     @Test

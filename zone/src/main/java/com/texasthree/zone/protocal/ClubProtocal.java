@@ -25,8 +25,8 @@ public class ClubProtocal {
             this.creator = club.getCreator();
             this.creatorName = "张三";
             this.avatar = club.getAvatar();
-            this.balance = club.getBalance().intValue();
-            this.fund = club.getFund().intValue();
+            this.balance = -1;
+            this.fund = -1;
             this.capacity = club.getCapacity();
             this.num = 10;
         }

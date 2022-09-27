@@ -36,8 +36,8 @@ public class AccountService {
      * @return 账户
      */
     @Transactional(rollbackFor = Exception.class)
-    public Account account(String name) {
-        var account = new Account(name);
+    public Account account(String name, boolean enableNegative) {
+        var account = new Account(name, enableNegative);
         this.accountDao.save(account);
         log.info("注册新账户 {} ", account.toString());
         return account;

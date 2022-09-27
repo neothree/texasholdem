@@ -24,14 +24,14 @@ public class AccountServiceTest {
     private AccountService accountService;
 
     public Account getAccount() {
-        return this.accountService.account(StringUtils.get16UUID());
+        return this.accountService.account(StringUtils.get16UUID(), false);
     }
 
     @Test
     @Transactional
     public void testRegister() throws Exception {
         var name = StringUtils.get16UUID();
-        var account = this.accountService.account(name);
+        var account = this.accountService.account(name, false);
         account = this.accountService.getDataById(account.getId());
         assertEquals(name, account.getName());
         assertEquals(0, account.getBalance().compareTo(BigDecimal.ZERO));
@@ -121,6 +121,12 @@ public class AccountServiceTest {
 
         func = () -> this.accountService.debit(accountId, amount1, StringUtils.get16UUID());
         this.checkCurrency(accountId, func, amount1, bit);
+
+        // 可以为负数
+        var account = this.accountService.account(StringUtils.getChineseName(), true);
+        assertTrue(account.isEnableNegative());
+        this.accountService.debit(account.getId(), BigDecimal.TEN, StringUtils.get10UUID());
+        assertEquals(0, account.getBalance().compareTo(BigDecimal.valueOf(-10)));
     }
 
     @Test
@@ -240,8 +246,7 @@ public class AccountServiceTest {
     @Transactional
     public void testAccount() throws Exception {
         var name = StringUtils.get16UUID();
-        var type = StringUtils.get16UUID();
-        var account = this.accountService.account(name);
+        var account = this.accountService.account(name, false);
         if (!DateUtils.isSameDayWithToday(account.getEditAt())) {
             assertEquals(0, account.getTodayExpend().compareTo(BigDecimal.ZERO));
             assertEquals(0, account.getTodayIncome().compareTo(BigDecimal.ZERO));

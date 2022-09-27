@@ -1,5 +1,6 @@
 package com.texasthree.zone;
 
+import com.texasthree.account.AccountService;
 import com.texasthree.utility.utlis.StringUtils;
 import com.texasthree.zone.club.Club;
 import com.texasthree.zone.club.ClubService;
@@ -32,6 +33,9 @@ class FundFlowTest {
     @Autowired
     private ClubService clubService;
 
+    @Autowired
+    private AccountService accountService;
+
     @Test
     public void testShare() throws Exception {
         var club = this.clubService.club(StringUtils.get10UUID(), StringUtils.get10UUID());
@@ -63,18 +67,21 @@ class FundFlowTest {
         user = this.userService.getDataById(user.getId());
         club = this.clubService.getClubById(club.getId());
         assertEquals(0, user.getBalance().compareTo(BigDecimal.valueOf(800)));
-        assertEquals(0, club.getFund().compareTo(BigDecimal.valueOf(-655)));
+        var fund = this.accountService.getDataById(club.getFundId());
+        assertEquals(0, fund.getBalance().compareTo(BigDecimal.valueOf(-655)));
 
         user1 = this.userService.getDataById(user1.getId());
         club1 = this.clubService.getClubById(club1.getId());
         assertEquals(0, user1.getBalance().compareTo(BigDecimal.valueOf(1380)));
-        assertEquals(0, club1.getFund().compareTo(BigDecimal.valueOf(475)));
+        fund = this.accountService.getDataById(club1.getFundId());
+        assertEquals(0, fund.getBalance().compareTo(BigDecimal.valueOf(475)));
 
         // 账是平的
         var sum = BigDecimal.ZERO;
         for (var v : clubs) {
             var c = this.clubService.getClubById(v.getId());
-            sum = sum.add(c.getFund());
+            fund = this.accountService.getDataById(c.getFundId());
+            sum = sum.add(fund.getBalance());
         }
         for (var v : users) {
             var c = this.userService.getDataById(v.getId());

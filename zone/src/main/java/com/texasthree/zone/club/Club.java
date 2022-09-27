@@ -30,6 +30,14 @@ public class Club {
         return this.data.getId();
     }
 
+    public String getFundId() {
+        return this.data.getFundId();
+    }
+
+    public String getBalanceId() {
+        return this.data.getBalanceId();
+    }
+
     public String getName() {
         return this.data.getName();
     }
@@ -48,10 +56,6 @@ public class Club {
 
     public BigDecimal getBalance() {
         return this.data.getBalance();
-    }
-
-    public BigDecimal getFund() {
-        return this.data.getFund();
     }
 
     void setData(ClubData data) {

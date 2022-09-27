@@ -65,10 +65,12 @@ public class Account {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createAt;
 
+    private boolean enableNegative = false;
+
     public Account() {
     }
 
-    public Account(String name) {
+    public Account(String name, boolean enableNegative) {
         if (StringUtils.isEmpty(name)) {
             throw new IllegalArgumentException();
         }
@@ -77,6 +79,7 @@ public class Account {
         this.name = name;
         this.editAt = LocalDateTime.now();
         this.createAt = this.editAt;
+        this.enableNegative = enableNegative;
     }
 
     public AccountStatement credit(BigDecimal amount, String requestNo) {
@@ -146,7 +149,7 @@ public class Account {
      */
     public boolean availableBalanceIsEnough(BigDecimal amount) {
         assertNonNegative(amount);
-        return this.getAvailableBalance().compareTo(amount) >= 0;
+        return this.isEnableNegative() || this.getAvailableBalance().compareTo(amount) >= 0;
     }
 
     /**
@@ -271,5 +274,13 @@ public class Account {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public boolean isEnableNegative() {
+        return enableNegative;
+    }
+
+    public void setEnableNegative(boolean enableNegative) {
+        this.enableNegative = enableNegative;
     }
 }
