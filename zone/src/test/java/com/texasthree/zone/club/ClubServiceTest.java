@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
 
+import javax.print.DocFlavor;
 import java.math.BigDecimal;
 
 import static org.junit.Assert.assertNotNull;
@@ -104,11 +105,15 @@ class ClubServiceTest {
         assertEquals(0, account.getBalance().compareTo(BigDecimal.ZERO));
 
         var amount = BigDecimal.valueOf(211);
-        this.clubService.balanceToMember(club.getId(), user.getId(), amount);
+        this.clubService.balanceToMember(club.getId(), user.getId(), amount, club.getCreator());
         balance = this.accountService.getDataById(club.getBalanceId());
         assertEquals(0, balance.getBalance().compareTo(BigDecimal.valueOf(489)));
         account = this.accountService.getDataById(user.getAccountId());
         assertEquals(0, account.getBalance().compareTo(amount));
+
+        // 错误：只有创始人可以发放
+        Runnable func = () -> this.clubService.balanceToMember(club.getId(), user.getId(), amount, StringUtils.get10UUID());
+        Tester.assertException(func, IllegalArgumentException.class);
     }
 
     @Test

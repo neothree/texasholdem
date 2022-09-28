@@ -43,6 +43,13 @@ public class ClubService {
         this.userService = userService;
     }
 
+    /**
+     * 创建俱乐部
+     *
+     * @param creator 创始人
+     * @param name    名称
+     * @return
+     */
     @Transactional
     public Club club(String creator, String name) {
         var balance = this.accountService.account(name + "余额", false);
@@ -56,6 +63,12 @@ public class ClubService {
         return club;
     }
 
+    /**
+     * 添加俱乐部成员
+     *
+     * @param id   俱乐部id
+     * @param user 新成员
+     */
     @Transactional(rollbackFor = Exception.class)
     public void addMember(String id, User user) {
         var club = getClubById(id);
@@ -67,6 +80,10 @@ public class ClubService {
 
     /**
      * 修改基金
+     *
+     * @param id     俱乐部
+     * @param amount 金额
+     * @return
      */
     @Transactional(rollbackFor = Exception.class)
     public Club fund(String id, BigDecimal amount) {
@@ -82,6 +99,9 @@ public class ClubService {
 
     /**
      * 基金转入到余额
+     *
+     * @param id     俱乐部
+     * @param amount 金额
      */
     @Transactional(rollbackFor = Exception.class)
     public void fundToBalance(String id, BigDecimal amount) {
@@ -98,26 +118,38 @@ public class ClubService {
 
     /**
      * 发放余额给成员
+     *
+     * @param id      俱乐部id
+     * @param member  成员uid
+     * @param amount  金额
+     * @param creator 请求创建人
      */
     @Transactional(rollbackFor = Exception.class)
-    public void balanceToMember(String clubId, String member, BigDecimal amount) {
+    public void balanceToMember(String id, String member, BigDecimal amount, String creator) {
+        var club = this.getClubById(id);
+        if (!club.getCreator().equals(creator)) {
+            throw new IllegalArgumentException("发放余额操作人错误 " + creator);
+        }
         requireGreatZero(amount);
-        this.mdao.findByClubIdAndUid(clubId, member);
-        var club = this.getClubById(clubId);
-        log.info("俱乐部发余额给成员 {} {} {}", clubId, member, amount);
+        this.mdao.findByClubIdAndUid(id, member);
+        log.info("俱乐部发余额给成员 {} {} {}", id, member, amount);
         this.accountService.debit(club.getBalanceId(), amount, StringUtils.get10UUID());
         this.userService.balance(member, amount);
     }
 
     /**
      * 成员捐献给余额
+     *
+     * @param id     俱乐部
+     * @param member 成员
+     * @param amount 金额
      */
     @Transactional(rollbackFor = Exception.class)
-    public void memberToBalance(String clubId, String member, BigDecimal amount) {
+    public void memberToBalance(String id, String member, BigDecimal amount) {
         requireGreatZero(amount);
-        this.mdao.findByClubIdAndUid(clubId, member);
-        var club = this.getClubById(clubId);
-        log.info("俱乐部成员捐献个余额 {} {} {}", clubId, member, amount);
+        this.mdao.findByClubIdAndUid(id, member);
+        var club = this.getClubById(id);
+        log.info("俱乐部成员捐献个余额 {} {} {}", id, member, amount);
         this.userService.balance(member, amount.negate());
         this.accountService.credit(club.getBalanceId(), amount, StringUtils.get10UUID());
     }
