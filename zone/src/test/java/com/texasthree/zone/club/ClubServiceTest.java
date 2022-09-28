@@ -2,8 +2,12 @@ package com.texasthree.zone.club;
 
 import com.texasthree.account.AccountException;
 import com.texasthree.account.AccountService;
+import com.texasthree.game.texas.CardType;
 import com.texasthree.utility.utlis.StringUtils;
 import com.texasthree.zone.Tester;
+import com.texasthree.zone.club.transaction.CTType;
+import com.texasthree.zone.club.transaction.ClubTransaction;
+import com.texasthree.zone.club.transaction.Status;
 import com.texasthree.zone.user.User;
 import com.texasthree.zone.user.UserService;
 import org.junit.jupiter.api.Test;
@@ -71,7 +75,10 @@ class ClubServiceTest {
 
         var amount = BigDecimal.valueOf(100);
         this.clubService.fund(id, amount);
-        this.clubService.fundToBalance(id, BigDecimal.TEN, StringUtils.get10UUID());
+        var trx = this.clubService.fundToBalance(id, BigDecimal.TEN, StringUtils.get10UUID());
+        trx = this.clubService.getTrxById(trx.getId());
+        assertTrx(trx, club.getId(), BigDecimal.TEN, CTType.FUND, Status.SUCCESS);
+
         fund = this.accountService.getDataById(club.getFundId());
         assertEquals(0, fund.getBalance().compareTo(BigDecimal.valueOf(90)));
         balance = this.accountService.getDataById(club.getBalanceId());
@@ -148,6 +155,13 @@ class ClubServiceTest {
 
     private User getUser() {
         return this.userService.user(StringUtils.get10UUID(), StringUtils.get10UUID(), true, StringUtils.get10UUID());
+    }
+
+    private void assertTrx(ClubTransaction trx, String clubId, BigDecimal amount, CTType type, Status status) {
+        assertEquals(clubId, trx.getClubId());
+        assertEquals(0, trx.getAmount().compareTo(amount));
+        assertEquals(type.name(), trx.getType());
+        assertEquals(status.name(), trx.getStatus());
     }
 
 }

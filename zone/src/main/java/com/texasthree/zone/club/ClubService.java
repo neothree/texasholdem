@@ -24,34 +24,7 @@ import java.util.Map;
  * @author: neo
  * @create: 2022-09-22 13:13
  */
-@Service
-public class ClubService {
-    protected final Logger log = LoggerFactory.getLogger(ClubService.class);
-
-    private final Map<String, Club> clubMap = new HashMap<>();
-
-    private final ClubDataDao cdao;
-
-    private final MemberDataDao mdao;
-
-    private final ClubTransactionDao ctdao;
-
-    private final AccountService accountService;
-
-    private final UserService userService;
-
-    @Autowired
-    public ClubService(ClubDataDao cdao,
-                       MemberDataDao mdao,
-                       ClubTransactionDao ctdao,
-                       AccountService accountService,
-                       UserService userService) {
-        this.cdao = cdao;
-        this.mdao = mdao;
-        this.ctdao = ctdao;
-        this.accountService = accountService;
-        this.userService = userService;
-    }
+public interface ClubService {
 
     /**
      * 创建俱乐部
@@ -60,18 +33,7 @@ public class ClubService {
      * @param name    名称
      * @return
      */
-    @Transactional
-    public Club club(String creator, String name) {
-        var balance = this.accountService.account(name + "余额", false);
-        var fund = this.accountService.account(name + "基金", true);
-        var data = new ClubData(creator, name, balance.getId(), fund.getId());
-        this.cdao.save(data);
-        var club = new Club(data);
-        this.clubMap.put(club.getId(), club);
-
-        log.info("创建俱乐部 creator={} name={}", creator, name);
-        return club;
-    }
+    Club club(String creator, String name);
 
     /**
      * 添加俱乐部成员
@@ -79,14 +41,7 @@ public class ClubService {
      * @param id   俱乐部id
      * @param user 新成员
      */
-    @Transactional(rollbackFor = Exception.class)
-    public void addMember(String id, User user) {
-        var club = getClubById(id);
-        var md = new MemberData(id, user.getId());
-        this.mdao.save(md);
-        this.userService.club(user.getId(), id);
-        log.info("俱乐部添加成员 club={} user={}", club, user);
-    }
+    void addMember(String id, User user);
 
     /**
      * 修改基金
@@ -95,17 +50,7 @@ public class ClubService {
      * @param amount 金额
      * @return
      */
-    @Transactional(rollbackFor = Exception.class)
-    public Club fund(String id, BigDecimal amount) {
-        log.info("修改俱乐部基金 {} {}", id, amount);
-        var data = this.getDataById(id);
-        if (amount.compareTo(BigDecimal.ZERO) > 0) {
-            this.accountService.credit(data.getFundId(), amount, StringUtils.get10UUID());
-        } else {
-            this.accountService.debit(data.getFundId(), amount.abs(), StringUtils.get10UUID(), true);
-        }
-        return getClubById(id);
-    }
+    Club fund(String id, BigDecimal amount);
 
     /**
      * 基金转入到余额
@@ -114,24 +59,9 @@ public class ClubService {
      * @param amount  金额
      * @param creator 创建人
      */
-    @Transactional(rollbackFor = Exception.class)
-    public void fundToBalance(String id, BigDecimal amount, String creator) {
-        requireGreatZero(amount);
-        var data = this.getDataById(id);
-        var fund = this.accountService.getDataById(data.getFundId());
-        if (fund.getAvailableBalance().compareTo(amount) < 0) {
-            throw AccountException.ACCOUNT_SUB_AMOUNT_OUTLIMIT.newInstance("俱乐部基金余额不足");
-        }
+    ClubTransaction fundToBalance(String id, BigDecimal amount, String creator);
 
-        // 交易记录
-        var trx = new ClubTransaction(id, amount, CTType.FUND, creator);
-        this.ctdao.save(trx);
-        this.log.info("俱乐部基金转入到余额 {} amount={}", data, amount);
-
-        // 修改金额
-        this.accountService.debit(data.getFundId(), amount, trx.getId());
-        this.accountService.credit(data.getBalanceId(), amount, trx.getId());
-    }
+    ClubTransaction getTrxById(String id);
 
     /**
      * 发放余额给成员
@@ -141,18 +71,7 @@ public class ClubService {
      * @param amount  金额
      * @param creator 请求创建人
      */
-    @Transactional(rollbackFor = Exception.class)
-    public void balanceToMember(String id, String member, BigDecimal amount, String creator) {
-        var club = this.getClubById(id);
-        if (!club.getCreator().equals(creator)) {
-            throw new IllegalArgumentException("发放余额操作人错误 " + creator);
-        }
-        requireGreatZero(amount);
-        this.mdao.findByClubIdAndUid(id, member);
-        log.info("俱乐部发余额给成员 {} {} {}", id, member, amount);
-        this.accountService.debit(club.getBalanceId(), amount, StringUtils.get10UUID());
-        this.userService.balance(member, amount);
-    }
+    void balanceToMember(String id, String member, BigDecimal amount, String creator);
 
     /**
      * 成员捐献给余额
@@ -161,49 +80,17 @@ public class ClubService {
      * @param member 成员
      * @param amount 金额
      */
-    @Transactional(rollbackFor = Exception.class)
-    public void memberToBalance(String id, String member, BigDecimal amount) {
-        requireGreatZero(amount);
-        this.mdao.findByClubIdAndUid(id, member);
-        var club = this.getClubById(id);
-        log.info("俱乐部成员捐献个余额 {} {} {}", id, member, amount);
-        this.userService.balance(member, amount.negate());
-        this.accountService.credit(club.getBalanceId(), amount, StringUtils.get10UUID());
-    }
+    void memberToBalance(String id, String member, BigDecimal amount);
 
-    public Club getClubById(String id) {
-        return new Club(getDataById(id));
-    }
+    /**
+     * 获取俱乐部
+     */
+    Club getClubById(String id);
 
-    private ClubData getDataById(String id) {
-        var data = this.cdao.findById(id);
-        if (data.isEmpty()) {
-            throw new IllegalArgumentException("无找到俱乐部数据 id=" + id);
-        }
-        return data.get();
-    }
+    MemberData getDataByClubIdAndUid(String clubId, String uid);
 
-    public MemberData getDataByClubIdAndUid(String clubId, String uid) {
-        var data = this.mdao.findByClubIdAndUid(clubId, uid);
-        return data.orElse(null);
-    }
-
-    private Club platform;
-
-    public Club platform() {
-        if (platform == null) {
-            var name = "平台俱乐部";
-            var data = this.cdao.findByName(name);
-            if (data.isEmpty()) {
-                this.platform = this.club("系统", name);
-            }
-        }
-        return this.platform;
-    }
-
-    private void requireGreatZero(BigDecimal amount) {
-        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException();
-        }
-    }
+    /**
+     * 平台俱乐部
+     */
+    Club platform();
 }
