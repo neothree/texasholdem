@@ -23,6 +23,7 @@
         <module>utility</module>
         <module>dao</module>
         <module>account</module>
+        <module>admin</module>
     </modules>
 
     <!--版本维护-->
