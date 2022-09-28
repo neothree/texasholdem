@@ -1,5 +1,7 @@
 package com.texasthree.zone.club.member;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -12,4 +14,6 @@ import java.util.Optional;
 @Repository
 public interface MemberDataDao extends JpaRepository<MemberData, String> {
     Optional<MemberData> findByClubIdAndUid(String clubId, String uid);
+
+    Page<MemberData> findAllByClubId(String clubId, Pageable pageable);
 }

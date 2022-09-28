@@ -2,7 +2,7 @@ package com.texasthree.zone.club;
 
 import com.texasthree.account.AccountException;
 import com.texasthree.account.AccountService;
-import com.texasthree.game.texas.CardType;
+import com.texasthree.dao.Pagination;
 import com.texasthree.utility.utlis.StringUtils;
 import com.texasthree.zone.Tester;
 import com.texasthree.zone.club.transaction.CTType;
@@ -17,7 +17,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
 
-import javax.print.DocFlavor;
 import java.math.BigDecimal;
 
 import static org.junit.Assert.assertNotNull;
@@ -38,16 +37,53 @@ class ClubServiceTest {
     private UserService userService;
 
     @Test
+    public void testClub() throws Exception {
+        var user = getUser();
+        var name = StringUtils.getChineseName();
+        var club = this.clubService.club(user.getId(), name);
+        assertEquals(user.getId(), club.getCreator());
+
+        var p = this.clubService.memberPage(club.getId(), new Pagination());
+        assertEquals(1, p.getTotalElements());
+        assertEquals(user.getId(), p.getContent().get(0).getUid());
+    }
+
+    @Test
+    public void testClubPage() throws Exception {
+        var p = this.clubService.clubPage(new Pagination());
+        var total = p.getTotalElements();
+
+        this.clubService.club(StringUtils.get10UUID(), StringUtils.get10UUID());
+        p = this.clubService.clubPage(new Pagination());
+        assertEquals( total + 1, p.getTotalElements());
+
+        this.clubService.club(StringUtils.get10UUID(), StringUtils.get10UUID());
+        p = this.clubService.clubPage(new Pagination());
+        assertEquals(total + 2, p.getTotalElements());
+    }
+
+    @Test
     public void testMember() throws Exception {
         var club = getClub();
         var user = getUser();
         assertNotEquals(user.getClubId(), club.getId());
         assertNull(this.clubService.getDataByClubIdAndUid(club.getId(), user.getId()));
 
-        this.clubService.addMember(club.getId(), user);
+        this.clubService.member(club.getId(), user);
         user = this.userService.getDataById(user.getId());
         assertEquals(club.getId(), user.getClubId());
         assertNotNull(this.clubService.getDataByClubIdAndUid(club.getId(), user.getId()));
+    }
+
+    @Test
+    public void testMemberPage() throws Exception {
+        var club = getClub();
+        var user = getUser();
+        this.clubService.member(club.getId(), user);
+        var p = this.clubService.memberPage(club.getId(), new Pagination());
+        assertEquals(2, p.getTotalElements());
+        assertTrue(p.getContent().stream().anyMatch(v -> v.getUid().equals(user.getId())));
+        assertTrue(p.getContent().stream().anyMatch(v -> v.getUid().equals(club.getCreator())));
     }
 
     @Test
@@ -102,7 +138,7 @@ class ClubServiceTest {
     public void testBalanceToMember() throws Exception {
         var club = getClub();
         var user = getUser();
-        this.clubService.addMember(club.getId(), user);
+        this.clubService.member(club.getId(), user);
         this.clubService.fund(club.getId(), BigDecimal.valueOf(1000));
         this.clubService.fundToBalance(club.getId(), BigDecimal.valueOf(700), StringUtils.get10UUID());
 
@@ -133,7 +169,7 @@ class ClubServiceTest {
     public void testMemberToBalance() throws Exception {
         var club = getClub();
         var user = getUser();
-        this.clubService.addMember(club.getId(), user);
+        this.clubService.member(club.getId(), user);
 
         var sum = BigDecimal.valueOf(1000);
         user = this.userService.balance(user.getId(), sum);
@@ -163,7 +199,8 @@ class ClubServiceTest {
     }
 
     private Club getClub() {
-        return this.clubService.club(StringUtils.get10UUID(), StringUtils.get10UUID());
+        var user = getUser();
+        return this.clubService.club(user.getId(), StringUtils.get10UUID());
     }
 
     private User getUser() {

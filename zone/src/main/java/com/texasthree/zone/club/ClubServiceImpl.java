@@ -2,6 +2,7 @@ package com.texasthree.zone.club;
 
 import com.texasthree.account.AccountException;
 import com.texasthree.account.AccountService;
+import com.texasthree.dao.Pagination;
 import com.texasthree.utility.utlis.StringUtils;
 import com.texasthree.zone.club.member.MemberData;
 import com.texasthree.zone.club.member.MemberDataDao;
@@ -14,6 +15,8 @@ import com.texasthree.zone.user.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -64,15 +67,27 @@ class ClubServiceImpl implements ClubService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Club club(String creator, String name) {
+        // 俱乐部数据
         var balance = this.accountService.account(name + "余额", false);
         var fund = this.accountService.account(name + "基金", true);
         var data = new ClubData(creator, name, balance.getId(), fund.getId());
         this.cdao.save(data);
+
+        // 成员数据
+        var md = new MemberData(data.getId(), creator);
+        this.mdao.save(md);
+
         var club = new Club(data);
         this.clubMap.put(club.getId(), club);
 
         log.info("创建俱乐部 creator={} name={}", creator, name);
         return club;
+    }
+
+    @Override
+    public Pagination<ClubData> clubPage(Pagination p) {
+        var page = this.cdao.findAll(PageRequest.of(p.getNumber(), p.getSize(), Sort.by("createAt").descending()));
+        return new Pagination<>(page);
     }
 
     /**
@@ -83,13 +98,20 @@ class ClubServiceImpl implements ClubService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addMember(String id, User user) {
+    public void member(String id, User user) {
         var club = getClubById(id);
         var md = new MemberData(id, user.getId());
         this.mdao.save(md);
         this.userService.club(user.getId(), id);
         log.info("俱乐部添加成员 club={} user={}", club, user);
     }
+
+    @Override
+    public Pagination<MemberData> memberPage(String clubId, Pagination p) {
+        var page = this.mdao.findAllByClubId(clubId, PageRequest.of(p.getNumber(), p.getSize(), Sort.by("createAt").descending()));
+        return new Pagination<>(page);
+    }
+
 
     /**
      * 修改基金

@@ -2,6 +2,7 @@ package com.texasthree.zone.club;
 
 import com.texasthree.account.AccountException;
 import com.texasthree.account.AccountService;
+import com.texasthree.dao.Pagination;
 import com.texasthree.utility.utlis.StringUtils;
 import com.texasthree.zone.club.member.MemberData;
 import com.texasthree.zone.club.member.MemberDataDao;
@@ -35,13 +36,20 @@ public interface ClubService {
      */
     Club club(String creator, String name);
 
+    Pagination<ClubData> clubPage(Pagination p);
+
     /**
      * 添加俱乐部成员
      *
      * @param id   俱乐部id
      * @param user 新成员
      */
-    void addMember(String id, User user);
+    void member(String id, User user);
+
+    /**
+     * 成员分页
+     */
+    Pagination<MemberData> memberPage(String clubId, Pagination p);
 
     /**
      * 修改基金
