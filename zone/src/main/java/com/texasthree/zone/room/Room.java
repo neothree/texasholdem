@@ -5,7 +5,7 @@ import com.texasthree.zone.net.Server;
 import com.texasthree.zone.round.TexasEventHandler;
 import com.texasthree.zone.round.TexasRound;
 import com.texasthree.zone.round.UserPlayer;
-import com.texasthree.zone.user.User;
+import com.texasthree.zone.User;
 import com.texasthree.zone.util.ScheduledEventChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -2,8 +2,7 @@ package com.texasthree.zone;
 
 import com.texasthree.account.AccountException;
 import com.texasthree.utility.utlis.StringUtils;
-import com.texasthree.zone.user.User;
-import com.texasthree.zone.user.UserData;
+import com.texasthree.user.UserData;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;

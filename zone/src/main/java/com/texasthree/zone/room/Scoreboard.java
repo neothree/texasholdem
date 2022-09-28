@@ -1,6 +1,7 @@
 package com.texasthree.zone.room;
 
-import com.texasthree.zone.user.User;
+import com.texasthree.zone.User;
+import com.texasthree.user.UserData;
 
 /**
  * 记分牌
@@ -12,7 +13,9 @@ public class Scoreboard {
     /**
      * 玩家
      */
-    private User user;
+    private String uid;
+
+    private String name;
     /**
      * 总买入
      */
@@ -31,7 +34,13 @@ public class Scoreboard {
     private boolean settle;
 
     public Scoreboard(User user) {
-        this.user = user;
+        this.uid = user.getId();
+        this.name = user.getName();
+    }
+
+    public Scoreboard(UserData user) {
+        this.uid = user.getId();
+        this.name = user.getName();
     }
 
     public void buyin(int value) {
@@ -55,16 +64,16 @@ public class Scoreboard {
 
     private void requireNonSettle() {
         if (this.settle) {
-            throw new IllegalArgumentException("玩家已经结算 " + user);
+            throw new IllegalArgumentException("玩家已经结算 " +  name);
         }
     }
 
     public String getUid() {
-        return this.user.getId();
+        return this.uid;
     }
 
     public String getName() {
-        return this.user.getName();
+        return this.name;
     }
 
     public int getBuyin() {
@@ -94,8 +103,8 @@ public class Scoreboard {
     @Override
     public String toString() {
         return new StringBuilder()
-                .append("uid=").append(user.getId())
-                .append(", name=").append(user.getName())
+                .append("uid=").append(uid)
+                .append(", name=").append(name)
                 .append(", buyin=").append(buyin)
                 .append(", gameProfit=").append(gameProfit)
                 .append(", insuranceProfit=").append(insuranceProfit)

@@ -1,10 +1,9 @@
 package com.texasthree.zone;
 
-import com.texasthree.zone.club.ClubService;
+import com.texasthree.club.ClubService;
 import com.texasthree.zone.room.Room;
 import com.texasthree.zone.room.Scoreboard;
-import com.texasthree.zone.user.User;
-import com.texasthree.zone.user.UserService;
+import com.texasthree.user.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

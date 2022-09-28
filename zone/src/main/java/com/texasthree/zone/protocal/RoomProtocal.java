@@ -123,7 +123,7 @@ public class RoomProtocal {
         public String avatar;
         public Integer chips;
 
-        public User(com.texasthree.zone.user.User user, Room room) {
+        public User(com.texasthree.zone.User user, Room room) {
             this.uid = user.getId();
             this.name = user.getName();
             this.avatar = user.getAvatar();

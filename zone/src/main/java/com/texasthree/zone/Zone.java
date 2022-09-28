@@ -3,11 +3,11 @@ package com.texasthree.zone;
 import com.texasthree.security.login.enums.LoginApp;
 import com.texasthree.security.login.service.LoginerService;
 import com.texasthree.utility.utlis.StringUtils;
-import com.texasthree.zone.club.ClubService;
+import com.texasthree.club.ClubService;
 import com.texasthree.zone.net.Server;
 import com.texasthree.zone.room.Room;
-import com.texasthree.zone.user.User;
-import com.texasthree.zone.user.UserService;
+import com.texasthree.user.UserData;
+import com.texasthree.user.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,11 +50,12 @@ public class Zone {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public User createUser(String username, String password, boolean real) {
+    public UserData createUser(String username, String password, boolean real) {
         var name = StringUtils.getChineseName();
         this.loginerService.loginer(username, password, LoginApp.USER);
         var club = this.clubService.platform();
-        return this.userService.user(username, name, real, club.getId());
+        var data = this.userService.user(username, name, real, club.getId());
+        return data;
     }
 
     public void start() {
@@ -69,7 +70,7 @@ public class Zone {
             room = new Room(StringUtils.get10UUID(), 9, this.fundFlow::share);
             room.setServer(server);
 
-            var user = createUser(StringUtils.get10UUID(), StringUtils.get10UUID(), false);
+            var user = new User(createUser(StringUtils.get10UUID(), StringUtils.get10UUID(), false));
             user.enter(room);
             room.addUser(user);
             room.sitDown(user, 7);

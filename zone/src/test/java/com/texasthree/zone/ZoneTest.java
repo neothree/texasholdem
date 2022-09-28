@@ -2,7 +2,7 @@ package com.texasthree.zone;
 
 import com.texasthree.security.login.service.LoginerService;
 import com.texasthree.utility.utlis.StringUtils;
-import com.texasthree.zone.club.ClubService;
+import com.texasthree.club.ClubService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,5 +39,4 @@ class ZoneTest {
         var loginer = this.loginerService.getDataByUsername(username);
         assertNotNull((loginer));
     }
-
 }

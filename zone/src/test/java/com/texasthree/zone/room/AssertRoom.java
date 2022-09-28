@@ -2,7 +2,7 @@ package com.texasthree.zone.room;
 
 import com.texasthree.game.texas.Optype;
 import com.texasthree.utility.utlis.StringUtils;
-import com.texasthree.zone.user.User;
+import com.texasthree.zone.User;
 import org.junit.jupiter.api.Assertions;
 
 import static org.junit.Assert.assertEquals;

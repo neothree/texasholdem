@@ -1,6 +1,6 @@
 package com.texasthree.zone.round;
 
-import com.texasthree.zone.user.User;
+import com.texasthree.zone.User;
 
 public class UserPlayer {
 

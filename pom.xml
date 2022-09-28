@@ -24,6 +24,8 @@
         <module>dao</module>
         <module>account</module>
         <module>admin</module>
+        <module>club</module>
+        <module>user</module>
     </modules>
 
     <!--版本维护-->

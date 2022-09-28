@@ -2,11 +2,11 @@ package com.texasthree.zone;
 
 import com.texasthree.account.AccountService;
 import com.texasthree.utility.utlis.StringUtils;
-import com.texasthree.zone.club.Club;
-import com.texasthree.zone.club.ClubService;
+import com.texasthree.club.Club;
+import com.texasthree.club.ClubService;
 import com.texasthree.zone.room.Scoreboard;
-import com.texasthree.zone.user.User;
-import com.texasthree.zone.user.UserService;
+import com.texasthree.user.UserData;
+import com.texasthree.user.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +45,7 @@ class FundFlowTest {
         clubs.add(club1);
         var user = this.userService.user(StringUtils.get10UUID(), StringUtils.get10UUID(), true, club.getId());
         var user1 = this.userService.user(StringUtils.get10UUID(), StringUtils.get10UUID(), true, club1.getId());
-        var users = new ArrayList<User>();
+        var users = new ArrayList<UserData>();
         users.add(user);
         users.add(user1);
 
@@ -91,4 +91,6 @@ class FundFlowTest {
         }
         assertEquals(0, sum.compareTo(BigDecimal.valueOf(2000)));
     }
+
+
 }

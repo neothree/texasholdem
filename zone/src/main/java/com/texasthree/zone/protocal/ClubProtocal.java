@@ -1,6 +1,6 @@
 package com.texasthree.zone.protocal;
 
-import com.texasthree.zone.club.Club;
+import com.texasthree.club.Club;
 
 /**
  * @author: neo
@@ -37,7 +37,7 @@ public class ClubProtocal {
         public String name;
         public String avatar;
 
-        public Member(com.texasthree.zone.club.member.Member v) {
+        public Member(com.texasthree.club.member.ClubMember v) {
             this.uid = v.getUid();
             this.name = "张三";
         }

@@ -2,11 +2,10 @@ package com.texasthree.zone.controller;
 
 import com.texasthree.security.shiro.AbstractMeController;
 import com.texasthree.utility.utlis.StringUtils;
-import com.texasthree.zone.club.ClubService;
-import com.texasthree.zone.club.member.Member;
-import com.texasthree.zone.club.member.MemberData;
+import com.texasthree.club.ClubService;
+import com.texasthree.club.member.ClubMember;
 import com.texasthree.zone.protocal.ClubProtocal;
-import com.texasthree.zone.user.User;
+import com.texasthree.zone.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,9 +36,8 @@ public class ClubController extends AbstractMeController<User> {
     @GetMapping("/members")
     public List<ClubProtocal.Member> member() throws Exception {
         var clubId = requireMeClubId(this.getMe());
-        var m = new Member(new MemberData(clubId, "111"));
         var list = new ArrayList<ClubProtocal.Member>();
-        list.add(new ClubProtocal.Member(m));
+        list.add(new ClubProtocal.Member(new ClubMember(clubId, "111")));
         return list;
     }
 

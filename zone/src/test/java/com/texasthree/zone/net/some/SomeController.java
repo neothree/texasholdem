@@ -1,6 +1,6 @@
 package com.texasthree.zone.net.some;
 
-import com.texasthree.zone.user.User;
+import com.texasthree.zone.User;
 import com.texasthree.zone.net.Command;
 import com.texasthree.zone.net.CommandController;
 

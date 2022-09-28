@@ -4,8 +4,8 @@ package com.texasthree.zone.config;
 import com.texasthree.security.shiro.FormAuthFilter;
 import com.texasthree.security.shiro.LoginerRealm;
 import com.texasthree.security.shiro.MeSource;
-import com.texasthree.zone.user.User;
-import com.texasthree.zone.user.UserService;
+import com.texasthree.zone.User;
+import com.texasthree.user.UserService;
 import org.apache.commons.collections.map.LinkedMap;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
@@ -22,7 +22,7 @@ public class ShiroConfig {
     @Primary
     @Bean("UserMeSource")
     public MeSource<User> meSource(UserService userService) {
-        return userService::getDataByUsername;
+        return v -> new User(userService.getDataByUsername(v)) ;
     }
 
     /**

@@ -7,7 +7,7 @@ import com.texasthree.zone.FundFlow;
 import com.texasthree.zone.Zone;
 import com.texasthree.zone.protocal.RoomProtocal;
 import com.texasthree.zone.room.Room;
-import com.texasthree.zone.user.User;
+import com.texasthree.zone.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
