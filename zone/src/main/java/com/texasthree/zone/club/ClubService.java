@@ -80,7 +80,7 @@ public interface ClubService {
      * @param member 成员
      * @param amount 金额
      */
-    void memberToBalance(String id, String member, BigDecimal amount);
+    ClubTransaction memberToBalance(String id, String member, BigDecimal amount);
 
     /**
      * 获取俱乐部

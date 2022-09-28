@@ -184,13 +184,22 @@ class ClubServiceImpl implements ClubService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void memberToBalance(String id, String member, BigDecimal amount) {
+    public ClubTransaction memberToBalance(String id, String member, BigDecimal amount) {
         requireGreatZero(amount);
-        this.mdao.findByClubIdAndUid(id, member);
+        var md = this.mdao.findByClubIdAndUid(id, member);
+        if (md.isEmpty()) {
+            throw new IllegalArgumentException("成员捐献给余额，找不到成员 clubId=" + id + " member=" + member);
+        }
         var club = this.getClubById(id);
         log.info("俱乐部成员捐献个余额 {} {} {}", id, member, amount);
         this.userService.balance(member, amount.negate());
         this.accountService.credit(club.getBalanceId(), amount, StringUtils.get10UUID());
+
+        // 交易记录
+        var trx = new ClubTransaction(id, amount, CTType.FROM_MEMBER, member);
+        trx.setStatus(Status.SUCCESS.name());
+        this.ctdao.save(trx);
+        return trx;
     }
 
     @Override

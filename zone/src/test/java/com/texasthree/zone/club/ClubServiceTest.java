@@ -143,11 +143,18 @@ class ClubServiceTest {
         assertEquals(0, balance.getBalance().compareTo(BigDecimal.ZERO));
 
         var amount = BigDecimal.valueOf(200);
-        this.clubService.memberToBalance(club.getId(), user.getId(), amount);
+        var trx = this.clubService.memberToBalance(club.getId(), user.getId(), amount);
+        trx = this.clubService.getTrxById(trx.getId());
+        assertTrx(trx, club.getId(), amount, CTType.FROM_MEMBER, Status.SUCCESS);
+
         account = this.accountService.getDataById(user.getAccountId());
         assertEquals(0, account.getBalance().compareTo(sum.subtract(amount)));
         balance = this.accountService.getDataById(club.getBalanceId());
         assertEquals(0, balance.getBalance().compareTo(amount));
+
+        // 错误：不是自己俱乐部成员
+        Runnable func = () -> this.clubService.memberToBalance(club.getId(), this.getUser().getId(), amount);
+        Tester.assertException(func, IllegalArgumentException.class);
     }
 
     @Test
