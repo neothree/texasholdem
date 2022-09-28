@@ -38,6 +38,19 @@ class ClubServiceTest {
     private UserService userService;
 
     @Test
+    public void testMember() throws Exception {
+        var club = getClub();
+        var user = getUser();
+        assertNotEquals(user.getClubId(), club.getId());
+        assertNull(this.clubService.getDataByClubIdAndUid(club.getId(), user.getId()));
+
+        this.clubService.addMember(club.getId(), user);
+        user = this.userService.getDataById(user.getId());
+        assertEquals(club.getId(), user.getClubId());
+        assertNotNull(this.clubService.getDataByClubIdAndUid(club.getId(), user.getId()));
+    }
+
+    @Test
     public void testFund() throws Exception {
         var club = getClub();
         var fund = this.accountService.getDataById(club.getFundId());
@@ -86,19 +99,6 @@ class ClubServiceTest {
     }
 
     @Test
-    public void testMember() throws Exception {
-        var club = getClub();
-        var user = getUser();
-        assertNotEquals(user.getClubId(), club.getId());
-        assertNull(this.clubService.getDataByClubIdAndUid(club.getId(), user.getId()));
-
-        this.clubService.addMember(club.getId(), user);
-        user = this.userService.getDataById(user.getId());
-        assertEquals(club.getId(), user.getClubId());
-        assertNotNull(this.clubService.getDataByClubIdAndUid(club.getId(), user.getId()));
-    }
-
-    @Test
     public void testBalanceToMember() throws Exception {
         var club = getClub();
         var user = getUser();
@@ -112,7 +112,9 @@ class ClubServiceTest {
         assertEquals(0, account.getBalance().compareTo(BigDecimal.ZERO));
 
         var amount = BigDecimal.valueOf(211);
-        this.clubService.balanceToMember(club.getId(), user.getId(), amount, club.getCreator());
+        var trx = this.clubService.balanceToMember(club.getId(), user.getId(), amount, club.getCreator());
+        trx = this.clubService.getTrxById(trx.getId());
+        assertTrx(trx, club.getId(), amount, CTType.TO_MEMBER, Status.SUCCESS);
         balance = this.accountService.getDataById(club.getBalanceId());
         assertEquals(0, balance.getBalance().compareTo(BigDecimal.valueOf(489)));
         account = this.accountService.getDataById(user.getAccountId());
@@ -120,6 +122,10 @@ class ClubServiceTest {
 
         // 错误：只有创始人可以发放
         Runnable func = () -> this.clubService.balanceToMember(club.getId(), user.getId(), amount, StringUtils.get10UUID());
+        Tester.assertException(func, IllegalArgumentException.class);
+
+        // 错误：不是自己俱乐部成员
+        func = () -> this.clubService.balanceToMember(club.getId(), this.getUser().getId(), amount, StringUtils.get10UUID());
         Tester.assertException(func, IllegalArgumentException.class);
     }
 

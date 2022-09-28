@@ -71,7 +71,7 @@ public interface ClubService {
      * @param amount  金额
      * @param creator 请求创建人
      */
-    void balanceToMember(String id, String member, BigDecimal amount, String creator);
+    ClubTransaction balanceToMember(String id, String member, BigDecimal amount, String creator);
 
     /**
      * 成员捐献给余额

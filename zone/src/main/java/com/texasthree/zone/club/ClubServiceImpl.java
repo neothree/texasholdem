@@ -140,11 +140,6 @@ class ClubServiceImpl implements ClubService {
         return trx;
     }
 
-    @Override
-    public ClubTransaction getTrxById(String id) {
-        return this.ctdao.findById(id).orElse(null);
-    }
-
     /**
      * 发放余额给成员
      *
@@ -155,16 +150,29 @@ class ClubServiceImpl implements ClubService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void balanceToMember(String id, String member, BigDecimal amount, String creator) {
+    public ClubTransaction balanceToMember(String id, String member, BigDecimal amount, String creator) {
         var club = this.getClubById(id);
         if (!club.getCreator().equals(creator)) {
             throw new IllegalArgumentException("发放余额操作人错误 " + creator);
         }
         requireGreatZero(amount);
-        this.mdao.findByClubIdAndUid(id, member);
-        log.info("俱乐部发余额给成员 {} {} {}", id, member, amount);
+
+        //俱乐部内的成员
+        var md = this.mdao.findByClubIdAndUid(id, member);
+        if (md.isEmpty()) {
+            throw new IllegalArgumentException("发放余额操作人错误，找不到成员 clubId=" + id + " member=" + member);
+        }
+
+        // 修改金额
         this.accountService.debit(club.getBalanceId(), amount, StringUtils.get10UUID());
         this.userService.balance(member, amount);
+
+        // 交易记录
+        var trx = new ClubTransaction(id, amount, CTType.TO_MEMBER, creator);
+        trx.setStatus(Status.SUCCESS.name());
+        this.ctdao.save(trx);
+        log.info("俱乐部发余额给成员 {} {} {}", id, member, amount);
+        return trx;
     }
 
     /**
@@ -216,6 +224,12 @@ class ClubServiceImpl implements ClubService {
             }
         }
         return this.platform;
+    }
+
+
+    @Override
+    public ClubTransaction getTrxById(String id) {
+        return this.ctdao.findById(id).orElse(null);
     }
 
     private void requireGreatZero(BigDecimal amount) {
