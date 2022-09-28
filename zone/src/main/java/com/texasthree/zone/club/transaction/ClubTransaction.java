@@ -1,18 +1,17 @@
-package com.texasthree.zone.club.balance;
+package com.texasthree.zone.club.transaction;
 
+import com.texasthree.utility.utlis.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Version;
+import javax.persistence.*;
+import java.math.BigDecimal;
 
 /**
  * @author: neo
  * @create: 2022-09-23 10:48
  */
 @Entity
-public class BalanceTransaction {
+public class ClubTransaction {
     /**
      * 主键ID
      */
@@ -26,13 +25,15 @@ public class BalanceTransaction {
     @Version
     private int version = 0;
     /**
-     * 金额
-     */
-    private int amount;
-    /**
      * 俱乐部
      */
+    @Column(nullable = false, updatable = false)
     private String clubId;
+    /**
+     * 金额
+     */
+    @Column(nullable = false, updatable = false)
+    private BigDecimal amount;
     /**
      * 成员
      */
@@ -40,13 +41,33 @@ public class BalanceTransaction {
     /**
      * 创建人
      */
+    @Column(nullable = false, updatable = false)
     private String creator;
     /**
-     * 转入/转出
+     * 交易类型
      */
-    private boolean direction;
-
+    @Column(nullable = false, updatable = false)
+    private String type;
+    /**
+     * 状态
+     */
     private String status;
+
+    public ClubTransaction() {
+    }
+
+    public ClubTransaction(String clubId, BigDecimal amount, CTType type, String creator) {
+        if (StringUtils.isEmpty(clubId, creator)
+                || type == null
+                || amount == null || amount.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("俱乐部交易参数错误");
+        }
+        this.clubId = clubId;
+        this.amount = amount;
+        this.type = type.name();
+        this.creator = creator;
+        this.status = Status.WAITING.name();
+    }
 
     public String getId() {
         return id;
@@ -64,11 +85,11 @@ public class BalanceTransaction {
         this.version = version;
     }
 
-    public int getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(int amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 
@@ -104,11 +125,11 @@ public class BalanceTransaction {
         this.member = member;
     }
 
-    public boolean isDirection() {
-        return direction;
+    public String getType() {
+        return type;
     }
 
-    public void setDirection(boolean direction) {
-        this.direction = direction;
+    public void setType(String type) {
+        this.type = type;
     }
 }

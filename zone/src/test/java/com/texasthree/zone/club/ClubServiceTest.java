@@ -61,7 +61,7 @@ class ClubServiceTest {
     public void testFundToBalance() throws Exception {
         var club = getClub();
         var id = club.getId();
-        Runnable func = () -> this.clubService.fundToBalance(id, BigDecimal.ONE);
+        Runnable func = () -> this.clubService.fundToBalance(id, BigDecimal.ONE, StringUtils.get10UUID());
         Tester.assertException(func, AccountException.ACCOUNT_SUB_AMOUNT_OUTLIMIT);
 
         var fund = this.accountService.getDataById(club.getFundId());
@@ -71,7 +71,7 @@ class ClubServiceTest {
 
         var amount = BigDecimal.valueOf(100);
         this.clubService.fund(id, amount);
-        this.clubService.fundToBalance(id, BigDecimal.TEN);
+        this.clubService.fundToBalance(id, BigDecimal.TEN, StringUtils.get10UUID());
         fund = this.accountService.getDataById(club.getFundId());
         assertEquals(0, fund.getBalance().compareTo(BigDecimal.valueOf(90)));
         balance = this.accountService.getDataById(club.getBalanceId());
@@ -97,7 +97,7 @@ class ClubServiceTest {
         var user = getUser();
         this.clubService.addMember(club.getId(), user);
         this.clubService.fund(club.getId(), BigDecimal.valueOf(1000));
-        this.clubService.fundToBalance(club.getId(), BigDecimal.valueOf(700));
+        this.clubService.fundToBalance(club.getId(), BigDecimal.valueOf(700), StringUtils.get10UUID());
 
         var balance = this.accountService.getDataById(club.getBalanceId());
         assertEquals(0, balance.getBalance().compareTo(BigDecimal.valueOf(700)));

@@ -5,6 +5,9 @@ import com.texasthree.account.AccountService;
 import com.texasthree.utility.utlis.StringUtils;
 import com.texasthree.zone.club.member.MemberData;
 import com.texasthree.zone.club.member.MemberDataDao;
+import com.texasthree.zone.club.transaction.CTType;
+import com.texasthree.zone.club.transaction.ClubTransaction;
+import com.texasthree.zone.club.transaction.ClubTransactionDao;
 import com.texasthree.zone.user.User;
 import com.texasthree.zone.user.UserService;
 import org.slf4j.Logger;
@@ -31,14 +34,21 @@ public class ClubService {
 
     private final MemberDataDao mdao;
 
+    private final ClubTransactionDao ctdao;
+
     private final AccountService accountService;
 
     private final UserService userService;
 
     @Autowired
-    public ClubService(ClubDataDao cdao, MemberDataDao mdao, AccountService accountService, UserService userService) {
+    public ClubService(ClubDataDao cdao,
+                       MemberDataDao mdao,
+                       ClubTransactionDao ctdao,
+                       AccountService accountService,
+                       UserService userService) {
         this.cdao = cdao;
         this.mdao = mdao;
+        this.ctdao = ctdao;
         this.accountService = accountService;
         this.userService = userService;
     }
@@ -100,20 +110,27 @@ public class ClubService {
     /**
      * 基金转入到余额
      *
-     * @param id     俱乐部
-     * @param amount 金额
+     * @param id      俱乐部
+     * @param amount  金额
+     * @param creator 创建人
      */
     @Transactional(rollbackFor = Exception.class)
-    public void fundToBalance(String id, BigDecimal amount) {
+    public void fundToBalance(String id, BigDecimal amount, String creator) {
         requireGreatZero(amount);
         var data = this.getDataById(id);
         var fund = this.accountService.getDataById(data.getFundId());
         if (fund.getAvailableBalance().compareTo(amount) < 0) {
             throw AccountException.ACCOUNT_SUB_AMOUNT_OUTLIMIT.newInstance("俱乐部基金余额不足");
         }
+
+        // 交易记录
+        var trx = new ClubTransaction(id, amount, CTType.FUND, creator);
+        this.ctdao.save(trx);
         this.log.info("俱乐部基金转入到余额 {} amount={}", data, amount);
-        this.accountService.debit(data.getFundId(), amount, StringUtils.get10UUID());
-        this.accountService.credit(data.getBalanceId(), amount, StringUtils.get10UUID());
+
+        // 修改金额
+        this.accountService.debit(data.getFundId(), amount, trx.getId());
+        this.accountService.credit(data.getBalanceId(), amount, trx.getId());
     }
 
     /**
